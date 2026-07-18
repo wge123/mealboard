@@ -5,12 +5,14 @@ use App\Livewire\PlanBuilder;
 use App\Livewire\RecipeCreate;
 use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeLibrary;
+use App\Livewire\ShoppingList;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::get('/plan', PlanBuilder::class)->name('plan.builder');
+    Route::get('/plan/{mealPlan}/shopping-list', ShoppingList::class)->name('plan.shopping-list');
     Route::get('/recipes', RecipeLibrary::class)->name('recipes.index');
     // /recipes/create must be registered before /recipes/{recipe} so "create"
     // isn't captured as a model id.

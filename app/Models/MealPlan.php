@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\MealPlanStatus;
+use Database\Factories\MealPlanFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MealPlan extends Model
 {
-    /** @use HasFactory<\Database\Factories\MealPlanFactory> */
+    /** @use HasFactory<MealPlanFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -18,6 +19,7 @@ class MealPlan extends Model
         'status',
         'locked_at',
         'locked_by',
+        'checked_items',
     ];
 
     /**
@@ -29,6 +31,7 @@ class MealPlan extends Model
             'week_start_date' => 'date',
             'status' => MealPlanStatus::class,
             'locked_at' => 'datetime',
+            'checked_items' => 'array',
         ];
     }
 
