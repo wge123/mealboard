@@ -1,0 +1,18 @@
+/* Mealboard — custom styles on top of Bootstrap. Vanilla CSS only, no build step. */
+
+:root {
+    --mealboard-accent: #2f7d4f;
+}
+
+body {
+    background-color: #fafaf7;
+}
+
+.navbar-brand {
+    color: var(--mealboard-accent);
+}
+
+.navbar-brand:hover,
+.navbar-brand:focus {
+    color: var(--mealboard-accent);
+}
