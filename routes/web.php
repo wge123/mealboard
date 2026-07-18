@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Livewire\ChannelSettings;
 use App\Livewire\PlanBuilder;
 use App\Livewire\RecipeCreate;
 use App\Livewire\RecipeDetail;
@@ -18,6 +19,7 @@ Route::middleware('auth')->group(function () {
     // isn't captured as a model id.
     Route::get('/recipes/create', RecipeCreate::class)->name('recipes.create');
     Route::get('/recipes/{recipe}', RecipeDetail::class)->name('recipes.show');
+    Route::get('/settings/channels', ChannelSettings::class)->name('settings.channels');
 });
 
 Route::middleware('guest')->group(function () {
