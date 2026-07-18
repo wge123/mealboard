@@ -2,6 +2,7 @@
 
 namespace App\Actions\Planning;
 
+use App\Enums\MealPlanStatus;
 use App\Enums\MealSlot;
 use App\Enums\MealType;
 use App\Enums\RecipeStatus;
@@ -11,6 +12,7 @@ use App\Models\PlannedMeal;
 use App\Models\Recipe;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use LogicException;
 use Random\Randomizer;
 
 class AutoFillWeek
@@ -40,6 +42,10 @@ class AutoFillWeek
      */
     public function handle(MealPlan $plan): Collection
     {
+        if ($plan->status !== MealPlanStatus::Draft) {
+            throw new LogicException('Only draft plans can be auto-filled.');
+        }
+
         $weekStart = $plan->week_start_date->copy()->startOfDay();
 
         $candidates = Recipe::query()

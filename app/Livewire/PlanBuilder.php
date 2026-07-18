@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Actions\Planning\AutoFillWeek;
+use App\Actions\Planning\LockWeek;
 use App\Enums\MealPlanStatus;
 use App\Enums\MealSlot;
 use App\Enums\MealType;
@@ -61,6 +62,22 @@ class PlanBuilder extends Component
     public function autoFill(): void
     {
         app(AutoFillWeek::class)->handle($this->editablePlan());
+    }
+
+    public function lock(): void
+    {
+        app(LockWeek::class)->handle($this->editablePlan(), auth()->user());
+    }
+
+    public function markCompleted(): void
+    {
+        $plan = $this->plan();
+
+        abort_unless($plan !== null, 404);
+        abort_unless($plan->status === MealPlanStatus::Locked, 403, 'Only locked weeks can be completed.');
+        abort_unless($this->weekHasEnded($plan), 403, 'The week has not ended yet.');
+
+        $plan->update(['status' => MealPlanStatus::Completed]);
     }
 
     public function openPicker(string $date, string $slot): void
@@ -134,8 +151,17 @@ class PlanBuilder extends Component
             'slots' => MealSlot::cases(),
             'meals' => $meals,
             'editable' => $plan?->status === MealPlanStatus::Draft,
+            'completable' => $plan !== null
+                && $plan->status === MealPlanStatus::Locked
+                && $this->weekHasEnded($plan),
             'pickerRecipes' => $this->pickerRecipes(),
         ]);
+    }
+
+    private function weekHasEnded(MealPlan $plan): bool
+    {
+        // The plan covers Mon–Fri, but "the week" runs through Sunday.
+        return $plan->week_start_date->copy()->addDays(6)->endOfDay()->isPast();
     }
 
     private function plan(): ?MealPlan

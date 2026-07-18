@@ -29,11 +29,24 @@
                 Mon {{ $plan->week_start_date->format('j M') }} – Fri {{ $plan->week_start_date->copy()->addDays(4)->format('j M Y') }}
             </span>
 
-            @if ($editable)
-                <button type="button" class="btn btn-outline-primary btn-sm ms-auto" wire:click="autoFill">
-                    Auto-fill empty slots
-                </button>
-            @endif
+            <div class="d-flex gap-2 ms-auto">
+                @if ($editable)
+                    <button type="button" class="btn btn-outline-primary btn-sm" wire:click="autoFill">
+                        Auto-fill empty slots
+                    </button>
+                    <button type="button" class="btn btn-warning btn-sm" wire:click="lock"
+                            wire:confirm="Lock this week? It becomes read-only for both of you.">
+                        Lock week
+                    </button>
+                @endif
+
+                @if ($completable)
+                    <button type="button" class="btn btn-success btn-sm" wire:click="markCompleted"
+                            wire:confirm="Mark this week as completed?">
+                        Mark completed
+                    </button>
+                @endif
+            </div>
         </div>
 
         {{-- Stacks one day per row on phones, five columns on md+. --}}

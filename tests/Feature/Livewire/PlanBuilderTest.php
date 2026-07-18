@@ -105,6 +105,111 @@ it('rejects picking an ineligible recipe server-side', function () {
     expect($plan->plannedMeals()->count())->toBe(0);
 });
 
+it('locks the selected draft week, stamping who locked it', function () {
+    $user = User::factory()->create();
+    $plan = MealPlan::factory()->create();
+
+    Livewire::actingAs($user)->test(PlanBuilder::class)->call('lock');
+
+    $plan->refresh();
+
+    expect($plan->status)->toBe(MealPlanStatus::Locked)
+        ->and($plan->locked_at)->not->toBeNull()
+        ->and($plan->locked_by)->toBe($user->id);
+});
+
+it('rejects mutations on a locked plan server-side', function (string $method, array $args) {
+    $plan = MealPlan::factory()->locked()->create();
+    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+
+    $meal = $plan->plannedMeals()->create([
+        'recipe_id' => $recipe->id,
+        'date' => $plan->week_start_date->toDateString(),
+        'slot' => MealSlot::Dinner,
+    ]);
+
+    $component = planBuilder();
+
+    // choose() needs picker state, which openPicker refuses to set on a
+    // locked plan — drive it directly to prove the mutation itself is gated.
+    if ($method === 'choose') {
+        $component->set('pickerDate', $plan->week_start_date->toDateString())
+            ->set('pickerSlot', 'dinner');
+    }
+
+    $args = array_map(
+        fn ($arg) => $arg === ':monday:' ? $plan->week_start_date->toDateString() : ($arg === ':recipe:' ? $recipe->id : $arg),
+        $args,
+    );
+
+    $component->call($method, ...$args)->assertStatus(403);
+
+    expect($meal->fresh())->not->toBeNull()
+        ->and($plan->plannedMeals()->count())->toBe(1);
+})->with([
+    'autoFill' => ['autoFill', []],
+    'openPicker' => ['openPicker', [':monday:', 'lunch']],
+    'choose' => ['choose', [':recipe:']],
+    'clearSlot' => ['clearSlot', [':monday:', 'dinner']],
+]);
+
+it('hides editing controls and shows a locked badge on a locked plan', function () {
+    MealPlan::factory()->locked()->create();
+
+    planBuilder()
+        ->assertSee('Locked')
+        ->assertDontSee('Auto-fill')
+        ->assertDontSee('Lock week')
+        ->assertDontSee('Swap')
+        ->assertDontSee('Clear');
+});
+
+it('marks a locked week as completed once the week has ended', function () {
+    $plan = MealPlan::factory()->locked()->create([
+        'week_start_date' => now()->startOfWeek()->subWeeks(2)->toDateString(),
+    ]);
+
+    planBuilder()->call('markCompleted');
+
+    expect($plan->refresh()->status)->toBe(MealPlanStatus::Completed);
+});
+
+it('refuses to complete a locked week that has not ended yet', function () {
+    $plan = MealPlan::factory()->locked()->create([
+        'week_start_date' => now()->startOfWeek()->addWeek()->toDateString(),
+    ]);
+
+    planBuilder()->call('markCompleted')->assertStatus(403);
+
+    expect($plan->refresh()->status)->toBe(MealPlanStatus::Locked);
+});
+
+it('refuses to complete a draft week', function () {
+    $plan = MealPlan::factory()->create([
+        'week_start_date' => now()->startOfWeek()->subWeeks(2)->toDateString(),
+    ]);
+
+    planBuilder()->call('markCompleted')->assertStatus(403);
+
+    expect($plan->refresh()->status)->toBe(MealPlanStatus::Draft);
+});
+
+it('keeps a draft plan fully editable after another week is locked', function () {
+    $locked = MealPlan::factory()->locked()->create();
+    $draft = MealPlan::factory()->create([
+        'week_start_date' => $locked->week_start_date->copy()->addWeeks(600)->toDateString(),
+    ]);
+
+    Recipe::factory()->approved()->count(3)->create(['meal_type' => MealType::Any]);
+
+    planBuilder()
+        ->set('planId', $draft->id)
+        ->call('autoFill');
+
+    expect($draft->plannedMeals()->count())->toBe(15)
+        ->and($locked->plannedMeals()->count())->toBe(0);
+});
+
 it('clears a slot', function () {
     $plan = MealPlan::factory()->create();
     $monday = $plan->week_start_date->toDateString();

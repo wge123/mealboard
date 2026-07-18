@@ -155,6 +155,17 @@ it('reuses recipes evenly when the pool is smaller than the week', function () {
         ->and($counts->max() - $counts->min())->toBeLessThanOrEqual(1);
 });
 
+it('refuses to fill a plan that is not a draft', function () {
+    Recipe::factory()->approved()->count(3)->create(['meal_type' => MealType::Any]);
+
+    $plan = MealPlan::factory()->locked()->create(['week_start_date' => AUTO_FILL_WEEK]);
+
+    expect(fn () => autoFillAction()->handle($plan))
+        ->toThrow(LogicException::class, 'Only draft plans can be auto-filled.');
+
+    expect($plan->plannedMeals()->count())->toBe(0);
+});
+
 it('produces an identical fill for the same seed', function () {
     Recipe::factory()->approved()->count(10)->create(['meal_type' => MealType::Any]);
 
