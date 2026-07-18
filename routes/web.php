@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Livewire\PlanBuilder;
 use App\Livewire\RecipeCreate;
 use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeLibrary;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'home')->name('home');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/plan', PlanBuilder::class)->name('plan.builder');
     Route::get('/recipes', RecipeLibrary::class)->name('recipes.index');
     // /recipes/create must be registered before /recipes/{recipe} so "create"
     // isn't captured as a model id.
