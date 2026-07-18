@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeLibrary;
 use Illuminate\Support\Facades\Route;
 
@@ -8,6 +9,7 @@ Route::view('/', 'home')->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::get('/recipes', RecipeLibrary::class)->name('recipes.index');
+    Route::get('/recipes/{recipe}', RecipeDetail::class)->name('recipes.show');
 });
 
 Route::middleware('guest')->group(function () {
