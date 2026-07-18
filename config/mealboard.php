@@ -1,5 +1,6 @@
 <?php
 
+use App\Discovery\AnthropicDriver;
 use App\Discovery\TheMealDbDriver;
 
 return [
@@ -20,7 +21,20 @@ return [
     'candidates_per_run' => 3,
 
     'drivers' => [
-        TheMealDbDriver::class,
+        AnthropicDriver::class, // primary (DECISIONS.md #2 — claude CLI)
+        TheMealDbDriver::class, // free-API fallback
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Claude CLI binary
+    |--------------------------------------------------------------------------
+    |
+    | Explicit path to the `claude` binary for the AnthropicDriver. When null,
+    | the driver locates it on PATH at runtime and fails fast if missing.
+    |
+    */
+
+    'claude_bin' => env('MEALBOARD_CLAUDE_BIN'),
 
 ];
