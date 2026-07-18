@@ -1,5 +1,8 @@
 <div>
-    <h1 class="h3 mb-3">Recipes</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Recipes</h1>
+        <a class="btn btn-primary btn-sm" href="{{ route('recipes.create') }}">Add recipe</a>
+    </div>
 
     <div class="row g-2 mb-3">
         <div class="col-12 col-md-4">
