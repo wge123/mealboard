@@ -1,0 +1,24 @@
+{
+  "controls": [
+    {
+      "id": "git",
+      "title": "Git",
+      "command": "lazygit",
+      "cwd": ".",
+      "height": 320
+    },
+    {
+      "id": "tests",
+      "title": "Pest",
+      "command": "./vendor/bin/pest; exec ${SHELL:-/bin/zsh} -l",
+      "cwd": ".",
+      "height": 260
+    },
+    {
+      "id": "feed",
+      "title": "Feed",
+      "command": "cmux feed tui --opentui",
+      "height": 260
+    }
+  ]
+}

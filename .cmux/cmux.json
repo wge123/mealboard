@@ -1,0 +1,50 @@
+{
+  "commands": [
+    {
+      "name": "Full-Stack Dev",
+      "description": "Vite, Pail logs, Claude, and a browser preview for mealboard",
+      "keywords": ["dev", "mealboard", "full-stack", "meal"],
+      "restart": "ignore",
+      "workspace": {
+        "name": "Mealboard Dev",
+        "cwd": ".",
+        "color": "#0d9488",
+        "layout": {
+          "direction": "horizontal",
+          "split": 0.55,
+          "children": [
+            {
+              "direction": "vertical",
+              "split": 0.5,
+              "children": [
+                {
+                  "pane": {
+                    "surfaces": [
+                      { "type": "terminal", "name": "Shell", "focus": true },
+                      { "type": "terminal", "name": "Vite", "command": "clear; npm run dev" }
+                    ]
+                  }
+                },
+                {
+                  "pane": {
+                    "surfaces": [
+                      { "type": "terminal", "name": "Pail", "command": "clear; php artisan pail" },
+                      { "type": "terminal", "name": "Claude Code", "command": "claude" }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "pane": {
+                "surfaces": [
+                  { "type": "browser", "name": "Preview", "url": "http://mealboard.test" }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
