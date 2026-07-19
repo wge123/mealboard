@@ -84,6 +84,24 @@ return [
 
     'api_token' => env('MEALBOARD_API_TOKEN'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Walmart list push (Tier 3)
+    |--------------------------------------------------------------------------
+    |
+    | walmart:push-list drives a HEADED Chrome with a persistent profile the
+    | user has already logged into walmart.com with. Both values are required
+    | (the command fails fast when either is missing): chrome_profile is the
+    | Chrome user-data directory, walmart_list_url the user's Walmart list
+    | page. Selectors and flow are PROVISIONAL until the first live supervised
+    | run — see docs/tier3-list.md.
+    |
+    */
+
+    'chrome_profile' => env('MEALBOARD_CHROME_PROFILE'),
+
+    'walmart_list_url' => env('MEALBOARD_WALMART_LIST_URL'),
+
     'brain_repo' => env('MEALBOARD_BRAIN_REPO', 'wge123/second-brain-vault'),
 
     'brain_files' => [
