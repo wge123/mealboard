@@ -32,7 +32,23 @@ class AutoFillWeek
     /** Jitter stays below any meaningful rating gap so it only breaks ties. */
     private const float JITTER_MAX = 0.25;
 
-    public function __construct(private Randomizer $randomizer = new Randomizer) {}
+    /** Added when the recipe's cuisine is profile-favored (beats jitter). */
+    private const float CUISINE_BOOST = 0.5;
+
+    /** Added when any recipe tag is profile-favored. */
+    private const float TAG_BOOST = 0.25;
+
+    /**
+     * Per-total-minute penalty applied to breakfast candidates when the
+     * profile shows breakfasts are often skipped: a 30-minute gap (0.6)
+     * outweighs jitter (0.25), so faster breakfasts win deterministically.
+     */
+    private const float SKIP_MINUTES_PENALTY = 0.02;
+
+    public function __construct(
+        private Randomizer $randomizer = new Randomizer,
+        private ComputeTasteProfile $tasteProfile = new ComputeTasteProfile,
+    ) {}
 
     /**
      * Fill the plan's empty Mon–Fri breakfast/lunch/dinner slots with
@@ -53,16 +69,24 @@ class AutoFillWeek
             ->orderBy('id')
             ->get();
 
-        $scores = $this->scores($candidates, $weekStart);
+        $profile = $this->tasteProfile->handle();
+
+        $scores = $this->scores($candidates, $weekStart, $profile);
+
+        // Breakfast-skip pattern: prefer lower total-minutes breakfasts.
+        $breakfastSkipped = isset($profile['slotPatterns'][MealSlot::Breakfast->value]);
 
         // One pool per slot: recipes whose meal_type matches the slot or is
         // 'any', best score first.
         $pools = [];
         foreach (MealSlot::cases() as $slot) {
+            $penalized = $breakfastSkipped && $slot === MealSlot::Breakfast;
+
             $pools[$slot->value] = $candidates
                 ->filter(fn (Recipe $recipe) => $recipe->meal_type === MealType::Any
                     || $recipe->meal_type->value === $slot->value)
-                ->sortByDesc(fn (Recipe $recipe) => $scores[$recipe->id])
+                ->sortByDesc(fn (Recipe $recipe) => $scores[$recipe->id]
+                    - ($penalized ? ($recipe->prep_minutes + $recipe->cook_minutes) * self::SKIP_MINUTES_PENALTY : 0.0))
                 ->values();
         }
 
@@ -122,14 +146,15 @@ class AutoFillWeek
     }
 
     /**
-     * Score = avg rating (via meal logs) − recent-planning penalty + jitter.
-     * Jitter is drawn once per recipe in id order, so a seeded Randomizer
-     * makes the whole fill deterministic.
+     * Score = avg rating (via meal logs) − recent-planning penalty
+     * + taste-profile boosts + jitter. Jitter is drawn once per recipe in id
+     * order, so a seeded Randomizer makes the whole fill deterministic.
      *
      * @param  Collection<int, Recipe>  $candidates  ordered by id
+     * @param  array{cuisines: array<string, float>, tags: array<string, float>}  $profile
      * @return array<int, float>
      */
-    private function scores(Collection $candidates, Carbon $weekStart): array
+    private function scores(Collection $candidates, Carbon $weekStart, array $profile): array
     {
         // Averages are compared in PHP, not in SQL, so the sqlite TEXT-bound
         // numeric gotcha doesn't apply here.
@@ -152,9 +177,32 @@ class AutoFillWeek
         foreach ($candidates as $recipe) {
             $scores[$recipe->id] = (float) ($avgRatings[$recipe->id] ?? self::UNRATED_SCORE)
                 - ($recentIds->has($recipe->id) ? self::RECENT_PENALTY : 0.0)
+                + $this->profileBoost($recipe, $profile)
                 + $this->randomizer->getFloat(0.0, self::JITTER_MAX);
         }
 
         return $scores;
+    }
+
+    /**
+     * @param  array{cuisines: array<string, float>, tags: array<string, float>}  $profile
+     */
+    private function profileBoost(Recipe $recipe, array $profile): float
+    {
+        $boost = 0.0;
+
+        $cuisine = mb_strtolower(trim((string) $recipe->cuisine));
+
+        if ($cuisine !== '' && array_key_exists($cuisine, $profile['cuisines'])) {
+            $boost += self::CUISINE_BOOST;
+        }
+
+        $tags = array_map(fn (string $tag) => mb_strtolower(trim($tag)), $recipe->tags ?? []);
+
+        if (array_intersect($tags, array_keys($profile['tags'])) !== []) {
+            $boost += self::TAG_BOOST;
+        }
+
+        return $boost;
     }
 }

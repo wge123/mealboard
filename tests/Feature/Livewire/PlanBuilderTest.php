@@ -4,7 +4,9 @@ use App\Enums\MealPlanStatus;
 use App\Enums\MealSlot;
 use App\Enums\MealType;
 use App\Livewire\PlanBuilder;
+use App\Models\MealLog;
 use App\Models\MealPlan;
+use App\Models\PlannedMeal;
 use App\Models\Recipe;
 use App\Models\User;
 use Livewire\Features\SupportTesting\Testable;
@@ -208,6 +210,27 @@ it('keeps a draft plan fully editable after another week is locked', function ()
 
     expect($draft->plannedMeals()->count())->toBe(15)
         ->and($locked->plannedMeals()->count())->toBe(0);
+});
+
+it('surfaces the breakfast-skip note on a draft plan when the pattern exists', function () {
+    MealPlan::factory()->create();
+
+    // 2 of 3 logged breakfast opportunities skipped.
+    foreach ([false, false, true] as $ate) {
+        MealLog::factory()->create([
+            'planned_meal_id' => PlannedMeal::factory()->create(['slot' => MealSlot::Breakfast])->id,
+            'ate_it' => $ate,
+            'rating' => null,
+        ]);
+    }
+
+    planBuilder()->assertSee('Breakfasts often skipped — picking faster ones.');
+});
+
+it('omits the breakfast-skip note without skip data', function () {
+    MealPlan::factory()->create();
+
+    planBuilder()->assertDontSee('Breakfasts often skipped');
 });
 
 it('clears a slot', function () {

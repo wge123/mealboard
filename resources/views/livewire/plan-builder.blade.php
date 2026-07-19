@@ -49,6 +49,12 @@
             </div>
         </div>
 
+        @if ($breakfastsOftenSkipped)
+            <div class="alert alert-info py-1 px-2 small mb-3">
+                Breakfasts often skipped — picking faster ones.
+            </div>
+        @endif
+
         {{-- Stacks one day per row on phones, five columns on md+. --}}
         <div class="row row-cols-1 row-cols-md-5 g-3">
             @foreach ($days as $day)

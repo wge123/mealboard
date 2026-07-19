@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Actions\Planning\AutoFillWeek;
+use App\Actions\Planning\ComputeTasteProfile;
 use App\Actions\Planning\LockWeek;
 use App\Enums\MealPlanStatus;
 use App\Enums\MealSlot;
@@ -155,6 +156,10 @@ class PlanBuilder extends Component
             // controls appear exactly when the plan is locked or completed.
             'loggable' => $plan !== null
                 && in_array($plan->status, [MealPlanStatus::Locked, MealPlanStatus::Completed], true),
+            // Taste-profile hint for auto-fill; only computed while a draft
+            // is on screen (short-circuits away on locked/completed weeks).
+            'breakfastsOftenSkipped' => $plan?->status === MealPlanStatus::Draft
+                && isset(app(ComputeTasteProfile::class)->handle()['slotPatterns'][MealSlot::Breakfast->value]),
             'completable' => $plan !== null
                 && $plan->status === MealPlanStatus::Locked
                 && $this->weekHasEnded($plan),

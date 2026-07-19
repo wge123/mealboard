@@ -166,6 +166,82 @@ it('refuses to fill a plan that is not a draft', function () {
     expect($plan->plannedMeals()->count())->toBe(0);
 });
 
+it('boosts recipes matching profile-favored cuisines', function () {
+    // Profile source: a LUNCH recipe with two 5-star logs makes 'thai'
+    // favored, without competing in the dinner pool under test.
+    $profiled = Recipe::factory()->approved()->create([
+        'meal_type' => MealType::Lunch, 'cuisine' => 'thai', 'tags' => [],
+    ]);
+    autoFillRate($profiled, 5, 5);
+
+    $thai = Recipe::factory()->approved()->create([
+        'meal_type' => MealType::Dinner, 'cuisine' => 'thai', 'tags' => [],
+    ]);
+    $italian = Recipe::factory()->approved()->create([
+        'meal_type' => MealType::Dinner, 'cuisine' => 'italian', 'tags' => [],
+    ]);
+
+    $created = autoFillAction()->handle(autoFillPlan());
+
+    $mondayDinner = $created->first(fn (PlannedMeal $meal) => $meal->date->toDateString() === AUTO_FILL_WEEK
+        && $meal->slot === MealSlot::Dinner);
+
+    // Both candidates are unrated (2.5): the +0.5 cuisine boost beats the
+    // 0.25 max jitter deterministically.
+    expect($mondayDinner->recipe_id)->toBe($thai->id);
+});
+
+it('prefers faster breakfasts when the profile shows breakfasts are often skipped', function () {
+    $fast = Recipe::factory()->approved()->create([
+        'meal_type' => MealType::Breakfast, 'prep_minutes' => 5, 'cook_minutes' => 5,
+        'cuisine' => null, 'tags' => [],
+    ]);
+    $slow = Recipe::factory()->approved()->create([
+        'meal_type' => MealType::Breakfast, 'prep_minutes' => 30, 'cook_minutes' => 30,
+        'cuisine' => null, 'tags' => [],
+    ]);
+
+    // Slow is better rated (3.0 via DINNER-slot logs, so breakfast skip
+    // stats stay untouched): without the pattern it wins deterministically
+    // (3.0 beats 2.5 + 0.25 max jitter).
+    foreach ([3, 3] as $rating) {
+        MealLog::factory()->create([
+            'planned_meal_id' => PlannedMeal::factory()->create([
+                'recipe_id' => $slow->id, 'slot' => MealSlot::Dinner,
+            ])->id,
+            'ate_it' => true,
+            'rating' => $rating,
+        ]);
+    }
+
+    $withoutPattern = autoFillAction(seed: 7)->handle(autoFillPlan('2026-09-07'));
+
+    $mondayBreakfast = fn ($created, string $monday) => $created->first(
+        fn (PlannedMeal $meal) => $meal->date->toDateString() === $monday && $meal->slot === MealSlot::Breakfast,
+    );
+
+    expect($mondayBreakfast($withoutPattern, '2026-09-07')->recipe_id)->toBe($slow->id);
+
+    // Skip pattern: 2 of 3 logged breakfasts uneaten, attached to a LUNCH
+    // recipe so the breakfast pool under test stays [fast, slow].
+    $lunch = Recipe::factory()->approved()->create(['meal_type' => MealType::Lunch, 'cuisine' => null, 'tags' => []]);
+    foreach ([false, false, true] as $ate) {
+        MealLog::factory()->create([
+            'planned_meal_id' => PlannedMeal::factory()->create([
+                'recipe_id' => $lunch->id, 'slot' => MealSlot::Breakfast,
+            ])->id,
+            'ate_it' => $ate,
+            'rating' => null,
+        ]);
+    }
+
+    $withPattern = autoFillAction(seed: 7)->handle(autoFillPlan('2026-10-05'));
+
+    // The per-minute penalty (0.02 * 60 = 1.2 vs 0.2) flips the pick to the
+    // faster breakfast regardless of seed.
+    expect($mondayBreakfast($withPattern, '2026-10-05')->recipe_id)->toBe($fast->id);
+});
+
 it('produces an identical fill for the same seed', function () {
     Recipe::factory()->approved()->count(10)->create(['meal_type' => MealType::Any]);
 
