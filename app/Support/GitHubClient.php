@@ -32,6 +32,45 @@ class GitHubClient
         return $response->throw()->body();
     }
 
+    /**
+     * Create or update a file via the contents API. Sha-aware: an existing
+     * file's blob sha is looked up first so the PUT updates in place.
+     */
+    public function putFile(string $repo, string $path, string $content, string $message): void
+    {
+        $payload = [
+            'message' => $message,
+            'content' => base64_encode($content),
+        ];
+
+        $sha = $this->getFileSha($repo, $path);
+
+        if ($sha !== null) {
+            $payload['sha'] = $sha;
+        }
+
+        $this->request()
+            ->withHeader('Accept', 'application/vnd.github+json')
+            ->put($this->contentsUrl($repo, $path), $payload)
+            ->throw();
+    }
+
+    /**
+     * Current blob sha of a file, or null when it does not exist (404).
+     */
+    public function getFileSha(string $repo, string $path): ?string
+    {
+        $response = $this->request()
+            ->withHeader('Accept', 'application/vnd.github+json')
+            ->get($this->contentsUrl($repo, $path));
+
+        if ($response->status() === 404) {
+            return null;
+        }
+
+        return $response->throw()->json('sha');
+    }
+
     private function contentsUrl(string $repo, string $path): string
     {
         return self::BASE."/repos/{$repo}/contents/{$path}";

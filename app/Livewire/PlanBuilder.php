@@ -65,9 +65,16 @@ class PlanBuilder extends Component
         app(AutoFillWeek::class)->handle($this->editablePlan());
     }
 
+    /** Warning surfaced when the post-lock vault publish failed. */
+    public ?string $publishWarning = null;
+
     public function lock(): void
     {
-        app(LockWeek::class)->handle($this->editablePlan(), auth()->user());
+        $lockWeek = app(LockWeek::class);
+
+        $lockWeek->handle($this->editablePlan(), auth()->user());
+
+        $this->publishWarning = $lockWeek->publishWarning;
     }
 
     public function markCompleted(): void

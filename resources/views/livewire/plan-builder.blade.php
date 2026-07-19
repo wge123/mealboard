@@ -18,6 +18,10 @@
         </div>
     </div>
 
+    @if ($publishWarning)
+        <div class="alert alert-warning" role="alert">{{ $publishWarning }}</div>
+    @endif
+
     @if (! $plan)
         <p class="text-muted">No meal plans yet. Create next week's draft to get started.</p>
     @else
