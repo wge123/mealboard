@@ -6,10 +6,12 @@ class ParsePastedIngredients
 {
     /**
      * Aliases (including plurals) mapped onto the normalized Unit value set.
+     * Public so the AI parse path (ParsePastedRecipeWithAi) normalizes with
+     * the same table.
      *
      * @var array<string, string>
      */
-    private const UNIT_ALIASES = [
+    public const UNIT_ALIASES = [
         'g' => 'g', 'gram' => 'g', 'grams' => 'g',
         'kg' => 'kg', 'kilogram' => 'kg', 'kilograms' => 'kg',
         'ml' => 'ml', 'milliliter' => 'ml', 'milliliters' => 'ml', 'millilitre' => 'ml', 'millilitres' => 'ml',
