@@ -20,6 +20,7 @@ class MealPlan extends Model
         'locked_at',
         'locked_by',
         'checked_items',
+        'purchased_at',
     ];
 
     /**
@@ -32,6 +33,7 @@ class MealPlan extends Model
             'status' => MealPlanStatus::class,
             'locked_at' => 'datetime',
             'checked_items' => 'array',
+            'purchased_at' => 'datetime',
         ];
     }
 

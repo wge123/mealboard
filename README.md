@@ -56,3 +56,28 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+---
+
+## Mealboard
+
+### MCP server
+
+Mealboard ships a local stdio MCP server (JSON-RPC 2.0 over STDIN/STDOUT, protocol `2024-11-05`, no SDK dependency) so Claude Code can drive the Walmart handoff directly.
+
+Register it with Claude Code:
+
+```bash
+claude mcp add mealboard -- php /Users/willem/Developer/Personal/mealboard/artisan mcp:serve
+```
+
+#### Tools
+
+| Tool | Arguments | Does |
+| --- | --- | --- |
+| `get_current_shopping_list` | — | The latest **locked** week's shopping list: items grouped by store category, each with cleaned Walmart search keywords, the remembered `product_url` when a match exists, and `checked` (already in cart) state. |
+| `save_product_match` | `ingredient`, `product_url`, `product_name` | Remembers the Walmart product for an ingredient (one match per ingredient, upserted; `last_confirmed_at` refreshed on every save). |
+| `get_week_plan` | `week_start` (`YYYY-MM-DD`, a Monday) | That week's schedule: Mon–Fri days, each day's breakfast/lunch/dinner slot mapping to the planned recipe title or `null`. |
+| `mark_list_purchased` | `week_start` (`YYYY-MM-DD`) | Stamps `purchased_at` on that week's meal plan once the order is placed. |
+
+Failures come back as JSON-RPC error responses — `-32602` for unknown tools/bad params, `-32002` for not-found (no locked week, unknown ingredient, no plan for that week) — the loop never crashes.
