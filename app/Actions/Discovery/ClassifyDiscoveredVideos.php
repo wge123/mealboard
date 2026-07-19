@@ -3,8 +3,10 @@
 namespace App\Actions\Discovery;
 
 use App\Discovery\ClaudeCli;
+use App\Enums\RecipeStatus;
 use App\Enums\VideoClassification;
 use App\Models\DiscoveredVideo;
+use App\Models\Recipe;
 use Illuminate\Support\Collection;
 use RuntimeException;
 
@@ -15,6 +17,9 @@ use RuntimeException;
  */
 class ClassifyDiscoveredVideos
 {
+    /** Most recent verdicts included in the prompt (newest first). */
+    private const int HISTORY_CAP = 20;
+
     public function __construct(
         private ClaudeCli $claude,
     ) {}
@@ -90,12 +95,22 @@ class ClassifyDiscoveredVideos
     }
 
     /**
-     * Classifier-history prompt section — wired to real feedback data in
-     * step 24 (mirrors AnthropicDriver's taste-profile stub).
+     * Approve/reject history of YouTube-sourced recipes (titles + verdicts,
+     * newest first, capped) so video scoring learns from past outcomes.
+     * Empty string on a fresh install keeps the "(none yet)" placeholder.
      */
     protected function classifierHistory(): string
     {
-        return '';
+        return Recipe::query()
+            ->whereIn('status', [RecipeStatus::Approved, RecipeStatus::Rejected])
+            ->where(fn ($query) => $query
+                ->where('source_url', 'like', '%youtube.com%')
+                ->orWhere('source_url', 'like', '%youtu.be%'))
+            ->orderByDesc('id')
+            ->limit(self::HISTORY_CAP)
+            ->get()
+            ->map(fn (Recipe $recipe) => strtoupper($recipe->status->value).': '.$recipe->title)
+            ->implode("\n");
     }
 
     /**

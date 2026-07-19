@@ -2,6 +2,9 @@
 
 namespace App\Discovery;
 
+use App\Actions\Planning\ComputeTasteProfile;
+use App\Enums\RecipeStatus;
+use App\Models\Recipe;
 use RuntimeException;
 
 /**
@@ -10,9 +13,19 @@ use RuntimeException;
  */
 class AnthropicDriver implements RecipeDiscoveryDriver
 {
+    /** A rejection theme needs at least this many rejected recipes. */
+    private const int REJECTION_THEME_MIN = 2;
+
+    /** Cap on rejection-theme lines so the prompt section stays compact. */
+    private const int REJECTION_THEME_CAP = 8;
+
+    /** "Long recipe" rejection-theme threshold (matches DECISIONS.md #6). */
+    private const int LONG_RECIPE_MINUTES = 30;
+
     public function __construct(
         private ClaudeCli $claude,
         private CandidateValidator $validator,
+        private ComputeTasteProfile $profile,
     ) {}
 
     public function discover(int $n): array
@@ -61,20 +74,89 @@ class AnthropicDriver implements RecipeDiscoveryDriver
     }
 
     /**
-     * Taste-profile prompt section — wired to real approval data in step 24.
+     * Serialized ComputeTasteProfile output. Empty string on a fresh
+     * install, so the prompt keeps its "(none yet)" placeholder.
      */
     protected function tasteProfile(): string
     {
-        return '';
+        $profile = $this->profile->handle();
+
+        $describe = fn (array $rated) => collect($rated)
+            ->map(fn (float $average, string $name) => "{$name} (avg {$average})")
+            ->implode(', ');
+
+        $lines = [];
+
+        if ($profile['cuisines'] !== []) {
+            $lines[] = 'Favored cuisines: '.$describe($profile['cuisines']);
+        }
+
+        if ($profile['tags'] !== []) {
+            $lines[] = 'Favored tags: '.$describe($profile['tags']);
+        }
+
+        if ($profile['favoredIngredients'] !== []) {
+            $lines[] = 'Favored ingredients: '.implode(', ', $profile['favoredIngredients']);
+        }
+
+        if ($profile['avoidedIngredients'] !== []) {
+            $lines[] = 'Avoid these ingredients: '.implode(', ', $profile['avoidedIngredients']);
+        }
+
+        foreach ($profile['slotPatterns'] as $slot => $rate) {
+            $lines[] = sprintf('Habit: %s is skipped %d%% of logged opportunities — favor very fast %s recipes.', $slot, (int) round($rate * 100), $slot);
+        }
+
+        return implode("\n", $lines);
     }
 
     /**
-     * DECISIONS.md #3 — rejected titles summarized into themes, not listed
-     * verbatim. Real summarization lands in step 24.
+     * DECISIONS.md #3 — rejected titles SUMMARIZED into themes, never listed
+     * verbatim. Plain PHP aggregation (no extra AI call): rejected recipes
+     * grouped by cuisine, tag, key ingredient, and over-30-minutes, each
+     * theme needing at least REJECTION_THEME_MIN members, capped at
+     * REJECTION_THEME_CAP lines.
      */
     protected function summarizeRejections(): string
     {
-        return '';
+        $rejected = Recipe::query()
+            ->where('status', RecipeStatus::Rejected)
+            ->with('ingredients')
+            ->get();
+
+        if ($rejected->isEmpty()) {
+            return '';
+        }
+
+        $normalize = fn (?string $value) => mb_strtolower(trim((string) $value));
+
+        // Theme label => rejected-recipe count.
+        $themes = collect()
+            ->merge($rejected
+                ->countBy(fn (Recipe $recipe) => $normalize($recipe->cuisine))
+                ->forget('')
+                ->mapWithKeys(fn (int $count, string $cuisine) => ["{$cuisine} dishes" => $count]))
+            ->merge($rejected
+                ->flatMap(fn (Recipe $recipe) => collect($recipe->tags ?? [])->map($normalize)->unique())
+                ->countBy()
+                ->forget('')
+                ->mapWithKeys(fn (int $count, string $tag) => ["recipes tagged \"{$tag}\"" => $count]))
+            ->merge($rejected
+                ->flatMap(fn (Recipe $recipe) => $recipe->ingredients->pluck('name')->unique())
+                ->countBy()
+                ->mapWithKeys(fn (int $count, string $ingredient) => ["recipes featuring {$ingredient}" => $count]))
+            ->put(
+                'recipes over '.self::LONG_RECIPE_MINUTES.' minutes total',
+                $rejected->filter(fn (Recipe $recipe) => $recipe->prep_minutes + $recipe->cook_minutes > self::LONG_RECIPE_MINUTES)->count(),
+            );
+
+        // Theme = repetition: drop singleton groups, biggest first, capped.
+        return $themes
+            ->filter(fn (int $count) => $count >= self::REJECTION_THEME_MIN)
+            ->sortDesc()
+            ->take(self::REJECTION_THEME_CAP)
+            ->map(fn (int $count, string $label) => "- {$label} ({$count} rejected)")
+            ->implode("\n");
     }
 
     /**

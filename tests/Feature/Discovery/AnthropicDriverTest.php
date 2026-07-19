@@ -1,6 +1,10 @@
 <?php
 
 use App\Discovery\AnthropicDriver;
+use App\Models\Ingredient;
+use App\Models\MealLog;
+use App\Models\PlannedMeal;
+use App\Models\Recipe;
 use Illuminate\Support\Facades\Process;
 
 function validClaudeCandidate(array $overrides = []): array
@@ -108,5 +112,85 @@ it('invokes claude -p with the candidate count and prompt section slots', functi
             && str_contains($prompt, '10 ingredients or fewer')
             && str_contains($prompt, "Taste profile:\n(none yet)")
             && str_contains($prompt, "previously rejected recipes — avoid these:\n(none yet)");
+    });
+});
+
+it('serializes the taste profile into the generation prompt when data exists', function () {
+    $garlic = Ingredient::factory()->create(['name' => 'garlic']);
+    $cilantro = Ingredient::factory()->create(['name' => 'cilantro']);
+
+    $loved = Recipe::factory()->create(['cuisine' => 'thai', 'tags' => ['quick']]);
+    $loved->ingredients()->attach($garlic->id);
+
+    $skipped = Recipe::factory()->create(['cuisine' => null, 'tags' => []]);
+    $skipped->ingredients()->attach($cilantro->id);
+
+    foreach ([5, 4] as $rating) {
+        MealLog::factory()->create([
+            'planned_meal_id' => PlannedMeal::factory()->create(['recipe_id' => $loved->id, 'slot' => 'dinner'])->id,
+            'ate_it' => true,
+            'rating' => $rating,
+        ]);
+    }
+
+    foreach (range(1, 2) as $ignored) {
+        MealLog::factory()->create([
+            'planned_meal_id' => PlannedMeal::factory()->create(['recipe_id' => $skipped->id, 'slot' => 'breakfast'])->id,
+            'ate_it' => false,
+            'rating' => null,
+        ]);
+    }
+
+    Process::fake(['*' => Process::result(output: json_encode([validClaudeCandidate()]))]);
+
+    app(AnthropicDriver::class)->discover(1);
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2];
+
+        return str_contains($prompt, 'Favored cuisines: thai (avg 4.5)')
+            && str_contains($prompt, 'Favored tags: quick (avg 4.5)')
+            && str_contains($prompt, 'Favored ingredients: garlic')
+            && str_contains($prompt, 'Avoid these ingredients: cilantro')
+            && str_contains($prompt, 'breakfast is skipped 100% of logged opportunities')
+            && ! str_contains($prompt, "Taste profile:\n(none yet)");
+    });
+});
+
+it('summarizes rejected recipes into themes, never verbatim titles', function () {
+    $cilantro = Ingredient::factory()->create(['name' => 'cilantro']);
+
+    $first = Recipe::factory()->create([
+        'status' => 'rejected', 'title' => 'Bangkok Fish Stew', 'cuisine' => 'thai',
+        'tags' => ['seafood'], 'prep_minutes' => 20, 'cook_minutes' => 25,
+    ]);
+    Recipe::factory()->create([
+        'status' => 'rejected', 'title' => 'Chiang Mai Braise', 'cuisine' => 'thai',
+        'tags' => ['seafood'], 'prep_minutes' => 30, 'cook_minutes' => 30,
+    ]);
+    $herby = Recipe::factory()->create([
+        'status' => 'rejected', 'title' => 'Herby Salad', 'cuisine' => 'french',
+        'tags' => [], 'prep_minutes' => 5, 'cook_minutes' => 0,
+    ]);
+
+    $first->ingredients()->attach($cilantro->id);
+    $herby->ingredients()->attach($cilantro->id);
+
+    Process::fake(['*' => Process::result(output: json_encode([validClaudeCandidate()]))]);
+
+    app(AnthropicDriver::class)->discover(1);
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2];
+
+        return str_contains($prompt, '- thai dishes (2 rejected)')
+            && str_contains($prompt, '- recipes tagged "seafood" (2 rejected)')
+            && str_contains($prompt, '- recipes featuring cilantro (2 rejected)')
+            && str_contains($prompt, '- recipes over 30 minutes total (2 rejected)')
+            // DECISIONS.md #3: summarized themes, no verbatim titles.
+            && ! str_contains($prompt, 'Bangkok Fish Stew')
+            && ! str_contains($prompt, 'Herby Salad')
+            // A singleton group is not a theme.
+            && ! str_contains($prompt, 'french dishes');
     });
 });

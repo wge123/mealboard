@@ -3,6 +3,7 @@
 use App\Actions\Discovery\ClassifyDiscoveredVideos;
 use App\Enums\VideoClassification;
 use App\Models\DiscoveredVideo;
+use App\Models\Recipe;
 use Illuminate\Support\Facades\Process;
 
 beforeEach(function () {
@@ -108,4 +109,40 @@ it('ignores unknown video ids and leaves unmentioned videos unclassified', funct
 
     expect($mentioned->refresh()->classification)->toBe(VideoClassification::LikelyRecipe)
         ->and($unmentioned->refresh()->classification)->toBeNull();
+});
+
+it('includes youtube approve/reject history in the classifier prompt', function () {
+    Recipe::factory()->approved()->create([
+        'title' => 'Approved Garlic Noodles',
+        'source_url' => 'https://www.youtube.com/watch?v=abc12345678',
+    ]);
+    Recipe::factory()->create([
+        'status' => 'rejected',
+        'title' => 'Rejected Fish Stew',
+        'source_url' => 'https://youtu.be/def12345678',
+    ]);
+    Recipe::factory()->approved()->create(['title' => 'Manual Pasta', 'source_url' => null]);
+    Recipe::factory()->create([
+        'title' => 'Pending YouTube Soup',
+        'source_url' => 'https://www.youtube.com/watch?v=ghi12345678',
+    ]);
+
+    DiscoveredVideo::factory()->create(['video_id' => 'vidHist0001']);
+
+    Process::fake(['*' => Process::result(output: json_encode([
+        ['video_id' => 'vidHist0001', 'classification' => 'likely_recipe', 'score' => 80],
+    ]))]);
+
+    app(ClassifyDiscoveredVideos::class)->handle();
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2];
+
+        return str_contains($prompt, 'APPROVED: Approved Garlic Noodles')
+            && str_contains($prompt, 'REJECTED: Rejected Fish Stew')
+            // Non-YouTube and still-pending recipes stay out of the history.
+            && ! str_contains($prompt, 'Manual Pasta')
+            && ! str_contains($prompt, 'Pending YouTube Soup')
+            && ! str_contains($prompt, "Classification history from past runs:\n(none yet)");
+    });
 });
