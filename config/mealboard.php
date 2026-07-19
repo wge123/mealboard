@@ -2,6 +2,7 @@
 
 use App\Discovery\AnthropicDriver;
 use App\Discovery\TheMealDbDriver;
+use App\Discovery\YouTubeDriver;
 
 return [
 
@@ -22,6 +23,7 @@ return [
 
     'drivers' => [
         AnthropicDriver::class, // primary (DECISIONS.md #2 — claude CLI)
+        YouTubeDriver::class, // channel RSS -> classify -> transcript pipeline
         TheMealDbDriver::class, // free-API fallback
     ],
 
@@ -36,5 +38,18 @@ return [
     */
 
     'claude_bin' => env('MEALBOARD_CLAUDE_BIN'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | YouTube transcript python
+    |--------------------------------------------------------------------------
+    |
+    | DECISIONS.md #4 — transcripts come from a thin python3 subprocess using
+    | youtube_transcript_api out of yt2md's venv. Transcript fetching ONLY;
+    | Mealboard's own claude driver does the structuring.
+    |
+    */
+
+    'yt_python' => env('MEALBOARD_YT_PYTHON', '/Users/willem/Developer/Personal/yt2md/venv/bin/python3'),
 
 ];
