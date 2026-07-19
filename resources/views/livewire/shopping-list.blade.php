@@ -34,23 +34,42 @@
             @foreach ($lines as $item)
                 @php($key = $item['name'].'|'.($item['unit'] ?? ''))
                 @php($isChecked = in_array($key, $checked, true))
+                @php($link = $links[$item['name']])
                 <li class="list-group-item">
-                    <div class="form-check mb-0">
-                        <input class="form-check-input" type="checkbox" id="item-{{ md5($key) }}"
+                    <div class="d-flex align-items-start gap-2">
+                        <input class="form-check-input mt-1 flex-shrink-0" type="checkbox" id="item-{{ md5($key) }}"
                                wire:click="toggleItem('{{ $key }}')" @checked($isChecked)>
-                        <label class="form-check-label {{ $isChecked ? 'text-decoration-line-through text-muted' : '' }}"
-                               for="item-{{ md5($key) }}">
-                            @if ($item['qty'] !== null)
-                                <strong>{{ rtrim(rtrim(number_format($item['qty'], 2, '.', ''), '0'), '.') }}</strong>
-                            @endif
-                            @if ($item['unit'] !== null && $item['unit'] !== 'count')
-                                {{ $item['unit'] }}
-                            @endif
-                            {{ $item['name'] }}
-                            @if ($item['notes'] !== [])
-                                <span class="text-muted small">({{ implode('; ', $item['notes']) }})</span>
-                            @endif
-                        </label>
+                        <div class="flex-grow-1 min-width-0">
+                            <a href="{{ $link['href'] }}" target="_blank" rel="noopener"
+                               class="d-block text-reset text-decoration-none {{ $isChecked ? 'text-decoration-line-through text-muted' : '' }}">
+                                @if ($item['qty'] !== null)
+                                    <strong>{{ rtrim(rtrim(number_format($item['qty'], 2, '.', ''), '0'), '.') }}</strong>
+                                @endif
+                                @if ($item['unit'] !== null && $item['unit'] !== 'count')
+                                    {{ $item['unit'] }}
+                                @endif
+                                {{ $item['name'] }}
+                                @if ($item['notes'] !== [])
+                                    <span class="text-muted small">({{ implode('; ', $item['notes']) }})</span>
+                                @endif
+                                <span class="text-muted small">{{ $link['matched'] ? '↗ product' : '↗ search' }}</span>
+                            </a>
+
+                            @unless ($link['matched'])
+                                <div class="input-group input-group-sm mt-1" style="max-width: 22rem;">
+                                    <input type="url" class="form-control" placeholder="Paste product URL"
+                                           aria-label="Walmart product URL for {{ $item['name'] }}"
+                                           wire:model="foundUrls.{{ $item['name'] }}">
+                                    <button type="button" class="btn btn-outline-success"
+                                            wire:click="saveMatch('{{ $item['name'] }}')">
+                                        Found it
+                                    </button>
+                                </div>
+                                @error('foundUrls.'.$item['name'])
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            @endunless
+                        </div>
                     </div>
                 </li>
             @endforeach

@@ -3,9 +3,13 @@
 namespace App\Livewire;
 
 use App\Actions\Planning\BuildShoppingList;
+use App\Actions\Planning\SaveProductMatch;
 use App\Enums\MealPlanStatus;
 use App\Enums\Unit;
+use App\Models\Ingredient;
 use App\Models\MealPlan;
+use App\Models\WalmartMatch;
+use App\Support\CleanIngredientKeywords;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -18,6 +22,13 @@ class ShoppingList extends Component
     public MealPlan $mealPlan;
 
     public bool $includeStaples = false;
+
+    /**
+     * Per-row "found it" paste fields, keyed by ingredient name.
+     *
+     * @var array<string, string>
+     */
+    public array $foundUrls = [];
 
     public function mount(MealPlan $mealPlan): void
     {
@@ -43,6 +54,30 @@ class ShoppingList extends Component
             : [...$checked, $key];
 
         $this->mealPlan->update(['checked_items' => $checked]);
+    }
+
+    /**
+     * Remember the pasted Walmart product URL for an ingredient. The product
+     * name is the ingredient name for now (Tier 1 — richer names arrive with
+     * the MCP handoff).
+     */
+    public function saveMatch(string $name): void
+    {
+        $url = trim($this->foundUrls[$name] ?? '');
+
+        if (! filter_var($url, FILTER_VALIDATE_URL)) {
+            $this->addError('foundUrls.'.$name, 'Paste a full product URL.');
+
+            return;
+        }
+
+        app(SaveProductMatch::class)->handle(
+            Ingredient::query()->where('name', $name)->firstOrFail(),
+            $url,
+            $name,
+        );
+
+        unset($this->foundUrls[$name]);
     }
 
     /**
@@ -87,12 +122,44 @@ class ShoppingList extends Component
 
     public function render(): View
     {
+        $items = $this->items();
+
         return view('livewire.shopping-list', [
-            'items' => $this->items(),
+            'items' => $items,
+            'links' => $this->links($items),
             'checked' => $this->mealPlan->checked_items ?? [],
             'markdown' => $this->markdownExport(),
             'plain' => $this->plainExport(),
         ]);
+    }
+
+    /**
+     * Walmart link per row: the remembered product URL when a match exists,
+     * otherwise a search on the cleaned ingredient keywords.
+     *
+     * @param  array<string, list<array{name: string, qty: float|null, unit: string|null, notes: list<string>}>>  $items
+     * @return array<string, array{href: string, matched: bool}>
+     */
+    private function links(array $items): array
+    {
+        $names = collect($items)->collapse()->pluck('name');
+
+        $matched = WalmartMatch::query()
+            ->whereHas('ingredient', fn ($query) => $query->whereIn('name', $names))
+            ->with('ingredient')
+            ->get()
+            ->mapWithKeys(fn (WalmartMatch $match) => [$match->ingredient->name => $match->product_url]);
+
+        $clean = app(CleanIngredientKeywords::class);
+
+        return $names->mapWithKeys(fn (string $name) => [
+            $name => isset($matched[$name])
+                ? ['href' => $matched[$name], 'matched' => true]
+                : [
+                    'href' => 'https://www.walmart.com/search?q='.urlencode($clean->handle($name)),
+                    'matched' => false,
+                ],
+        ])->all();
     }
 
     /**

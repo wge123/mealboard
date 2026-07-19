@@ -9,6 +9,7 @@ use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\Recipe;
 use App\Models\User;
+use App\Models\WalmartMatch;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
@@ -157,4 +158,100 @@ it('reflects the staples toggle in the exports', function () {
     $component->set('includeStaples', true);
 
     expect($component->instance()->plainExport())->toBe("500 g chicken\n1 tsp salt");
+});
+
+it('links a matched row straight to its Walmart product', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $onion->id,
+        'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
+    ]);
+    $plan = lockedPlanWith([[$onion, 2, 'count']]);
+
+    shoppingListPage($plan)
+        ->assertSeeHtml('href="https://www.walmart.com/ip/yellow-onion/44390949"')
+        ->assertSeeHtml('target="_blank"')
+        ->assertDontSeeHtml('https://www.walmart.com/search')
+        ->assertSee('↗ product');
+});
+
+it('links an unmatched row to a Walmart search on cleaned keywords', function () {
+    // "frozen" is a prep word — cleaning drops it from the search query.
+    $peas = Ingredient::factory()->create(['name' => 'frozen peas', 'category' => IngredientCategory::Frozen]);
+    $plan = lockedPlanWith([[$peas, 500, 'g']]);
+
+    shoppingListPage($plan)
+        ->assertSeeHtml('href="https://www.walmart.com/search?q=peas"')
+        ->assertSeeHtml('target="_blank"')
+        ->assertSee('↗ search');
+});
+
+it('url-encodes multi-word search keywords', function () {
+    $chicken = Ingredient::factory()->create(['name' => 'chicken thighs', 'category' => IngredientCategory::Meat]);
+    $plan = lockedPlanWith([[$chicken, 1, 'lb']]);
+
+    shoppingListPage($plan)
+        ->assertSeeHtml('href="https://www.walmart.com/search?q=chicken+thighs"');
+});
+
+it('saves a pasted product URL and flips the row to a direct link', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    $plan = lockedPlanWith([[$onion, 2, 'count']]);
+
+    $component = shoppingListPage($plan)
+        ->assertSeeHtml('https://www.walmart.com/search?q=yellow+onion')
+        ->set('foundUrls.yellow onion', 'https://www.walmart.com/ip/yellow-onion/44390949')
+        ->call('saveMatch', 'yellow onion');
+
+    $match = WalmartMatch::sole();
+
+    expect($match->ingredient_id)->toBe($onion->id)
+        ->and($match->product_url)->toBe('https://www.walmart.com/ip/yellow-onion/44390949')
+        ->and($match->product_name)->toBe('yellow onion')
+        ->and($match->last_confirmed_at)->not->toBeNull();
+
+    // Same request cycle: the row already renders as a direct product link.
+    $component
+        ->assertSeeHtml('href="https://www.walmart.com/ip/yellow-onion/44390949"')
+        ->assertDontSeeHtml('https://www.walmart.com/search?q=yellow+onion');
+});
+
+it('rejects a non-URL paste with an inline error and saves nothing', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    $plan = lockedPlanWith([[$onion, 2, 'count']]);
+
+    shoppingListPage($plan)
+        ->set('foundUrls.yellow onion', 'not a url')
+        ->call('saveMatch', 'yellow onion')
+        ->assertHasErrors('foundUrls.yellow onion');
+
+    expect(WalmartMatch::count())->toBe(0);
+});
+
+it('keeps Walmart links working when staples are toggled in', function () {
+    $salt = Ingredient::factory()->pantryStaple()->create(['name' => 'salt']);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $salt->id,
+        'product_url' => 'https://www.walmart.com/ip/salt/10315356',
+    ]);
+    $chicken = Ingredient::factory()->create(['name' => 'chicken thighs', 'category' => IngredientCategory::Meat]);
+    $plan = lockedPlanWith([[$salt, 1, 'tsp'], [$chicken, 500, 'g']]);
+
+    shoppingListPage($plan)
+        ->assertDontSeeHtml('https://www.walmart.com/ip/salt/10315356')
+        ->assertSeeHtml('href="https://www.walmart.com/search?q=chicken+thighs"')
+        ->set('includeStaples', true)
+        ->assertSeeHtml('href="https://www.walmart.com/ip/salt/10315356"')
+        ->assertSeeHtml('href="https://www.walmart.com/search?q=chicken+thighs"');
+});
+
+it('still persists checked state with the tappable rows', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    $plan = lockedPlanWith([[$onion, 2, 'count']]);
+
+    shoppingListPage($plan)->call('toggleItem', 'yellow onion|count');
+
+    expect($plan->refresh()->checked_items)->toBe(['yellow onion|count']);
+
+    shoppingListPage($plan)->assertSeeHtml('text-decoration-line-through');
 });
