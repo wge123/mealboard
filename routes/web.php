@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\ChannelSettings;
 use App\Livewire\DailyCatchUp;
+use App\Livewire\Insights;
 use App\Livewire\PlanBuilder;
 use App\Livewire\RecipeApproval;
 use App\Livewire\RecipeCreate;
@@ -23,6 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/recipes/create', RecipeCreate::class)->name('recipes.create');
     Route::get('/recipes/{recipe}', RecipeDetail::class)->name('recipes.show');
     Route::get('/approve', RecipeApproval::class)->name('recipes.approve');
+    Route::get('/insights', Insights::class)->name('insights');
     Route::get('/settings/channels', ChannelSettings::class)->name('settings.channels');
 });
 
