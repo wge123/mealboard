@@ -71,6 +71,19 @@ return [
 
     'github_pat' => env('GITHUB_PAT'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Pull-endpoint API token
+    |--------------------------------------------------------------------------
+    |
+    | DECISIONS.md #7 (pull half) — static token guarding /api/plan/current
+    | and /api/plan/ical. Accepted as `Authorization: Bearer <token>` or
+    | `?token=<token>` (calendar subscribers can't set headers).
+    |
+    */
+
+    'api_token' => env('MEALBOARD_API_TOKEN'),
+
     'brain_repo' => env('MEALBOARD_BRAIN_REPO', 'wge123/second-brain-vault'),
 
     'brain_files' => [
