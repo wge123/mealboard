@@ -79,6 +79,11 @@
                                                 </button>
                                             </div>
                                         @endif
+
+                                        {{-- Past slots (date-only, today included) on locked/completed weeks get quick-log controls. --}}
+                                        @if ($loggable && $day->lte(today()))
+                                            <livewire:meal-log-controls :planned-meal="$meal" :key="'log-'.$meal->id" />
+                                        @endif
                                     @else
                                         <div class="text-muted small">—</div>
                                         @if ($editable)

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\ChannelSettings;
+use App\Livewire\DailyCatchUp;
 use App\Livewire\PlanBuilder;
 use App\Livewire\RecipeApproval;
 use App\Livewire\RecipeCreate;
@@ -15,6 +16,7 @@ Route::view('/', 'home')->name('home');
 Route::middleware('auth')->group(function () {
     Route::get('/plan', PlanBuilder::class)->name('plan.builder');
     Route::get('/plan/{mealPlan}/shopping-list', ShoppingList::class)->name('plan.shopping-list');
+    Route::get('/log', DailyCatchUp::class)->name('log.catch-up');
     Route::get('/recipes', RecipeLibrary::class)->name('recipes.index');
     // /recipes/create must be registered before /recipes/{recipe} so "create"
     // isn't captured as a model id.

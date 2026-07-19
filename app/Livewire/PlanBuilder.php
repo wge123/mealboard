@@ -151,6 +151,10 @@ class PlanBuilder extends Component
             'slots' => MealSlot::cases(),
             'meals' => $meals,
             'editable' => $plan?->status === MealPlanStatus::Draft,
+            // Week-locking read-only rule explicitly permits logging: quick-log
+            // controls appear exactly when the plan is locked or completed.
+            'loggable' => $plan !== null
+                && in_array($plan->status, [MealPlanStatus::Locked, MealPlanStatus::Completed], true),
             'completable' => $plan !== null
                 && $plan->status === MealPlanStatus::Locked
                 && $this->weekHasEnded($plan),
