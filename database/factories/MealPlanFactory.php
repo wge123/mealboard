@@ -3,23 +3,28 @@
 namespace Database\Factories;
 
 use App\Enums\MealPlanStatus;
+use App\Models\MealPlan;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
 /**
- * @extends Factory<\App\Models\MealPlan>
+ * @extends Factory<MealPlan>
  */
 class MealPlanFactory extends Factory
 {
+    private static int $weekSequence = 0;
+
     /**
      * @return array<string, mixed>
      */
     public function definition(): array
     {
         // A unique Monday per plan (meal_plans.week_start_date is unique).
+        // Sequential far-future weeks: random draws could collide with the
+        // near-now dates tests set explicitly.
         $monday = Carbon::now()->startOfWeek(Carbon::MONDAY)
-            ->addWeeks(fake()->unique()->numberBetween(0, 500));
+            ->addWeeks(1000 + self::$weekSequence++);
 
         return [
             'week_start_date' => $monday->toDateString(),
