@@ -3,14 +3,16 @@
 namespace App\Models;
 
 use App\Enums\IngredientCategory;
+use Database\Factories\IngredientFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Ingredient extends Model
 {
-    /** @use HasFactory<\Database\Factories\IngredientFactory> */
+    /** @use HasFactory<IngredientFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -46,5 +48,10 @@ class Ingredient extends Model
         return $this->belongsToMany(Recipe::class)
             ->withPivot(['qty', 'unit', 'note'])
             ->withTimestamps();
+    }
+
+    public function walmartMatch(): HasOne
+    {
+        return $this->hasOne(WalmartMatch::class);
     }
 }
