@@ -52,4 +52,29 @@ return [
 
     'yt_python' => env('MEALBOARD_YT_PYTHON', '/Users/willem/Developer/Personal/yt2md/venv/bin/python3'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Second-brain vault (GitHub)
+    |--------------------------------------------------------------------------
+    |
+    | DECISIONS.md #7 — Mealboard both pulls preference notes FROM the vault
+    | repo (brain:sync, step 25) and pushes meal-plan markdown TO it
+    | (PublishMealsMarkdown, step 26), via the GitHub contents API.
+    |
+    | brain_files lists the vault-relative markdown paths brain:sync pulls
+    | (food/recipe preference notes). Deviation from the original step text:
+    | DECISIONS.md #5 put the YouTube channel list in the database with its
+    | own settings UI, so channel sync is deliberately NOT part of brain_files
+    | or brain:sync. A path missing in the repo warns per file, never fails.
+    |
+    */
+
+    'github_pat' => env('GITHUB_PAT'),
+
+    'brain_repo' => env('MEALBOARD_BRAIN_REPO', 'wge123/second-brain-vault'),
+
+    'brain_files' => [
+        'wiki/concepts/food-preferences.md',
+    ],
+
 ];

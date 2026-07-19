@@ -1,6 +1,7 @@
 <?php
 
 use App\Discovery\AnthropicDriver;
+use App\Models\BrainNote;
 use App\Models\Ingredient;
 use App\Models\MealLog;
 use App\Models\PlannedMeal;
@@ -154,6 +155,40 @@ it('serializes the taste profile into the generation prompt when data exists', f
             && str_contains($prompt, 'Avoid these ingredients: cilantro')
             && str_contains($prompt, 'breakfast is skipped 100% of logged opportunities')
             && ! str_contains($prompt, "Taste profile:\n(none yet)");
+    });
+});
+
+it('surfaces synced brain notes in the taste-profile prompt section', function () {
+    BrainNote::factory()->create([
+        'content' => "No mushrooms in anything.\nLoves spicy food.",
+    ]);
+
+    Process::fake(['*' => Process::result(output: json_encode([validClaudeCandidate()]))]);
+
+    app(AnthropicDriver::class)->discover(1);
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2];
+
+        return str_contains($prompt, "No mushrooms in anything.\nLoves spicy food.")
+            && ! str_contains($prompt, "Taste profile:\n(none yet)");
+    });
+});
+
+it('caps synced brain-note content at 1500 characters in the prompt', function () {
+    BrainNote::factory()->create([
+        'content' => str_repeat('x', 1500).'ZZZOVERFLOWZZZ',
+    ]);
+
+    Process::fake(['*' => Process::result(output: json_encode([validClaudeCandidate()]))]);
+
+    app(AnthropicDriver::class)->discover(1);
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2];
+
+        return str_contains($prompt, str_repeat('x', 1500))
+            && ! str_contains($prompt, 'ZZZOVERFLOW');
     });
 });
 

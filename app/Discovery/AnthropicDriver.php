@@ -4,6 +4,7 @@ namespace App\Discovery;
 
 use App\Actions\Planning\ComputeTasteProfile;
 use App\Enums\RecipeStatus;
+use App\Models\BrainNote;
 use App\Models\Recipe;
 use RuntimeException;
 
@@ -21,6 +22,9 @@ class AnthropicDriver implements RecipeDiscoveryDriver
 
     /** "Long recipe" rejection-theme threshold (matches DECISIONS.md #6). */
     private const int LONG_RECIPE_MINUTES = 30;
+
+    /** Cap on synced brain-note text so a long note can't flood the prompt. */
+    private const int BRAIN_NOTES_CHAR_CAP = 1500;
 
     public function __construct(
         private ClaudeCli $claude,
@@ -105,6 +109,14 @@ class AnthropicDriver implements RecipeDiscoveryDriver
 
         foreach ($profile['slotPatterns'] as $slot => $rate) {
             $lines[] = sprintf('Habit: %s is skipped %d%% of logged opportunities — favor very fast %s recipes.', $slot, (int) round($rate * 100), $slot);
+        }
+
+        // Synced second-brain preference notes (brain:sync, step 25) surface
+        // as plain preference lines alongside the computed profile.
+        $notes = trim(BrainNote::query()->orderBy('path')->pluck('content')->implode("\n"));
+
+        if ($notes !== '') {
+            $lines[] = rtrim(mb_substr($notes, 0, self::BRAIN_NOTES_CHAR_CAP));
         }
 
         return implode("\n", $lines);

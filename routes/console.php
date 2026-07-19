@@ -8,5 +8,9 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// Vault preference notes sync BEFORE discovery so the day's discovery
+// prompt sees fresh notes (step 25).
+Schedule::command('brain:sync')->dailyAt('05:15');
+
 // DECISIONS.md #1 — discovery runs DAILY (3 candidates per driver, config).
 Schedule::command('recipes:discover')->dailyAt('05:30');
