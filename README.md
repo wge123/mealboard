@@ -1,67 +1,70 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mealboard
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Self-hosted Laravel household meal planner: recipe library with AI/YouTube discovery and approve/reject cards, Mon–Fri auto-filled meal plans weighted by a taste profile learned from eat/rating logs, weekly shopping lists, second-brain vault sync, and a three-tier Walmart pickup handoff.
 
-## About Laravel
+Stack: Laravel + Livewire 3 + Alpine, Bootstrap via CDN (no build step), MySQL, database queue. AI features shell out to the local `claude` CLI (`claude -p --model sonnet`) — no API key. All architectural decisions are recorded in [DECISIONS.md](DECISIONS.md).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Setup
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+cp .env.example .env && php artisan key:generate
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS mealboard"
+php artisan migrate --seed        # seeds willem@ + partner@example.com (password: password) and ~10 recipes
+herd link mealboard               # → http://mealboard.test
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### .env keys
 
-## Contributing
+| Key | Required for | Notes |
+| --- | --- | --- |
+| `DB_*` | everything | MySQL database `mealboard` |
+| `QUEUE_CONNECTION=database` | discovery runs | set by default |
+| `MEALBOARD_API_TOKEN` | pull endpoints | generated; Bearer or `?token=` on `/api/plan/*` |
+| `GITHUB_PAT` | `brain:sync`, meals publishing | fine-grained, Contents R/W on `wge123/second-brain-vault` |
+| `MEALBOARD_BRAIN_REPO` | optional override | defaults to `wge123/second-brain-vault` |
+| `MEALBOARD_CLAUDE_BIN` | optional override | defaults to `claude` on PATH |
+| `MEALBOARD_YT_PYTHON` | optional override | defaults to the yt2md venv python |
+| `MEALBOARD_CHROME_PROFILE` | `walmart:push-list` (Tier 3) | persistent logged-in Chrome user-data dir |
+| `MEALBOARD_WALMART_LIST_URL` | `walmart:push-list` (Tier 3) | your Walmart list page URL |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Running
 
-## Code of Conduct
+Two long-lived processes:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# scheduler (cron): * * * * * cd /Users/willem/Developer/Personal/mealboard && php artisan schedule:run >> /dev/null 2>&1
+# queue worker:
+php artisan queue:work --tries=1
+```
 
-## Security Vulnerabilities
+Scheduled commands (`php artisan schedule:list`):
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- `brain:sync` — daily 05:15, pulls preference notes from the vault repo into discovery prompts
+- `recipes:discover` — daily 05:30, all drivers (claude CLI → YouTube → TheMealDB), 3 candidates/run, fuzzy-deduped, idempotent per day (`--force` to re-run)
+- `meals:publish-today` — daily 00:10, pushes `meals/today.md` to the vault repo when a locked week covers today
 
-## License
+## Daily use (phone-first)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- `/recipes` — library (search/filters), `/recipes/create` — manual add with paste parser + AI parse button
+- `/approve` — discovery approve/reject cards (keyboard: **A** / **R**)
+- `/plan` — week builder: create next week, auto-fill, swap, then **Lock week** (locking publishes to the vault and opens the shopping list)
+- `/plan/{id}/shopping-list` — shared checklist; rows tap through to Walmart product or search; paste-back "found it" saves the match
+- `/log` — yesterday's catch-up logging; past slots on the locked week log inline
+- `/insights` — ate/skip rates, top-rated, discovery rejection rate
+- `/settings/channels` — YouTube channels feeding discovery
 
----
+## Pull endpoints
 
-## Mealboard
+`GET /api/plan/current` (JSON) and `GET /api/plan/ical` (iCal, one VEVENT per meal at 08/12/18h) — both take `Authorization: Bearer $MEALBOARD_API_TOKEN` or `?token=`.
 
-### MCP server
+## Walmart handoff tiers
+
+1. **Tier 1 — tap-through list** (always on): shopping-list rows link to remembered products or keyword search; every confirmed "found it" teaches `walmart_matches`.
+2. **Tier 2 — supervised agent cart**: runbook in [docs/tier2-cart.md](docs/tier2-cart.md). Claude drives a logged-in browser via the MCP server below; human approves ambiguity and places the order. Nothing is ever purchased automatically.
+3. **Tier 3 — `walmart:push-list`**: headed Chrome pushes cleaned keywords onto your Walmart list (never the cart); selectors are provisional until first supervised run — see [docs/tier3-list.md](docs/tier3-list.md). Fails loudly on any selector miss.
+
+## MCP server
 
 Mealboard ships a local stdio MCP server (JSON-RPC 2.0 over STDIN/STDOUT, protocol `2024-11-05`, no SDK dependency) so Claude Code can drive the Walmart handoff directly.
 
@@ -71,7 +74,7 @@ Register it with Claude Code:
 claude mcp add mealboard -- php /Users/willem/Developer/Personal/mealboard/artisan mcp:serve
 ```
 
-#### Tools
+### Tools
 
 | Tool | Arguments | Does |
 | --- | --- | --- |
@@ -81,3 +84,11 @@ claude mcp add mealboard -- php /Users/willem/Developer/Personal/mealboard/artis
 | `mark_list_purchased` | `week_start` (`YYYY-MM-DD`) | Stamps `purchased_at` on that week's meal plan once the order is placed. |
 
 Failures come back as JSON-RPC error responses — `-32602` for unknown tools/bad params, `-32002` for not-found (no locked week, unknown ingredient, no plan for that week) — the loop never crashes.
+
+## Tests
+
+```bash
+./vendor/bin/pest    # runs on sqlite :memory:
+```
+
+Gotchas pinned by the suite: sqlite+PDO makes bound-numeric aggregate comparisons silently false (inline/PHP-side instead); `Process::fake` patterns must wildcard around the binary (`'*claude*'`).
