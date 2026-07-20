@@ -2,17 +2,20 @@
 
 Self-hosted Laravel household meal planner: recipe library with AI/YouTube discovery and approve/reject cards, Mon–Fri auto-filled meal plans weighted by a taste profile learned from eat/rating logs, weekly shopping lists, second-brain vault sync, and a three-tier Walmart pickup handoff.
 
-Stack: Laravel + Livewire 3 + Alpine, Bootstrap via CDN (no build step), MySQL, database queue. AI features shell out to the local `claude` CLI (`claude -p --model sonnet`) — no API key. All architectural decisions are recorded in [DECISIONS.md](DECISIONS.md).
+Stack: Laravel + Livewire 3 + Alpine, Tailwind CSS v4 + daisyUI 5 via Vite (custom light/dark themes, phone-first with a bottom tab bar), MySQL, database queue. AI features shell out to the local `claude` CLI (`claude -p --model sonnet`) — no API key. All architectural decisions are recorded in [DECISIONS.md](DECISIONS.md).
 
 ## Setup
 
 ```bash
 composer install
+npm install && npm run build      # Vite bundle (Tailwind 4 + daisyUI); rerun npm run build after CSS/blade changes
 cp .env.example .env && php artisan key:generate
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS mealboard"
 php artisan migrate --seed        # seeds willem@ + partner@example.com (password: password) and ~10 recipes
 herd link mealboard               # → http://mealboard.test
 ```
+
+Local dev auto-logs you in as Willem (`AutoLoginLocal` middleware, `local` env only).
 
 ### .env keys
 

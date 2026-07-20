@@ -7,3 +7,5 @@
 #5 Channel list home: DATABASE table + small Livewire settings UI (phone-editable).
 #6 Healthy/easy thresholds: total time ≤30 min AND ≤10 ingredients, whole-food-leaning bias in prompts.
 #7 Second-brain consumption: BOTH markdown push to the vault meals folder AND JSON/iCal pull endpoints (steps 26 and 27 both build).
+
+#8 UI framework (2026-07-20, supersedes the "vanilla CSS / Bootstrap CDN ok, no Tailwind" convention): full UI overhaul to Tailwind CSS v4 + daisyUI 5 via Vite after the user rejected the Bootstrap UI ("it looks terrible"). Custom mealboard/mealboard-dark oklch themes (cream/stone base, herb-green primary), Inter + Fraunces self-hosted via @fontsource, meal-type accent vars, bottom tab bar on phones. Build step now required: npm run build. No further UI deps (Flux/MaryUI/etc.) without an explicit decision.
