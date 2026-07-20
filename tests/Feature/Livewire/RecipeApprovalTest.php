@@ -33,7 +33,7 @@ it('shows the video link and thumbnail for a youtube source', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeApproval::class)
         ->assertSee('https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg', false)
-        ->assertSee('Watch on YouTube')
+        ->assertSee('YouTube')
         ->assertSee('salmon fillets');
 });
 

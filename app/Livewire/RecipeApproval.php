@@ -19,6 +19,9 @@ use Livewire\Component;
 #[Title('Approve recipes')]
 class RecipeApproval extends Component
 {
+    /** Cards decided this session — drives the "N of M pending" progress line. */
+    public int $reviewed = 0;
+
     public function approve(int $recipeId): void
     {
         $this->decide($recipeId, RecipeStatus::Approved);
@@ -41,6 +44,7 @@ class RecipeApproval extends Component
 
         if ($recipe !== null) {
             app(SetRecipeStatus::class)->handle($recipe, $status, auth()->user());
+            $this->reviewed++;
         }
     }
 
@@ -53,6 +57,7 @@ class RecipeApproval extends Component
                 ->orderBy('created_at')
                 ->orderBy('id')
                 ->first(),
+            'pending' => Recipe::query()->where('status', RecipeStatus::Pending)->count(),
         ]);
     }
 }
