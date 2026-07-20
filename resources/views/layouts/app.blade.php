@@ -13,16 +13,31 @@
     <nav class="navbar navbar-expand-lg border-bottom mb-4">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ url('/') }}">Mealboard</a>
-            <div class="d-flex align-items-center gap-3">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
                 @auth
-                    <span class="text-muted small">{{ auth()->user()->name }}</span>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">Log out</button>
-                    </form>
-                @else
-                    <a class="btn btn-outline-primary btn-sm" href="{{ route('login') }}">Log in</a>
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('plan.*')) active @endif" href="{{ route('plan.builder') }}">Plan</a></li>
+                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('recipes.index') || request()->routeIs('recipes.show') || request()->routeIs('recipes.create')) active @endif" href="{{ route('recipes.index') }}">Recipes</a></li>
+                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('recipes.approve')) active @endif" href="{{ route('recipes.approve') }}">Approve</a></li>
+                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('log.*')) active @endif" href="{{ route('log.catch-up') }}">Log</a></li>
+                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('insights')) active @endif" href="{{ route('insights') }}">Insights</a></li>
+                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('settings.*')) active @endif" href="{{ route('settings.channels') }}">Channels</a></li>
+                    </ul>
                 @endauth
+                <div class="d-flex align-items-center gap-3">
+                    @auth
+                        <span class="text-muted small">{{ auth()->user()->name }}</span>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Log out</button>
+                        </form>
+                    @else
+                        <a class="btn btn-outline-primary btn-sm" href="{{ route('login') }}">Log in</a>
+                    @endauth
+                </div>
             </div>
         </div>
     </nav>

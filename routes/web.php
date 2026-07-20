@@ -12,7 +12,7 @@ use App\Livewire\RecipeLibrary;
 use App\Livewire\ShoppingList;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'home')->name('home');
+Route::redirect('/', '/plan')->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::get('/plan', PlanBuilder::class)->name('plan.builder');

@@ -50,6 +50,12 @@
                         Mark completed
                     </button>
                 @endif
+
+                @if (! $editable)
+                    <a class="btn btn-primary btn-sm" href="{{ route('plan.shopping-list', $plan) }}">
+                        Shopping list
+                    </a>
+                @endif
             </div>
         </div>
 
