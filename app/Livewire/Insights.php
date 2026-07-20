@@ -28,7 +28,15 @@ class Insights extends Component
     {
         $logs = MealLog::query()->with('plannedMeal.recipe')->get();
 
+        $ate = $logs->filter(fn (MealLog $log) => $log->ate_it)->count();
+        $rated = $logs->filter(fn (MealLog $log) => $log->rating !== null);
+
         return view('livewire.insights', [
+            'totals' => [
+                'logs' => $logs->count(),
+                'ateRate' => $logs->isEmpty() ? null : (int) round($ate / $logs->count() * 100),
+                'avgRating' => $rated->isEmpty() ? null : round($rated->avg('rating'), 2),
+            ],
             'slotRates' => $this->ateRates(
                 $logs,
                 fn (MealLog $log) => $log->plannedMeal->slot->value,
@@ -81,7 +89,7 @@ class Insights extends Component
      * Top recipes by average rating, at least one rated log each.
      *
      * @param  Collection<int, MealLog>  $logs
-     * @return Collection<int, array{title: string, avg: float, count: int}>
+     * @return Collection<int, array{id: int, title: string, avg: float, count: int}>
      */
     private function topRecipes(Collection $logs): Collection
     {
@@ -89,6 +97,7 @@ class Insights extends Component
             ->filter(fn (MealLog $log) => $log->rating !== null)
             ->groupBy(fn (MealLog $log) => $log->plannedMeal->recipe_id)
             ->map(fn (Collection $group) => [
+                'id' => $group->first()->plannedMeal->recipe_id,
                 'title' => $group->first()->plannedMeal->recipe->title,
                 'avg' => round($group->avg('rating'), 2),
                 'count' => $group->count(),

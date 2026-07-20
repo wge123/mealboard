@@ -1,21 +1,25 @@
-<div>
-    <h1 class="h3 mb-1">Catch up on yesterday</h1>
-    <p class="text-muted small mb-3">{{ $yesterday->format('l j M') }} — meals you haven't logged yet.</p>
+{{-- Single column, capped width: comfortable one-thumb logging on a phone. --}}
+<div class="mx-auto w-full max-w-md">
+    <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Catch up on yesterday</h1>
+    <p class="mt-1 mb-4 text-sm opacity-60">{{ $yesterday->format('l j M') }} — meals you haven't logged yet.</p>
 
     @if ($meals->isEmpty())
-        <p class="text-muted">All caught up — nothing left to log from yesterday.</p>
+        <div class="rounded-2xl border border-base-300 bg-base-200 px-6 py-14 text-center">
+            <p class="text-6xl" aria-hidden="true">🎉</p>
+            <p class="mt-4 font-[family-name:var(--font-display)] text-2xl font-semibold">All caught up</p>
+            <p class="mt-1 text-sm opacity-60">Nothing left to log from yesterday.</p>
+        </div>
     @else
-        {{-- Single column, capped width: comfortable one-thumb logging on a phone. --}}
-        <div class="d-flex flex-column gap-2" style="max-width: 28rem;">
+        <div class="flex flex-col gap-3">
             @foreach ($meals as $meal)
-                <div class="card">
-                    <div class="card-body p-2">
-                        <div class="text-uppercase text-muted small">{{ $meal->slot->value }}</div>
-                        <a href="{{ route('recipes.show', $meal->recipe) }}" class="d-block small fw-semibold text-decoration-none">
-                            {{ $meal->recipe->title }}
-                        </a>
-                        <livewire:meal-log-controls :planned-meal="$meal" :key="'catchup-'.$meal->id" />
-                    </div>
+                <div class="slot-row rounded-2xl border-y border-r border-base-300 bg-base-100 p-4"
+                     style="--slot-accent: var(--meal-{{ $meal->slot->value }})">
+                    <div class="slot-label text-[10px] font-semibold tracking-widest uppercase">{{ $meal->slot->value }}</div>
+                    <a href="{{ route('recipes.show', $meal->recipe) }}"
+                       class="mt-0.5 block font-[family-name:var(--font-display)] text-lg leading-snug font-semibold hover:text-primary">
+                        {{ $meal->recipe->title }}
+                    </a>
+                    <livewire:meal-log-controls :planned-meal="$meal" :key="'catchup-'.$meal->id" />
                 </div>
             @endforeach
         </div>

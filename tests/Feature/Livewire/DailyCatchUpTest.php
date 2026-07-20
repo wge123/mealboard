@@ -76,5 +76,6 @@ it('excludes yesterday\'s meals on draft plans — logging opens at lock', funct
 it('shows the empty state when everything is logged', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(DailyCatchUp::class)
-        ->assertSee('All caught up — nothing left to log from yesterday.');
+        ->assertSee('All caught up')
+        ->assertSee('Nothing left to log from yesterday.');
 });
