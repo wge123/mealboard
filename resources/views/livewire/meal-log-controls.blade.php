@@ -5,12 +5,16 @@
         <div class="join">
             <button type="button"
                     class="btn join-item btn-sm min-h-11 {{ $ateIt === true ? 'btn-success' : 'btn-ghost border border-base-300' }}"
-                    wire:click="setAte(true)">
+                    wire:click="setAte(true)"
+                    wire:loading.attr="disabled" wire:target="setAte">
+                <span wire:loading wire:target="setAte(true)" class="loading loading-spinner loading-xs"></span>
                 Yes
             </button>
             <button type="button"
                     class="btn join-item btn-sm min-h-11 {{ $ateIt === false ? 'btn-error' : 'btn-ghost border border-base-300' }}"
-                    wire:click="setAte(false)">
+                    wire:click="setAte(false)"
+                    wire:loading.attr="disabled" wire:target="setAte">
+                <span wire:loading wire:target="setAte(false)" class="loading loading-spinner loading-xs"></span>
                 No
             </button>
         </div>
@@ -23,6 +27,7 @@
                 <button type="button"
                         class="flex min-h-11 min-w-9 flex-1 items-center justify-center text-lg {{ $rating !== null && $star <= $rating ? 'text-warning' : 'text-base-content/30' }}"
                         wire:click="setRating({{ $star }})"
+                        wire:loading.attr="disabled" wire:target="setRating"
                         aria-label="Rate {{ $star }} of 5">
                     {{ $rating !== null && $star <= $rating ? '★' : '☆' }}
                 </button>

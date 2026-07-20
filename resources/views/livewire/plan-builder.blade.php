@@ -30,18 +30,24 @@
 
     <div class="mb-6 flex flex-wrap items-center gap-2">
         @if ($plan && $editable)
-            <button type="button" class="btn btn-outline btn-primary btn-sm min-h-11" wire:click="autoFill">
+            <button type="button" class="btn btn-outline btn-primary btn-sm min-h-11" wire:click="autoFill"
+                    wire:loading.attr="disabled" wire:target="autoFill">
+                <span wire:loading wire:target="autoFill" class="loading loading-spinner loading-xs"></span>
                 Auto-fill empty slots
             </button>
             <button type="button" class="btn btn-primary btn-sm min-h-11" wire:click="lock"
-                    wire:confirm="Lock this week? It becomes read-only for both of you.">
+                    wire:confirm="Lock this week? It becomes read-only for both of you."
+                    wire:loading.attr="disabled" wire:target="lock">
+                <span wire:loading wire:target="lock" class="loading loading-spinner loading-xs"></span>
                 Lock week
             </button>
         @endif
 
         @if ($plan && $completable)
             <button type="button" class="btn btn-success btn-sm min-h-11" wire:click="markCompleted"
-                    wire:confirm="Mark this week as completed?">
+                    wire:confirm="Mark this week as completed?"
+                    wire:loading.attr="disabled" wire:target="markCompleted">
+                <span wire:loading wire:target="markCompleted" class="loading loading-spinner loading-xs"></span>
                 Mark completed
             </button>
         @endif
@@ -52,7 +58,9 @@
             </a>
         @endif
 
-        <button type="button" class="btn btn-ghost btn-sm min-h-11 border border-base-300" wire:click="createNextWeek">
+        <button type="button" class="btn btn-ghost btn-sm min-h-11 border border-base-300" wire:click="createNextWeek"
+                wire:loading.attr="disabled" wire:target="createNextWeek">
+            <span wire:loading wire:target="createNextWeek" class="loading loading-spinner loading-xs"></span>
             Create next week
         </button>
     </div>
@@ -112,7 +120,8 @@
                                                 Swap
                                             </button>
                                             <button type="button" class="btn btn-ghost btn-sm min-h-11 px-2 text-error"
-                                                    wire:click="clearSlot('{{ $day->toDateString() }}', '{{ $slot->value }}')">
+                                                    wire:click="clearSlot('{{ $day->toDateString() }}', '{{ $slot->value }}')"
+                                                    wire:loading.attr="disabled" wire:target="clearSlot">
                                                 Clear
                                             </button>
                                         </div>
@@ -164,7 +173,8 @@
                                     <button type="button"
                                             class="slot-row flex min-h-11 w-full items-center justify-between gap-2 rounded-lg bg-base-200 px-3 py-2 text-left hover:bg-base-300"
                                             style="--slot-accent: var(--meal-{{ $recipe->meal_type->value }})"
-                                            wire:click="choose({{ $recipe->id }})">
+                                            wire:click="choose({{ $recipe->id }})"
+                                            wire:loading.attr="disabled" wire:target="choose">
                                         <span class="font-medium">{{ $recipe->title }}</span>
                                         @if ($minutes > 0)
                                             <span class="badge badge-ghost badge-sm shrink-0">{{ $minutes }} min</span>

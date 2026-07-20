@@ -17,7 +17,11 @@
             </p>
             <textarea rows="6" class="textarea textarea-lg mt-3 w-full" wire:model="paste" aria-label="Paste ingredients"></textarea>
             <div class="mt-2 flex flex-wrap items-center gap-2">
-                <button type="button" class="btn btn-outline btn-sm min-h-11" wire:click="parsePaste">Parse ingredients</button>
+                <button type="button" class="btn btn-outline btn-sm min-h-11" wire:click="parsePaste"
+                        wire:loading.attr="disabled" wire:target="parsePaste">
+                    <span wire:loading wire:target="parsePaste" class="loading loading-spinner loading-xs"></span>
+                    Parse ingredients
+                </button>
                 <button type="button" class="btn btn-primary btn-sm min-h-11" wire:click="aiParse"
                         wire:loading.attr="disabled" wire:target="aiParse">
                     <span wire:loading.remove wire:target="aiParse">AI parse</span>
@@ -43,7 +47,11 @@
         @include('livewire.partials.ingredient-rows')
 
         <div class="mt-6 flex gap-2">
-            <button type="submit" class="btn btn-primary min-h-11">Save recipe</button>
+            <button type="submit" class="btn btn-primary min-h-11"
+                    wire:loading.attr="disabled" wire:target="save">
+                <span wire:loading wire:target="save" class="loading loading-spinner loading-xs"></span>
+                Save recipe
+            </button>
             <a class="btn btn-ghost min-h-11 border border-base-300" href="{{ route('recipes.index') }}">Cancel</a>
         </div>
     </form>

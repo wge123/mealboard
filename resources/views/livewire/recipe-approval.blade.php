@@ -87,11 +87,15 @@
 
                 <div class="mt-6 flex flex-col gap-2">
                     <button type="button" class="btn btn-primary btn-lg w-full"
-                            wire:click="approve({{ $recipe->id }})">
+                            wire:click="approve({{ $recipe->id }})"
+                            wire:loading.attr="disabled" wire:target="approve, reject">
+                        <span wire:loading wire:target="approve" class="loading loading-spinner loading-xs"></span>
                         Approve <kbd class="kbd kbd-sm hidden lg:inline-flex">A</kbd>
                     </button>
                     <button type="button" class="btn btn-ghost min-h-11 w-full"
-                            wire:click="reject({{ $recipe->id }})">
+                            wire:click="reject({{ $recipe->id }})"
+                            wire:loading.attr="disabled" wire:target="approve, reject">
+                        <span wire:loading wire:target="reject" class="loading loading-spinner loading-xs"></span>
                         Reject <kbd class="kbd kbd-sm hidden lg:inline-flex">R</kbd>
                     </button>
                 </div>

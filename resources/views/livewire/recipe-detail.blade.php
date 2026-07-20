@@ -47,13 +47,25 @@
         {{-- Status controls: joined button group. --}}
         <div class="join mt-4">
             @if ($recipe->status !== \App\Enums\RecipeStatus::Approved)
-                <button type="button" class="btn join-item btn-success btn-sm min-h-11" wire:click="setStatus('approved')">Approve</button>
+                <button type="button" class="btn join-item btn-success btn-sm min-h-11" wire:click="setStatus('approved')"
+                        wire:loading.attr="disabled" wire:target="setStatus">
+                    <span wire:loading wire:target="setStatus('approved')" class="loading loading-spinner loading-xs"></span>
+                    Approve
+                </button>
             @endif
             @if ($recipe->status !== \App\Enums\RecipeStatus::Rejected)
-                <button type="button" class="btn btn-outline join-item btn-error btn-sm min-h-11" wire:click="setStatus('rejected')">Reject</button>
+                <button type="button" class="btn btn-outline join-item btn-error btn-sm min-h-11" wire:click="setStatus('rejected')"
+                        wire:loading.attr="disabled" wire:target="setStatus">
+                    <span wire:loading wire:target="setStatus('rejected')" class="loading loading-spinner loading-xs"></span>
+                    Reject
+                </button>
             @endif
             @if ($recipe->status !== \App\Enums\RecipeStatus::Archived)
-                <button type="button" class="btn btn-ghost join-item btn-sm min-h-11 border border-base-300" wire:click="setStatus('archived')">Archive</button>
+                <button type="button" class="btn btn-ghost join-item btn-sm min-h-11 border border-base-300" wire:click="setStatus('archived')"
+                        wire:loading.attr="disabled" wire:target="setStatus">
+                    <span wire:loading wire:target="setStatus('archived')" class="loading loading-spinner loading-xs"></span>
+                    Archive
+                </button>
             @endif
         </div>
 
@@ -101,7 +113,11 @@
             @include('livewire.partials.ingredient-rows')
 
             <div class="mt-6 flex gap-2">
-                <button type="submit" class="btn btn-primary min-h-11">Save</button>
+                <button type="submit" class="btn btn-primary min-h-11"
+                        wire:loading.attr="disabled" wire:target="save">
+                    <span wire:loading wire:target="save" class="loading loading-spinner loading-xs"></span>
+                    Save
+                </button>
                 <button type="button" class="btn btn-ghost min-h-11 border border-base-300" wire:click="cancelEditing">Cancel</button>
             </div>
         </form>
