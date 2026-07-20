@@ -66,6 +66,13 @@ class RecipeLibrary extends Component
 
         return view('livewire.recipe-library', [
             'recipes' => $query->get(),
+            // Average rating per recipe id, for the card chip row.
+            'ratings' => MealLog::query()
+                ->join('planned_meals', 'planned_meals.id', '=', 'meal_logs.planned_meal_id')
+                ->whereNotNull('meal_logs.rating')
+                ->groupBy('planned_meals.recipe_id')
+                ->selectRaw('planned_meals.recipe_id as recipe_id, AVG(meal_logs.rating) as avg_rating')
+                ->pluck('avg_rating', 'recipe_id'),
             'mealTypes' => MealType::cases(),
             'cuisines' => (clone $approved)->whereNotNull('cuisine')->distinct()->orderBy('cuisine')->pluck('cuisine'),
             'tags' => (clone $approved)->pluck('tags')->flatten()->unique()->sort()->values(),

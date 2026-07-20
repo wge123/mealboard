@@ -145,4 +145,55 @@
     .slot-label {
         color: color-mix(in oklab, var(--slot-accent) 55%, var(--color-base-content));
     }
+
+    /* Minimal typographic rhythm for Str::markdown output (recipe instructions).
+       Hand-written on purpose — no @tailwindcss/typography dependency. */
+    .prose-mb {
+        line-height: 1.65;
+    }
+
+    .prose-mb h2 {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 1.25em 0 0.5em;
+    }
+
+    .prose-mb h3 {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 1em 0 0.4em;
+    }
+
+    .prose-mb p {
+        margin: 0.75em 0;
+    }
+
+    .prose-mb ol,
+    .prose-mb ul {
+        margin: 0.75em 0;
+        padding-inline-start: 1.5em;
+    }
+
+    .prose-mb ol {
+        list-style: decimal;
+    }
+
+    .prose-mb ul {
+        list-style: disc;
+    }
+
+    .prose-mb li {
+        margin-block: 0.375em;
+        padding-inline-start: 0.25em;
+    }
+
+    .prose-mb > :first-child {
+        margin-top: 0;
+    }
+
+    .prose-mb > :last-child {
+        margin-bottom: 0;
+    }
 }

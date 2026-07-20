@@ -1,41 +1,50 @@
 <div>
-    <div class="mb-3">
-        <a class="text-decoration-none" href="{{ route('recipes.index') }}">&larr; Recipes</a>
-    </div>
+    <a class="btn btn-ghost btn-sm mb-4 min-h-11 border border-base-300" href="{{ route('recipes.index') }}">
+        &larr; Recipes
+    </a>
 
-    <h1 class="h3 mb-3">Add recipe</h1>
+    <h1 class="mb-4 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Add recipe</h1>
 
     <form wire:submit="save">
         @include('livewire.partials.recipe-form-fields')
 
-        <h2 class="h5 mt-4">Paste a recipe</h2>
-        <p class="text-muted small mb-2">One ingredient per line, e.g. <code>2 cups diced onion</code> — or paste anything and let AI parse it. Parsed rows land below and stay editable.</p>
-        <textarea rows="5" class="form-control mb-2" wire:model="paste" aria-label="Paste ingredients"></textarea>
-        <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
-            <button type="button" class="btn btn-outline-secondary btn-sm" wire:click="parsePaste">Parse ingredients</button>
-            <button type="button" class="btn btn-outline-primary btn-sm" wire:click="aiParse"
-                    wire:loading.attr="disabled" wire:target="aiParse">
-                <span wire:loading.remove wire:target="aiParse">AI parse</span>
-                <span wire:loading wire:target="aiParse">Parsing&hellip;</span>
-            </button>
-            @if ($parsedWith === 'ai')
-                <span class="badge text-bg-success">AI parsed</span>
-            @elseif ($parsedWith === 'heuristic')
-                <span class="badge text-bg-secondary">Heuristic parsed</span>
-            @elseif ($parsedWith === 'fallback')
-                <span class="badge text-bg-warning">Heuristic parsed (AI unavailable)</span>
+        {{-- Paste-to-parse: the fastest way in; heuristic and AI parsers side by side. --}}
+        <section class="mt-6 rounded-2xl border border-base-300 bg-base-200 p-4">
+            <h2 class="font-[family-name:var(--font-display)] text-xl font-semibold">Paste a recipe</h2>
+            <p class="mt-1 text-sm opacity-60">
+                One ingredient per line, e.g. <code class="rounded bg-base-300 px-1">2 cups diced onion</code> —
+                or paste anything and let AI parse it. Parsed rows land below and stay editable.
+            </p>
+            <textarea rows="6" class="textarea textarea-lg mt-3 w-full" wire:model="paste" aria-label="Paste ingredients"></textarea>
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+                <button type="button" class="btn btn-outline btn-sm min-h-11" wire:click="parsePaste">Parse ingredients</button>
+                <button type="button" class="btn btn-primary btn-sm min-h-11" wire:click="aiParse"
+                        wire:loading.attr="disabled" wire:target="aiParse">
+                    <span wire:loading.remove wire:target="aiParse">AI parse</span>
+                    <span wire:loading.flex wire:target="aiParse" class="items-center gap-2">
+                        <span class="loading loading-spinner loading-xs"></span>
+                        Parsing&hellip;
+                    </span>
+                </button>
+                @if ($parsedWith === 'ai')
+                    <span class="badge badge-soft badge-success">AI parsed</span>
+                @elseif ($parsedWith === 'heuristic')
+                    <span class="badge badge-soft badge-neutral">Heuristic parsed</span>
+                @elseif ($parsedWith === 'fallback')
+                    <span class="badge badge-soft badge-warning">Heuristic parsed (AI unavailable)</span>
+                @endif
+            </div>
+            @if ($parseError !== '')
+                <div class="alert alert-error mt-3 py-2 text-sm" role="alert">{{ $parseError }}</div>
             @endif
-        </div>
-        @if ($parseError !== '')
-            <div class="alert alert-danger py-2" role="alert">{{ $parseError }}</div>
-        @endif
+        </section>
 
-        <h2 class="h5">Ingredients</h2>
+        <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Ingredients</h2>
         @include('livewire.partials.ingredient-rows')
 
-        <div class="mt-4 d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Save recipe</button>
-            <a class="btn btn-outline-secondary" href="{{ route('recipes.index') }}">Cancel</a>
+        <div class="mt-6 flex gap-2">
+            <button type="submit" class="btn btn-primary min-h-11">Save recipe</button>
+            <a class="btn btn-ghost min-h-11 border border-base-300" href="{{ route('recipes.index') }}">Cancel</a>
         </div>
     </form>
 </div>

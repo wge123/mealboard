@@ -1,88 +1,108 @@
 <div>
-    <div class="mb-3">
-        <a class="text-decoration-none" href="{{ route('recipes.index') }}">&larr; Recipes</a>
-    </div>
+    <a class="btn btn-ghost btn-sm mb-4 min-h-11 border border-base-300" href="{{ route('recipes.index') }}">
+        &larr; Recipes
+    </a>
 
     @if (! $editing)
-        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
-            <h1 class="h3 mb-0">{{ $recipe->title }}</h1>
-            <button type="button" class="btn btn-outline-primary btn-sm" wire:click="startEditing">Edit</button>
+        @php($minutes = (int) $recipe->prep_minutes + (int) $recipe->cook_minutes)
+
+        {{-- Hero header: display title, status, chip row. --}}
+        <div class="flex flex-wrap items-start justify-between gap-2">
+            <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">{{ $recipe->title }}</h1>
+            <button type="button" class="btn btn-outline btn-primary btn-sm min-h-11" wire:click="startEditing">Edit</button>
         </div>
 
-        <p class="mb-2">
-            <span class="badge text-bg-secondary">{{ ucfirst($recipe->status->value) }}</span>
-            <span class="badge text-bg-light border">{{ ucfirst($recipe->meal_type->value) }}</span>
+        <div class="mt-2.5 flex flex-wrap items-center gap-1.5">
+            <span class="badge badge-soft {{ ['pending' => 'badge-warning', 'approved' => 'badge-success', 'rejected' => 'badge-error', 'archived' => 'badge-neutral'][$recipe->status->value] }}">
+                {{ ucfirst($recipe->status->value) }}
+            </span>
+            <span class="badge badge-ghost slot-label font-medium" style="--slot-accent: var(--meal-{{ $recipe->meal_type->value }})">
+                {{ ucfirst($recipe->meal_type->value) }}
+            </span>
             @if ($recipe->cuisine)
-                <span class="badge text-bg-light border">{{ ucfirst($recipe->cuisine) }}</span>
+                <span class="badge badge-ghost">{{ ucfirst($recipe->cuisine) }}</span>
             @endif
+            @if ($minutes > 0)
+                <span class="badge badge-ghost" title="Prep {{ $recipe->prep_minutes }} min, cook {{ $recipe->cook_minutes }} min">{{ $minutes }} min</span>
+            @endif
+            <span class="badge badge-ghost">Serves {{ $recipe->servings }}</span>
             @foreach ($recipe->tags ?? [] as $tag)
-                <span class="badge text-bg-light border">{{ $tag }}</span>
+                <span class="badge badge-ghost badge-sm">{{ $tag }}</span>
             @endforeach
-        </p>
+        </div>
 
-        <p class="text-muted mb-1">
-            Prep {{ $recipe->prep_minutes }} min · Cook {{ $recipe->cook_minutes }} min ·
-            {{ $recipe->prep_minutes + $recipe->cook_minutes }} min total · Serves {{ $recipe->servings }}
-        </p>
-        <p class="text-muted small mb-1">
-            Source: {{ ucfirst($recipe->source->value) }}@if ($recipe->source_url) — <a href="{{ $recipe->source_url }}">{{ $recipe->source_url }}</a>@endif
+        <p class="mt-2 text-sm opacity-60">
+            Source: {{ ucfirst($recipe->source->value) }}@if ($recipe->source_url) — <a class="link" href="{{ $recipe->source_url }}" target="_blank" rel="noopener">{{ $recipe->source_url }}</a>@endif
         </p>
         @if ($recipe->approved_at)
-            <p class="text-muted small">
+            <p class="text-sm opacity-60">
                 Approved {{ $recipe->approved_at->format('Y-m-d') }}@if ($recipe->approvedBy) by {{ $recipe->approvedBy->name }}@endif
             </p>
         @endif
 
-        <p class="mt-3">{{ $recipe->description }}</p>
+        @if ($recipe->description)
+            <p class="mt-3 max-w-prose leading-relaxed">{{ $recipe->description }}</p>
+        @endif
 
-        <div class="mb-3">
+        {{-- Status controls: joined button group. --}}
+        <div class="join mt-4">
             @if ($recipe->status !== \App\Enums\RecipeStatus::Approved)
-                <button type="button" class="btn btn-success btn-sm" wire:click="setStatus('approved')">Approve</button>
+                <button type="button" class="btn join-item btn-success btn-sm min-h-11" wire:click="setStatus('approved')">Approve</button>
             @endif
             @if ($recipe->status !== \App\Enums\RecipeStatus::Rejected)
-                <button type="button" class="btn btn-outline-danger btn-sm" wire:click="setStatus('rejected')">Reject</button>
+                <button type="button" class="btn btn-outline join-item btn-error btn-sm min-h-11" wire:click="setStatus('rejected')">Reject</button>
             @endif
             @if ($recipe->status !== \App\Enums\RecipeStatus::Archived)
-                <button type="button" class="btn btn-outline-secondary btn-sm" wire:click="setStatus('archived')">Archive</button>
+                <button type="button" class="btn btn-ghost join-item btn-sm min-h-11 border border-base-300" wire:click="setStatus('archived')">Archive</button>
             @endif
         </div>
 
-        <h2 class="h5">Ingredients</h2>
-        <div class="table-responsive mb-4">
-            <table class="table table-sm align-middle">
-                <tbody>
+        {{-- Ingredients (left) + instructions (right) on lg+, stacked on phones. --}}
+        <div class="mt-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-5">
+            <section class="rounded-2xl border border-base-300 bg-base-100 lg:col-span-2">
+                <h2 class="px-4 pt-4 font-[family-name:var(--font-display)] text-xl font-semibold">Ingredients</h2>
+                <ul class="divide-y divide-base-300 p-2">
                     @forelse ($recipe->ingredients as $ingredient)
-                        <tr>
-                            <td class="text-nowrap text-end" style="width: 1%;">
+                        <li class="flex items-baseline gap-3 px-2 py-2.5">
+                            <span class="w-16 shrink-0 text-right text-sm tabular-nums opacity-70">
                                 {{ $ingredient->pivot->qty !== null ? (string) (float) $ingredient->pivot->qty : '' }}
-                            </td>
-                            <td class="text-nowrap" style="width: 1%;">{{ $ingredient->pivot->unit }}</td>
-                            <td>{{ $ingredient->name }}</td>
-                            <td class="text-muted">{{ $ingredient->pivot->note }}</td>
-                        </tr>
+                                {{ $ingredient->pivot->unit !== 'count' ? $ingredient->pivot->unit : '' }}
+                            </span>
+                            <span class="min-w-0">
+                                <span class="font-medium">{{ $ingredient->name }}</span>
+                                @if ($ingredient->is_pantry_staple)
+                                    <span class="badge badge-ghost badge-xs ms-1 align-middle">staple</span>
+                                @endif
+                                @if ($ingredient->pivot->note)
+                                    <span class="block text-xs opacity-50">{{ $ingredient->pivot->note }}</span>
+                                @endif
+                            </span>
+                        </li>
                     @empty
-                        <tr><td class="text-muted">No ingredients recorded.</td></tr>
+                        <li class="px-2 py-2.5 text-sm opacity-60">No ingredients recorded.</li>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+                </ul>
+            </section>
 
-        <h2 class="h5">Instructions</h2>
-        <div class="recipe-instructions">
-            {!! \Illuminate\Support\Str::markdown($recipe->instructions, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
+            <section class="rounded-2xl border border-base-300 bg-base-100 p-4 lg:col-span-3 lg:p-5">
+                <h2 class="font-[family-name:var(--font-display)] text-xl font-semibold">Instructions</h2>
+                <div class="prose-mb mt-3">
+                    {!! \Illuminate\Support\Str::markdown($recipe->instructions, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
+                </div>
+            </section>
         </div>
     @else
-        <h1 class="h3 mb-3">Edit recipe</h1>
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Edit recipe</h1>
 
-        <form wire:submit="save">
+        <form wire:submit="save" class="mt-4">
             @include('livewire.partials.recipe-form-fields')
 
-            <h2 class="h5 mt-4">Ingredients</h2>
+            <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Ingredients</h2>
             @include('livewire.partials.ingredient-rows')
 
-            <div class="mt-4 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Save</button>
-                <button type="button" class="btn btn-outline-secondary" wire:click="cancelEditing">Cancel</button>
+            <div class="mt-6 flex gap-2">
+                <button type="submit" class="btn btn-primary min-h-11">Save</button>
+                <button type="button" class="btn btn-ghost min-h-11 border border-base-300" wire:click="cancelEditing">Cancel</button>
             </div>
         </form>
     @endif
