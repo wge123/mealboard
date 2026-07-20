@@ -128,3 +128,16 @@
         font-family: var(--font-sans);
     }
 }
+
+@layer components {
+    /* Meal-slot accents: a row sets --slot-accent (style attr) to one of the
+       --meal-* theme vars; these consume it. The label mixes toward
+       base-content so light accents (breakfast amber) stay readable. */
+    .slot-row {
+        border-left: 4px solid var(--slot-accent);
+    }
+
+    .slot-label {
+        color: color-mix(in oklab, var(--slot-accent) 55%, var(--color-base-content));
+    }
+}

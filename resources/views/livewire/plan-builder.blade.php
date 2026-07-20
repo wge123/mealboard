@@ -1,153 +1,185 @@
 <div>
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h1 class="h3 mb-0">Weekly plan</h1>
+    {{-- Header: week title + status, week picker, actions. --}}
+    <div class="mb-1 flex flex-wrap items-center gap-x-3 gap-y-2">
+        <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
+            {{ $plan ? 'Week of '.$plan->week_start_date->format('j M') : 'Plan' }}
+        </h1>
 
-        <div class="d-flex align-items-center gap-2">
-            @if ($plans->isNotEmpty())
-                <select class="form-select form-select-sm w-auto" wire:model.live="planId" aria-label="Week">
-                    @foreach ($plans as $option)
-                        <option value="{{ $option->id }}">
-                            Week of {{ $option->week_start_date->format('j M Y') }} ({{ $option->status->value }})
-                        </option>
-                    @endforeach
-                </select>
-            @endif
-            <button type="button" class="btn btn-primary btn-sm" wire:click="createNextWeek">
-                Create next week
+        @if ($plan)
+            <span class="badge badge-soft {{ ['draft' => 'badge-warning', 'locked' => 'badge-success', 'completed' => 'badge-neutral'][$plan->status->value] }}">
+                {{ ucfirst($plan->status->value) }}
+            </span>
+        @endif
+
+        @if ($plans->isNotEmpty())
+            <select class="select select-sm ms-auto min-h-11 w-auto" wire:model.live="planId" aria-label="Week">
+                @foreach ($plans as $option)
+                    <option value="{{ $option->id }}">
+                        Week of {{ $option->week_start_date->format('j M Y') }} ({{ $option->status->value }})
+                    </option>
+                @endforeach
+            </select>
+        @endif
+    </div>
+
+    @if ($plan)
+        <p class="mb-4 text-sm opacity-60">
+            Mon {{ $plan->week_start_date->format('j M') }} – Fri {{ $plan->week_start_date->copy()->addDays(4)->format('j M Y') }}
+        </p>
+    @endif
+
+    <div class="mb-6 flex flex-wrap items-center gap-2">
+        @if ($plan && $editable)
+            <button type="button" class="btn btn-outline btn-primary btn-sm min-h-11" wire:click="autoFill">
+                Auto-fill empty slots
             </button>
-        </div>
+            <button type="button" class="btn btn-primary btn-sm min-h-11" wire:click="lock"
+                    wire:confirm="Lock this week? It becomes read-only for both of you.">
+                Lock week
+            </button>
+        @endif
+
+        @if ($plan && $completable)
+            <button type="button" class="btn btn-success btn-sm min-h-11" wire:click="markCompleted"
+                    wire:confirm="Mark this week as completed?">
+                Mark completed
+            </button>
+        @endif
+
+        @if ($plan && ! $editable)
+            <a class="btn btn-primary btn-sm min-h-11" href="{{ route('plan.shopping-list', $plan) }}">
+                Shopping list
+            </a>
+        @endif
+
+        <button type="button" class="btn btn-ghost btn-sm min-h-11 border border-base-300" wire:click="createNextWeek">
+            Create next week
+        </button>
     </div>
 
     @if ($publishWarning)
-        <div class="alert alert-warning" role="alert">{{ $publishWarning }}</div>
+        <div class="alert alert-warning mb-4" role="alert">{{ $publishWarning }}</div>
     @endif
 
     @if (! $plan)
-        <p class="text-muted">No meal plans yet. Create next week's draft to get started.</p>
-    @else
-        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-            <span class="badge text-bg-{{ ['draft' => 'secondary', 'locked' => 'warning', 'completed' => 'success'][$plan->status->value] }}">
-                {{ ucfirst($plan->status->value) }}
-            </span>
-            <span class="text-muted small">
-                Mon {{ $plan->week_start_date->format('j M') }} – Fri {{ $plan->week_start_date->copy()->addDays(4)->format('j M Y') }}
-            </span>
-
-            <div class="d-flex gap-2 ms-auto">
-                @if ($editable)
-                    <button type="button" class="btn btn-outline-primary btn-sm" wire:click="autoFill">
-                        Auto-fill empty slots
-                    </button>
-                    <button type="button" class="btn btn-warning btn-sm" wire:click="lock"
-                            wire:confirm="Lock this week? It becomes read-only for both of you.">
-                        Lock week
-                    </button>
-                @endif
-
-                @if ($completable)
-                    <button type="button" class="btn btn-success btn-sm" wire:click="markCompleted"
-                            wire:confirm="Mark this week as completed?">
-                        Mark completed
-                    </button>
-                @endif
-
-                @if (! $editable)
-                    <a class="btn btn-primary btn-sm" href="{{ route('plan.shopping-list', $plan) }}">
-                        Shopping list
-                    </a>
-                @endif
-            </div>
+        <div class="rounded-2xl border border-base-300 bg-base-200 px-6 py-12 text-center">
+            <p class="font-[family-name:var(--font-display)] text-xl font-semibold">Nothing planned yet</p>
+            <p class="mt-1 text-sm opacity-60">No meal plans yet. Create next week's draft to get started.</p>
         </div>
-
+    @else
         @if ($breakfastsOftenSkipped)
-            <div class="alert alert-info py-1 px-2 small mb-3">
+            <div class="alert alert-info alert-soft mb-4 py-2 text-sm" role="status">
                 Breakfasts often skipped — picking faster ones.
             </div>
         @endif
 
-        {{-- Stacks one day per row on phones, five columns on md+. --}}
-        <div class="row row-cols-1 row-cols-md-5 g-3">
+        {{-- Day cards: stacked on phones, five columns on lg+. --}}
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-5 lg:gap-3">
             @foreach ($days as $day)
-                <div class="col">
-                    <div class="card h-100">
-                        <div class="card-header py-2">
-                            <strong>{{ $day->format('D') }}</strong>
-                            <span class="text-muted small">{{ $day->format('j M') }}</span>
-                        </div>
-                        <div class="card-body p-2 d-flex flex-column gap-2">
-                            @foreach ($slots as $slot)
-                                @php($meal = $meals->get($day->toDateString().'|'.$slot->value))
-                                <div class="border rounded p-2">
-                                    <div class="text-uppercase text-muted small">{{ $slot->value }}</div>
-                                    @if ($meal)
-                                        <a href="{{ route('recipes.show', $meal->recipe) }}" class="d-block small fw-semibold text-decoration-none">
-                                            {{ $meal->recipe->title }}
-                                        </a>
-                                        @if ($editable)
-                                            <div class="d-flex gap-1 mt-1">
-                                                <button type="button" class="btn btn-outline-secondary btn-sm py-0"
-                                                        wire:click="openPicker('{{ $day->toDateString() }}', '{{ $slot->value }}')">
-                                                    Swap
-                                                </button>
-                                                <button type="button" class="btn btn-outline-danger btn-sm py-0"
-                                                        wire:click="clearSlot('{{ $day->toDateString() }}', '{{ $slot->value }}')">
-                                                    Clear
-                                                </button>
-                                            </div>
-                                        @endif
+                @php($isToday = $day->isToday())
+                <section class="rounded-2xl border bg-base-200 {{ $isToday ? 'border-primary/50' : 'border-base-300' }}">
+                    <header class="flex items-center justify-between px-3 pt-3 pb-1">
+                        <h2 class="text-sm font-semibold {{ $isToday ? 'text-primary' : '' }}">
+                            {{ $day->format('D') }}
+                            <span class="font-normal opacity-60">{{ $day->format('j M') }}</span>
+                        </h2>
+                        @if ($isToday)
+                            <span class="badge badge-primary badge-sm">Today</span>
+                        @endif
+                    </header>
 
-                                        {{-- Past slots (date-only, today included) on locked/completed weeks get quick-log controls. --}}
-                                        @if ($loggable && $day->lte(today()))
-                                            <livewire:meal-log-controls :planned-meal="$meal" :key="'log-'.$meal->id" />
-                                        @endif
-                                    @else
-                                        <div class="text-muted small">—</div>
-                                        @if ($editable)
-                                            <button type="button" class="btn btn-outline-primary btn-sm py-0 mt-1"
-                                                    wire:click="openPicker('{{ $day->toDateString() }}', '{{ $slot->value }}')">
-                                                Pick
-                                            </button>
-                                        @endif
+                    <div class="flex flex-col gap-2 p-3 pt-2">
+                        @foreach ($slots as $slot)
+                            @php($meal = $meals->get($day->toDateString().'|'.$slot->value))
+                            <div class="slot-row rounded-xl bg-base-100 p-3" style="--slot-accent: var(--meal-{{ $slot->value }})">
+                                <div class="slot-label text-[10px] font-semibold tracking-widest uppercase">{{ $slot->value }}</div>
+
+                                @if ($meal)
+                                    <a href="{{ route('recipes.show', $meal->recipe) }}"
+                                       class="mt-0.5 block font-[family-name:var(--font-display)] leading-snug font-semibold hover:text-primary">
+                                        {{ $meal->recipe->title }}
+                                    </a>
+
+                                    @php($minutes = (int) $meal->recipe->prep_minutes + (int) $meal->recipe->cook_minutes)
+                                    @if ($minutes > 0)
+                                        <span class="badge badge-ghost badge-sm mt-1.5">{{ $minutes }} min</span>
                                     @endif
-                                </div>
-                            @endforeach
-                        </div>
+
+                                    @if ($editable)
+                                        <div class="mt-1.5 flex gap-1">
+                                            <button type="button" class="btn btn-ghost btn-sm min-h-11 px-2"
+                                                    wire:click="openPicker('{{ $day->toDateString() }}', '{{ $slot->value }}')">
+                                                Swap
+                                            </button>
+                                            <button type="button" class="btn btn-ghost btn-sm min-h-11 px-2 text-error"
+                                                    wire:click="clearSlot('{{ $day->toDateString() }}', '{{ $slot->value }}')">
+                                                Clear
+                                            </button>
+                                        </div>
+                                    @endif
+
+                                    {{-- Past slots (date-only, today included) on locked/completed weeks get quick-log controls. --}}
+                                    @if ($loggable && $day->lte(today()))
+                                        <livewire:meal-log-controls :planned-meal="$meal" :key="'log-'.$meal->id" />
+                                    @endif
+                                @else
+                                    @if ($editable)
+                                        <button type="button"
+                                                class="btn btn-ghost mt-1.5 min-h-11 w-full justify-start border border-dashed border-base-300 font-normal text-base-content/60"
+                                                wire:click="openPicker('{{ $day->toDateString() }}', '{{ $slot->value }}')">
+                                            + Add
+                                        </button>
+                                    @else
+                                        <div class="mt-1 text-sm text-base-content/40">—</div>
+                                    @endif
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
-                </div>
+                </section>
             @endforeach
         </div>
 
-        {{-- Recipe picker overlay --}}
+        {{-- Recipe picker: Livewire-driven daisyUI modal. --}}
         @if ($pickerDate && $pickerSlot)
-            <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                 style="background: rgba(0, 0, 0, .5); z-index: 1050;">
-                <div class="card shadow" style="width: min(28rem, 92vw); max-height: 80vh;">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>
-                            Pick a {{ $pickerSlot }} recipe —
-                            {{ \Illuminate\Support\Carbon::parse($pickerDate)->format('D j M') }}
-                        </span>
-                        <button type="button" class="btn-close" aria-label="Close" wire:click="closePicker"></button>
+            <div class="modal modal-open modal-bottom sm:modal-middle" role="dialog" aria-modal="true">
+                <div class="modal-box border border-base-300">
+                    <div class="slot-label text-[10px] font-semibold tracking-widest uppercase" style="--slot-accent: var(--meal-{{ $pickerSlot }})">
+                        {{ $pickerSlot }}
                     </div>
-                    <div class="card-body overflow-auto">
-                        <input type="search" class="form-control mb-2" placeholder="Search recipes…"
-                               wire:model.live.debounce.300ms="pickerSearch" aria-label="Search recipes">
+                    <h3 class="mt-0.5 font-[family-name:var(--font-display)] text-xl font-semibold">
+                        Pick a recipe — {{ \Illuminate\Support\Carbon::parse($pickerDate)->format('D j M') }}
+                    </h3>
 
+                    <input type="search" class="input mt-3 min-h-11 w-full" placeholder="Search recipes…"
+                           wire:model.live.debounce.300ms="pickerSearch" aria-label="Search recipes">
+
+                    <div class="mt-3 max-h-80 overflow-y-auto">
                         @if ($pickerRecipes->isEmpty())
-                            <p class="text-muted small mb-0">No approved recipes match this slot.</p>
+                            <p class="py-4 text-center text-sm opacity-60">No approved recipes match this slot.</p>
                         @else
-                            <div class="list-group list-group-flush">
+                            <div class="flex flex-col gap-1.5">
                                 @foreach ($pickerRecipes as $recipe)
-                                    <button type="button" class="list-group-item list-group-item-action"
+                                    @php($minutes = (int) $recipe->prep_minutes + (int) $recipe->cook_minutes)
+                                    <button type="button"
+                                            class="slot-row flex min-h-11 w-full items-center justify-between gap-2 rounded-lg bg-base-200 px-3 py-2 text-left hover:bg-base-300"
+                                            style="--slot-accent: var(--meal-{{ $recipe->meal_type->value }})"
                                             wire:click="choose({{ $recipe->id }})">
-                                        {{ $recipe->title }}
-                                        <span class="text-muted small">({{ $recipe->meal_type->value }})</span>
+                                        <span class="font-medium">{{ $recipe->title }}</span>
+                                        @if ($minutes > 0)
+                                            <span class="badge badge-ghost badge-sm shrink-0">{{ $minutes }} min</span>
+                                        @endif
                                     </button>
                                 @endforeach
                             </div>
                         @endif
                     </div>
+
+                    <div class="modal-action">
+                        <button type="button" class="btn btn-ghost min-h-11" wire:click="closePicker">Cancel</button>
+                    </div>
                 </div>
+                <button type="button" class="modal-backdrop" wire:click="closePicker" aria-label="Close"></button>
             </div>
         @endif
     @endif
