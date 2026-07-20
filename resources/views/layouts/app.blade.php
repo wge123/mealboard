@@ -5,49 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? config('app.name', 'Mealboard') }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <script>
+        // Apply persisted theme before first paint (system = no attribute).
+        (() => {
+            const t = localStorage.getItem('mealboard-theme');
+            if (t === 'dark') document.documentElement.dataset.theme = 'mealboard-dark';
+            else if (t === 'light') document.documentElement.dataset.theme = 'mealboard';
+        })();
+    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg border-bottom mb-4">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url('/') }}">Mealboard</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="mainNav">
-                @auth
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('plan.*')) active @endif" href="{{ route('plan.builder') }}">Plan</a></li>
-                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('recipes.index') || request()->routeIs('recipes.show') || request()->routeIs('recipes.create')) active @endif" href="{{ route('recipes.index') }}">Recipes</a></li>
-                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('recipes.approve')) active @endif" href="{{ route('recipes.approve') }}">Approve</a></li>
-                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('log.*')) active @endif" href="{{ route('log.catch-up') }}">Log</a></li>
-                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('insights')) active @endif" href="{{ route('insights') }}">Insights</a></li>
-                        <li class="nav-item"><a class="nav-link @if(request()->routeIs('settings.*')) active @endif" href="{{ route('settings.channels') }}">Channels</a></li>
-                    </ul>
-                @endauth
-                <div class="d-flex align-items-center gap-3">
-                    @auth
-                        <span class="text-muted small">{{ auth()->user()->name }}</span>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-secondary btn-sm">Log out</button>
-                        </form>
-                    @else
-                        <a class="btn btn-outline-primary btn-sm" href="{{ route('login') }}">Log in</a>
-                    @endauth
+<body class="min-h-screen bg-base-100 text-base-content">
+    {{-- Temporary shell — the real navigation arrives in step 4. --}}
+    <header class="border-b border-base-300 bg-base-100">
+        <nav class="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-1 gap-y-2 px-4 py-3">
+            <a href="{{ url('/') }}" class="mr-4 font-[family-name:var(--font-display)] text-xl font-semibold text-primary">Mealboard</a>
+            @auth
+                <div class="flex flex-wrap items-center gap-1">
+                    <a href="{{ route('plan.builder') }}" class="btn btn-ghost btn-sm min-h-11 @if(request()->routeIs('plan.*')) btn-active @endif">Plan</a>
+                    <a href="{{ route('recipes.index') }}" class="btn btn-ghost btn-sm min-h-11 @if(request()->routeIs('recipes.index') || request()->routeIs('recipes.show') || request()->routeIs('recipes.create')) btn-active @endif">Recipes</a>
+                    <a href="{{ route('recipes.approve') }}" class="btn btn-ghost btn-sm min-h-11 @if(request()->routeIs('recipes.approve')) btn-active @endif">Approve</a>
+                    <a href="{{ route('log.catch-up') }}" class="btn btn-ghost btn-sm min-h-11 @if(request()->routeIs('log.*')) btn-active @endif">Log</a>
+                    <a href="{{ route('insights') }}" class="btn btn-ghost btn-sm min-h-11 @if(request()->routeIs('insights')) btn-active @endif">Insights</a>
+                    <a href="{{ route('settings.channels') }}" class="btn btn-ghost btn-sm min-h-11 @if(request()->routeIs('settings.*')) btn-active @endif">Channels</a>
                 </div>
+            @endauth
+            <div class="ms-auto flex items-center gap-2">
+                <div
+                    x-data="{
+                        theme: localStorage.getItem('mealboard-theme') || 'system',
+                        set(t) {
+                            this.theme = t;
+                            if (t === 'system') {
+                                localStorage.removeItem('mealboard-theme');
+                                document.documentElement.removeAttribute('data-theme');
+                            } else {
+                                localStorage.setItem('mealboard-theme', t);
+                                document.documentElement.dataset.theme = t === 'dark' ? 'mealboard-dark' : 'mealboard';
+                            }
+                        },
+                    }"
+                    class="dropdown dropdown-end"
+                >
+                    <button type="button" tabindex="0" class="btn btn-ghost btn-sm min-h-11" aria-label="Theme">
+                        <span x-show="theme === 'light'">Light</span>
+                        <span x-show="theme === 'dark'">Dark</span>
+                        <span x-show="theme === 'system'">Auto</span>
+                    </button>
+                    <ul tabindex="0" class="dropdown-content menu z-10 mt-1 w-32 rounded-box border border-base-300 bg-base-100 p-1">
+                        <li><button type="button" @click="set('light'); $el.closest('.dropdown').querySelector('button').blur()" :class="theme === 'light' && 'menu-active'">Light</button></li>
+                        <li><button type="button" @click="set('dark'); $el.closest('.dropdown').querySelector('button').blur()" :class="theme === 'dark' && 'menu-active'">Dark</button></li>
+                        <li><button type="button" @click="set('system'); $el.closest('.dropdown').querySelector('button').blur()" :class="theme === 'system' && 'menu-active'">System</button></li>
+                    </ul>
+                </div>
+                @auth
+                    <span class="hidden text-sm opacity-60 sm:inline">{{ auth()->user()->name }}</span>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-outline btn-sm min-h-11">Log out</button>
+                    </form>
+                @else
+                    <a class="btn btn-outline btn-primary btn-sm min-h-11" href="{{ route('login') }}">Log in</a>
+                @endauth
             </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
-    <main class="container pb-5">
+    <main class="mx-auto w-full max-w-6xl px-4 py-6 pb-16">
         {{ $slot ?? '' }}
         @yield('content')
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @livewireScripts
 </body>
 </html>
