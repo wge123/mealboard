@@ -1,9 +1,130 @@
+/* ============================================================================
+   Mealboard tactile rules — read this before styling any page (steps 4+):
+   - Cards: rounded-2xl (var(--radius-box)), subtle 1px borders over shadows.
+     Shadows only for true elevation (modals, popovers), never for resting cards.
+   - Tap targets: >= 44px on anything interactive (checkboxes, slot cards,
+     nav items, buttons). This is a phone-first kitchen/store app.
+   - Whitespace is generous: sections breathe, lists get padding, never cram.
+   - Meal-type accents come from --meal-breakfast/lunch/dinner/any — use them
+     for slot markers, chips, and left-edge card bars; do not invent new hues.
+   - Type: Inter Variable for UI/body, Fraunces (--font-display) for page
+     titles and recipe names only — display face used with restraint.
+   ========================================================================== */
+
 @import 'tailwindcss';
+
+@import '@fontsource-variable/inter';
+@import '@fontsource/fraunces/400.css';
+@import '@fontsource/fraunces/600.css';
+@import '@fontsource/fraunces/700.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+@plugin "daisyui" {
+    themes: mealboard --default, mealboard-dark --prefersdark;
+}
+
+/* Light — warm stone/cream base, herb-green primary */
+@plugin "daisyui/theme" {
+    name: 'mealboard';
+    default: true;
+    prefersdark: false;
+    color-scheme: light;
+
+    --color-base-100: oklch(98.2% 0.008 85);
+    --color-base-200: oklch(95.5% 0.011 83);
+    --color-base-300: oklch(90.5% 0.015 80);
+    --color-base-content: oklch(27% 0.022 55);
+
+    --color-primary: oklch(52% 0.115 150);
+    --color-primary-content: oklch(97.5% 0.012 150);
+    --color-secondary: oklch(62% 0.115 42);
+    --color-secondary-content: oklch(98% 0.01 42);
+    --color-accent: oklch(76% 0.125 82);
+    --color-accent-content: oklch(30% 0.06 82);
+    --color-neutral: oklch(36% 0.02 58);
+    --color-neutral-content: oklch(96% 0.01 85);
+
+    --color-info: oklch(60% 0.11 232);
+    --color-info-content: oklch(97% 0.012 232);
+    --color-success: oklch(58% 0.125 152);
+    --color-success-content: oklch(97% 0.012 152);
+    --color-warning: oklch(76% 0.15 78);
+    --color-warning-content: oklch(30% 0.07 78);
+    --color-error: oklch(56% 0.185 27);
+    --color-error-content: oklch(97% 0.012 27);
+
+    /* rounded-2xl feel */
+    --radius-box: 1rem;
+    --radius-field: 0.75rem;
+    --radius-selector: 1rem;
+    --size-field: 0.28125rem;
+    --size-selector: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+
+    /* Meal-type accents */
+    --meal-breakfast: oklch(78% 0.14 75);
+    --meal-lunch: oklch(70% 0.115 230);
+    --meal-dinner: oklch(58% 0.14 295);
+    --meal-any: oklch(60% 0.02 60);
+}
+
+/* Dark — warm charcoal, same herb-green family lightened */
+@plugin "daisyui/theme" {
+    name: 'mealboard-dark';
+    default: false;
+    prefersdark: true;
+    color-scheme: dark;
+
+    --color-base-100: oklch(23% 0.013 58);
+    --color-base-200: oklch(20% 0.012 58);
+    --color-base-300: oklch(17% 0.011 58);
+    --color-base-content: oklch(92% 0.013 82);
+
+    --color-primary: oklch(70% 0.105 150);
+    --color-primary-content: oklch(20% 0.04 150);
+    --color-secondary: oklch(71% 0.1 42);
+    --color-secondary-content: oklch(22% 0.05 42);
+    --color-accent: oklch(80% 0.11 85);
+    --color-accent-content: oklch(26% 0.06 85);
+    --color-neutral: oklch(29% 0.013 58);
+    --color-neutral-content: oklch(92% 0.013 82);
+
+    --color-info: oklch(72% 0.1 232);
+    --color-info-content: oklch(20% 0.05 232);
+    --color-success: oklch(70% 0.115 152);
+    --color-success-content: oklch(20% 0.05 152);
+    --color-warning: oklch(80% 0.13 80);
+    --color-warning-content: oklch(26% 0.06 80);
+    --color-error: oklch(68% 0.15 25);
+    --color-error-content: oklch(20% 0.05 25);
+
+    --radius-box: 1rem;
+    --radius-field: 0.75rem;
+    --radius-selector: 1rem;
+    --size-field: 0.28125rem;
+    --size-selector: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+
+    --meal-breakfast: oklch(82% 0.12 75);
+    --meal-lunch: oklch(76% 0.1 230);
+    --meal-dinner: oklch(70% 0.11 295);
+    --meal-any: oklch(70% 0.015 60);
+}
+
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Fraunces', ui-serif, Georgia, serif;
+}
+
+@layer base {
+    body {
+        font-family: var(--font-sans);
+    }
 }
