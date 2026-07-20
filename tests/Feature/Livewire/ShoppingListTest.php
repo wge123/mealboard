@@ -85,14 +85,14 @@ it('persists checked items across component reloads', function () {
     expect($plan->refresh()->checked_items)->toBe(['flour|g']);
 
     // A brand-new component instance (fresh request) sees the checked state.
-    shoppingListPage($plan)->assertSeeHtml('text-decoration-line-through');
+    shoppingListPage($plan)->assertSeeHtml('line-through');
 
     // Toggling again unchecks and persists that too.
     shoppingListPage($plan)->call('toggleItem', 'flour|g');
 
     expect($plan->refresh()->checked_items)->toBe([]);
 
-    shoppingListPage($plan)->assertDontSeeHtml('text-decoration-line-through');
+    shoppingListPage($plan)->assertDontSeeHtml('line-through');
 });
 
 it('toggles pantry staples into and out of the list', function () {
@@ -253,5 +253,5 @@ it('still persists checked state with the tappable rows', function () {
 
     expect($plan->refresh()->checked_items)->toBe(['yellow onion|count']);
 
-    shoppingListPage($plan)->assertSeeHtml('text-decoration-line-through');
+    shoppingListPage($plan)->assertSeeHtml('line-through');
 });

@@ -127,6 +127,11 @@
     body {
         font-family: var(--font-sans);
     }
+
+    /* Alpine: hide x-cloak'd elements until Alpine initializes them. */
+    [x-cloak] {
+        display: none !important;
+    }
 }
 
 @layer components {
