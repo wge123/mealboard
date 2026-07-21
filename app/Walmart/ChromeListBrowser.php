@@ -139,19 +139,43 @@ class ChromeListBrowser implements ListBrowser
         return is_numeric($result) ? (int) $result : null;
     }
 
-    /** Hard-stop on Walmart's press-and-hold captcha — a human must pass it. */
+    /**
+     * Walmart's press-and-hold captcha: only a human may pass it. This is a
+     * SUPERVISED command, so keep the window open and wait for them (up to
+     * 3 minutes, announced on stderr) instead of exiting and closing Chrome.
+     */
     private function guardCaptcha(): void
     {
         $hit = $this->evaluate(
             "document.body.innerText.includes('".self::CAPTCHA_HEADING."')",
         );
 
-        if ($hit === true) {
-            throw new RuntimeException(
-                'captcha: "'.self::CAPTCHA_HEADING.'" dialog is showing — complete it by hand in the '
-                .'browser window, then re-run (docs/tier3-list.md hazard 1)',
-            );
+        if ($hit !== true) {
+            return;
         }
+
+        fwrite(STDERR, "\n⚠ Walmart is showing the \"".self::CAPTCHA_HEADING."\" check — press and hold the button in the Chrome window. Waiting up to 3 minutes…\n");
+
+        $deadline = time() + 180;
+
+        while (time() < $deadline) {
+            sleep(3);
+
+            $still = $this->evaluate(
+                "document.body.innerText.includes('".self::CAPTCHA_HEADING."')",
+            );
+
+            if ($still !== true) {
+                fwrite(STDERR, "✓ Captcha cleared — continuing.\n");
+                sleep(2);
+
+                return;
+            }
+        }
+
+        throw new RuntimeException(
+            'captcha: "'.self::CAPTCHA_HEADING.'" was not completed within 3 minutes — re-run when ready (docs/tier3-list.md hazard 1)',
+        );
     }
 
     private function evaluate(string $js): mixed
@@ -174,7 +198,17 @@ class ChromeListBrowser implements ListBrowser
         }
 
         if ($node === null) {
-            throw new RuntimeException("selector miss: {$selector} ({$what})");
+            $shot = storage_path('logs/walmart-miss-'.now()->format('His').'.png');
+            $url = null;
+
+            try {
+                $this->page()->screenshot()->saveToFile($shot);
+                $url = $this->page()->getCurrentUrl();
+            } catch (Throwable) {
+                $shot = 'screenshot failed';
+            }
+
+            throw new RuntimeException("selector miss: {$selector} ({$what}) — url: {$url}, screenshot: {$shot}");
         }
 
         return $node;

@@ -54,6 +54,16 @@ by carting from it. The command never touches cart or checkout.
 1. **Captcha**: list creation triggered a "Robot or human?" press-and-hold
    dialog (heading `Robot or human?`). STOP and hand to the human — never
    automate. The pending action completes once the human passes it.
+   **ESCALATION (2026-07-21, blocks this command)**: in the chrome-php headed
+   browser the press-and-hold challenge LOOPS FOREVER even for a real human —
+   PerimeterX rejects the flagged automation environment itself, not the
+   gesture. The same challenge passed first-try in a playwright-cli session
+   earlier the same night. Consequence: `walmart:push-list` cannot currently
+   complete on Walmart via chrome-php. Paths forward (no evasion, ever):
+   (a) reimplement the browser seam on the stack that empirically passed,
+   (b) findings from the external-tools research (GitHub/forums), or
+   (c) retire Tier 3 and keep Tier 1/2 (the 42-item week was assembled fine
+   via the supervised interactive route).
 2. **Silent focus loss during bulk adds**: after ~8 rapid type+Enter adds the
    input lost focus and later keystrokes went to the page with NO error.
    Mitigation (now the required pattern): re-focus the input before EVERY
