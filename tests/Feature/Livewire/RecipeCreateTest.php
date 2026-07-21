@@ -36,6 +36,7 @@ it('saves a manual recipe with ingredient pivot rows and redirects to it', funct
         ->test(RecipeCreate::class)
         ->set('title', 'Weeknight Fried Rice')
         ->set('description', 'Uses up leftover rice.')
+        ->set('sourceUrl', 'https://example.com/recipes/weeknight-fried-rice')
         ->set('mealType', 'dinner')
         ->set('cuisine', 'chinese')
         ->set('prepMinutes', 10)
@@ -133,7 +134,7 @@ it('requires a title and validates units against the normalized set', function (
             ['name' => 'flour', 'qty' => '1', 'unit' => 'handful', 'note' => ''],
         ])
         ->call('save')
-        ->assertHasErrors(['title' => 'required', 'rows.0.unit']);
+        ->assertHasErrors(['title' => 'required', 'sourceUrl' => 'required', 'rows.0.unit']);
 
     expect(Recipe::count())->toBe(0);
 });

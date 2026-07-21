@@ -32,7 +32,7 @@
         </div>
 
         <p class="mt-2 text-sm opacity-60">
-            Source: {{ ucfirst($recipe->source->value) }}@if ($recipe->source_url) — <a class="link" href="{{ $recipe->source_url }}" target="_blank" rel="noopener">{{ $recipe->source_url }}</a>@endif
+            Inspired from <a class="link" href="{{ $recipe->source_url }}" target="_blank" rel="noopener">{{ parse_url($recipe->source_url, PHP_URL_HOST) ?: $recipe->source_url }}</a> · {{ ucfirst($recipe->source->value) }}
         </p>
         @if ($recipe->approved_at)
             <p class="text-sm opacity-60">

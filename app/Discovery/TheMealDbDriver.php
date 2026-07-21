@@ -88,9 +88,12 @@ class TheMealDbDriver implements RecipeDiscoveryDriver
     }
 
     /**
+     * The meal's own source or video when the API has one; otherwise its
+     * TheMealDB page, which always exists — every recipe carries a source.
+     *
      * @param  array<string, mixed>  $meal
      */
-    private function sourceUrl(array $meal): ?string
+    private function sourceUrl(array $meal): string
     {
         foreach (['strSource', 'strYoutube'] as $key) {
             $url = trim((string) ($meal[$key] ?? ''));
@@ -100,7 +103,7 @@ class TheMealDbDriver implements RecipeDiscoveryDriver
             }
         }
 
-        return null;
+        return 'https://www.themealdb.com/meal/'.$meal['idMeal'];
     }
 
     /**

@@ -6,6 +6,9 @@ use App\Actions\Planning\ComputeTasteProfile;
 use App\Enums\RecipeStatus;
 use App\Models\BrainNote;
 use App\Models\Recipe;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 /**
@@ -70,10 +73,12 @@ class AnthropicDriver implements RecipeDiscoveryDriver
           "instructions": string (numbered steps, markdown allowed),
           "cuisine": string or null,
           "tags": array of strings,
-          "source_url": null,
+          "source_url": string (see source rule below),
           "ingredients": array of {"qty": number or null, "unit": string or null, "name": string, "note": string or null}
         }
         Allowed ingredient units: g, kg, ml, l, tsp, tbsp, cup, oz, lb, count, or null for unitless items.
+
+        Source rule: every candidate MUST cite the real, published recipe page or cooking video it is based on as source_url (an http(s) URL on a recipe site or YouTube). Only cite URLs you are confident actually exist — NEVER invent or guess a URL. If you cannot cite a real source for an idea, replace it with a candidate you can cite. Cited URLs are checked; a dead link gets the candidate discarded.
         PROMPT;
     }
 
@@ -189,11 +194,40 @@ class AnthropicDriver implements RecipeDiscoveryDriver
         foreach ($decoded as $item) {
             $candidate = $this->validator->validate($item);
 
-            if ($candidate !== null) {
-                $candidates[] = $candidate;
+            if ($candidate === null) {
+                continue;
             }
+
+            // The model is told to cite real sources, but it can still
+            // hallucinate one — a dead link disqualifies the candidate.
+            if (! $this->sourceResolves($candidate['source_url'])) {
+                Log::warning("discovery: discarded candidate \"{$candidate['title']}\" — cited source_url does not resolve: {$candidate['source_url']}");
+
+                continue;
+            }
+
+            $candidates[] = $candidate;
         }
 
         return $candidates;
+    }
+
+    /**
+     * A hallucinated citation shows up as a hard not-found or a dead host.
+     * Bot-blocking responses (403/429) still prove the URL resolves, so only
+     * 404/410/connection failure disqualify.
+     */
+    private function sourceResolves(string $url): bool
+    {
+        try {
+            $status = Http::timeout(5)
+                ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Mealboard/1.0'])
+                ->head($url)
+                ->status();
+        } catch (ConnectionException) {
+            return false;
+        }
+
+        return ! in_array($status, [404, 410], true);
     }
 }

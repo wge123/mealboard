@@ -11,6 +11,7 @@ it('creates a recipe with ingredient pivot rows', function () {
         'title' => 'Shakshuka',
         'description' => 'Eggs poached in spiced tomato sauce.',
         'source' => RecipeSource::Manual,
+        'source_url' => 'https://example.com/recipes/shakshuka',
         'meal_type' => 'breakfast',
         'prep_minutes' => 10,
         'cook_minutes' => 20,

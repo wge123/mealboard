@@ -23,6 +23,7 @@ class RecipeSeeder extends Seeder
                 'title' => $data['title'],
                 'description' => $data['description'],
                 'source' => RecipeSource::Manual,
+                'source_url' => $data['source_url'],
                 'status' => $data['status'],
                 'meal_type' => $data['meal_type'],
                 'prep_minutes' => $data['prep_minutes'],
@@ -68,6 +69,7 @@ class RecipeSeeder extends Seeder
         return [
             [
                 'title' => 'Spinach and Feta Scrambled Eggs',
+                'source_url' => 'https://www.budgetbytes.com/scrambled-eggs-with-spinach-and-feta/',
                 'description' => 'Soft scrambled eggs folded with wilted spinach and crumbled feta. Fast enough for a weekday.',
                 'status' => RecipeStatus::Approved,
                 'meal_type' => MealType::Breakfast,
@@ -87,6 +89,7 @@ class RecipeSeeder extends Seeder
             ],
             [
                 'title' => 'Blueberry Banana Oatmeal',
+                'source_url' => 'https://www.budgetbytes.com/blueberry-banana-baked-oatmeal/',
                 'description' => 'Creamy stovetop oats sweetened with banana and studded with frozen blueberries.',
                 'status' => RecipeStatus::Approved,
                 'meal_type' => MealType::Breakfast,
@@ -107,6 +110,7 @@ class RecipeSeeder extends Seeder
             ],
             [
                 'title' => 'Chicken Caesar Wraps',
+                'source_url' => 'https://www.budgetbytes.com/chicken-caesar-wrap/',
                 'description' => 'Grilled chicken, crisp romaine, and parmesan in a tortilla — a lunch that travels well.',
                 'status' => RecipeStatus::Approved,
                 'meal_type' => MealType::Lunch,
@@ -127,6 +131,7 @@ class RecipeSeeder extends Seeder
             ],
             [
                 'title' => 'Thai Peanut Noodle Salad',
+                'source_url' => 'https://www.feastingathome.com/thai-noodle-salad-with-peanut-sauce/',
                 'description' => 'Cold rice noodles in a punchy peanut-lime dressing with crunchy vegetables.',
                 'status' => RecipeStatus::Approved,
                 'meal_type' => MealType::Lunch,
@@ -147,6 +152,7 @@ class RecipeSeeder extends Seeder
             ],
             [
                 'title' => 'Spaghetti Bolognese',
+                'source_url' => 'https://www.bbcgoodfood.com/recipes/best-spaghetti-bolognese-recipe',
                 'description' => 'A weeknight-friendly ragu: beef, tomatoes, and aromatics simmered until rich.',
                 'status' => RecipeStatus::Approved,
                 'meal_type' => MealType::Dinner,
@@ -168,6 +174,7 @@ class RecipeSeeder extends Seeder
             ],
             [
                 'title' => 'Chicken Tikka Masala',
+                'source_url' => 'https://cafedelites.com/chicken-tikka-masala/',
                 'description' => 'Yogurt-marinated chicken thighs in a spiced tomato-cream sauce over basmati rice.',
                 'status' => RecipeStatus::Approved,
                 'meal_type' => MealType::Dinner,
@@ -189,6 +196,7 @@ class RecipeSeeder extends Seeder
             ],
             [
                 'title' => 'Weeknight Beef Tacos',
+                'source_url' => 'https://natashaskitchen.com/ground-beef-tacos/',
                 'description' => 'Seasoned beef with charred corn, cheddar, and salsa in warm tortillas.',
                 'status' => RecipeStatus::Approved,
                 'meal_type' => MealType::Dinner,
@@ -210,6 +218,7 @@ class RecipeSeeder extends Seeder
             ],
             [
                 'title' => 'Salmon Teriyaki with Broccoli',
+                'source_url' => 'https://www.recipetineats.com/teriyaki-salmon/',
                 'description' => 'Pan-seared salmon glazed in a quick homemade teriyaki, with steamed broccoli and rice.',
                 'status' => RecipeStatus::Approved,
                 'meal_type' => MealType::Dinner,
@@ -230,6 +239,7 @@ class RecipeSeeder extends Seeder
             ],
             [
                 'title' => 'Margherita Flatbread',
+                'source_url' => 'https://www.bunsinmyoven.com/margherita-flatbread/',
                 'description' => 'Store-bought flatbread with fresh mozzarella, tomato, and basil — dinner in 20 minutes.',
                 'status' => RecipeStatus::Pending,
                 'meal_type' => MealType::Dinner,
@@ -250,6 +260,7 @@ class RecipeSeeder extends Seeder
             ],
             [
                 'title' => 'Hearty Lentil Soup',
+                'source_url' => 'https://cookieandkate.com/best-lentil-soup-recipe/',
                 'description' => 'A pot of brown lentils with carrot, celery, and stock. Works for lunch or dinner, freezes well.',
                 'status' => RecipeStatus::Pending,
                 'meal_type' => MealType::Any,

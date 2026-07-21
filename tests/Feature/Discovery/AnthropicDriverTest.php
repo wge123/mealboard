@@ -6,6 +6,7 @@ use App\Models\Ingredient;
 use App\Models\MealLog;
 use App\Models\PlannedMeal;
 use App\Models\Recipe;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 
 function validClaudeCandidate(array $overrides = []): array
@@ -20,7 +21,7 @@ function validClaudeCandidate(array $overrides = []): array
         'instructions' => "1. Sear the salmon.\n2. Whisk the dressing.\n3. Assemble the bowls.",
         'cuisine' => 'Mediterranean',
         'tags' => ['fish', 'quick'],
-        'source_url' => null,
+        'source_url' => 'https://example.com/recipes/lemon-garlic-salmon-bowls',
         'ingredients' => [
             ['qty' => 2, 'unit' => null, 'name' => 'salmon fillets', 'note' => null],
             ['qty' => 1, 'unit' => 'tbsp', 'name' => 'olive oil', 'note' => null],
@@ -31,6 +32,10 @@ function validClaudeCandidate(array $overrides = []): array
 
 beforeEach(function () {
     config()->set('mealboard.claude_bin', '/fake/bin/claude');
+
+    // The driver HEAD-checks every cited source_url; fake the fixture host
+    // so no test touches the network. Liveness tests fake their own hosts.
+    Http::fake(['example.com/*' => Http::response()]);
 });
 
 it('parses strict JSON output into schema-checked candidates', function () {
@@ -81,6 +86,51 @@ it('discards a malformed candidate while keeping its valid sibling', function ()
 
     expect($candidates)->toHaveCount(1)
         ->and($candidates[0]['title'])->toBe('Survivor Stir-Fry');
+});
+
+it('discards a candidate without a cited source_url', function () {
+    $json = json_encode([
+        validClaudeCandidate(['title' => 'Uncited Dish', 'source_url' => null]),
+        validClaudeCandidate(),
+    ]);
+
+    Process::fake(['*' => Process::result(output: $json)]);
+
+    $candidates = app(AnthropicDriver::class)->discover(2);
+
+    expect($candidates)->toHaveCount(1)
+        ->and($candidates[0]['title'])->toBe('Lemon Garlic Salmon Bowls');
+});
+
+it('discards a candidate whose cited source_url is a dead link', function () {
+    Http::fake(['dead.example.net/*' => Http::response(status: 404)]);
+
+    $json = json_encode([
+        validClaudeCandidate(['title' => 'Hallucinated Dish', 'source_url' => 'https://dead.example.net/recipe']),
+        validClaudeCandidate(),
+    ]);
+
+    Process::fake(['*' => Process::result(output: $json)]);
+
+    $candidates = app(AnthropicDriver::class)->discover(2);
+
+    expect($candidates)->toHaveCount(1)
+        ->and($candidates[0]['title'])->toBe('Lemon Garlic Salmon Bowls');
+});
+
+it('keeps a candidate whose source blocks bots, since the URL still resolves', function () {
+    Http::fake(['blocked.example.net/*' => Http::response(status: 403)]);
+
+    $json = json_encode([
+        validClaudeCandidate(['title' => 'Bot-Blocked Dish', 'source_url' => 'https://blocked.example.net/recipe']),
+    ]);
+
+    Process::fake(['*' => Process::result(output: $json)]);
+
+    $candidates = app(AnthropicDriver::class)->discover(1);
+
+    expect($candidates)->toHaveCount(1)
+        ->and($candidates[0]['title'])->toBe('Bot-Blocked Dish');
 });
 
 it('throws when the whole output is unparseable', function () {

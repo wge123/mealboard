@@ -43,7 +43,7 @@ trait InteractsWithRecipeForm
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'sourceUrl' => ['nullable', 'url', 'max:255'],
+            'sourceUrl' => ['required', 'url', 'max:255'],
             'mealType' => ['required', Rule::enum(MealType::class)],
             'cuisine' => ['nullable', 'string', 'max:255'],
             'prepMinutes' => ['required', 'integer', 'min:0'],
@@ -91,7 +91,7 @@ trait InteractsWithRecipeForm
         return [
             'title' => $this->title,
             'description' => $this->description,
-            'source_url' => $this->sourceUrl ?: null,
+            'source_url' => $this->sourceUrl,
             'meal_type' => $this->mealType,
             'cuisine' => $this->cuisine !== '' ? mb_strtolower(trim($this->cuisine)) : null,
             'prep_minutes' => $this->prepMinutes,

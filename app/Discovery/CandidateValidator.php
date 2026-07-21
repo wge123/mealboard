@@ -65,8 +65,17 @@ class CandidateValidator
             ];
         }
 
-        $cuisine = $item['cuisine'] ?? null;
+        // Every recipe needs a real source (user decision 2026-07-21): a
+        // candidate without a valid http(s) source_url is malformed.
         $sourceUrl = $item['source_url'] ?? null;
+
+        if (! is_string($sourceUrl)
+            || filter_var($sourceUrl, FILTER_VALIDATE_URL) === false
+            || ! in_array(parse_url($sourceUrl, PHP_URL_SCHEME), ['http', 'https'], true)) {
+            return null;
+        }
+
+        $cuisine = $item['cuisine'] ?? null;
 
         return [
             'title' => trim($item['title']),
@@ -78,7 +87,7 @@ class CandidateValidator
             'instructions' => trim($item['instructions']),
             'cuisine' => is_string($cuisine) && trim($cuisine) !== '' ? trim($cuisine) : null,
             'tags' => array_values(array_filter($item['tags'] ?? [], 'is_string')),
-            'source_url' => is_string($sourceUrl) && $sourceUrl !== '' ? $sourceUrl : null,
+            'source_url' => $sourceUrl,
             'ingredients' => $ingredients,
         ];
     }

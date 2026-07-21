@@ -87,15 +87,21 @@ class ExtractRecipeFromVideo
     {
         $output = $this->claude->run($this->prompt($video, $transcript));
 
-        $candidate = $this->validator->validate(json_decode($this->claude->extractJson($output), true));
+        $item = json_decode($this->claude->extractJson($output), true);
+
+        if (is_array($item)) {
+            // The video IS the source — inject it before schema validation so
+            // the validator's source_url requirement holds on this path too.
+            $item['source_url'] = "https://www.youtube.com/watch?v={$video->video_id}";
+        }
+
+        $candidate = $this->validator->validate($item);
 
         if ($candidate === null) {
             throw new RuntimeException(
                 'claude recipe output failed schema validation: '.mb_substr(trim($output), 0, 300),
             );
         }
-
-        $candidate['source_url'] = "https://www.youtube.com/watch?v={$video->video_id}";
 
         return $candidate;
     }

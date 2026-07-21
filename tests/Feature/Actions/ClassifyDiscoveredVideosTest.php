@@ -121,7 +121,7 @@ it('includes youtube approve/reject history in the classifier prompt', function 
         'title' => 'Rejected Fish Stew',
         'source_url' => 'https://youtu.be/def12345678',
     ]);
-    Recipe::factory()->approved()->create(['title' => 'Manual Pasta', 'source_url' => null]);
+    Recipe::factory()->approved()->create(['title' => 'Manual Pasta', 'source_url' => 'https://example.com/recipes/manual-pasta']);
     Recipe::factory()->create([
         'title' => 'Pending YouTube Soup',
         'source_url' => 'https://www.youtube.com/watch?v=ghi12345678',
