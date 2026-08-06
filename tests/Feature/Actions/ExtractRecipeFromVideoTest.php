@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Discovery\ExtractRecipeFromVideo;
+use App\Exceptions\DiscoveryEnvironmentException;
 use App\Models\DiscoveredVideo;
 use Illuminate\Support\Facades\Process;
 
@@ -84,6 +85,28 @@ it('records a captionless video failure without calling claude', function () {
         ->and($video->processed_at)->toBeNull();
 
     Process::assertDidntRun(fn ($process) => $process->command[0] === '/fake/bin/claude');
+});
+
+it('does not blacklist the video when the interpreter itself cannot run', function () {
+    // 126/127 means yt_python is gone, not that the video is captionless. The
+    // per-video path would write an error on the row, and YouTubeDriver filters
+    // on whereNull('error'), so a healthy video would be excluded from every
+    // future run because of a broken absolute path in config.
+    $video = DiscoveredVideo::factory()->likelyRecipe()->create();
+
+    Process::fake([
+        '*python3*' => Process::result(
+            output: '',
+            errorOutput: 'sh: /fake/bin/python3: cannot execute: No such file or directory',
+            exitCode: 126,
+        ),
+    ]);
+
+    expect(fn () => app(ExtractRecipeFromVideo::class)->handle($video))
+        ->toThrow(DiscoveryEnvironmentException::class, 'could not be executed');
+
+    expect($video->refresh()->error)->toBeNull()
+        ->and($video->processed_at)->toBeNull();
 });
 
 it('records an empty transcript as a failure', function () {
