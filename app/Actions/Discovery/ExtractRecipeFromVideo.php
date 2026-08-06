@@ -4,6 +4,7 @@ namespace App\Actions\Discovery;
 
 use App\Discovery\CandidateValidator;
 use App\Discovery\ClaudeCli;
+use App\Exceptions\DiscoveryEnvironmentException;
 use App\Models\DiscoveredVideo;
 use Illuminate\Support\Facades\Process;
 use RuntimeException;
@@ -16,7 +17,10 @@ use RuntimeException;
  *
  * Failures (captionless video, empty transcript, malformed recipe JSON) are
  * loud but per-video: the error lands on the discovered_videos row and null
- * is returned so the caller continues with the other videos.
+ * is returned so the caller continues with the other videos. Recording the
+ * error is permanent, since YouTubeDriver filters on whereNull('error'), which
+ * is why a broken environment must NOT take that path; see
+ * DiscoveryEnvironmentException.
  */
 class ExtractRecipeFromVideo
 {
@@ -57,14 +61,31 @@ class ExtractRecipeFromVideo
 
     private function transcript(string $videoId): string
     {
+        $python = (string) config('mealboard.yt_python');
+
         $result = Process::timeout(120)->run([
-            (string) config('mealboard.yt_python'),
+            $python,
             '-c',
             self::TRANSCRIPT_SCRIPT,
             $videoId,
         ]);
 
         if ($result->failed()) {
+            // Diagnose the shell's "cannot execute" codes before blaming the
+            // video. yt_python is an absolute path into another project's venv,
+            // so it breaks whenever that project is moved or rebuilt, and the
+            // resulting 126/127 is otherwise indistinguishable from a
+            // captionless video. Taking the per-video path there would record
+            // an error on the row and blacklist a perfectly good video forever
+            // (YouTubeDriver filters on whereNull('error')), one per run, for a
+            // fault that has nothing to do with it.
+            if (in_array($result->exitCode(), [126, 127], true)) {
+                throw new DiscoveryEnvironmentException(
+                    "yt_python at '{$python}' could not be executed (exit ".$result->exitCode().'): '
+                    .trim($result->errorOutput() !== '' ? $result->errorOutput() : $result->output()),
+                );
+            }
+
             throw new RuntimeException(
                 'transcript fetch failed (exit '.$result->exitCode().'): '
                 .trim($result->errorOutput() !== '' ? $result->errorOutput() : $result->output()),

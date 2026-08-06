@@ -30,6 +30,10 @@ class RunDiscovery
                 $found = app($driverClass)->discover($count);
                 $candidates = [...$candidates, ...$found];
             } catch (Throwable $e) {
+                // report() before reducing the exception to its message: the
+                // DiscoveryRun row keeps one line, and without this the stack
+                // trace of an unattended failure is destroyed here.
+                report($e);
                 $error = $e->getMessage();
                 $errors[$driverClass] = $error;
             }
