@@ -115,19 +115,52 @@ it('no-ops when discovery already ran today unless forced', function () {
         ->and(DiscoveryRun::count())->toBe(2);
 });
 
-it('records a driver failure on the discovery_runs row and still succeeds', function () {
+it('keeps the surviving drivers but exits non-zero when one fails', function () {
+    // The surviving driver's candidates are still stored (a partial run is
+    // better than none), but the exit code must report the failure: it is the
+    // only signal the scheduler's onFailure hook can see, and a run in which
+    // every driver died used to be indistinguishable from a perfect one.
     config()->set('mealboard.drivers', [FailingDiscoveryDriver::class, FakeDiscoveryDriver::class]);
     FakeDiscoveryDriver::$candidates = [discoveredCandidate('Resilient Ratatouille')];
 
     $this->artisan('recipes:discover')
         ->expectsOutputToContain('driver blew up')
-        ->assertSuccessful();
+        ->assertFailed();
 
     $failedRun = DiscoveryRun::firstWhere('driver', FailingDiscoveryDriver::class);
 
     expect($failedRun->error)->toContain('driver blew up')
         ->and($failedRun->candidates_found)->toBe(0)
         ->and(Recipe::count())->toBe(1);
+});
+
+it('exits zero when every driver succeeds', function () {
+    // The control for the test above: without this, "exits non-zero" could be
+    // true of every run rather than only of failing ones.
+    config()->set('mealboard.drivers', [FakeDiscoveryDriver::class]);
+    FakeDiscoveryDriver::$candidates = [discoveredCandidate('Untroubled Tagine')];
+
+    $this->artisan('recipes:discover')->assertSuccessful();
+});
+
+it('schedules every command with a failure notification and its own log', function () {
+    // Guards the wiring itself: a command scheduled without onFailure fails
+    // invisibly no matter what its exit code says.
+    $scheduled = collect(app(Schedule::class)->events())
+        ->filter(fn ($event) => str_contains($event->command ?? '', 'artisan'));
+
+    expect($scheduled)->toHaveCount(3);
+
+    foreach ($scheduled as $event) {
+        // onFailure registers into the protected afterCallbacks list, so
+        // reflection is the only evidence that a hook was attached at all.
+        $after = (new ReflectionProperty($event, 'afterCallbacks'))->getValue($event);
+
+        expect($after)->not->toBeEmpty()
+            ->and($event->withoutOverlapping)->toBeTrue()
+            ->and($event->output)->toContain('storage/logs/schedule-')
+            ->and($event->shouldAppendOutput)->toBeTrue();
+    }
 });
 
 it('is scheduled daily at 05:30', function () {

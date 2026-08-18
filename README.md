@@ -33,13 +33,21 @@ Local dev auto-logs you in as Willem (`AutoLoginLocal` middleware, `local` env o
 
 ## Running
 
-Two long-lived processes:
+The scheduler:
 
 ```bash
-# scheduler (cron): * * * * * cd /Users/willem/Developer/Personal/mealboard && php artisan schedule:run >> /dev/null 2>&1
-# queue worker:
-php artisan queue:work --tries=1
+# cron: * * * * * cd /Users/willem/Developer/Personal/mealboard && php artisan schedule:run >> storage/logs/schedule-run.log 2>&1
 ```
+
+Do not redirect that line to `/dev/null`. The scheduled commands report trouble
+on stdout, and each one also appends its own output to
+`storage/logs/schedule-<command>.log`; a failing command additionally fires
+`job-notify-fail.sh` (see `mealboard.job_notify_fail`), which is what produces
+the desktop alert and the HUD badge. Sending the run itself to `/dev/null`
+throws away everything that is not covered by those two channels.
+
+There is no queue worker to run: nothing in this codebase implements
+`ShouldQueue`, and discovery executes synchronously inside `recipes:discover`.
 
 Scheduled commands (`php artisan schedule:list`):
 

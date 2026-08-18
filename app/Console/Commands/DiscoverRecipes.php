@@ -8,6 +8,7 @@ use App\Enums\RecipeSource;
 use App\Models\DiscoveryRun;
 use App\Models\Recipe;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class DiscoverRecipes extends Command
 {
@@ -29,6 +30,7 @@ class DiscoverRecipes extends Command
 
         foreach ($result['errors'] as $driver => $error) {
             $this->warn("{$driver}: {$error}");
+            Log::error("recipes:discover driver failed: {$driver}: {$error}");
         }
 
         // Fuzzy title dedupe against ALL existing recipes — rejected included,
@@ -62,6 +64,20 @@ class DiscoverRecipes extends Command
         }
 
         $this->info("Created {$created} pending recipe(s), skipped {$skipped} duplicate(s).");
+
+        // A driver that threw is a real failure even when the surviving drivers
+        // produced candidates, and the exit code is the only thing the
+        // scheduler's onFailure hook can see. Returning SUCCESS here is how a
+        // run in which every driver died still looked like a perfect day.
+        //
+        // Candidates created above are already committed and the per-day
+        // idempotency guard still holds, so a retry of this command re-runs the
+        // drivers without duplicating what this run stored.
+        if ($result['errors'] !== []) {
+            $this->error(count($result['errors']).' discovery driver(s) failed.');
+
+            return self::FAILURE;
+        }
 
         return self::SUCCESS;
     }

@@ -65,7 +65,9 @@ return [
     | (food/recipe preference notes). Deviation from the original step text:
     | DECISIONS.md #5 put the YouTube channel list in the database with its
     | own settings UI, so channel sync is deliberately NOT part of brain_files
-    | or brain:sync. A path missing in the repo warns per file, never fails.
+    | or brain:sync. A path missing in the repo warns per file and is skipped;
+    | a run in which NO configured path synced exits non-zero, because that is
+    | total loss of the preference data rather than one stale note.
     |
     */
 
@@ -107,5 +109,22 @@ return [
     'brain_files' => [
         'wiki/concepts/food-preferences.md',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scheduled-job failure reporter
+    |--------------------------------------------------------------------------
+    |
+    | Absolute path to the machine-wide job failure reporter that the scheduler
+    | calls from onFailure (routes/console.php). Calling it is what earns a job
+    | the HUD badge, the session-start surfacing and the autonomous repair pass.
+    | Machine-specific, like yt_python above, hence the absolute default.
+    |
+    */
+
+    'job_notify_fail' => env(
+        'MEALBOARD_JOB_NOTIFY_FAIL',
+        '/Users/willem/Developer/Personal/second_brain/scripts/job-notify-fail.sh',
+    ),
 
 ];

@@ -67,6 +67,22 @@ it('warns and continues when a vault file is missing', function () {
     expect(BrainNote::pluck('path')->all())->toBe(['wiki/concepts/food-preferences.md']);
 });
 
+it('exits non-zero when no configured note synced at all', function () {
+    // A partial miss is a skip (asserted above, and it still exits zero). Every
+    // note missing is total loss of the preference data, and it degrades
+    // silently downstream: discovery just renders "(none yet)" and keeps
+    // producing recipes that ignore the user's stated preferences.
+    config()->set('mealboard.brain_files', ['wiki/concepts/gone.md']);
+
+    Http::fake(['api.github.com/*' => Http::response('Not Found', 404)]);
+
+    $this->artisan('brain:sync')
+        ->expectsOutputToContain('No brain notes synced')
+        ->assertFailed();
+
+    expect(BrainNote::count())->toBe(0);
+});
+
 it('throws when GITHUB_PAT is not set', function () {
     config()->set('mealboard.github_pat', null);
 
