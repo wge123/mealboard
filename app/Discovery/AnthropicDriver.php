@@ -6,6 +6,7 @@ use App\Actions\Planning\ComputeTasteProfile;
 use App\Enums\RecipeStatus;
 use App\Models\BrainNote;
 use App\Models\Recipe;
+use App\Models\RecipeRequest;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -40,21 +41,55 @@ class AnthropicDriver implements RecipeDiscoveryDriver
         return $this->parseCandidates($this->claude->run($this->prompt($n)));
     }
 
-    private function prompt(int $n): string
+    /**
+     * Same driver, aimed at one household request instead of at open-ended
+     * discovery. The weeknight caps are dropped: the household named the dish,
+     * and a hibachi spread for four does not fit in 10 ingredients.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function discoverFor(RecipeRequest $request, int $n): array
+    {
+        return $this->parseCandidates($this->claude->run($this->prompt($n, $request)));
+    }
+
+    private function prompt(int $n, ?RecipeRequest $request = null): string
     {
         $tasteProfile = $this->tasteProfile();
-        $rejections = $this->summarizeRejections();
+        // On a request, the "over 30 minutes" theme is dropped: it is an
+        // artifact of the weeknight rubric, and leaving it in would tell the
+        // model to avoid long recipes two lines after telling it there is no
+        // time limit. Cuisine, tag and ingredient themes still apply, because
+        // those are real dislikes rather than a scheduling constraint.
+        $rejections = $this->summarizeRejections(includeDurationTheme: $request === null);
 
         $tasteProfileSection = $tasteProfile !== '' ? $tasteProfile : '(none yet)';
         $rejectionSection = $rejections !== '' ? $rejections : '(none yet)';
 
-        return <<<PROMPT
-        You are the recipe discovery engine for a household meal planner. Suggest exactly {$n} recipe candidates the household has plausibly never tried.
+        $brief = $request !== null
+            ? <<<BRIEF
+            The household has asked for this specifically:
+            "{$request->query}"
 
-        Hard constraints for EVERY candidate (healthy + easy):
-        - Total time (prep_minutes + cook_minutes) must be 30 minutes or less.
-        - 10 ingredients or fewer.
-        - Whole-food-leaning: minimally processed ingredients over packaged or ultra-processed ones.
+            Every candidate must be a genuine answer to that request. Prefer the authentic version of what was asked for over a lighter or faster reinterpretation of it.
+
+            Constraints for EVERY candidate:
+            - There is NO time limit and NO ingredient limit. The household's usual weeknight caps do not apply to a requested dish; give the recipe the time and the ingredients it actually takes.
+            - Whole-food-leaning where the dish allows it, without compromising what makes the dish itself.
+            BRIEF
+            : <<<'BRIEF'
+            Suggest candidates the household has plausibly never tried.
+
+            Hard constraints for EVERY candidate (healthy + easy):
+            - Total time (prep_minutes + cook_minutes) must be 30 minutes or less.
+            - 10 ingredients or fewer.
+            - Whole-food-leaning: minimally processed ingredients over packaged or ultra-processed ones.
+            BRIEF;
+
+        return <<<PROMPT
+        You are the recipe discovery engine for a household meal planner. Suggest exactly {$n} recipe candidates.
+
+        {$brief}
 
         Taste profile:
         {$tasteProfileSection}
@@ -134,7 +169,7 @@ class AnthropicDriver implements RecipeDiscoveryDriver
      * theme needing at least REJECTION_THEME_MIN members, capped at
      * REJECTION_THEME_CAP lines.
      */
-    protected function summarizeRejections(): string
+    protected function summarizeRejections(bool $includeDurationTheme = true): string
     {
         $rejected = Recipe::query()
             ->where('status', RecipeStatus::Rejected)
@@ -162,10 +197,10 @@ class AnthropicDriver implements RecipeDiscoveryDriver
                 ->flatMap(fn (Recipe $recipe) => $recipe->ingredients->pluck('name')->unique())
                 ->countBy()
                 ->mapWithKeys(fn (int $count, string $ingredient) => ["recipes featuring {$ingredient}" => $count]))
-            ->put(
+            ->when($includeDurationTheme, fn ($themes) => $themes->put(
                 'recipes over '.self::LONG_RECIPE_MINUTES.' minutes total',
                 $rejected->filter(fn (Recipe $recipe) => $recipe->prep_minutes + $recipe->cook_minutes > self::LONG_RECIPE_MINUTES)->count(),
-            );
+            ));
 
         // Theme = repetition: drop singleton groups, biggest first, capped.
         return $themes

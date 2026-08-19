@@ -49,6 +49,10 @@
             </figure>
 
             <div class="p-5">
+                @if ($recipe->recipeRequest !== null)
+                    <p class="mb-1 text-xs opacity-60">You asked for &ldquo;{{ $recipe->recipeRequest->query }}&rdquo;</p>
+                @endif
+
                 <h2 class="font-[family-name:var(--font-display)] text-2xl leading-tight font-semibold">{{ $recipe->title }}</h2>
 
                 <div class="mt-2.5 flex flex-wrap gap-1.5">

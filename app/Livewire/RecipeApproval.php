@@ -52,7 +52,7 @@ class RecipeApproval extends Component
     {
         return view('livewire.recipe-approval', [
             'recipe' => Recipe::query()
-                ->with('ingredients')
+                ->with(['ingredients', 'recipeRequest'])
                 ->where('status', RecipeStatus::Pending)
                 ->orderBy('created_at')
                 ->orderBy('id')

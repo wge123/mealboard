@@ -21,6 +21,7 @@ class Recipe extends Model
         'description',
         'source_url',
         'source',
+        'recipe_request_id',
         'status',
         'meal_type',
         'prep_minutes',
@@ -48,6 +49,12 @@ class Recipe extends Model
             'discovered_at' => 'datetime',
             'approved_at' => 'datetime',
         ];
+    }
+
+    /** @return BelongsTo<RecipeRequest, $this> */
+    public function recipeRequest(): BelongsTo
+    {
+        return $this->belongsTo(RecipeRequest::class);
     }
 
     public function ingredients(): BelongsToMany

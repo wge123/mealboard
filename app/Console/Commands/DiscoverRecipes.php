@@ -4,9 +4,9 @@ namespace App\Console\Commands;
 
 use App\Actions\Discovery\RunDiscovery;
 use App\Actions\Recipes\CreateRecipe;
+use App\Discovery\NearDuplicateFilter;
 use App\Enums\RecipeSource;
 use App\Models\DiscoveryRun;
-use App\Models\Recipe;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -16,7 +16,7 @@ class DiscoverRecipes extends Command
 
     protected $description = 'Run all discovery drivers and store new candidates as pending recipes';
 
-    public function handle(RunDiscovery $runDiscovery, CreateRecipe $createRecipe): int
+    public function handle(RunDiscovery $runDiscovery, CreateRecipe $createRecipe, NearDuplicateFilter $duplicates): int
     {
         // Idempotent per day — the scheduler fires daily (DECISIONS.md #1)
         // and a manual rerun should not double the day's candidates.
@@ -35,16 +35,13 @@ class DiscoverRecipes extends Command
 
         // Fuzzy title dedupe against ALL existing recipes — rejected included,
         // so a rejected suggestion is never re-suggested — and within the batch.
-        $knownTitles = Recipe::query()
-            ->pluck('title')
-            ->map(fn (string $title) => mb_strtolower(trim($title)))
-            ->all();
+        $knownTitles = $duplicates->knownTitles();
 
         $created = 0;
         $skipped = 0;
 
         foreach ($result['candidates'] as $candidate) {
-            if ($this->isNearDuplicate($candidate['title'], $knownTitles)) {
+            if ($duplicates->isDuplicate($candidate['title'], $knownTitles)) {
                 $skipped++;
 
                 continue;
@@ -80,27 +77,5 @@ class DiscoverRecipes extends Command
         }
 
         return self::SUCCESS;
-    }
-
-    /**
-     * @param  list<string>  $knownTitles  lowercased, trimmed
-     */
-    private function isNearDuplicate(string $title, array $knownTitles): bool
-    {
-        $needle = mb_strtolower(trim($title));
-
-        foreach ($knownTitles as $known) {
-            if (levenshtein($needle, $known) <= 3) {
-                return true;
-            }
-
-            similar_text($needle, $known, $percent);
-
-            if ($percent >= 85) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
