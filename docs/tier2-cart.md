@@ -26,6 +26,26 @@ the run ends with the human reviewing the cart and placing the order themselves.
 5. **The human is present.** This is a supervised run. If the human steps away,
    the agent pauses.
 
+## Readiness check (run before the human sits down)
+
+One command proves prerequisites 3 and 4 at once — the server starts and a
+locked week exists — so a supervised run never dies on its first tool call:
+
+```bash
+cd /Users/willem/Developer/Personal/mealboard
+printf '%s\n' \
+  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
+  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"get_current_shopping_list","arguments":{}}}' \
+  | php artisan mcp:serve | tail -1
+```
+
+Expect a JSON-RPC result whose text payload starts with a `week_start_date`.
+`No locked week.` means prerequisite 4 is unmet — lock the plan in Mealboard
+and re-run. If `php` is not found (Herd puts it on PATH only in an interactive
+shell), use the absolute binary:
+`"$HOME/Library/Application Support/Herd/bin/php" artisan mcp:serve`.
+
 ## The loop
 
 1. Call `get_current_shopping_list`. It returns the locked week's items grouped
