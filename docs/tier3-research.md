@@ -1,4 +1,4 @@
-# Tier 3 v2: external research findings (2026-08-13)
+# Tier 3 v2: external research findings (2026-08-13, §6 added 2026-08-21)
 
 Research sweep answering the question left open by `docs/tier3-list.md` hazard 1
 (PerimeterX press-and-hold loops forever in the chrome-php headed browser, so
@@ -7,8 +7,10 @@ Research sweep answering the question left open by `docs/tier3-list.md` hazard 1
 > Is there a maintained tool or documented internal API for Walmart list-writes
 > that doesn't require fighting PerimeterX?
 
-**Short answer: no, not for _lists_. But there is one for _carts_, and it is
-official, documented, live today, and requires no automation at all.**
+**Short answer: no maintained tool and no usable internal API for _lists_. But
+there is an official write path for _carts_ that requires no automation at all
+(§3), and there is one unmaintained but instructive reference implementation that
+does write _lists_ without evasion (§6).**
 
 Every claim below is scoped to what was actually checked; the checks are named
 so they can be re-run.
@@ -34,8 +36,9 @@ wrapper is archived.
 A repo search restricted to `pushed:>2025-06-01` surfaced ~30 live "Walmart plus
 automation" repos. Nearly all are seller-side (Marketplace, Retail Link, DSV
 pricing, WFS) or analytics. Three consumer-side exceptions turned up; two are
-disqualified, and the third (§6) is the one live project that actually writes to
-Walmart **lists** without fighting PerimeterX. The two disqualified:
+disqualified, and the third (§6) is the only project found that writes to Walmart
+**lists** without fighting PerimeterX (though "live" overstates it, as §6
+records). The two disqualified:
 
 - `markswendsen-code/mcp-walmart` (`@striderlabs/mcp-walmart`, 1 star, last push
   2026-04-16): Playwright MCP server, cart-only, no list support, takes the
@@ -167,6 +170,64 @@ The single gating fact is geographic: this is only useful if a Kroger-family
 banner (Kroger, Fred Meyer, Ralphs, King Soopers, Harris Teeter, Fry's, Smith's)
 actually serves the household. That is not a research question.
 
+## 6. The browser-extension list-writer: the one prior art that writes lists without evasion
+
+`esabisch/grocery-bridge` (MIT, verified against the GitHub API 2026-08-21) is a
+Chrome MV3 extension that syncs a Todoist grocery list into a Walmart **list**.
+It is the third consumer-side exception §1 referred to, and it matters because it
+is the only project found that does list-writes while satisfying this repo's
+"no CAPTCHA evasion, ever" rule.
+
+**Why it never fights PerimeterX.** It is not an automation environment. The
+extension runs inside the user's own already-signed-in Chrome and drives ordinary
+DOM clicks (find the "Add to list" button, open the dialog, match the list by
+name, click "Done", confirm via the success toast). There is no headless browser,
+no driver flag, no stealth patching, and no `/orchestra/` replay. Hazard 1 was PX
+rejecting the *automation environment*; this design simply doesn't present one.
+
+**It stops at the challenge rather than solving it.** The whole of its
+challenge handling is a predicate:
+
+```js
+function detectChallenge() {
+  if (/\/blocked(\?|$)/.test(location.pathname)) return true;
+  if (/robot or human|are you a robot/i.test(document.title || "")) return true;
+  const txt = (document.body?.innerText || "").slice(0, 2000).toLowerCase();
+  return /press\s*and\s*hold|are you a robot|verify you are human|access denied/.test(txt);
+}
+```
+
+It returns a boolean and the run pauses for the human to press-and-hold, then
+resumes. Nothing in the repo attempts to hold, spoof, or bypass the gesture. That
+is the opposite posture from the two projects §1 disqualified, and it is
+compatible with this repo's standing rule.
+
+**Its own history is evidence about option (b).** The commit log is five commits
+over 2026-05-08 to 2026-05-10, and one of them is `cfdde4d` *"feat: scaffold MV3
+extension, retire Playwright path"*, immediately after `d143a59` *"snapshot:
+pre-pivot Playwright scaffold"*. An independent developer built the Playwright
+version first and then abandoned it for the in-browser extension. That is one
+data point, not a proof, but it points the same direction as §1's finding that no
+external Playwright-based Walmart list-writer has stayed working.
+
+**Honest limits, and they are large:**
+
+- **It is not maintained.** 5 commits, one author, all within three days, last
+  push 2026-05-10, 0 stars, 0 forks. The doc's headline ("no *maintained* tool
+  for lists") survives intact; this is a reference implementation, not a
+  dependency. Its `lib/walmart-dom.js` is 11.9 KB of Walmart DOM selectors, which
+  is exactly the brittle surface that rots on Walmart's next front-end deploy.
+- **Wrong source system.** It reads Todoist, not Mealboard. Only the Walmart half
+  is reusable.
+- **A Chrome extension is a new artifact class for this repo**, with its own
+  install and upkeep story, and it only runs when that browser is open.
+
+**What it changes for Mealboard.** It establishes that a list-write path exists
+which is both PerimeterX-free and evasion-free, so the choice is no longer
+"cart link or nothing" for list semantics. Call it **option (f): a Mealboard
+browser extension that walks matched `walmart_matches` rows and adds each to a
+named Walmart list, pausing for the human on challenge.**
+
 ---
 
 ## Recommendation
@@ -181,24 +242,42 @@ actually serves the household. That is not a research question.
    push can. **Gate:** the repo owner must decide whether an agent-emitted,
    human-clicked cart link is compatible with the "nothing is ever carted" rule.
    If yes, it very likely obsoletes Tier 3 as built.
-2. **Secondary: (b), the Playwright ListBrowser rewrite**, if list semantics are
-   genuinely wanted over cart semantics. The evidence for the stack difference is
-   real (playwright-cli passed the same challenge first-try on 2026-07-21), but
-   note what this research found: *no external project has done this and kept it
-   working*, so it is a treadmill Mealboard would ride alone, for a list the user
-   then still has to cart from by hand.
-3. **Reject (a)** on the §2 evidence: it is downstream of (b), not an alternative
+2. **If and only if that gate closes "no", build (f), the browser extension**
+   (§6). This is the fallback that the 2026-08-13 sweep missed, and it is a
+   better one than (b): it preserves genuine *list* semantics, so it satisfies
+   "nothing is ever carted" as written and needs no reinterpretation of the rule.
+   It never fights PerimeterX, it pauses for the human instead of evading, and
+   `esabisch/grocery-bridge` is an MIT reference implementation of exactly this
+   against exactly Walmart. Cost: a new artifact class (a Chrome extension) and
+   ownership of a brittle DOM-selector layer.
+3. **(b), the Playwright ListBrowser rewrite, is now third and probably dead.**
+   The evidence for the stack difference is real (playwright-cli passed the same
+   challenge first-try on 2026-07-21), but two findings undercut it: no external
+   project has done this and kept it working, and the one developer found who
+   tried it for Walmart lists explicitly retired his Playwright path for an
+   in-browser extension (§6). If list semantics are the goal, (f) reaches them
+   without the treadmill, for a list the user still has to cart from by hand
+   either way.
+4. **Reject (a)** on the §2 evidence: it is downstream of (b), not an alternative
    to it, and adds rotating persisted-query hashes on top.
-4. **(d) Kroger** is the strongest engineering answer in the abstract, an
+5. **(d) Kroger** is the strongest engineering answer in the abstract, an
    official cart write with a maintained client, and is worth doing *only* if a
    Kroger-family store is actually available.
-5. **(c) retire Tier 3** is the correct outcome if the §3 cart boundary is
-   unacceptable *and* the (b) treadmill isn't worth it. Tier 1/2 already
-   assembled the 42-item week fine via the supervised interactive route.
+6. **(c) retire Tier 3** is now the weakest of the live options rather than a
+   likely landing spot. It was the right call while "cart link or Playwright
+   treadmill" were the only choices; with (f) on the table there is a list-write
+   path that breaks neither the carting rule nor the evasion rule. Retire only if
+   neither (e) nor (f) is wanted. Tier 1/2 already assembled the 42-item week
+   fine via the supervised interactive route.
 
 ## Sources
 
 - GitHub repo metadata and repo/code search via `gh api` (2026-08-13).
+- §6 `esabisch/grocery-bridge`: repo metadata, commit list, file tree, and the
+  verbatim `lib/walmart-dom.js` / `manifest.json` contents read from the public
+  GitHub API and `raw.githubusercontent.com` on 2026-08-21. The
+  no-evasion and retired-Playwright claims are from that source read, not from
+  the project's README alone.
 - Walmart Add To Cart link service parameters: Walmart affiliate API docs
   (`walmart.io/apidocs/affiliates/gm-add-to-cart`, now behind a JS shell);
   endpoint behavior verified live by direct HTTP probe on 2026-08-13.
