@@ -64,6 +64,10 @@ by carting from it. The command never touches cart or checkout.
    (b) findings from the external-tools research (GitHub/forums), or
    (c) retire Tier 3 and keep Tier 1/2 (the 42-item week was assembled fine
    via the supervised interactive route).
+   **Path (b) is answered in `docs/tier3-research.md`** — no maintained
+   list-write tool exists; the live options are the affiliate cart link (§3) and
+   an in-browser list writer (§6, built on the substrate in §7). Selecting one
+   is the repo owner's call.
 2. **Silent focus loss during bulk adds**: after ~8 rapid type+Enter adds the
    input lost focus and later keystrokes went to the page with NO error.
    Mitigation (now the required pattern): re-focus the input before EVERY
