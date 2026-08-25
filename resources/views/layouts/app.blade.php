@@ -40,6 +40,7 @@
                 <div class="flex items-center gap-1">
                     <a href="{{ route('plan.builder') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('plan.builder') ? 'text-primary' : '' }}">Plan</a>
                     <a href="{{ route('recipes.index') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('recipes.index', 'recipes.show', 'recipes.create') ? 'text-primary' : '' }}">Recipes</a>
+                    <a href="{{ route('recipes.request') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('recipes.request') ? 'text-primary' : '' }}">Request</a>
                     <a href="{{ route('recipes.approve') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('recipes.approve') ? 'text-primary' : '' }}">
                         Approve
                         @if ($pendingRecipeCount > 0)

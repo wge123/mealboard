@@ -21,6 +21,37 @@ return [
 
     'candidates_per_run' => 3,
 
+    /*
+    |--------------------------------------------------------------------------
+    | On-demand requests
+    |--------------------------------------------------------------------------
+    |
+    | A request (recipes:request / the /request page) is the household asking
+    | for one named dish, so it is deliberately NOT bound by the weeknight
+    | caps the scheduled run enforces in its prompts. request_search_results
+    | is how many YouTube hits yt-dlp fetches for one request;
+    | request_candidates_per_lane caps what each lane (video extraction, claude)
+    | contributes, so one request cannot flood the approval queue.
+    |
+    */
+
+    'request_search_results' => 12,
+
+    'request_candidates_per_lane' => 3,
+
+    /*
+    |--------------------------------------------------------------------------
+    | yt-dlp binary
+    |--------------------------------------------------------------------------
+    |
+    | Explicit path to yt-dlp for the request lane's keyword search. When null,
+    | SearchYouTube locates it on PATH at runtime and fails fast if missing.
+    | Chosen over the YouTube Data API because it needs no key and no quota.
+    |
+    */
+
+    'yt_dlp' => env('MEALBOARD_YT_DLP'),
+
     'drivers' => [
         AnthropicDriver::class, // primary (DECISIONS.md #2 — claude CLI)
         YouTubeDriver::class, // channel RSS -> classify -> transcript pipeline

@@ -9,6 +9,7 @@ use App\Livewire\RecipeApproval;
 use App\Livewire\RecipeCreate;
 use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeLibrary;
+use App\Livewire\RecipeRequester;
 use App\Livewire\ShoppingList;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,7 @@ Route::middleware('auth')->group(function () {
     // isn't captured as a model id.
     Route::get('/recipes/create', RecipeCreate::class)->name('recipes.create');
     Route::get('/recipes/{recipe}', RecipeDetail::class)->name('recipes.show');
+    Route::get('/request', RecipeRequester::class)->name('recipes.request');
     Route::get('/approve', RecipeApproval::class)->name('recipes.approve');
     Route::get('/insights', Insights::class)->name('insights');
     Route::get('/settings/channels', ChannelSettings::class)->name('settings.channels');
