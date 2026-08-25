@@ -1,4 +1,4 @@
-# Tier 3 v2: external research findings (2026-08-13, §6 added 2026-08-21)
+# Tier 3 v2: external research findings (2026-08-13, §6 added 2026-08-21, §7 added 2026-08-23)
 
 Research sweep answering the question left open by `docs/tier3-list.md` hazard 1
 (PerimeterX press-and-hold loops forever in the chrome-php headed browser, so
@@ -10,7 +10,8 @@ Research sweep answering the question left open by `docs/tier3-list.md` hazard 1
 **Short answer: no maintained tool and no usable internal API for _lists_. But
 there is an official write path for _carts_ that requires no automation at all
 (§3), and there is one unmaintained but instructive reference implementation that
-does write _lists_ without evasion (§6).**
+does write _lists_ without evasion (§6). Since 2026-08-23 that posture also has
+a maintained substrate to build on (§7).**
 
 Every claim below is scoped to what was actually checked; the checks are named
 so they can be re-run.
@@ -228,6 +229,81 @@ which is both PerimeterX-free and evasion-free, so the choice is no longer
 browser extension that walks matched `walmart_matches` rows and adds each to a
 named Walmart list, pausing for the human on challenge.**
 
+## 7. OpenTabs: option (f) now has a maintained substrate (2026-08-23)
+
+`opentabs-dev/opentabs` (MIT, 912 stars, last push 2026-08-22, checked via the
+GitHub API 2026-08-23) is a Chrome extension plus a local MCP/CLI bridge whose
+whole premise is §6's posture, generalised: plugins call a site's own APIs
+**from inside the user's already-authenticated tab** (`fetchFromPage`), rather
+than driving a browser from outside it. It ships ~100 plugins, and one of them is
+Walmart.
+
+**What the Walmart plugin has today** (`plugins/walmart`, 10 tools):
+`search_products`, `get_product`, `get_product_reviews`, `get_store`,
+`get_cart`, `list_orders`, `get_current_user`, plus `navigate_to_product` /
+`navigate_to_search` / `navigate_to_checkout`. Auth is nothing but the user's
+`customer` / `hasCID` cookies read in-page. **There is no list tool and no write
+tool** — the framework is what is on offer here, not a ready-made list writer.
+
+**Why this matters to option (f).** (f) as written in §6 means Mealboard owns a
+new artifact class: an MV3 extension, its install story, and ~12 KB of Walmart
+DOM selectors. On this substrate Mealboard instead owns **one plugin tool**
+(`add_to_list`), and the extension, the browser bridge, the MCP surface, the
+permission model and the install path are someone else's maintained code.
+OpenTabs also ships network capture as a built-in browser tool, which is exactly
+the instrument needed to obtain — and later re-obtain — the persisted-query hash
+§2 warns about.
+
+**This refines §2's dismissal of the same-session `fetch()`.** That parenthetical
+gave two objections; only one survives:
+
+- *"It still needs the PX pass it was supposed to avoid."* — Not in this shape.
+  The call originates in the user's ordinary browsing session, so there is no
+  automation environment for PX to score. That is the same argument §6 makes for
+  DOM clicks, and it applies unchanged to an in-page `fetch()`.
+- *"It still needs the rotating hash."* — Correct, and unchanged. The trade
+  against §6 is therefore narrow: **one rotating persisted hash instead of ~12 KB
+  of DOM selectors.** Both are rot surfaces. Which rots slower is untested here
+  and should not be asserted; the hash has the advantage of being re-capturable
+  automatically from the tab's own traffic, and of failing loudly
+  (`PersistedQueryNotFound`) rather than silently clicking the wrong element.
+
+**The list mutation is still uncaptured.** Code search on 2026-08-23 for
+`/orchestra/lists/graphql`, `walmart addToList mutation` and
+`orchestra graphql walmart list` returned **0 hits**, so no one has published it.
+Step one of this path is unchanged from §2: add one item to a Mealboard list by
+hand with network capture running, and read the operation name, hash and
+variables off that request.
+
+**New corroboration for §2's hash treadmill, and a project to *not* depend on.**
+`teebs4140/walmart-pp-cli` (Go, last push 2026-07-11) is an agent-native Walmart
+grocery CLI that hard-codes four persisted operations with explicit
+`LastValidated: "2026-07-11"` fields — `Search` (service `snb`), `ItemById`
+(`pdp`), `getCart` and `updateItems` (both `home`), addressed as
+`/orchestra/<service>/graphql/<Op>/<sha256>`. That is the treadmill as a shipped
+artifact rather than an inference, and its header set (`Origin`, per-operation
+`Referer`, `Sec-CH-UA*`, `Traceparent`, `Baggage`, `WM-Client-TraceId`) documents
+what a request must carry. **It is disqualified as a dependency on the same rule
+that killed the two projects in §1**: its transport is `github.com/enetx/surf`
+over `refraction-networking/utls`, i.e. Chrome TLS/JA3 impersonation, which is
+fingerprint evasion. Take its endpoint map as documentation; never its transport.
+Its very existence is also the cleanest illustration of the §7 thesis — the only
+reason it needs uTLS at all is that it calls from outside the browser.
+
+**Cost and caveats of adopting OpenTabs**: a third-party extension with access to
+the user's logged-in sessions is a real trust decision. Its posture is
+defensible (every tool off until explicitly enabled, per-tool Ask/Auto
+permissions, permissions reset on version change, local-only with an audit log,
+source review encouraged before enabling), but it is still third-party code in
+the browser where the user banks. Pin the version, enable only the Walmart tools,
+and keep the Mealboard tool in a locally-installed plugin rather than a published
+one.
+
+**Search refresh.** Re-running the §1 sweep on 2026-08-23
+(`gh search repos "walmart grocery"` sorted by last update, `gh search repos
+"walmart list"`, and the three code searches above) surfaced nothing that writes
+to a Walmart list. The headline holds ten days on.
+
 ---
 
 ## Recommendation
@@ -249,7 +325,11 @@ named Walmart list, pausing for the human on challenge.**
    It never fights PerimeterX, it pauses for the human instead of evading, and
    `esabisch/grocery-bridge` is an MIT reference implementation of exactly this
    against exactly Walmart. Cost: a new artifact class (a Chrome extension) and
-   ownership of a brittle DOM-selector layer.
+   ownership of a brittle DOM-selector layer. **Build it on OpenTabs (§7) rather
+   than from scratch** unless running a third-party extension with session access
+   is itself unacceptable: that reduces Mealboard's share to a single
+   `add_to_list` plugin tool, and swaps the DOM-selector layer for one
+   re-capturable persisted-query hash.
 3. **(b), the Playwright ListBrowser rewrite, is now third and probably dead.**
    The evidence for the stack difference is real (playwright-cli passed the same
    challenge first-try on 2026-07-21), but two findings undercut it: no external
@@ -272,7 +352,12 @@ named Walmart list, pausing for the human on challenge.**
 
 ## Sources
 
-- GitHub repo metadata and repo/code search via `gh api` (2026-08-13).
+- GitHub repo metadata and repo/code search via `gh api` (2026-08-13; §7 sweep
+  re-run 2026-08-23).
+- §7 `opentabs-dev/opentabs`: repo metadata, `plugins/walmart/README.md`,
+  `plugins/walmart/src/tools/` listing and `walmart-api.ts` read from the public
+  GitHub API on 2026-08-23. §7 `teebs4140/walmart-pp-cli`: `go.mod` and
+  `internal/walmart/{operations,headers,cookies,api}.go` read the same way.
 - §6 `esabisch/grocery-bridge`: repo metadata, commit list, file tree, and the
   verbatim `lib/walmart-dom.js` / `manifest.json` contents read from the public
   GitHub API and `raw.githubusercontent.com` on 2026-08-21. The
