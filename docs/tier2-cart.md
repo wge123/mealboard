@@ -21,8 +21,13 @@ the run ends with the human reviewing the cart and placing the order themselves.
    claude mcp add mealboard -- php /Users/willem/Developer/Personal/mealboard/artisan mcp:serve
    ```
 
-4. **A locked week.** `get_current_shopping_list` serves the latest *locked*
-   week; lock the plan in Mealboard first.
+4. **A locked week — the one you actually want.**
+   `get_current_shopping_list` serves the latest *locked* plan by
+   `week_start_date` and applies no recency rule whatsoever
+   (`McpServer::getCurrentShoppingList`), so a draft plan for this week loses
+   to a locked plan from a month ago and the run silently shops the wrong
+   week. Lock the current week's plan in Mealboard first, then confirm the
+   date the readiness check echoes back.
 5. **The human is present.** This is a supervised run. If the human steps away,
    the agent pauses.
 
@@ -45,6 +50,29 @@ Expect a JSON-RPC result whose text payload starts with a `week_start_date`.
 and re-run. If `php` is not found (Herd puts it on PATH only in an interactive
 shell), use the absolute binary:
 `"$HOME/Library/Application Support/Herd/bin/php" artisan mcp:serve`.
+
+**Read the `week_start_date` it echoes, don't just check that one exists.**
+The only failure this command reports loudly is a total absence of locked
+plans (`No locked week.`); a stale one comes back looking perfectly healthy.
+Observed 2026-08-29: the tool served `2026-07-27` — locked 2026-07-20 — while
+the newest plan, `2026-08-17`, sat in `draft` and was therefore invisible to
+it. If the date is not the week you mean to shop, stop and lock the right
+plan; nothing downstream will catch it, and the cart is the human's real
+grocery cart.
+
+Two more things worth knowing before the first run:
+
+- `walmart_matches` is empty on this machine (0 rows, checked 2026-08-29), so
+  every `product_url` comes back `null` and every item is a fresh search. The
+  first supervised run is the slow one; it exists to fill that table.
+- A one-line count of what the run will face:
+
+  ```bash
+  "$HOME/Library/Application Support/Herd/bin/php" artisan tinker --execute='
+    $p = App\Models\MealPlan::where("status","locked")->orderByDesc("week_start_date")->first();
+    echo $p->week_start_date->toDateString()," checked=",count($p->checked_items ?? []),
+         " matches=",App\Models\WalmartMatch::count(),PHP_EOL;'
+  ```
 
 ## The loop
 
