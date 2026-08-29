@@ -10,11 +10,18 @@ use App\Models\Recipe;
 use Random\Engine\Mt19937;
 use Random\Randomizer;
 
-/**
- * A far-future Monday so meal-log fixture dates (factory: now..+6d) never
- * fall inside the plan's prior-14-day penalty window.
- */
+/** The Monday every fill under test starts on. */
 const AUTO_FILL_WEEK = '2026-09-07';
+
+/**
+ * Date for planned meals that only exist to carry a rating log. It sits far
+ * outside every week under test and its prior-14-day penalty window, so the
+ * fixtures never hand the recipes they rate a RECENT_PENALTY. The factory
+ * default (now..+6d) cannot be relied on for that: it moves with the clock,
+ * and once the wall clock reached AUTO_FILL_WEEK minus 14 days it started
+ * penalizing rated recipes at random, failing these tests intermittently.
+ */
+const AUTO_FILL_UNRELATED = '2026-01-05';
 
 function autoFillAction(int $seed = 1): AutoFillWeek
 {
@@ -31,7 +38,9 @@ function autoFillRate(Recipe $recipe, int ...$ratings): void
 {
     foreach ($ratings as $rating) {
         MealLog::factory()->create([
-            'planned_meal_id' => PlannedMeal::factory()->create(['recipe_id' => $recipe->id])->id,
+            'planned_meal_id' => PlannedMeal::factory()->create([
+                'recipe_id' => $recipe->id, 'date' => AUTO_FILL_UNRELATED,
+            ])->id,
             'ate_it' => true,
             'rating' => $rating,
         ]);
@@ -208,6 +217,7 @@ it('prefers faster breakfasts when the profile shows breakfasts are often skippe
         MealLog::factory()->create([
             'planned_meal_id' => PlannedMeal::factory()->create([
                 'recipe_id' => $slow->id, 'slot' => MealSlot::Dinner,
+                'date' => AUTO_FILL_UNRELATED,
             ])->id,
             'ate_it' => true,
             'rating' => $rating,
@@ -229,6 +239,7 @@ it('prefers faster breakfasts when the profile shows breakfasts are often skippe
         MealLog::factory()->create([
             'planned_meal_id' => PlannedMeal::factory()->create([
                 'recipe_id' => $lunch->id, 'slot' => MealSlot::Breakfast,
+                'date' => AUTO_FILL_UNRELATED,
             ])->id,
             'ate_it' => $ate,
             'rating' => null,
