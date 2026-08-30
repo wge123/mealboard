@@ -25,9 +25,10 @@ the run ends with the human reviewing the cart and placing the order themselves.
    `get_current_shopping_list` serves the latest *locked* plan by
    `week_start_date` and applies no recency rule whatsoever
    (`McpServer::getCurrentShoppingList`), so a draft plan for this week loses
-   to a locked plan from a month ago and the run silently shops the wrong
-   week. Lock the current week's plan in Mealboard first, then confirm the
-   date the readiness check echoes back.
+   to a locked plan from a month ago. Lock the current week's plan in
+   Mealboard first. The payload reports `weeks_stale` alongside the date —
+   `0` is this week, anything higher is how many weeks old the list you are
+   about to shop actually is.
 5. **The human is present.** This is a supervised run. If the human steps away,
    the agent pauses.
 
@@ -45,20 +46,22 @@ printf '%s\n' \
   | php artisan mcp:serve | tail -1
 ```
 
-Expect a JSON-RPC result whose text payload starts with a `week_start_date`.
-`No locked week.` means prerequisite 4 is unmet — lock the plan in Mealboard
-and re-run. If `php` is not found (Herd puts it on PATH only in an interactive
+Expect a JSON-RPC result whose text payload starts with a `week_start_date`
+followed by `"weeks_stale":0`. `No locked week.` means prerequisite 4 is unmet
+— lock the plan in Mealboard and re-run. If `php` is not found (Herd puts it on PATH only in an interactive
 shell), use the absolute binary:
 `"$HOME/Library/Application Support/Herd/bin/php" artisan mcp:serve`.
 
-**Read the `week_start_date` it echoes, don't just check that one exists.**
-The only failure this command reports loudly is a total absence of locked
-plans (`No locked week.`); a stale one comes back looking perfectly healthy.
-Observed 2026-08-29: the tool served `2026-07-27` — locked 2026-07-20 — while
-the newest plan, `2026-08-17`, sat in `draft` and was therefore invisible to
-it. If the date is not the week you mean to shop, stop and lock the right
-plan; nothing downstream will catch it, and the cart is the human's real
-grocery cart.
+**A non-zero `weeks_stale` stops the run.** The only failure this command
+reports loudly is a total absence of locked plans (`No locked week.`); a stale
+week comes back as an ordinary, healthy-looking list. Observed 2026-08-29 and
+again 2026-08-30: the tool served `2026-07-27` — locked 2026-07-20 — while the
+newest plan, `2026-08-17`, sat in `draft` and was therefore invisible to it;
+that list reports `"weeks_stale":4` when measured on 2026-08-30, and the
+number keeps growing every Monday it is left alone. Anything but `0` means you
+are one lock away from shopping the wrong week into the human's real grocery
+cart, so go lock the right plan before the human sits down. (Shopping an older week on
+purpose is fine — but say so out loud first.)
 
 Two more things worth knowing before the first run:
 
@@ -76,8 +79,9 @@ Two more things worth knowing before the first run:
 
 ## The loop
 
-1. Call `get_current_shopping_list`. It returns the locked week's items grouped
-   by store category; each item carries:
+1. Call `get_current_shopping_list`. Check `weeks_stale` first — if it is not
+   `0`, say so and confirm the week before adding anything. It returns the
+   locked week's items grouped by store category; each item carries:
    - `keywords` — cleaned Walmart search keywords (quantities/units/prep
      stripped: "2 cups diced yellow onion" → "yellow onion"),
    - `product_url` — the remembered Walmart product when a previous run

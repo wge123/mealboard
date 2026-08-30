@@ -150,6 +150,11 @@ class McpServer
      * cleaned search keywords, the remembered Walmart product URL when one
      * exists, and the shared checkbox state.
      *
+     * `weeks_stale` says how far behind today that week is (0 = this week),
+     * because "latest locked" is not the same as "current": a week left in
+     * draft loses to an older locked one, and a cart run reading only the
+     * items would shop the wrong list without ever failing.
+     *
      * @return array<string, mixed>
      */
     private function getCurrentShoppingList(): array
@@ -189,9 +194,21 @@ class McpServer
 
         return [
             'week_start_date' => $plan->week_start_date->toDateString(),
+            'weeks_stale' => $this->weeksStale($plan),
             'purchased_at' => $plan->purchased_at?->toIso8601String(),
             'items' => $list,
         ];
+    }
+
+    /**
+     * Whole weeks between the plan's week and the current one: 0 for this
+     * week, positive for a past week, negative for one still ahead.
+     */
+    private function weeksStale(MealPlan $plan): int
+    {
+        return (int) round(
+            $plan->week_start_date->copy()->startOfWeek()->diffInDays(now()->startOfWeek()) / 7
+        );
     }
 
     /**
@@ -324,7 +341,7 @@ class McpServer
         return [
             [
                 'name' => 'get_current_shopping_list',
-                'description' => "The latest locked week's shopping list: items grouped by store category, each with cleaned Walmart search keywords, the remembered product URL when one exists, and checked (already in cart) state.",
+                'description' => "The latest locked week's shopping list: items grouped by store category, each with cleaned Walmart search keywords, the remembered product URL when one exists, and checked (already in cart) state. Read `weeks_stale` before shopping: 0 means this week, anything higher means the week you are about to shop is that many weeks old and is probably not the one intended.",
                 'inputSchema' => ['type' => 'object', 'properties' => (object) []],
             ],
             [
