@@ -80,10 +80,15 @@ Scheduled commands (`php artisan schedule:list`):
 
 Mealboard ships a local stdio MCP server (JSON-RPC 2.0 over STDIN/STDOUT, protocol `2024-11-05`, no SDK dependency) so Claude Code can drive the Walmart handoff directly.
 
-Register it with Claude Code:
+A project-scoped [`.mcp.json`](.mcp.json) ships with the repo, so a Claude Code
+session started in this directory picks the server up automatically — approve it
+once at the trust prompt. It calls php and `artisan` by absolute path because
+`php` is not on the PATH Claude Code inherits when launched from the GUI.
+
+To register it globally instead (for sessions started elsewhere):
 
 ```bash
-claude mcp add mealboard -- php /Users/willem/Developer/Personal/mealboard/artisan mcp:serve
+claude mcp add mealboard -- "$HOME/Library/Application Support/Herd/bin/php" /Users/willem/Developer/Personal/mealboard/artisan mcp:serve
 ```
 
 ### Tools

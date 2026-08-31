@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "mealboard": {
+      "command": "/Users/willem/Library/Application Support/Herd/bin/php",
+      "args": [
+        "/Users/willem/Developer/Personal/mealboard/artisan",
+        "mcp:serve"
+      ]
+    }
+  }
+}

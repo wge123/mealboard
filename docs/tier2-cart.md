@@ -14,11 +14,24 @@ the run ends with the human reviewing the cart and placing the order themselves.
    `claude-in-chrome` extension) or a Playwright MCP attached to that same
    logged-in Chrome instance. Not a fresh headless browser — the whole point is
    to reuse the human's real, logged-in, watched session.
-3. **Mealboard MCP server registered** with Claude Code (see README →
-   *MCP server*):
+3. **Mealboard MCP server available** to Claude Code. The repo ships a
+   project-scoped [`.mcp.json`](../.mcp.json), so a Claude Code session started
+   in this directory discovers the server itself — the only human step is
+   approving it once at the trust prompt (`/mcp` lists it as `mealboard`).
+   Nothing needs to be added to `~/.claude.json` by hand.
+
+   The entry invokes Herd's php and this repo's `artisan` by **absolute path**
+   on purpose. `php` is not on the PATH a GUI-launched Claude Code inherits
+   (Herd only puts it on an interactive shell's PATH), so a bare `php` command
+   would fail at spawn time with nothing but a dead server to show for it.
+   Verified 2026-08-31 by running the file's own `command` + `args` with an
+   empty environment: the list came back, `rc 0`.
+
+   If you ever need it registered globally instead (a session started outside
+   this directory), the equivalent is:
 
    ```bash
-   claude mcp add mealboard -- php /Users/willem/Developer/Personal/mealboard/artisan mcp:serve
+   claude mcp add mealboard -- "$HOME/Library/Application Support/Herd/bin/php" /Users/willem/Developer/Personal/mealboard/artisan mcp:serve
    ```
 
 4. **A locked week — the one you actually want.**
@@ -34,7 +47,27 @@ the run ends with the human reviewing the cart and placing the order themselves.
 
 ## Readiness check (run before the human sits down)
 
-One command proves prerequisites 3 and 4 at once — the server starts and a
+**First: does Claude Code see the server at all?** From the repo root:
+
+```bash
+cd /Users/willem/Developer/Personal/mealboard && claude mcp list | grep mealboard
+```
+
+Three answers, and each one names exactly what is left to do:
+
+- `⏸ Pending approval`: the shipped `.mcp.json` is found and its spawn line is
+  valid, so approving it at the trust prompt is the human moment (the line says
+  so: "run `claude` to approve"). This is the expected answer before the first
+  run (observed 2026-09-01).
+- `✔ Connected`: already approved on this machine, nothing to do.
+- `✘ Failed to connect`: the spawn itself is broken (almost always the php
+  path, see prerequisite 3). Fix it before the human sits down. A supervised
+  run that discovers this live has already wasted their attention.
+
+`claude mcp list` reports the pending state **without approving anything**, so
+it is safe to run ahead of the human and it writes nothing to `~/.claude.json`.
+
+Then, one command proves prerequisites 3 and 4 at once — the server starts and a
 locked week exists — so a supervised run never dies on its first tool call:
 
 ```bash
@@ -57,7 +90,7 @@ reports loudly is a total absence of locked plans (`No locked week.`); a stale
 week comes back as an ordinary, healthy-looking list. Observed 2026-08-29 and
 again 2026-08-30: the tool served `2026-07-27` — locked 2026-07-20 — while the
 newest plan, `2026-08-17`, sat in `draft` and was therefore invisible to it;
-that list reports `"weeks_stale":4` when measured on 2026-08-30, and the
+that list reports `"weeks_stale":5` when re-measured on 2026-09-01, and the
 number keeps growing every Monday it is left alone. Anything but `0` means you
 are one lock away from shopping the wrong week into the human's real grocery
 cart, so go lock the right plan before the human sits down. (Shopping an older week on
@@ -65,7 +98,7 @@ purpose is fine — but say so out loud first.)
 
 Two more things worth knowing before the first run:
 
-- `walmart_matches` is empty on this machine (0 rows, checked 2026-08-29), so
+- `walmart_matches` is empty on this machine (0 rows, re-checked 2026-09-01), so
   every `product_url` comes back `null` and every item is a fresh search. The
   first supervised run is the slow one; it exists to fill that table.
 - A one-line count of what the run will face:
