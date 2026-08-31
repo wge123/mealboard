@@ -255,3 +255,52 @@ it('still persists checked state with the tappable rows', function () {
 
     shoppingListPage($plan)->assertSeeHtml('line-through');
 });
+
+it('renders one affiliate add-to-cart link covering every matched row', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $onion->id,
+        'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
+    ]);
+    $chicken = Ingredient::factory()->create(['name' => 'chicken thighs', 'category' => IngredientCategory::Meat]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $chicken->id,
+        'product_url' => 'https://www.walmart.com/ip/chicken-thighs/10315356',
+    ]);
+    // Unmatched: contributes a search chip, never an item id.
+    $peas = Ingredient::factory()->create(['name' => 'frozen peas', 'category' => IngredientCategory::Frozen]);
+    $plan = lockedPlanWith([[$onion, 2, 'count'], [$chicken, 500, 'g'], [$peas, 500, 'g']]);
+
+    shoppingListPage($plan)
+        ->assertSeeHtml('href="https://affil.walmart.com/cart/addToCart?items=44390949,10315356"')
+        ->assertSee('Add matched items to Walmart cart')
+        ->assertSeeHtml('href="https://www.walmart.com/search?q=peas"');
+});
+
+it('renders no cart link at all when nothing is matched', function () {
+    $peas = Ingredient::factory()->create(['name' => 'frozen peas', 'category' => IngredientCategory::Frozen]);
+    $plan = lockedPlanWith([[$peas, 500, 'g']]);
+
+    shoppingListPage($plan)
+        ->assertDontSeeHtml('affil.walmart.com')
+        ->assertDontSee('Add matched items to Walmart cart');
+});
+
+it('follows the staples toggle into the cart link', function () {
+    $salt = Ingredient::factory()->pantryStaple()->create(['name' => 'salt']);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $salt->id,
+        'product_url' => 'https://www.walmart.com/ip/salt/10315356',
+    ]);
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $onion->id,
+        'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
+    ]);
+    $plan = lockedPlanWith([[$salt, 1, 'tsp'], [$onion, 2, 'count']]);
+
+    shoppingListPage($plan)
+        ->assertSeeHtml('href="https://affil.walmart.com/cart/addToCart?items=44390949"')
+        ->set('includeStaples', true)
+        ->assertSeeHtml('href="https://affil.walmart.com/cart/addToCart?items=44390949,10315356"');
+});
