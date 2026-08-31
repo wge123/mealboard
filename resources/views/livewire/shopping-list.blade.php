@@ -95,15 +95,24 @@
 
     @if ($items !== [])
         {{-- Sticky action bar: sits above the fixed bottom tab bar on phones. --}}
-        <div class="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 mt-6 flex gap-2 rounded-2xl border border-base-300 bg-base-100 p-2 lg:bottom-4">
-            <button type="button" class="btn btn-outline btn-primary min-h-11 flex-1" x-data="{ copied: false }"
-                    x-text="copied ? 'Copied!' : 'Copy as markdown'"
-                    @click="navigator.clipboard.writeText(@js($markdown)); copied = true; setTimeout(() => copied = false, 1500)">
-            </button>
-            <button type="button" class="btn btn-outline btn-primary min-h-11 flex-1" x-data="{ copied: false }"
-                    x-text="copied ? 'Copied!' : 'Copy as plain list'"
-                    @click="navigator.clipboard.writeText(@js($plain)); copied = true; setTimeout(() => copied = false, 1500)">
-            </button>
+        <div class="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 mt-6 flex flex-col gap-2 rounded-2xl border border-base-300 bg-base-100 p-2 lg:bottom-4">
+            @if ($cartUrl !== null)
+                {{-- Affiliate add-to-cart: the human clicks it, nothing here ever carts. --}}
+                <a href="{{ $cartUrl }}" target="_blank" rel="noopener"
+                   class="btn btn-primary min-h-11 w-full">
+                    Add matched items to Walmart cart
+                </a>
+            @endif
+            <div class="flex gap-2">
+                <button type="button" class="btn btn-outline btn-primary min-h-11 flex-1" x-data="{ copied: false }"
+                        x-text="copied ? 'Copied!' : 'Copy as markdown'"
+                        @click="navigator.clipboard.writeText(@js($markdown)); copied = true; setTimeout(() => copied = false, 1500)">
+                </button>
+                <button type="button" class="btn btn-outline btn-primary min-h-11 flex-1" x-data="{ copied: false }"
+                        x-text="copied ? 'Copied!' : 'Copy as plain list'"
+                        @click="navigator.clipboard.writeText(@js($plain)); copied = true; setTimeout(() => copied = false, 1500)">
+                </button>
+            </div>
         </div>
     @endif
 </div>

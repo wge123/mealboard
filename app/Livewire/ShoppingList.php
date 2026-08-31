@@ -10,6 +10,7 @@ use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\WalmartMatch;
 use App\Support\CleanIngredientKeywords;
+use App\Support\WalmartCartLink;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -123,14 +124,33 @@ class ShoppingList extends Component
     public function render(): View
     {
         $items = $this->items();
+        $links = $this->links($items);
 
         return view('livewire.shopping-list', [
             'items' => $items,
-            'links' => $this->links($items),
+            'links' => $links,
+            'cartUrl' => $this->cartUrl($links),
             'checked' => $this->mealPlan->checked_items ?? [],
             'markdown' => $this->markdownExport(),
             'plain' => $this->plainExport(),
         ]);
+    }
+
+    /**
+     * One affiliate add-to-cart link covering every matched row, or null when
+     * nothing is matched — unmatched rows keep their per-row search chip.
+     *
+     * @param  array<string, array{href: string, matched: bool}>  $links
+     */
+    private function cartUrl(array $links): ?string
+    {
+        $productUrls = collect($links)
+            ->filter(fn (array $link) => $link['matched'])
+            ->pluck('href')
+            ->values()
+            ->all();
+
+        return app(WalmartCartLink::class)->handle($productUrls);
     }
 
     /**

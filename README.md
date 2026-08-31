@@ -60,7 +60,7 @@ Scheduled commands (`php artisan schedule:list`):
 - `/recipes` — library (search/filters), `/recipes/create` — manual add with paste parser + AI parse button
 - `/approve` — discovery approve/reject cards (keyboard: **A** / **R**)
 - `/plan` — week builder: create next week, auto-fill, swap, then **Lock week** (locking publishes to the vault and opens the shopping list)
-- `/plan/{id}/shopping-list` — shared checklist; rows tap through to Walmart product or search; paste-back "found it" saves the match
+- `/plan/{id}/shopping-list` — shared checklist; rows tap through to Walmart product or search; paste-back "found it" saves the match; one **Add matched items to Walmart cart** link when any row is matched
 - `/log` — yesterday's catch-up logging; past slots on the locked week log inline
 - `/insights` — ate/skip rates, top-rated, discovery rejection rate
 - `/settings/channels` — YouTube channels feeding discovery
@@ -74,6 +74,7 @@ Scheduled commands (`php artisan schedule:list`):
 1. **Tier 1 — tap-through list** (always on): shopping-list rows link to remembered products or keyword search; every confirmed "found it" teaches `walmart_matches`.
 2. **Tier 2 — supervised agent cart**: runbook in [docs/tier2-cart.md](docs/tier2-cart.md). Claude drives a logged-in browser via the MCP server below; human approves ambiguity and places the order. Nothing is ever purchased automatically.
 3. **Tier 3 — `walmart:push-list`**: headed Chrome pushes cleaned keywords onto your Walmart list (never the cart); selectors are provisional until first supervised run — see [docs/tier3-list.md](docs/tier3-list.md). Fails loudly on any selector miss.
+4. **Tier 3 v2 — affiliate add-to-cart link** (always on): the shopping list renders one `affil.walmart.com/cart/addToCart?items=...` link built from the matched rows' `usItemId`s. The human clicks it in their own browser, so no request of ours is ever scored by PerimeterX — see [docs/tier3-research.md](docs/tier3-research.md) §3. Quantities are not passed (recipe amounts are not pack counts).
 
 ## MCP server
 
