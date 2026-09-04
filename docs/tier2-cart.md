@@ -98,17 +98,26 @@ purpose is fine — but say so out loud first.)
 
 Two more things worth knowing before the first run:
 
-- `walmart_matches` is empty on this machine (0 rows, re-checked 2026-09-01), so
-  every `product_url` comes back `null` and every item is a fresh search. The
-  first supervised run is the slow one; it exists to fill that table.
-- A one-line count of what the run will face:
+- **Match memory is nearly empty, and the single row in it did not come from a
+  cart run.** `walmart_matches` holds exactly 1 row on this machine
+  (re-measured 2026-09-04): ingredient `onion` → *Fresh Whole Yellow Onions,
+  Each*, written 2026-09-03 08:04 while building the Tier 3 add-to-cart link,
+  not by anyone filling a cart. So one item opens directly via loop step 2a and
+  the other 42 are fresh searches — the first supervised run is still the slow
+  one, and it exists to fill that table.
+- **Take a baseline first, because a bare count no longer proves anything.**
+  This runbook's acceptance test is "≥1 *new* match", and
+  `WalmartMatch::count() > 0` has been true since 2026-09-03 without a single
+  cart ever being filled. Record the count *and the clock* before the run:
 
   ```bash
   "$HOME/Library/Application Support/Herd/bin/php" artisan tinker --execute='
     $p = App\Models\MealPlan::where("status","locked")->orderByDesc("week_start_date")->first();
     echo $p->week_start_date->toDateString()," checked=",count($p->checked_items ?? []),
-         " matches=",App\Models\WalmartMatch::count(),PHP_EOL;'
+         " matches=",App\Models\WalmartMatch::count()," at=",now()->toDateTimeString(),PHP_EOL;'
   ```
+
+  Observed 2026-09-04: `2026-07-27 checked=1 matches=1 at=2026-09-04 ...`.
 
 ## The loop
 
@@ -179,3 +188,27 @@ Agent:  Next item…
 
 At the end of the run: "12 added, 2 you picked from candidates, 3 were already
 checked. Cart is ready for your review — I have not placed the order."
+
+## Done when
+
+Judge the run against the baseline you took in the readiness check, never
+against zero — one match row already exists and it proves nothing about this
+run.
+
+1. **Match memory grew or was refreshed.** `WalmartMatch::count()` is higher
+   than the baseline number, or — if the run only re-confirmed products that
+   were already remembered — the newest `last_confirmed_at` is later than the
+   baseline timestamp:
+
+   ```bash
+   "$HOME/Library/Application Support/Herd/bin/php" artisan tinker --execute='
+     echo App\Models\WalmartMatch::count()," matches, newest confirmation ",
+          App\Models\WalmartMatch::max("last_confirmed_at"),PHP_EOL;'
+   ```
+
+2. **The Walmart cart holds at least one item the run added**, visible on the
+   cart page in the human's own browser.
+3. **Nothing was bought.** No order confirmation page, no new order in the
+   account's order history, no charge. If any of those exist, the run broke the
+   first hard rule and the outcome is a failure regardless of the other two
+   checks.
