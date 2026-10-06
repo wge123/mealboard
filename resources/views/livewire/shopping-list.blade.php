@@ -12,6 +12,13 @@
         </a>
     </div>
 
+    @if ($proposedCount > 0)
+        {{-- Matcher guesses stay off the cart link until reviewed. --}}
+        <a href="{{ route('walmart.review') }}" class="alert alert-info alert-soft mb-4 min-h-11">
+            {{ $proposedCount }} proposed Walmart {{ Str::plural('match', $proposedCount) }} waiting for review &rarr;
+        </a>
+    @endif
+
     {{-- Pantry staples toggle. --}}
     <label class="mb-5 flex min-h-11 w-fit cursor-pointer items-center gap-3">
         <input type="checkbox" class="toggle toggle-primary" wire:model.live="includeStaples">

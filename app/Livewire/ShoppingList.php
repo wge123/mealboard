@@ -9,6 +9,7 @@ use App\Enums\Unit;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\WalmartMatch;
+use App\Models\WalmartMatchProposal;
 use App\Support\CleanIngredientKeywords;
 use App\Support\WalmartCartLink;
 use Illuminate\Contracts\View\View;
@@ -130,6 +131,9 @@ class ShoppingList extends Component
             'items' => $items,
             'links' => $links,
             'cartUrl' => $this->cartUrl($links),
+            'proposedCount' => WalmartMatchProposal::query()
+                ->whereHas('ingredient', fn ($query) => $query->whereIn('name', array_keys($links)))
+                ->count(),
             'checked' => $this->mealPlan->checked_items ?? [],
             'markdown' => $this->markdownExport(),
             'plain' => $this->plainExport(),

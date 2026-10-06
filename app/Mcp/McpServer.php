@@ -3,14 +3,15 @@
 namespace App\Mcp;
 
 use App\Actions\Planning\BuildShoppingList;
+use App\Actions\Planning\ProposeProductMatch;
 use App\Actions\Planning\SaveProductMatch;
 use App\Enums\MealPlanStatus;
 use App\Enums\MealSlot;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
-use App\Models\WalmartMatch;
 use App\Support\CleanIngredientKeywords;
+use DomainException;
 use Throwable;
 
 /**
@@ -37,6 +38,7 @@ class McpServer
     public function __construct(
         private BuildShoppingList $buildShoppingList,
         private SaveProductMatch $saveProductMatch,
+        private ProposeProductMatch $proposeProductMatch,
         private CleanIngredientKeywords $cleanKeywords,
     ) {}
 
@@ -142,6 +144,7 @@ class McpServer
         $data = match ($params['name'] ?? null) {
             'get_current_shopping_list' => $this->getCurrentShoppingList(),
             'save_product_match' => $this->saveProductMatchTool($arguments),
+            'propose_product_match' => $this->proposeProductMatchTool($arguments),
             'get_week_plan' => $this->getWeekPlan($arguments),
             'mark_list_purchased' => $this->markListPurchased($arguments),
             default => throw new McpError(
@@ -188,20 +191,24 @@ class McpServer
 
         $names = collect($items)->collapse()->pluck('name');
 
-        $productUrls = WalmartMatch::query()
-            ->whereHas('ingredient', fn ($query) => $query->whereIn('name', $names))
-            ->with('ingredient')
+        $ingredients = Ingredient::query()
+            ->whereIn('name', $names)
+            ->with(['walmartMatch', 'walmartMatchProposal', 'walmartRejectedItems'])
             ->get()
-            ->mapWithKeys(fn (WalmartMatch $match) => [$match->ingredient->name => $match->product_url]);
+            ->keyBy('name');
 
         $list = [];
 
         foreach ($items as $category => $lines) {
             foreach ($lines as $item) {
+                $ingredient = $ingredients[$item['name']];
+
                 $list[$category][] = [
                     ...$item,
                     'keywords' => $this->cleanKeywords->handle($item['name']),
-                    'product_url' => $productUrls[$item['name']] ?? null,
+                    'product_url' => $ingredient->walmartMatch?->product_url,
+                    'proposed_url' => $ingredient->walmartMatchProposal?->product_url,
+                    'rejected_item_ids' => $ingredient->walmartRejectedItems->pluck('item_id')->all(),
                     'checked' => in_array($item['name'].'|'.($item['unit'] ?? ''), $checked, true),
                 ];
             }
@@ -253,6 +260,46 @@ class McpServer
             'product_url' => $match->product_url,
             'product_name' => $match->product_name,
             'last_confirmed_at' => $match->last_confirmed_at->toIso8601String(),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $arguments
+     * @return array<string, mixed>
+     */
+    private function proposeProductMatchTool(array $arguments): array
+    {
+        $name = mb_strtolower($this->stringArgument($arguments, 'ingredient'));
+        $productUrl = $this->stringArgument($arguments, 'product_url');
+        $productName = $this->stringArgument($arguments, 'product_name');
+        $confidence = $arguments['confidence'] ?? null;
+
+        if ($confidence !== null && ! is_string($confidence)) {
+            throw new McpError(self::INVALID_PARAMS, 'Invalid params: confidence must be a string.');
+        }
+
+        if (! filter_var($productUrl, FILTER_VALIDATE_URL)) {
+            throw new McpError(self::INVALID_PARAMS, 'Invalid params: product_url must be a full URL.');
+        }
+
+        $ingredient = Ingredient::query()->where('name', $name)->first();
+
+        if ($ingredient === null) {
+            throw new McpError(self::NOT_FOUND, "Ingredient not found: {$name}");
+        }
+
+        try {
+            $proposal = $this->proposeProductMatch->handle($ingredient, $productUrl, $productName, $confidence);
+        } catch (DomainException $e) {
+            throw new McpError(self::INVALID_PARAMS, 'Invalid params: '.$e->getMessage());
+        }
+
+        return [
+            'ingredient' => $ingredient->name,
+            'product_url' => $proposal->product_url,
+            'product_name' => $proposal->product_name,
+            'confidence' => $proposal->confidence,
+            'status' => 'proposed',
         ];
     }
 
@@ -356,7 +403,7 @@ class McpServer
         return [
             [
                 'name' => 'get_current_shopping_list',
-                'description' => "The latest locked week's shopping list: items grouped by store category, each with cleaned Walmart search keywords, the remembered product URL when one exists, and checked (already in cart) state. Read `weeks_stale` before shopping: 0 means this week, anything higher means the week you are about to shop is that many weeks old and is probably not the one intended.",
+                'description' => "The latest locked week's shopping list: items grouped by store category, each with cleaned Walmart search keywords, the confirmed product URL when one exists (`product_url`), a pending unreviewed guess (`proposed_url`), the Walmart item ids a human rejected for that ingredient (`rejected_item_ids`, never propose these), and checked (already in cart) state. Read `weeks_stale` before shopping: 0 means this week, anything higher means the week you are about to shop is that many weeks old and is probably not the one intended.",
                 'inputSchema' => ['type' => 'object', 'properties' => (object) []],
             ],
             [
@@ -368,6 +415,20 @@ class McpServer
                         'ingredient' => ['type' => 'string', 'description' => 'Ingredient name as it appears on the shopping list.'],
                         'product_url' => ['type' => 'string', 'description' => 'Walmart product page URL.'],
                         'product_name' => ['type' => 'string', 'description' => 'Product title as listed on Walmart.'],
+                    ],
+                    'required' => ['ingredient', 'product_url', 'product_name'],
+                ],
+            ],
+            [
+                'name' => 'propose_product_match',
+                'description' => 'Propose a Walmart product for an unmatched ingredient. Use this, not save_product_match, for any guess a human has not confirmed (e.g. a web-search match): it lands as proposed, stays off the cart link, and waits for the human review screen. Refused when the ingredient already has a confirmed match, when the URL carries no item id, or when the item id is in the ingredient\'s rejected list.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'ingredient' => ['type' => 'string', 'description' => 'Ingredient name as it appears on the shopping list.'],
+                        'product_url' => ['type' => 'string', 'description' => 'Walmart product page URL, walmart.com/ip/<slug>/<usItemId>.'],
+                        'product_name' => ['type' => 'string', 'description' => 'Product title as listed on Walmart.'],
+                        'confidence' => ['type' => 'string', 'enum' => ['high', 'medium', 'low'], 'description' => 'How sure the match is; low rows are reviewed first.'],
                     ],
                     'required' => ['ingredient', 'product_url', 'product_name'],
                 ],

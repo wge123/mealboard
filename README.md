@@ -61,6 +61,7 @@ Scheduled commands (`php artisan schedule:list`):
 - `/approve` — discovery approve/reject cards (keyboard: **A** / **R**)
 - `/plan` — week builder: create next week, auto-fill, swap, then **Lock week** (locking publishes to the vault and opens the shopping list)
 - `/plan/{id}/shopping-list` — shared checklist; rows tap through to Walmart product or search; paste-back "found it" saves the match; one **Add matched items to Walmart cart** link when any row is matched
+- `/walmart/review` — settle the matcher's proposed products: leave a row to confirm it, tick it to reject that product (never proposed again for the ingredient), or paste the right URL; the shopping list links here while proposals are waiting
 - `/log` — yesterday's catch-up logging; past slots on the locked week log inline
 - `/insights` — ate/skip rates, top-rated, discovery rejection rate
 - `/settings/channels` — YouTube channels feeding discovery
@@ -95,8 +96,9 @@ claude mcp add mealboard -- "$HOME/Library/Application Support/Herd/bin/php" /Us
 
 | Tool | Arguments | Does |
 | --- | --- | --- |
-| `get_current_shopping_list` | — | The latest **locked** week's shopping list: items grouped by store category, each with cleaned Walmart search keywords, the remembered `product_url` when a match exists, and `checked` (already in cart) state. |
+| `get_current_shopping_list` | — | The latest **locked** week's shopping list: items grouped by store category, each with cleaned Walmart search keywords, the confirmed `product_url` when a match exists, a pending `proposed_url`, the `rejected_item_ids` never to propose again, and `checked` (already in cart) state. |
 | `save_product_match` | `ingredient`, `product_url`, `product_name` | Remembers the Walmart product for an ingredient (one match per ingredient, upserted; `last_confirmed_at` refreshed on every save). |
+| `propose_product_match` | `ingredient`, `product_url`, `product_name`, optional `confidence` (`high`/`medium`/`low`) | Parks an unconfirmed guess (e.g. a web-search match) for `/walmart/review` instead of saving it; it stays off the cart link until reviewed. Refused for an already-matched ingredient, a URL with no item id, or a rejected item id. |
 | `get_week_plan` | `week_start` (`YYYY-MM-DD`, a Monday) | That week's schedule: Mon–Fri days, each day's breakfast/lunch/dinner slot mapping to the planned recipe title or `null`. |
 | `mark_list_purchased` | `week_start` (`YYYY-MM-DD`) | Stamps `purchased_at` on that week's meal plan once the order is placed. |
 
