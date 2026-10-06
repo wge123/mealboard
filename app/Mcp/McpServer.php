@@ -43,12 +43,27 @@ class McpServer
     /**
      * Run a session over the given streams until the input closes.
      *
+     * A false from fgets is not always EOF. Claude Code spawns the server
+     * with a socketpair on stdin (libuv, macOS), so a read that waits longer
+     * than default_socket_timeout (60s) returns false with `timed_out` set.
+     * Treating that as EOF made an idle server exit cleanly after a minute.
+     *
      * @param  resource  $input
      * @param  resource  $output
      */
     public function serve($input, $output): void
     {
-        while (($line = fgets($input)) !== false) {
+        while (true) {
+            $line = fgets($input);
+
+            if ($line === false) {
+                if (stream_get_meta_data($input)['timed_out']) {
+                    continue;
+                }
+
+                break;
+            }
+
             if (trim($line) === '') {
                 continue;
             }

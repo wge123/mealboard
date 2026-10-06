@@ -372,6 +372,30 @@ it('runs a full end-to-end stdio session in one pipe', function () {
     expect(MealPlan::sole()->purchased_at)->not->toBeNull();
 });
 
+it('keeps serving through a read timeout instead of treating it as EOF', function () {
+    // Claude Code hands the server a socketpair on stdin, where an idle read
+    // returns false with `timed_out` set once default_socket_timeout passes.
+    // A socket whose writer stays quiet past a short timeout reproduces that.
+    $line = json_encode(['jsonrpc' => '2.0', 'id' => 7, 'method' => 'tools/list']);
+    $writer = proc_open(
+        [PHP_BINARY, '-r', 'usleep(300000); echo $argv[1], "\\n";', $line],
+        [1 => ['socket']],
+        $pipes,
+    );
+
+    stream_set_timeout($pipes[1], 0, 50000);
+    $output = fopen('php://memory', 'r+');
+
+    app(McpServer::class)->serve($pipes[1], $output);
+    proc_close($writer);
+
+    rewind($output);
+    $response = json_decode(trim(stream_get_contents($output)), true);
+
+    expect($response['id'])->toBe(7)
+        ->and($response['result']['tools'])->toHaveCount(4);
+});
+
 it('registers the mcp:serve artisan command', function () {
     expect(collect(Artisan::all())->keys()->contains('mcp:serve'))->toBeTrue();
 });
