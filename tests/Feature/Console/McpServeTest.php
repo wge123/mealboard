@@ -9,6 +9,8 @@ use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\Recipe;
 use App\Models\WalmartMatch;
+use App\Models\WalmartMatchProposal;
+use App\Models\WalmartRejectedItem;
 use Illuminate\Support\Carbon;
 
 /**
@@ -98,7 +100,7 @@ it('completes the initialize handshake and swallows the initialized notification
         ->and($responses[0]['result']['capabilities'])->toHaveKey('tools');
 });
 
-it('lists all four tools', function () {
+it('lists all five tools', function () {
     [$response] = mcpSession([
         ['jsonrpc' => '2.0', 'id' => 2, 'method' => 'tools/list'],
     ]);
@@ -106,6 +108,7 @@ it('lists all four tools', function () {
     expect(array_column($response['result']['tools'], 'name'))->toBe([
         'get_current_shopping_list',
         'save_product_match',
+        'propose_product_match',
         'get_week_plan',
         'mark_list_purchased',
     ]);
@@ -365,7 +368,7 @@ it('runs a full end-to-end stdio session in one pipe', function () {
 
     expect($responses)->toHaveCount(4)
         ->and(array_column($responses, 'id'))->toBe([1, 2, 3, 4])
-        ->and($responses[1]['result']['tools'])->toHaveCount(4)
+        ->and($responses[1]['result']['tools'])->toHaveCount(5)
         ->and(mcpToolData($responses[2])['items'])->toHaveKeys(['produce', 'meat'])
         ->and(mcpToolData($responses[3])['purchased_at'])->not->toBeNull();
 
@@ -393,9 +396,95 @@ it('keeps serving through a read timeout instead of treating it as EOF', functio
     $response = json_decode(trim(stream_get_contents($output)), true);
 
     expect($response['id'])->toBe(7)
-        ->and($response['result']['tools'])->toHaveCount(4);
+        ->and($response['result']['tools'])->toHaveCount(5);
 });
 
 it('registers the mcp:serve artisan command', function () {
     expect(collect(Artisan::all())->keys()->contains('mcp:serve'))->toBeTrue();
+});
+
+/** One tools/call of propose_product_match. */
+function mcpPropose(array $arguments): array
+{
+    [$response] = mcpSession([
+        ['jsonrpc' => '2.0', 'id' => 9, 'method' => 'tools/call', 'params' => [
+            'name' => 'propose_product_match',
+            'arguments' => $arguments,
+        ]],
+    ]);
+
+    return $response;
+}
+
+it('parks a proposed match without confirming it', function () {
+    mcpSeededPlan();
+
+    $response = mcpPropose([
+        'ingredient' => 'Chicken Thighs',
+        'product_url' => 'https://www.walmart.com/ip/gv-chicken-thighs/51259017',
+        'product_name' => 'Great Value Chicken Thighs',
+        'confidence' => 'high',
+    ]);
+
+    expect(mcpToolData($response))->toMatchArray([
+        'ingredient' => 'chicken thighs',
+        'status' => 'proposed',
+        'confidence' => 'high',
+    ])
+        ->and(WalmartMatchProposal::sole()->product_name)->toBe('Great Value Chicken Thighs')
+        ->and(WalmartMatch::query()->whereHas('ingredient', fn ($q) => $q->where('name', 'chicken thighs'))->exists())->toBeFalse();
+});
+
+it('serves proposed urls and rejected ids on the shopping list', function () {
+    mcpSeededPlan();
+    $chicken = Ingredient::query()->where('name', 'chicken thighs')->sole();
+    WalmartMatchProposal::factory()->create([
+        'ingredient_id' => $chicken->id,
+        'product_url' => 'https://www.walmart.com/ip/gv-chicken-thighs/51259017',
+    ]);
+    WalmartRejectedItem::create(['ingredient_id' => $chicken->id, 'item_id' => '14296616416']);
+
+    [$response] = mcpSession([
+        ['jsonrpc' => '2.0', 'id' => 3, 'method' => 'tools/call', 'params' => [
+            'name' => 'get_current_shopping_list',
+            'arguments' => [],
+        ]],
+    ]);
+
+    $data = mcpToolData($response);
+    [$onion] = $data['items']['produce'];
+    [$chicken] = $data['items']['meat'];
+
+    expect($chicken['product_url'])->toBeNull()
+        ->and($chicken['proposed_url'])->toBe('https://www.walmart.com/ip/gv-chicken-thighs/51259017')
+        ->and($chicken['rejected_item_ids'])->toBe(['14296616416'])
+        ->and($onion['proposed_url'])->toBeNull()
+        ->and($onion['rejected_item_ids'])->toBe([]);
+});
+
+it('refuses to propose a rejected item, a matched ingredient, an id-less url, or a bad confidence', function (array $arguments, string $message) {
+    mcpSeededPlan();
+    $chicken = Ingredient::query()->where('name', 'chicken thighs')->sole();
+    WalmartRejectedItem::create(['ingredient_id' => $chicken->id, 'item_id' => '14296616416']);
+
+    $response = mcpPropose([...['product_name' => 'Some product'], ...$arguments]);
+
+    expect($response['error']['code'])->toBe(-32602)
+        ->and($response['error']['message'])->toContain($message)
+        ->and(WalmartMatchProposal::count())->toBe(0);
+})->with([
+    'rejected id' => [['ingredient' => 'chicken thighs', 'product_url' => 'https://www.walmart.com/ip/mp-thighs/14296616416'], 'was rejected'],
+    'already matched' => [['ingredient' => 'yellow onion', 'product_url' => 'https://www.walmart.com/ip/onion/123'], 'already has a confirmed match'],
+    'no item id' => [['ingredient' => 'chicken thighs', 'product_url' => 'https://www.walmart.com/search?q=chicken'], 'No Walmart item id'],
+    'bad confidence' => [['ingredient' => 'chicken thighs', 'product_url' => 'https://www.walmart.com/ip/t/51259017', 'confidence' => 'sure'], 'Confidence must be'],
+]);
+
+it('reports an unknown ingredient on propose as not found', function () {
+    $response = mcpPropose([
+        'ingredient' => 'unobtainium',
+        'product_url' => 'https://www.walmart.com/ip/x/1',
+        'product_name' => 'X',
+    ]);
+
+    expect($response['error']['code'])->toBe(-32002);
 });
