@@ -31,7 +31,10 @@
                     @php($key = $item['name'].'|'.($item['unit'] ?? ''))
                     @php($isChecked = in_array($key, $checked, true))
                     @php($link = $links[$item['name']])
-                    <li class="px-3" @unless ($link['matched']) x-data="{ paste: @js($errors->has('foundUrls.'.$item['name'])) }" @endunless>
+                    {{-- A flagged product needs a replacement, so it gets the paste flow too. --}}
+                    @php($flagged = $link['availability'] !== null && $link['availability'] !== \App\Enums\WalmartAvailability::Ok)
+                    @php($canPaste = ! $link['matched'] || $flagged)
+                    <li class="px-3" @if ($canPaste) x-data="{ paste: @js($errors->has('foundUrls.'.$item['name'])) }" @endif>
                         <div class="flex items-center gap-2">
                             {{-- Whole label row toggles the checkbox — big in-store tap target. --}}
                             <label class="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5">
@@ -43,6 +46,12 @@
                                         <span class="ms-1 text-sm opacity-60">
                                             @if ($item['qty'] !== null){{ rtrim(rtrim(number_format($item['qty'], 2, '.', ''), '0'), '.') }}@endif
                                             @if ($item['unit'] !== null && $item['unit'] !== 'count') {{ $item['unit'] }}@endif
+                                        </span>
+                                    @endif
+                                    @if ($flagged)
+                                        <span class="badge badge-sm ms-1 {{ $link['availability'] === \App\Enums\WalmartAvailability::OutOfStock ? 'badge-warning' : 'badge-error' }}"
+                                              title="Seen at the {{ $link['seenAt'] }} cart import">
+                                            {{ $link['availability'] === \App\Enums\WalmartAvailability::OutOfStock ? 'out of stock' : 'ship-only' }} · {{ $link['seenAt'] }}
                                         </span>
                                     @endif
                                     @if ($item['notes'] !== [])
@@ -57,12 +66,12 @@
                                aria-label="Walmart {{ $link['matched'] ? 'product' : 'search' }} for {{ $item['name'] }}">↗ {{ $link['matched'] ? 'product' : 'search' }}</a>
                         </div>
 
-                        @unless ($link['matched'])
+                        @if ($canPaste)
                             {{-- Found-it flow collapsed behind a small toggle so the checklist stays a checklist. --}}
                             <div class="pb-1 ps-10">
                                 <button type="button" class="btn btn-ghost btn-sm min-h-11 px-2 font-normal text-base-content/60"
                                         @click="paste = !paste">
-                                    + save product
+                                    {{ $link['matched'] ? '+ replace product' : '+ save product' }}
                                 </button>
                                 <div x-show="paste" x-cloak class="pb-2">
                                     <div class="join w-full max-w-sm">
@@ -81,7 +90,7 @@
                                     @enderror
                                 </div>
                             </div>
-                        @endunless
+                        @endif
                     </li>
                 @endforeach
             </ul>
@@ -92,6 +101,40 @@
             <p class="mt-1 text-sm opacity-60">The week has no planned meals with ingredients.</p>
         </div>
     @endforelse
+
+    @if (collect($links)->contains('matched', true))
+        {{-- After a cart import: paste what Walmart could not put in the pickup order. --}}
+        <details class="mb-5 rounded-2xl border border-base-300 bg-base-100 px-3 py-2" @if ($errors->has('availability')) open @endif>
+            <summary class="min-h-11 cursor-pointer content-center text-sm font-medium">Report cart import</summary>
+            <div class="flex flex-col gap-2 pb-2">
+                <label class="text-sm">
+                    <span class="opacity-60">"Unable to add to Cart" list (out of stock)</span>
+                    <textarea class="textarea mt-1 w-full" rows="3" wire:model="outOfStockPaste"></textarea>
+                </label>
+                <label class="text-sm">
+                    <span class="opacity-60">Cart's shipping section (ship-only, not pickup)</span>
+                    <textarea class="textarea mt-1 w-full" rows="3" wire:model="shipOnlyPaste"></textarea>
+                </label>
+                @error('availability')
+                    <div class="text-sm text-error">{{ $message }}</div>
+                @enderror
+                <button type="button" class="btn btn-outline btn-primary btn-sm min-h-11 w-fit" wire:click="recordAvailability">
+                    Record availability
+                </button>
+            </div>
+        </details>
+    @endif
+
+    @if ($availabilityReport !== null)
+        <div class="mb-5 rounded-2xl border border-base-300 bg-base-200 px-3 py-2 text-sm" role="status">
+            Recorded: {{ count($availabilityReport['out-of-stock']) }} out of stock, {{ count($availabilityReport['ship-only']) }} ship-only, {{ $availabilityReport['ok'] }} ok.
+            @foreach (['out-of-stock' => 'Out of stock', 'ship-only' => 'Ship-only'] as $kind => $label)
+                @if ($availabilityReport[$kind] !== [])
+                    <span class="block opacity-70">{{ $label }}: {{ implode('; ', $availabilityReport[$kind]) }}</span>
+                @endif
+            @endforeach
+        </div>
+    @endif
 
     @if ($items !== [])
         {{-- Sticky action bar: sits above the fixed bottom tab bar on phones. --}}

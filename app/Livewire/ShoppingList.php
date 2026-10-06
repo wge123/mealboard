@@ -3,15 +3,19 @@
 namespace App\Livewire;
 
 use App\Actions\Planning\BuildShoppingList;
+use App\Actions\Planning\RecordCartAvailability;
 use App\Actions\Planning\SaveProductMatch;
 use App\Enums\MealPlanStatus;
 use App\Enums\Unit;
+use App\Enums\WalmartAvailability;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\WalmartMatch;
 use App\Support\CleanIngredientKeywords;
 use App\Support\WalmartCartLink;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -30,6 +34,19 @@ class ShoppingList extends Component
      * @var array<string, string>
      */
     public array $foundUrls = [];
+
+    /** Walmart's "Unable to add to Cart" list, pasted after a cart import. */
+    public string $outOfStockPaste = '';
+
+    /** The cart's shipping section, pasted after a cart import. */
+    public string $shipOnlyPaste = '';
+
+    /**
+     * What the last recordAvailability() call flagged, for the confirmation line.
+     *
+     * @var array{out-of-stock: list<string>, ship-only: list<string>, ok: int}|null
+     */
+    public ?array $availabilityReport = null;
 
     public function mount(MealPlan $mealPlan): void
     {
@@ -79,6 +96,29 @@ class ShoppingList extends Component
         );
 
         unset($this->foundUrls[$name]);
+    }
+
+    /**
+     * Record what the last cart import could not put in the pickup order. The
+     * matches the cart link covered are the ones judged: flagged when a pasted
+     * line names them, ok otherwise.
+     */
+    public function recordAvailability(): void
+    {
+        if (trim($this->outOfStockPaste) === '' && trim($this->shipOnlyPaste) === '') {
+            $this->addError('availability', 'Paste the unavailable list or the shipping section first.');
+
+            return;
+        }
+
+        $this->availabilityReport = app(RecordCartAvailability::class)->handle(
+            $this->matches($this->itemNames($this->items())),
+            $this->outOfStockPaste,
+            $this->shipOnlyPaste,
+        );
+
+        $this->outOfStockPaste = '';
+        $this->shipOnlyPaste = '';
     }
 
     /**
@@ -140,7 +180,7 @@ class ShoppingList extends Component
      * One affiliate add-to-cart link covering every matched row, or null when
      * nothing is matched — unmatched rows keep their per-row search chip.
      *
-     * @param  array<string, array{href: string, matched: bool}>  $links
+     * @param  array<string, array{href: string, matched: bool, availability: WalmartAvailability|null, seenAt: string|null}>  $links
      */
     private function cartUrl(array $links): ?string
     {
@@ -158,28 +198,53 @@ class ShoppingList extends Component
      * otherwise a search on the cleaned ingredient keywords.
      *
      * @param  array<string, list<array{name: string, qty: float|null, unit: string|null, notes: list<string>}>>  $items
-     * @return array<string, array{href: string, matched: bool}>
+     * @return array<string, array{href: string, matched: bool, availability: WalmartAvailability|null, seenAt: string|null}>
      */
     private function links(array $items): array
     {
-        $names = collect($items)->collapse()->pluck('name');
+        $names = $this->itemNames($items);
 
-        $matched = WalmartMatch::query()
-            ->whereHas('ingredient', fn ($query) => $query->whereIn('name', $names))
-            ->with('ingredient')
-            ->get()
-            ->mapWithKeys(fn (WalmartMatch $match) => [$match->ingredient->name => $match->product_url]);
+        $matched = $this->matches($names)
+            ->keyBy(fn (WalmartMatch $match) => $match->ingredient->name);
 
         $clean = app(CleanIngredientKeywords::class);
 
         return $names->mapWithKeys(fn (string $name) => [
             $name => isset($matched[$name])
-                ? ['href' => $matched[$name], 'matched' => true]
+                ? [
+                    'href' => $matched[$name]->product_url,
+                    'matched' => true,
+                    'availability' => $matched[$name]->availability,
+                    'seenAt' => $matched[$name]->availability_seen_at?->format('j M'),
+                ]
                 : [
                     'href' => 'https://www.walmart.com/search?q='.urlencode($clean->handle($name)),
                     'matched' => false,
+                    'availability' => null,
+                    'seenAt' => null,
                 ],
         ])->all();
+    }
+
+    /**
+     * @param  array<string, list<array{name: string, qty: float|null, unit: string|null, notes: list<string>}>>  $items
+     * @return Collection<int, string>
+     */
+    private function itemNames(array $items): Collection
+    {
+        return collect($items)->collapse()->pluck('name');
+    }
+
+    /**
+     * @param  Collection<int, string>  $names
+     * @return EloquentCollection<int, WalmartMatch>
+     */
+    private function matches(Collection $names): EloquentCollection
+    {
+        return WalmartMatch::query()
+            ->whereHas('ingredient', fn ($query) => $query->whereIn('name', $names))
+            ->with('ingredient')
+            ->get();
     }
 
     /**
