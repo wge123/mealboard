@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Ingredient extends Model
@@ -53,5 +54,15 @@ class Ingredient extends Model
     public function walmartMatch(): HasOne
     {
         return $this->hasOne(WalmartMatch::class);
+    }
+
+    public function walmartMatchProposal(): HasOne
+    {
+        return $this->hasOne(WalmartMatchProposal::class);
+    }
+
+    public function walmartRejectedItems(): HasMany
+    {
+        return $this->hasMany(WalmartRejectedItem::class);
     }
 }
