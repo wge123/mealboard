@@ -304,3 +304,79 @@ it('follows the staples toggle into the cart link', function () {
         ->set('includeStaples', true)
         ->assertSeeHtml('href="https://affil.walmart.com/cart/addToCart?items=44390949,10315356"');
 });
+
+it('records a pasted cart import and badges the flagged rows', function () {
+    $sprouts = Ingredient::factory()->create(['name' => 'bean sprouts', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $sprouts->id,
+        'product_name' => 'Fresh Bean Sprouts, 1 lb',
+        'product_url' => 'https://www.walmart.com/ip/Fresh-Bean-Sprouts-1-Lb/103909028',
+    ]);
+    $sesame = Ingredient::factory()->create(['name' => 'sesame oil', 'category' => IngredientCategory::Pantry]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $sesame->id,
+        'product_name' => 'Kikkoman 100% Pure Sesame Oil, 5 fl oz',
+        'product_url' => 'https://www.walmart.com/ip/Kikkoman-100-Pure-Sesame-Oil-5-Fl-Oz/110322105',
+    ]);
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $onion->id,
+        'product_name' => 'Fresh Whole Yellow Onions, Each',
+        'product_url' => 'https://www.walmart.com/ip/fresh-whole-yellow-onions-each/44390949',
+    ]);
+    $plan = lockedPlanWith([[$sprouts, 1, 'count'], [$sesame, 1, 'tbsp'], [$onion, 2, 'count']]);
+
+    shoppingListPage($plan)
+        ->assertSee('Report cart import')
+        ->assertDontSee('out of stock ·')
+        ->set('outOfStockPaste', "Unable to add to Cart\nFresh Bean Sprouts 1 lb")
+        ->set('shipOnlyPaste', "Kikkoman 100% Pure Sesame Oil 5 fl oz\nSold by KoFe")
+        ->call('recordAvailability')
+        ->assertSee('Recorded: 1 out of stock, 1 ship-only, 1 ok.')
+        ->assertSee('out of stock ·')
+        ->assertSee('ship-only ·')
+        ->assertSee('+ replace product')
+        ->assertSet('outOfStockPaste', '');
+
+    // A fresh request still shows the badges: the flag lives on the match.
+    shoppingListPage($plan)
+        ->assertSee('out of stock ·')
+        ->assertSee('ship-only ·');
+});
+
+it('refuses an empty cart import report', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create(['ingredient_id' => $onion->id]);
+    $plan = lockedPlanWith([[$onion, 2, 'count']]);
+
+    shoppingListPage($plan)
+        ->call('recordAvailability')
+        ->assertHasErrors('availability');
+
+    expect(WalmartMatch::sole()->availability)->toBeNull();
+});
+
+it('hides the cart import report when nothing is matched', function () {
+    $peas = Ingredient::factory()->create(['name' => 'frozen peas', 'category' => IngredientCategory::Frozen]);
+    $plan = lockedPlanWith([[$peas, 500, 'g']]);
+
+    shoppingListPage($plan)->assertDontSee('Report cart import');
+});
+
+it('re-matching a flagged row clears its badge', function () {
+    $sprouts = Ingredient::factory()->create(['name' => 'bean sprouts', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $sprouts->id,
+        'product_url' => 'https://www.walmart.com/ip/old-sprouts/1',
+        'availability' => 'out-of-stock',
+        'availability_seen_at' => now(),
+    ]);
+    $plan = lockedPlanWith([[$sprouts, 1, 'count']]);
+
+    shoppingListPage($plan)
+        ->assertSee('out of stock ·')
+        ->set('foundUrls.bean sprouts', 'https://www.walmart.com/ip/new-sprouts/2')
+        ->call('saveMatch', 'bean sprouts')
+        ->assertDontSee('out of stock ·')
+        ->assertDontSee('+ replace product');
+});
