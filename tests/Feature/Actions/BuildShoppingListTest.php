@@ -8,6 +8,8 @@ use App\Enums\MealType;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\Recipe;
+use App\Models\WalmartMatch;
+use Illuminate\Support\Arr;
 
 /**
  * Attach a one-recipe planned meal to the plan. Each call uses a fresh
@@ -47,10 +49,14 @@ function shoppingList(MealPlan $plan, bool $includeStaples = false): array
     return app(BuildShoppingList::class)->handle($plan, $includeStaples);
 }
 
-/** Flatten the grouped list to one row per line for easy assertions. */
+/** Flatten the grouped lines to one row per line, keeping only the merge fields. */
 function flatLines(array $list): array
 {
-    return collect($list)->flatMap(fn (array $items) => $items)->values()->all();
+    return collect($list['lines'])
+        ->flatMap(fn (array $items) => $items)
+        ->map(fn (array $line) => Arr::only($line, ['name', 'qty', 'unit', 'notes']))
+        ->values()
+        ->all();
 }
 
 it('refuses to build a list for a draft plan', function () {
@@ -161,8 +167,8 @@ it('groups by category in store order and sorts lines by name', function () {
 
     $list = shoppingList($plan);
 
-    expect(array_keys($list))->toBe(['produce', 'pantry'])
-        ->and(collect($list['produce'])->pluck('name')->all())->toBe(['apple', 'carrot']);
+    expect(array_keys($list['lines']))->toBe(['produce', 'pantry'])
+        ->and(collect($list['lines']['produce'])->pluck('name')->all())->toBe(['apple', 'carrot']);
 });
 
 it('builds a list for a completed week too', function () {
@@ -172,4 +178,73 @@ it('builds a list for a completed week too', function () {
     attachMeal($plan, [[$milk, 1, 'l']]);
 
     expect(flatLines(shoppingList($plan)))->toHaveCount(1);
+});
+
+it('gives each line its key, label, checked state, product match and search link', function () {
+    $plan = MealPlan::factory()->locked()->create();
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $onion->id,
+        'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
+    ]);
+    $parsley = Ingredient::factory()->create(['name' => 'parsley', 'category' => IngredientCategory::Produce]);
+    $flour = Ingredient::factory()->create(['name' => 'flour', 'category' => IngredientCategory::Pantry]);
+    $peas = Ingredient::factory()->create(['name' => 'frozen peas', 'category' => IngredientCategory::Frozen]);
+
+    attachMeal($plan, [[$onion, 2, 'count'], [$parsley, null, null], [$flour, 1.5, 'kg'], [$peas, 500, 'g']]);
+    $plan->update(['checked_items' => ['flour|kg']]);
+
+    expect(shoppingList($plan)['lines'])->toBe([
+        'produce' => [
+            [
+                'key' => 'parsley|',
+                'name' => 'parsley',
+                'qty' => null,
+                'unit' => null,
+                'notes' => [],
+                'label' => 'parsley',
+                'checked' => false,
+                'product_url' => null,
+                'search_url' => 'https://www.walmart.com/search?q=parsley',
+            ],
+            [
+                'key' => 'yellow onion|count',
+                'name' => 'yellow onion',
+                'qty' => 2.0,
+                'unit' => 'count',
+                'notes' => [],
+                'label' => '2 yellow onion',
+                'checked' => false,
+                'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
+                'search_url' => 'https://www.walmart.com/search?q=yellow+onion',
+            ],
+        ],
+        'pantry' => [
+            [
+                'key' => 'flour|kg',
+                'name' => 'flour',
+                'qty' => 1.5,
+                'unit' => 'kg',
+                'notes' => [],
+                'label' => '1.5 kg flour',
+                'checked' => true,
+                'product_url' => null,
+                'search_url' => 'https://www.walmart.com/search?q=flour',
+            ],
+        ],
+        'frozen' => [
+            [
+                'key' => 'frozen peas|g',
+                'name' => 'frozen peas',
+                'qty' => 500.0,
+                'unit' => 'g',
+                'notes' => [],
+                'label' => '500 g frozen peas',
+                'checked' => false,
+                'product_url' => null,
+                // "frozen" is a prep word: cleaning drops it from the search.
+                'search_url' => 'https://www.walmart.com/search?q=peas',
+            ],
+        ],
+    ]);
 });
