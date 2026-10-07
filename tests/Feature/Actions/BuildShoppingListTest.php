@@ -298,3 +298,46 @@ it('never puts pantry staples on the buy list, even when they are shown', functi
     expect(collect(flatLines($list))->pluck('name')->sort()->values()->all())->toBe(['chicken', 'salt'])
         ->and(collect($list['buy_list'])->pluck('name')->all())->toBe(['chicken']);
 });
+
+it('builds the cart link from the buy list\'s matched products only', function () {
+    $plan = MealPlan::factory()->locked()->create();
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $onion->id,
+        'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
+    ]);
+    $chicken = Ingredient::factory()->create(['name' => 'chicken thighs', 'category' => IngredientCategory::Meat]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $chicken->id,
+        'product_url' => 'https://www.walmart.com/ip/chicken-thighs/10315356',
+    ]);
+    $salt = Ingredient::factory()->pantryStaple()->create(['name' => 'salt']);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $salt->id,
+        'product_url' => 'https://www.walmart.com/ip/salt/10315357',
+    ]);
+    $peas = Ingredient::factory()->create(['name' => 'frozen peas', 'category' => IngredientCategory::Frozen]);
+
+    // Onion is the only matched product still to buy: chicken is checked,
+    // salt is a staple (shown, not bought), peas have no product match.
+    attachMeal($plan, [[$onion, 2, 'count'], [$chicken, 500, 'g'], [$salt, 1, 'tsp'], [$peas, 500, 'g']]);
+    $plan->update(['checked_items' => ['chicken thighs|g']]);
+
+    expect(shoppingList($plan, includeStaples: true)['cart_link'])
+        ->toBe('https://affil.walmart.com/cart/addToCart?items=44390949');
+});
+
+it('has no cart link when nothing on the buy list is matched', function () {
+    $plan = MealPlan::factory()->locked()->create();
+    $chicken = Ingredient::factory()->create(['name' => 'chicken thighs', 'category' => IngredientCategory::Meat]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $chicken->id,
+        'product_url' => 'https://www.walmart.com/ip/chicken-thighs/10315356',
+    ]);
+    $peas = Ingredient::factory()->create(['name' => 'frozen peas', 'category' => IngredientCategory::Frozen]);
+
+    attachMeal($plan, [[$chicken, 500, 'g'], [$peas, 500, 'g']]);
+    $plan->update(['checked_items' => ['chicken thighs|g']]);
+
+    expect(shoppingList($plan)['cart_link'])->toBeNull();
+});
