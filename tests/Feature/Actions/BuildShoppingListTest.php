@@ -53,7 +53,7 @@ function shoppingList(MealPlan $plan, bool $includeStaples = false): array
 function flatLines(array $list): array
 {
     return collect($list['lines'])
-        ->flatMap(fn (array $items) => $items)
+        ->flatMap(fn (array $categoryLines) => $categoryLines)
         ->map(fn (array $line) => Arr::only($line, ['name', 'qty', 'unit', 'notes']))
         ->values()
         ->all();
@@ -340,4 +340,19 @@ it('has no cart link when nothing on the buy list is matched', function () {
     $plan->update(['checked_items' => ['chicken thighs|g']]);
 
     expect(shoppingList($plan)['cart_link'])->toBeNull();
+});
+
+it('keeps a shown pantry staple\'s product match on its line', function () {
+    $plan = MealPlan::factory()->locked()->create();
+    $salt = Ingredient::factory()->pantryStaple()->create(['name' => 'salt']);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $salt->id,
+        'product_url' => 'https://www.walmart.com/ip/salt/10315357',
+    ]);
+
+    attachMeal($plan, [[$salt, 1, 'tsp']]);
+
+    $line = shoppingList($plan, includeStaples: true)['lines']['pantry'][0];
+
+    expect($line['product_url'])->toBe('https://www.walmart.com/ip/salt/10315357');
 });

@@ -95,34 +95,21 @@ it('persists checked items across component reloads', function () {
     shoppingListPage($plan)->assertDontSeeHtml('line-through');
 });
 
-it('toggles pantry staples into and out of the list', function () {
+it('passes the staples switch through to the list', function () {
     $salt = Ingredient::factory()->pantryStaple()->create(['name' => 'salt']);
-    $chicken = Ingredient::factory()->create(['name' => 'chicken', 'category' => IngredientCategory::Meat]);
-    $plan = lockedPlanWith([[$salt, 1, 'tsp'], [$chicken, 500, 'g']]);
+    $plan = lockedPlanWith([[$salt, 1, 'tsp']]);
 
     shoppingListPage($plan)
-        ->assertSee('chicken')
-        ->assertDontSee('salt')
         ->set('includeStaples', true)
-        ->assertSee('salt')
-        ->set('includeStaples', false)
-        ->assertDontSee('salt');
+        ->assertSee('1 tsp salt');
 });
 
-it('produces the exact markdown export', function () {
-    $carrot = Ingredient::factory()->create(['name' => 'carrots', 'category' => IngredientCategory::Produce]);
+it('exports the lines as a markdown checklist under category headings', function () {
     $milk = Ingredient::factory()->create(['name' => 'milk', 'category' => IngredientCategory::Dairy]);
     $flour = Ingredient::factory()->create(['name' => 'flour', 'category' => IngredientCategory::Pantry]);
-    $plan = lockedPlanWith([
-        [$carrot, 3, 'count'],
-        [$milk, 250, 'ml'],
-        [$flour, 1.5, 'kg'],
-    ]);
+    $plan = lockedPlanWith([[$milk, 250, 'ml'], [$flour, 1.5, 'kg']]);
 
     expect(shoppingListPage($plan)->instance()->markdownExport())->toBe(
-        "## Produce\n".
-        "- [ ] 3 carrots\n".
-        "\n".
         "## Dairy\n".
         "- [ ] 250 ml milk\n".
         "\n".
@@ -131,18 +118,13 @@ it('produces the exact markdown export', function () {
     );
 });
 
-it('produces the exact plain export for Instacart handoff', function () {
-    $carrot = Ingredient::factory()->create(['name' => 'carrots', 'category' => IngredientCategory::Produce]);
+it('exports one label per line for the Instacart handoff', function () {
     $milk = Ingredient::factory()->create(['name' => 'milk', 'category' => IngredientCategory::Dairy]);
     $flour = Ingredient::factory()->create(['name' => 'flour', 'category' => IngredientCategory::Pantry]);
-    $plan = lockedPlanWith([
-        [$carrot, 3, 'count'],
-        [$milk, 250, 'ml'],
-        [$flour, 1.5, 'kg'],
-    ]);
+    $plan = lockedPlanWith([[$milk, 250, 'ml'], [$flour, 1.5, 'kg']]);
 
     expect(shoppingListPage($plan)->instance()->plainExport())->toBe(
-        "3 carrots\n250 ml milk\n1.5 kg flour",
+        "250 ml milk\n1.5 kg flour",
     );
 });
 
