@@ -248,3 +248,53 @@ it('gives each line its key, label, checked state, product match and search link
         ],
     ]);
 });
+
+it('puts each ingredient on the buy list once, with cleaned keywords and its product match', function () {
+    $plan = MealPlan::factory()->locked()->create();
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $onion->id,
+        'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
+    ]);
+    $flour = Ingredient::factory()->create(['name' => 'flour', 'category' => IngredientCategory::Pantry]);
+    $peas = Ingredient::factory()->create(['name' => 'frozen peas', 'category' => IngredientCategory::Frozen]);
+
+    // Cups and grams of flour stay two lines, but flour is one thing to buy.
+    attachMeal($plan, [[$onion, 2, 'count'], [$flour, 2, 'cup'], [$peas, 500, 'g']]);
+    attachMeal($plan, [[$flour, 500, 'g']]);
+
+    expect(shoppingList($plan)['buy_list'])->toBe([
+        ['name' => 'yellow onion', 'keywords' => 'yellow onion', 'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949'],
+        ['name' => 'flour', 'keywords' => 'flour', 'product_url' => null],
+        ['name' => 'frozen peas', 'keywords' => 'peas', 'product_url' => null],
+    ]);
+});
+
+it('keeps an ingredient on the buy list until every one of its lines is checked', function () {
+    $plan = MealPlan::factory()->locked()->create();
+    $flour = Ingredient::factory()->create(['name' => 'flour', 'category' => IngredientCategory::Pantry]);
+
+    attachMeal($plan, [[$flour, 2, 'cup']]);
+    attachMeal($plan, [[$flour, 500, 'g']]);
+
+    $plan->update(['checked_items' => ['flour|cup']]);
+
+    expect(collect(shoppingList($plan)['buy_list'])->pluck('name')->all())->toBe(['flour']);
+
+    $plan->update(['checked_items' => ['flour|cup', 'flour|g']]);
+
+    expect(shoppingList($plan)['buy_list'])->toBe([]);
+});
+
+it('never puts pantry staples on the buy list, even when they are shown', function () {
+    $plan = MealPlan::factory()->locked()->create();
+    $salt = Ingredient::factory()->pantryStaple()->create(['name' => 'salt']);
+    $chicken = Ingredient::factory()->create(['name' => 'chicken', 'category' => IngredientCategory::Meat]);
+
+    attachMeal($plan, [[$salt, 1, 'tsp'], [$chicken, 500, 'g']]);
+
+    $list = shoppingList($plan, includeStaples: true);
+
+    expect(collect(flatLines($list))->pluck('name')->sort()->values()->all())->toBe(['chicken', 'salt'])
+        ->and(collect($list['buy_list'])->pluck('name')->all())->toBe(['chicken']);
+});
