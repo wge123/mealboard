@@ -30,7 +30,7 @@ class BuildListPushItems
 
         $keywords = [];
 
-        foreach ($this->buildShoppingList->handle($plan) as $items) {
+        foreach ($this->buildShoppingList->handle($plan)['lines'] as $items) {
             foreach ($items as $item) {
                 if (in_array($item['name'].'|'.($item['unit'] ?? ''), $checked, true)) {
                     continue;

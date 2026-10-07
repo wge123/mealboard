@@ -11,6 +11,7 @@ use App\Models\MealPlan;
 use App\Models\PlannedMeal;
 use App\Models\WalmartMatch;
 use App\Support\CleanIngredientKeywords;
+use Illuminate\Support\Arr;
 use Throwable;
 
 /**
@@ -183,7 +184,7 @@ class McpServer
             throw new McpError(self::NOT_FOUND, 'No locked week.');
         }
 
-        $items = $this->buildShoppingList->handle($plan);
+        $items = $this->buildShoppingList->handle($plan)['lines'];
         $checked = $plan->checked_items ?? [];
 
         $names = collect($items)->collapse()->pluck('name');
@@ -199,7 +200,7 @@ class McpServer
         foreach ($items as $category => $lines) {
             foreach ($lines as $item) {
                 $list[$category][] = [
-                    ...$item,
+                    ...Arr::only($item, ['name', 'qty', 'unit', 'notes']),
                     'keywords' => $this->cleanKeywords->handle($item['name']),
                     'product_url' => $productUrls[$item['name']] ?? null,
                     'checked' => in_array($item['name'].'|'.($item['unit'] ?? ''), $checked, true),

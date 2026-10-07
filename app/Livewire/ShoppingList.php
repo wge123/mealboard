@@ -86,7 +86,7 @@ class ShoppingList extends Component
      */
     public function items(): array
     {
-        return app(BuildShoppingList::class)->handle($this->mealPlan, $this->includeStaples);
+        return app(BuildShoppingList::class)->handle($this->mealPlan, $this->includeStaples)['lines'];
     }
 
     /** Markdown checklist: category headings + `- [ ] qty unit name` lines. */

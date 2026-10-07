@@ -4,8 +4,10 @@ namespace App\Actions\Planning;
 
 use App\Enums\IngredientCategory;
 use App\Enums\MealPlanStatus;
+use App\Enums\Unit;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
+use App\Support\CleanIngredientKeywords;
 use LogicException;
 
 class BuildShoppingList
@@ -21,10 +23,16 @@ class BuildShoppingList
         'volume' => ['ml' => 1, 'l' => 1000],
     ];
 
+    public function __construct(private CleanIngredientKeywords $cleanKeywords) {}
+
     /**
      * Build the merged shopping list for a locked (or completed) week.
      *
-     * @return array<string, list<array{name: string, qty: float|null, unit: string|null, notes: list<string>}>>
+     * Each line: key (what the page sends when it is checked), name, qty,
+     * unit, notes, label, checked, product_url (the product match, if any)
+     * and search_url (a Walmart search on the cleaned keywords).
+     *
+     * @return array{lines: array<string, list<array<string, mixed>>>}
      */
     public function handle(MealPlan $plan, bool $includeStaples = false): array
     {
@@ -32,7 +40,7 @@ class BuildShoppingList
             throw new LogicException('Only locked weeks have a shopping list.');
         }
 
-        $plan->load('plannedMeals.recipe.ingredients');
+        $plan->load('plannedMeals.recipe.ingredients.walmartMatch');
 
         $lines = [];
 
@@ -46,7 +54,7 @@ class BuildShoppingList
             }
         }
 
-        return $this->group($lines);
+        return ['lines' => $this->group($lines, $plan->checked_items ?? [])];
     }
 
     /**
@@ -67,6 +75,7 @@ class BuildShoppingList
             'unit' => $unit,
             'qty' => null,
             'notes' => [],
+            'product_url' => $ingredient->walmartMatch?->product_url,
         ];
 
         if ($ingredient->pivot->qty !== null) {
@@ -103,14 +112,15 @@ class BuildShoppingList
      * sorting lines by name within each category.
      *
      * @param  array<string, array<string, mixed>>  $lines
-     * @return array<string, list<array{name: string, qty: float|null, unit: string|null, notes: list<string>}>>
+     * @param  list<string>  $checked
+     * @return array<string, list<array<string, mixed>>>
      */
-    private function group(array $lines): array
+    private function group(array $lines, array $checked): array
     {
         $grouped = [];
 
         foreach ($lines as $line) {
-            $grouped[$line['category']->value][] = $this->present($line);
+            $grouped[$line['category']->value][] = $this->present($line, $checked);
         }
 
         $order = array_flip(array_column(IngredientCategory::cases(), 'value'));
@@ -125,9 +135,10 @@ class BuildShoppingList
 
     /**
      * @param  array<string, mixed>  $line
-     * @return array{name: string, qty: float|null, unit: string|null, notes: list<string>}
+     * @param  list<string>  $checked
+     * @return array<string, mixed>
      */
-    private function present(array $line): array
+    private function present(array $line, array $checked): array
     {
         $qty = $line['qty'];
         $unit = $line['unit'];
@@ -136,12 +147,38 @@ class BuildShoppingList
             [$qty, $unit] = $this->displayUnit($line['family'], $qty);
         }
 
+        $qty = $qty === null ? null : round($qty, 2);
+        $key = $line['name'].'|'.($unit ?? '');
+
         return [
+            'key' => $key,
             'name' => $line['name'],
-            'qty' => $qty === null ? null : round($qty, 2),
+            'qty' => $qty,
             'unit' => $unit,
             'notes' => $line['notes'],
+            'label' => $this->label($line['name'], $qty, $unit),
+            'checked' => in_array($key, $checked, true),
+            'product_url' => $line['product_url'],
+            'search_url' => 'https://www.walmart.com/search?q='.urlencode($this->cleanKeywords->handle($line['name'])),
         ];
+    }
+
+    /** "1.5 kg flour"; a count unit is left out ("3 carrots", not "3 count carrots"). */
+    private function label(string $name, ?float $qty, ?string $unit): string
+    {
+        $parts = [];
+
+        if ($qty !== null) {
+            $parts[] = rtrim(rtrim(number_format($qty, 2, '.', ''), '0'), '.');
+        }
+
+        if ($unit !== null && $unit !== Unit::Count->value) {
+            $parts[] = $unit;
+        }
+
+        $parts[] = $name;
+
+        return implode(' ', $parts);
     }
 
     /**
