@@ -32,7 +32,11 @@ class BuildShoppingList
      * unit, notes, label, checked, product_url (the product match, if any)
      * and search_url (a Walmart search on the cleaned keywords).
      *
-     * @return array{lines: array<string, list<array<string, mixed>>>}
+     * The buy list: one entry per ingredient still to buy (name, keywords,
+     * product_url), leaving out pantry staples and any ingredient whose every
+     * line is checked.
+     *
+     * @return array{lines: array<string, list<array<string, mixed>>>, buy_list: list<array{name: string, keywords: string, product_url: string|null}>}
      */
     public function handle(MealPlan $plan, bool $includeStaples = false): array
     {
@@ -54,7 +58,43 @@ class BuildShoppingList
             }
         }
 
-        return ['lines' => $this->group($lines, $plan->checked_items ?? [])];
+        $grouped = $this->group($lines, $plan->checked_items ?? []);
+
+        $staples = collect($lines)->where('staple', true)->pluck('name')->all();
+
+        return [
+            'lines' => $grouped,
+            'buy_list' => $this->buyList($grouped, $staples),
+        ];
+    }
+
+    /**
+     * Walk the lines in store-flow order, keeping each ingredient once while
+     * any of its lines is still unchecked.
+     *
+     * @param  array<string, list<array<string, mixed>>>  $grouped
+     * @param  list<string>  $staples
+     * @return list<array{name: string, keywords: string, product_url: string|null}>
+     */
+    private function buyList(array $grouped, array $staples): array
+    {
+        $entries = [];
+
+        foreach ($grouped as $lines) {
+            foreach ($lines as $line) {
+                if ($line['checked'] || in_array($line['name'], $staples, true)) {
+                    continue;
+                }
+
+                $entries[$line['name']] ??= [
+                    'name' => $line['name'],
+                    'keywords' => $this->cleanKeywords->handle($line['name']),
+                    'product_url' => $line['product_url'],
+                ];
+            }
+        }
+
+        return array_values($entries);
     }
 
     /**
@@ -71,6 +111,7 @@ class BuildShoppingList
         $lines[$key] ??= [
             'name' => $ingredient->name,
             'category' => $ingredient->category,
+            'staple' => $ingredient->is_pantry_staple,
             'family' => $family,
             'unit' => $unit,
             'qty' => null,
