@@ -8,6 +8,7 @@ use App\Enums\Unit;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Support\CleanIngredientKeywords;
+use App\Support\WalmartCartLink;
 use LogicException;
 
 class BuildShoppingList
@@ -23,7 +24,10 @@ class BuildShoppingList
         'volume' => ['ml' => 1, 'l' => 1000],
     ];
 
-    public function __construct(private CleanIngredientKeywords $cleanKeywords) {}
+    public function __construct(
+        private CleanIngredientKeywords $cleanKeywords,
+        private WalmartCartLink $cartLink,
+    ) {}
 
     /**
      * Build the merged shopping list for a locked (or completed) week.
@@ -34,9 +38,10 @@ class BuildShoppingList
      *
      * The buy list: one entry per ingredient still to buy (name, keywords,
      * product_url), leaving out pantry staples and any ingredient whose every
-     * line is checked.
+     * line is checked. The cart link adds the buy list's matched products,
+     * and is null when none of them is matched.
      *
-     * @return array{lines: array<string, list<array<string, mixed>>>, buy_list: list<array{name: string, keywords: string, product_url: string|null}>}
+     * @return array{lines: array<string, list<array<string, mixed>>>, buy_list: list<array{name: string, keywords: string, product_url: string|null}>, cart_link: string|null}
      */
     public function handle(MealPlan $plan, bool $includeStaples = false): array
     {
@@ -62,9 +67,14 @@ class BuildShoppingList
 
         $staples = collect($lines)->where('staple', true)->pluck('name')->all();
 
+        $buyList = $this->buyList($grouped, $staples);
+
         return [
             'lines' => $grouped,
-            'buy_list' => $this->buyList($grouped, $staples),
+            'buy_list' => $buyList,
+            'cart_link' => $this->cartLink->handle(
+                array_values(array_filter(array_column($buyList, 'product_url'))),
+            ),
         ];
     }
 
