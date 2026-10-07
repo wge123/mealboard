@@ -18,6 +18,8 @@ class BuildShoppingList
      * unit. Units outside these families (oz, lb, count, null) only merge with
      * themselves — cups and grams of the same ingredient stay separate lines.
      */
+    private const string WALMART_SEARCH = 'https://www.walmart.com/search?q=';
+
     private const array FAMILIES = [
         'spoon' => ['tsp' => 1, 'tbsp' => 3, 'cup' => 48],
         'mass' => ['g' => 1, 'kg' => 1000],
@@ -32,16 +34,16 @@ class BuildShoppingList
     /**
      * Build the merged shopping list for a locked (or completed) week.
      *
-     * Each line: key (what the page sends when it is checked), name, qty,
-     * unit, notes, label, checked, product_url (the product match, if any)
-     * and search_url (a Walmart search on the cleaned keywords).
+     * A line's key is what the page sends when the line is checked; its
+     * product_url is the product match, if any, and its search_url a Walmart
+     * search on the cleaned keywords.
      *
      * The buy list: one entry per ingredient still to buy (name, keywords,
      * product_url), leaving out pantry staples and any ingredient whose every
      * line is checked. The cart link adds the buy list's matched products,
      * and is null when none of them is matched.
      *
-     * @return array{lines: array<string, list<array<string, mixed>>>, buy_list: list<array{name: string, keywords: string, product_url: string|null}>, cart_link: string|null}
+     * @return array{lines: array<string, list<array{key: string, name: string, qty: float|null, unit: string|null, notes: list<string>, label: string, checked: bool, product_url: string|null, search_url: string}>>, buy_list: list<array{name: string, keywords: string, product_url: string|null}>, cart_link: string|null}
      */
     public function handle(MealPlan $plan, bool $includeStaples = false): array
     {
@@ -65,7 +67,7 @@ class BuildShoppingList
 
         $grouped = $this->group($lines, $plan->checked_items ?? []);
 
-        $staples = collect($lines)->where('staple', true)->pluck('name')->all();
+        $staples = collect($lines)->where('pantry_staple', true)->pluck('name')->all();
 
         $buyList = $this->buyList($grouped, $staples);
 
@@ -82,7 +84,7 @@ class BuildShoppingList
      * Walk the lines in store-flow order, keeping each ingredient once while
      * any of its lines is still unchecked.
      *
-     * @param  array<string, list<array<string, mixed>>>  $grouped
+     * @param  array<string, list<array{key: string, name: string, qty: float|null, unit: string|null, notes: list<string>, label: string, checked: bool, product_url: string|null, search_url: string}>>  $grouped
      * @param  list<string>  $staples
      * @return list<array{name: string, keywords: string, product_url: string|null}>
      */
@@ -121,7 +123,7 @@ class BuildShoppingList
         $lines[$key] ??= [
             'name' => $ingredient->name,
             'category' => $ingredient->category,
-            'staple' => $ingredient->is_pantry_staple,
+            'pantry_staple' => $ingredient->is_pantry_staple,
             'family' => $family,
             'unit' => $unit,
             'qty' => null,
@@ -164,7 +166,7 @@ class BuildShoppingList
      *
      * @param  array<string, array<string, mixed>>  $lines
      * @param  list<string>  $checked
-     * @return array<string, list<array<string, mixed>>>
+     * @return array<string, list<array{key: string, name: string, qty: float|null, unit: string|null, notes: list<string>, label: string, checked: bool, product_url: string|null, search_url: string}>>
      */
     private function group(array $lines, array $checked): array
     {
@@ -177,8 +179,8 @@ class BuildShoppingList
         $order = array_flip(array_column(IngredientCategory::cases(), 'value'));
         uksort($grouped, fn (string $a, string $b) => $order[$a] <=> $order[$b]);
 
-        foreach ($grouped as &$items) {
-            usort($items, fn (array $a, array $b) => $a['name'] <=> $b['name']);
+        foreach ($grouped as &$categoryLines) {
+            usort($categoryLines, fn (array $a, array $b) => $a['name'] <=> $b['name']);
         }
 
         return $grouped;
@@ -187,7 +189,7 @@ class BuildShoppingList
     /**
      * @param  array<string, mixed>  $line
      * @param  list<string>  $checked
-     * @return array<string, mixed>
+     * @return array{key: string, name: string, qty: float|null, unit: string|null, notes: list<string>, label: string, checked: bool, product_url: string|null, search_url: string}
      */
     private function present(array $line, array $checked): array
     {
@@ -210,7 +212,7 @@ class BuildShoppingList
             'label' => $this->label($line['name'], $qty, $unit),
             'checked' => in_array($key, $checked, true),
             'product_url' => $line['product_url'],
-            'search_url' => 'https://www.walmart.com/search?q='.urlencode($this->cleanKeywords->handle($line['name'])),
+            'search_url' => self::WALMART_SEARCH.urlencode($this->cleanKeywords->handle($line['name'])),
         ];
     }
 

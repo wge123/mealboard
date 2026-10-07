@@ -18,35 +18,35 @@
         <span class="text-sm font-medium">Include pantry staples</span>
     </label>
 
-    @forelse ($items as $category => $lines)
+    @forelse ($lines as $category => $categoryLines)
         <section>
             {{-- Sticky section header: stays visible while scrolling the category. --}}
             <h2 class="sticky top-0 z-10 flex items-center gap-2 bg-base-100 py-2 text-xs font-semibold tracking-wide text-base-content/60 uppercase">
                 {{ ucfirst($category) }}
-                <span class="badge badge-ghost badge-sm">{{ count($lines) }}</span>
+                <span class="badge badge-ghost badge-sm">{{ count($categoryLines) }}</span>
             </h2>
 
             <ul class="mb-5 divide-y divide-base-300 rounded-2xl border border-base-300 bg-base-100">
-                @foreach ($lines as $item)
-                    @php($matched = $item['product_url'] !== null)
-                    <li class="px-3" @unless ($matched) x-data="{ paste: @js($errors->has('foundUrls.'.$item['name'])) }" @endunless>
+                @foreach ($categoryLines as $line)
+                    @php($matched = $line['product_url'] !== null)
+                    <li class="px-3" @unless ($matched) x-data="{ paste: @js($errors->has('foundUrls.'.$line['name'])) }" @endunless>
                         <div class="flex items-center gap-2">
                             {{-- Whole label row toggles the checkbox — big in-store tap target. --}}
                             <label class="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5">
                                 <input type="checkbox" class="checkbox checkbox-primary checkbox-lg shrink-0"
-                                       wire:click="toggleItem('{{ $item['key'] }}')" @checked($item['checked'])>
-                                <span class="min-w-0 {{ $item['checked'] ? 'line-through opacity-50' : '' }}">
-                                    <span class="font-medium">{{ $item['label'] }}</span>
-                                    @if ($item['notes'] !== [])
-                                        <span class="block text-xs opacity-50">{{ implode('; ', $item['notes']) }}</span>
+                                       wire:click="toggleItem('{{ $line['key'] }}')" @checked($line['checked'])>
+                                <span class="min-w-0 {{ $line['checked'] ? 'line-through opacity-50' : '' }}">
+                                    <span class="font-medium">{{ $line['label'] }}</span>
+                                    @if ($line['notes'] !== [])
+                                        <span class="block text-xs opacity-50">{{ implode('; ', $line['notes']) }}</span>
                                     @endif
                                 </span>
                             </label>
 
                             {{-- Walmart link chip — deliberately NOT the whole row (row = toggle). --}}
-                            <a href="{{ $item['product_url'] ?? $item['search_url'] }}" target="_blank" rel="noopener"
+                            <a href="{{ $line['product_url'] ?? $line['search_url'] }}" target="_blank" rel="noopener"
                                class="btn btn-ghost btn-sm min-h-11 shrink-0 px-2 font-normal text-primary"
-                               aria-label="Walmart {{ $matched ? 'product' : 'search' }} for {{ $item['name'] }}">↗ {{ $matched ? 'product' : 'search' }}</a>
+                               aria-label="Walmart {{ $matched ? 'product' : 'search' }} for {{ $line['name'] }}">↗ {{ $matched ? 'product' : 'search' }}</a>
                         </div>
 
                         @unless ($matched)
@@ -59,16 +59,16 @@
                                 <div x-show="paste" x-cloak class="pb-2">
                                     <div class="join w-full max-w-sm">
                                         <input type="url" class="input join-item input-sm min-h-11 w-full" placeholder="Paste product URL"
-                                               aria-label="Walmart product URL for {{ $item['name'] }}"
-                                               wire:model="foundUrls.{{ $item['name'] }}">
+                                               aria-label="Walmart product URL for {{ $line['name'] }}"
+                                               wire:model="foundUrls.{{ $line['name'] }}">
                                         <button type="button" class="btn btn-outline join-item btn-success btn-sm min-h-11"
-                                                wire:click="saveMatch('{{ $item['name'] }}')"
+                                                wire:click="saveMatch('{{ $line['name'] }}')"
                                                 wire:loading.attr="disabled" wire:target="saveMatch">
                                             <span wire:loading wire:target="saveMatch" class="loading loading-spinner loading-xs"></span>
                                             Found it
                                         </button>
                                     </div>
-                                    @error('foundUrls.'.$item['name'])
+                                    @error('foundUrls.'.$line['name'])
                                         <div class="mt-1 text-sm text-error">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -85,7 +85,7 @@
         </div>
     @endforelse
 
-    @if ($items !== [])
+    @if ($lines !== [])
         {{-- Sticky action bar: sits above the fixed bottom tab bar on phones. --}}
         <div class="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 mt-6 flex flex-col gap-2 rounded-2xl border border-base-300 bg-base-100 p-2 lg:bottom-4">
             @if ($cartUrl !== null)

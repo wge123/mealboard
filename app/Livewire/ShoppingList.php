@@ -125,7 +125,7 @@ class ShoppingList extends Component
     public function render(): View
     {
         return view('livewire.shopping-list', [
-            'items' => $this->shoppingList['lines'],
+            'lines' => $this->shoppingList['lines'],
             'cartUrl' => $this->shoppingList['cart_link'],
             'markdown' => $this->markdownExport(),
             'plain' => $this->plainExport(),
