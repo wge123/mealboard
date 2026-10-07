@@ -28,23 +28,15 @@
 
             <ul class="mb-5 divide-y divide-base-300 rounded-2xl border border-base-300 bg-base-100">
                 @foreach ($lines as $item)
-                    @php($key = $item['name'].'|'.($item['unit'] ?? ''))
-                    @php($isChecked = in_array($key, $checked, true))
-                    @php($link = $links[$item['name']])
-                    <li class="px-3" @unless ($link['matched']) x-data="{ paste: @js($errors->has('foundUrls.'.$item['name'])) }" @endunless>
+                    @php($matched = $item['product_url'] !== null)
+                    <li class="px-3" @unless ($matched) x-data="{ paste: @js($errors->has('foundUrls.'.$item['name'])) }" @endunless>
                         <div class="flex items-center gap-2">
                             {{-- Whole label row toggles the checkbox — big in-store tap target. --}}
                             <label class="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5">
                                 <input type="checkbox" class="checkbox checkbox-primary checkbox-lg shrink-0"
-                                       wire:click="toggleItem('{{ $key }}')" @checked($isChecked)>
-                                <span class="min-w-0 {{ $isChecked ? 'line-through opacity-50' : '' }}">
-                                    <span class="font-medium">{{ $item['name'] }}</span>
-                                    @if ($item['qty'] !== null || ($item['unit'] !== null && $item['unit'] !== 'count'))
-                                        <span class="ms-1 text-sm opacity-60">
-                                            @if ($item['qty'] !== null){{ rtrim(rtrim(number_format($item['qty'], 2, '.', ''), '0'), '.') }}@endif
-                                            @if ($item['unit'] !== null && $item['unit'] !== 'count') {{ $item['unit'] }}@endif
-                                        </span>
-                                    @endif
+                                       wire:click="toggleItem('{{ $item['key'] }}')" @checked($item['checked'])>
+                                <span class="min-w-0 {{ $item['checked'] ? 'line-through opacity-50' : '' }}">
+                                    <span class="font-medium">{{ $item['label'] }}</span>
                                     @if ($item['notes'] !== [])
                                         <span class="block text-xs opacity-50">{{ implode('; ', $item['notes']) }}</span>
                                     @endif
@@ -52,12 +44,12 @@
                             </label>
 
                             {{-- Walmart link chip — deliberately NOT the whole row (row = toggle). --}}
-                            <a href="{{ $link['href'] }}" target="_blank" rel="noopener"
+                            <a href="{{ $item['product_url'] ?? $item['search_url'] }}" target="_blank" rel="noopener"
                                class="btn btn-ghost btn-sm min-h-11 shrink-0 px-2 font-normal text-primary"
-                               aria-label="Walmart {{ $link['matched'] ? 'product' : 'search' }} for {{ $item['name'] }}">↗ {{ $link['matched'] ? 'product' : 'search' }}</a>
+                               aria-label="Walmart {{ $matched ? 'product' : 'search' }} for {{ $item['name'] }}">↗ {{ $matched ? 'product' : 'search' }}</a>
                         </div>
 
-                        @unless ($link['matched'])
+                        @unless ($matched)
                             {{-- Found-it flow collapsed behind a small toggle so the checklist stays a checklist. --}}
                             <div class="pb-1 ps-10">
                                 <button type="button" class="btn btn-ghost btn-sm min-h-11 px-2 font-normal text-base-content/60"

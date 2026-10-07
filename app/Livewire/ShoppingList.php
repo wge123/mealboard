@@ -5,13 +5,10 @@ namespace App\Livewire;
 use App\Actions\Planning\BuildShoppingList;
 use App\Actions\Planning\SaveProductMatch;
 use App\Enums\MealPlanStatus;
-use App\Enums\Unit;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
-use App\Models\WalmartMatch;
-use App\Support\CleanIngredientKeywords;
-use App\Support\WalmartCartLink;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -82,129 +79,56 @@ class ShoppingList extends Component
     }
 
     /**
-     * @return array<string, list<array{name: string, qty: float|null, unit: string|null, notes: list<string>}>>
+     * The week's shopping list, merged once per request and shared by the
+     * render and both exports.
+     *
+     * @return array{lines: array<string, list<array<string, mixed>>>, buy_list: list<array<string, mixed>>, cart_link: string|null}
      */
-    public function items(): array
+    #[Computed]
+    public function shoppingList(): array
     {
-        return app(BuildShoppingList::class)->handle($this->mealPlan, $this->includeStaples)['lines'];
+        return app(BuildShoppingList::class)->handle($this->mealPlan, $this->includeStaples);
     }
 
-    /** Markdown checklist: category headings + `- [ ] qty unit name` lines. */
+    /** Markdown checklist: category headings + `- [ ] label` lines. */
     public function markdownExport(): string
     {
         $sections = [];
 
-        foreach ($this->items() as $category => $items) {
-            $lines = ['## '.ucfirst($category)];
+        foreach ($this->shoppingList['lines'] as $category => $lines) {
+            $section = ['## '.ucfirst($category)];
 
-            foreach ($items as $item) {
-                $lines[] = '- [ ] '.$this->itemLabel($item);
+            foreach ($lines as $line) {
+                $section[] = '- [ ] '.$line['label'];
             }
 
-            $sections[] = implode("\n", $lines);
+            $sections[] = implode("\n", $section);
         }
 
         return implode("\n\n", $sections);
     }
 
-    /** Plain list, one `quantity unit name` line per item (Instacart handoff). */
+    /** Plain list, one label per line (Instacart handoff). */
     public function plainExport(): string
     {
-        $lines = [];
+        $labels = [];
 
-        foreach ($this->items() as $items) {
-            foreach ($items as $item) {
-                $lines[] = $this->itemLabel($item);
+        foreach ($this->shoppingList['lines'] as $lines) {
+            foreach ($lines as $line) {
+                $labels[] = $line['label'];
             }
         }
 
-        return implode("\n", $lines);
+        return implode("\n", $labels);
     }
 
     public function render(): View
     {
-        $items = $this->items();
-        $links = $this->links($items);
-
         return view('livewire.shopping-list', [
-            'items' => $items,
-            'links' => $links,
-            'cartUrl' => $this->cartUrl($links),
-            'checked' => $this->mealPlan->checked_items ?? [],
+            'items' => $this->shoppingList['lines'],
+            'cartUrl' => $this->shoppingList['cart_link'],
             'markdown' => $this->markdownExport(),
             'plain' => $this->plainExport(),
         ]);
-    }
-
-    /**
-     * One affiliate add-to-cart link covering every matched row, or null when
-     * nothing is matched — unmatched rows keep their per-row search chip.
-     *
-     * @param  array<string, array{href: string, matched: bool}>  $links
-     */
-    private function cartUrl(array $links): ?string
-    {
-        $productUrls = collect($links)
-            ->filter(fn (array $link) => $link['matched'])
-            ->pluck('href')
-            ->values()
-            ->all();
-
-        return app(WalmartCartLink::class)->handle($productUrls);
-    }
-
-    /**
-     * Walmart link per row: the remembered product URL when a match exists,
-     * otherwise a search on the cleaned ingredient keywords.
-     *
-     * @param  array<string, list<array{name: string, qty: float|null, unit: string|null, notes: list<string>}>>  $items
-     * @return array<string, array{href: string, matched: bool}>
-     */
-    private function links(array $items): array
-    {
-        $names = collect($items)->collapse()->pluck('name');
-
-        $matched = WalmartMatch::query()
-            ->whereHas('ingredient', fn ($query) => $query->whereIn('name', $names))
-            ->with('ingredient')
-            ->get()
-            ->mapWithKeys(fn (WalmartMatch $match) => [$match->ingredient->name => $match->product_url]);
-
-        $clean = app(CleanIngredientKeywords::class);
-
-        return $names->mapWithKeys(fn (string $name) => [
-            $name => isset($matched[$name])
-                ? ['href' => $matched[$name], 'matched' => true]
-                : [
-                    'href' => 'https://www.walmart.com/search?q='.urlencode($clean->handle($name)),
-                    'matched' => false,
-                ],
-        ])->all();
-    }
-
-    /**
-     * @param  array{name: string, qty: float|null, unit: string|null, notes: list<string>}  $item
-     */
-    private function itemLabel(array $item): string
-    {
-        $parts = [];
-
-        if ($item['qty'] !== null) {
-            $parts[] = $this->formatQty($item['qty']);
-        }
-
-        // "3 count carrots" reads worse than "3 carrots" on a shopping list.
-        if ($item['unit'] !== null && $item['unit'] !== Unit::Count->value) {
-            $parts[] = $item['unit'];
-        }
-
-        $parts[] = $item['name'];
-
-        return implode(' ', $parts);
-    }
-
-    private function formatQty(float $qty): string
-    {
-        return rtrim(rtrim(number_format($qty, 2, '.', ''), '0'), '.');
     }
 }
