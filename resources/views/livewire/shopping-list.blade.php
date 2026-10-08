@@ -18,7 +18,7 @@
         <div role="alert" class="alert alert-warning mb-5">
             <span>
                 <strong>Stale week.</strong>
-                This week ended {{ $weeksStale }} {{ $weeksStale === 1 ? 'week' : 'weeks' }} ago and no newer week has been locked — lock the current week before shopping.
+                This week ended {{ $weeksStale }} {{ Str::plural('week', $weeksStale) }} ago and no newer week has been locked — lock the current week before shopping.
             </span>
         </div>
     @endif
@@ -73,7 +73,7 @@
                                                aria-label="Walmart product URL for {{ $line['name'] }}"
                                                wire:model="foundUrls.{{ $line['name'] }}">
                                         <button type="button" class="btn btn-outline join-item btn-success btn-sm min-h-11"
-                                                wire:click="saveMatch('{{ $line['name'] }}')"
+                                                wire:click="saveMatch(@js($line['name']))"
                                                 wire:loading.attr="disabled" wire:target="saveMatch">
                                             <span wire:loading wire:target="saveMatch" class="loading loading-spinner loading-xs"></span>
                                             Found it

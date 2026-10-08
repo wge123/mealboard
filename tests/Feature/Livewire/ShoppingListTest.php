@@ -175,13 +175,13 @@ it('still persists checked state with the tappable rows', function () {
 });
 
 /**
- * The key the browser sends when the page's only checkbox is clicked: the
- * `toggleItem(...)` argument as the browser reads it, which must be one
- * well-formed JS string literal.
+ * The argument the browser sends when the page's only `$method` control is
+ * clicked: the `$method(...)` argument as the browser reads it, which must be
+ * one well-formed JS string literal.
  */
-function clickedLineKey(Testable $page): string
+function clickedArgument(Testable $page, string $method): string
 {
-    preg_match('/wire:click="toggleItem\((.*?)\)"/', $page->html(), $click);
+    preg_match('/wire:click="'.$method.'\((.*?)\)"/', $page->html(), $click);
     $argument = html_entity_decode($click[1], ENT_QUOTES | ENT_HTML5);
 
     expect($argument)->toMatch('/^\'(?:[^\'\\\\]|\\\\.)*\'$/');
@@ -193,10 +193,24 @@ it('toggles a line whose ingredient name has an apostrophe', function () {
     $yeast = Ingredient::factory()->create(['name' => "baker's yeast", 'category' => IngredientCategory::Pantry]);
     $plan = lockedPlanWith([[$yeast, 7, 'g']]);
 
-    $key = clickedLineKey(shoppingListPage($plan));
+    $key = clickedArgument(shoppingListPage($plan), 'toggleItem');
 
     shoppingListPage($plan)->call('toggleItem', $key)->assertSeeHtml('line-through');
     shoppingListPage($plan)->call('toggleItem', $key)->assertDontSeeHtml('line-through');
+});
+
+it('saves a product match for an ingredient whose name has an apostrophe', function () {
+    $yeast = Ingredient::factory()->create(['name' => "baker's yeast", 'category' => IngredientCategory::Pantry]);
+    $plan = lockedPlanWith([[$yeast, 7, 'g']]);
+
+    $name = clickedArgument(shoppingListPage($plan), 'saveMatch');
+
+    shoppingListPage($plan)
+        ->set("foundUrls.{$name}", 'https://www.walmart.com/ip/bakers-yeast/10450997')
+        ->call('saveMatch', $name)
+        ->assertHasNoErrors();
+
+    expect(WalmartMatch::sole()->ingredient_id)->toBe($yeast->id);
 });
 
 it('renders the cart link without a checked line', function () {
@@ -230,6 +244,21 @@ it('warns when the week it shows is stale', function () {
 it('shows no stale-week warning for this week', function () {
     $plan = MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-20']);
     $this->travelTo(Carbon::parse('2026-07-26 18:00')); // Sunday, still this week
+
+    shoppingListPage($plan)->assertDontSee('Stale week');
+});
+
+it('shows no stale-week warning for an older week once a newer one is locked', function () {
+    $older = MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-13']);
+    MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-20']);
+    $this->travelTo(Carbon::parse('2026-08-30 09:00'));
+
+    shoppingListPage($older)->assertDontSee('Stale week');
+});
+
+it('shows no stale-week warning for a completed week', function () {
+    $plan = MealPlan::factory()->create(['week_start_date' => '2026-07-20', 'status' => MealPlanStatus::Completed]);
+    $this->travelTo(Carbon::parse('2026-08-30 09:00'));
 
     shoppingListPage($plan)->assertDontSee('Stale week');
 });

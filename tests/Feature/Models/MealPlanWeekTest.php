@@ -66,10 +66,32 @@ it('turns stale the Monday after its week', function () {
     expect(mealPlanWeek('2026-07-20')->weeksStale())->toBe(1);
 });
 
-it('is negative for a week still ahead', function () {
+it('is not stale while its week is still ahead', function () {
     $this->travelTo(Carbon::parse('2026-07-22 09:00'));
 
-    expect(mealPlanWeek('2026-08-03')->weeksStale())->toBe(-2);
+    expect(mealPlanWeek('2026-08-03')->weeksStale())->toBe(0);
+});
+
+it('is not stale when a newer week has been locked', function () {
+    $older = MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-13']);
+    MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-20']);
+    $this->travelTo(Carbon::parse('2026-08-30 09:00'));
+
+    expect($older->weeksStale())->toBe(0);
+});
+
+it('is not stale once the week is completed', function () {
+    $completed = MealPlan::factory()->create(['week_start_date' => '2026-07-20', 'status' => MealPlanStatus::Completed]);
+    $this->travelTo(Carbon::parse('2026-08-30 09:00'));
+
+    expect($completed->weeksStale())->toBe(0);
+});
+
+it('is not stale while the week is a draft', function () {
+    $draft = MealPlan::factory()->create(['week_start_date' => '2026-07-20']);
+    $this->travelTo(Carbon::parse('2026-08-30 09:00'));
+
+    expect($draft->weeksStale())->toBe(0);
 });
 
 function mealPlanWeek(string $monday): MealPlan

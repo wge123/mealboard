@@ -122,7 +122,8 @@ Two more things worth knowing before the first run:
 ## The loop
 
 1. Call `get_current_shopping_list`. Check `weeks_stale` first — if it is not
-   `0`, say so and confirm the week before adding anything. **Walk the
+   `0`, **STOP**: add nothing, and tell the user the latest locked week is
+   that many weeks stale and a newer week must be locked first. **Walk the
    `buy_list`**: one entry per ingredient still to buy, in store-flow order.
    Pantry staples and ingredients whose every line is checked (handled, don't
    buy again) are already left out, and an ingredient with two lines (cups

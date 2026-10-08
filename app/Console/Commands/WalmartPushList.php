@@ -3,9 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Actions\Planning\BuildShoppingList;
+use App\Enums\MealPlanStatus;
 use App\Models\MealPlan;
 use App\Walmart\ListBrowser;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class WalmartPushList extends Command
@@ -37,21 +39,31 @@ class WalmartPushList extends Command
             );
         }
 
-        $items = array_column($buildShoppingList->handle($this->plan($this->option('week')))['buy_list'], 'keywords');
+        $buyList = $buildShoppingList->handle($this->plan($this->option('week')))['buy_list'];
 
-        if ($items === []) {
+        // The list page adds an item by searching its keywords, and an empty
+        // search adds nothing useful: say which entries were left off.
+        foreach ($buyList as $entry) {
+            if ($entry['keywords'] === '') {
+                $this->components->warn("Skipped \"{$entry['name']}\": its search keywords are empty, so the list cannot search for it.");
+            }
+        }
+
+        $buyListKeywords = array_values(array_filter(array_column($buyList, 'keywords'), fn (string $keywords) => $keywords !== ''));
+
+        if ($buyListKeywords === []) {
             $this->components->info('Nothing to push — the buy list is empty.');
 
             return self::SUCCESS;
         }
 
-        $total = count($items);
+        $total = count($buyListKeywords);
         $browser = app(ListBrowser::class);
 
         try {
             $browser->open($listUrl);
 
-            foreach ($items as $index => $keywords) {
+            foreach ($buyListKeywords as $index => $keywords) {
                 $n = $index + 1;
 
                 try {
@@ -76,9 +88,9 @@ class WalmartPushList extends Command
         }
 
         $this->components->info(sprintf(
-            'Pushed %d item%s to the Walmart list. Review the list in the browser — nothing was carted or purchased.',
+            'Pushed %d %s to the Walmart list. Review the list in the browser — nothing was carted or purchased.',
             $total,
-            $total === 1 ? '' : 's',
+            Str::plural('item', $total),
         ));
 
         return self::SUCCESS;
@@ -87,13 +99,20 @@ class WalmartPushList extends Command
     /**
      * The named week, else the latest locked one — refusing a stale latest
      * week (GLOSSARY: Stale week), which is almost never the one meant.
-     * Naming the week explicitly is the override.
+     * Naming the week explicitly is the override; a named draft week has no
+     * shopping list yet, so it is refused here rather than deep in the module.
      */
     private function plan(?string $weekStart): MealPlan
     {
         if ($weekStart !== null) {
-            return MealPlan::query()->whereDate('week_start_date', $weekStart)->first()
+            $plan = MealPlan::forWeek($weekStart)
                 ?? throw new RuntimeException("No meal plan for week starting {$weekStart}.");
+
+            if ($plan->status === MealPlanStatus::Draft) {
+                throw new RuntimeException("The week starting {$weekStart} is a draft — lock it before pushing its list.");
+            }
+
+            return $plan;
         }
 
         $plan = MealPlan::latestLocked() ?? throw new RuntimeException('No locked week.');
@@ -103,10 +122,10 @@ class WalmartPushList extends Command
             $week = $plan->week_start_date->toDateString();
 
             throw new RuntimeException(sprintf(
-                'The latest locked week (%s) is %d week%s stale — lock a newer week, or pass --week=%s to push it anyway.',
+                'The latest locked week (%s) is %d %s stale — lock a newer week, or pass --week=%s to push it anyway.',
                 $week,
                 $weeksStale,
-                $weeksStale === 1 ? '' : 's',
+                Str::plural('week', $weeksStale),
                 $week,
             ));
         }

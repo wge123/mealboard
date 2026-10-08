@@ -32,14 +32,19 @@ return new class extends Migration
     /**
      * Not reversible: a bucket does not say which display unit the line had.
      */
-    public function down(): void {}
+    public function down(): void
+    {
+        throw new LogicException('Rekeying checked items by merge bucket is not reversible: a bucket does not say which display unit the line had.');
+    }
 
     private function rekey(string $key): string
     {
         $separator = strrpos($key, '|');
 
+        // Every key the page ever wrote is `name|unit`; one without the
+        // separator is corrupt, and passing it through would hide that.
         if ($separator === false) {
-            return $key;
+            throw new UnexpectedValueException("Checked key \"{$key}\" has no \"|\" separator; fix the stored checked_items before migrating.");
         }
 
         $unit = substr($key, $separator + 1);

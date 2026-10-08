@@ -21,6 +21,19 @@ it('rewrites checked keys from display unit to merge bucket', function () {
     );
 });
 
+it('refuses a stored key with no unit separator as corrupt', function () {
+    MealPlan::factory()->locked()->create(['checked_items' => ['flour|kg', 'flour']]);
+
+    expect(fn () => runRekeyCheckedItemsMigration())
+        ->toThrow(UnexpectedValueException::class, 'Checked key "flour" has no "|" separator');
+});
+
+it('cannot be rolled back', function () {
+    $migration = require database_path('migrations/2026_10_08_000000_rekey_checked_items_by_merge_bucket.php');
+
+    expect(fn () => $migration->down())->toThrow(LogicException::class, 'not reversible');
+});
+
 it('leaves a plan with nothing checked alone', function () {
     $plan = MealPlan::factory()->locked()->create(['checked_items' => null]);
 
