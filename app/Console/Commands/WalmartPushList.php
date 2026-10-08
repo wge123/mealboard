@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Actions\Planning\BuildShoppingList;
+use App\Enums\MealPlanStatus;
 use App\Models\MealPlan;
 use App\Walmart\ListBrowser;
 use Illuminate\Console\Command;
@@ -87,13 +88,20 @@ class WalmartPushList extends Command
     /**
      * The named week, else the latest locked one — refusing a stale latest
      * week (GLOSSARY: Stale week), which is almost never the one meant.
-     * Naming the week explicitly is the override.
+     * Naming the week explicitly is the override; a named draft week has no
+     * shopping list yet, so it is refused here rather than deep in the module.
      */
     private function plan(?string $weekStart): MealPlan
     {
         if ($weekStart !== null) {
-            return MealPlan::query()->whereDate('week_start_date', $weekStart)->first()
+            $plan = MealPlan::query()->whereDate('week_start_date', $weekStart)->first()
                 ?? throw new RuntimeException("No meal plan for week starting {$weekStart}.");
+
+            if ($plan->status === MealPlanStatus::Draft) {
+                throw new RuntimeException("The week starting {$weekStart} is a draft — lock it before pushing its list.");
+            }
+
+            return $plan;
         }
 
         $plan = MealPlan::latestLocked() ?? throw new RuntimeException('No locked week.');
