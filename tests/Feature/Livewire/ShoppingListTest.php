@@ -247,3 +247,18 @@ it('shows no stale-week warning for this week', function () {
 
     shoppingListPage($plan)->assertDontSee('Stale week');
 });
+
+it('shows no stale-week warning for an older week once a newer one is locked', function () {
+    $older = MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-13']);
+    MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-20']);
+    $this->travelTo(Carbon::parse('2026-08-30 09:00'));
+
+    shoppingListPage($older)->assertDontSee('Stale week');
+});
+
+it('shows no stale-week warning for a completed week', function () {
+    $plan = MealPlan::factory()->create(['week_start_date' => '2026-07-20', 'status' => MealPlanStatus::Completed]);
+    $this->travelTo(Carbon::parse('2026-08-30 09:00'));
+
+    shoppingListPage($plan)->assertDontSee('Stale week');
+});
