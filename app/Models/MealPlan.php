@@ -53,17 +53,31 @@ class MealPlan extends Model
     }
 
     /**
-     * Whole weeks between this plan's week and the current one: 0 for this
-     * week, positive for a past (stale) week, negative for one still ahead.
-     * Weeks start on Monday whatever locale Carbon is set to, so a Sunday
-     * evening still counts as the week being shopped.
+     * How many whole weeks this plan is a stale week (GLOSSARY): positive
+     * only for a locked week whose dates are past while no newer week is
+     * locked; 0 for this week, a week ahead, a draft, a completed week, and
+     * an older week a newer locked one has replaced. Weeks start on Monday
+     * whatever locale Carbon is set to, so a Sunday evening still counts as
+     * the week being shopped.
      */
     public function weeksStale(): int
     {
+        if ($this->status !== MealPlanStatus::Locked || $this->newerWeekLocked()) {
+            return 0;
+        }
+
         $weekStart = $this->week_start_date->copy()->startOfWeek(CarbonInterface::MONDAY);
         $thisWeek = now()->startOfWeek(CarbonInterface::MONDAY);
 
-        return (int) round($weekStart->diffInDays($thisWeek) / 7);
+        return max(0, (int) round($weekStart->diffInDays($thisWeek) / 7));
+    }
+
+    private function newerWeekLocked(): bool
+    {
+        return static::query()
+            ->where('status', MealPlanStatus::Locked)
+            ->whereDate('week_start_date', '>', $this->week_start_date->toDateString())
+            ->exists();
     }
 
     public function plannedMeals(): HasMany
