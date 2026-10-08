@@ -146,6 +146,19 @@ it('still pushes a stale week when it is named explicitly', function () {
         ->and($browser->added)->toBe(['carrots']);
 });
 
+it('skips an ingredient whose keywords clean to nothing and names it', function () {
+    configurePush();
+    $browser = fakeListBrowser();
+    $this->travelTo(Carbon::parse('2026-07-22 09:00'));
+
+    $plan = MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-20']);
+    pushPlanMeal($plan, [['carrots'], [', to taste']]);
+
+    expect(Artisan::call('walmart:push-list'))->toBe(0)
+        ->and($browser->added)->toBe(['carrots'])
+        ->and(Artisan::output())->toContain('Skipped ", to taste": its search keywords are empty');
+});
+
 it('exits non-zero when no week is locked', function () {
     configurePush();
     $this->mock(ListBrowser::class)->shouldNotReceive('open');
