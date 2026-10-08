@@ -181,7 +181,6 @@ class McpServer
         }
 
         $items = $this->buildShoppingList->handle($plan)['lines'];
-        $checked = $plan->checked_items ?? [];
 
         $names = collect($items)->collapse()->pluck('name');
 
@@ -199,7 +198,7 @@ class McpServer
                     ...Arr::only($item, ['name', 'qty', 'unit', 'notes']),
                     'keywords' => $this->cleanKeywords->handle($item['name']),
                     'product_url' => $productUrls[$item['name']] ?? null,
-                    'checked' => in_array($item['name'].'|'.($item['unit'] ?? ''), $checked, true),
+                    'checked' => $item['checked'],
                 ];
             }
         }

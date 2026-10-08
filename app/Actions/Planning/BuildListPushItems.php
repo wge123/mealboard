@@ -26,13 +26,12 @@ class BuildListPushItems
     public function handle(?string $weekStart = null): array
     {
         $plan = $this->plan($weekStart);
-        $checked = $plan->checked_items ?? [];
 
         $keywords = [];
 
         foreach ($this->buildShoppingList->handle($plan)['lines'] as $items) {
             foreach ($items as $item) {
-                if (in_array($item['name'].'|'.($item['unit'] ?? ''), $checked, true)) {
+                if ($item['checked']) {
                     continue;
                 }
 
