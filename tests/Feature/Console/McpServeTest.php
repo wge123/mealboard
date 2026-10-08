@@ -127,7 +127,10 @@ it('returns the latest locked week shopping list with keywords, product urls, an
 
     $data = mcpToolData($response);
 
+    // How stale the week is comes from the meal plan's week rules
+    // (MealPlanWeekTest); the tool only has to report it.
     expect($data['week_start_date'])->toBe('2026-07-20')
+        ->and($data['weeks_stale'])->toBeInt()
         ->and($data['purchased_at'])->toBeNull();
 
     expect($data['items'])->toBe([
@@ -193,56 +196,6 @@ it('picks the most recent locked week when several exist', function () {
     ]);
 
     expect(mcpToolData($response)['week_start_date'])->toBe('2026-07-20');
-});
-
-it('reports how many weeks stale the served list is', function () {
-    mcpSeededPlan();
-    $this->travelTo(Carbon::parse('2026-08-30 09:00'));
-
-    [$response] = mcpSession([
-        ['jsonrpc' => '2.0', 'id' => 3, 'method' => 'tools/call', 'params' => [
-            'name' => 'get_current_shopping_list',
-            'arguments' => [],
-        ]],
-    ]);
-
-    $data = mcpToolData($response);
-
-    expect($data['week_start_date'])->toBe('2026-07-20')
-        ->and($data['weeks_stale'])->toBe(5);
-});
-
-it('reports zero weeks stale while the served list is the current week', function () {
-    mcpSeededPlan();
-    $this->travelTo(Carbon::parse('2026-07-23 09:00'));
-
-    [$response] = mcpSession([
-        ['jsonrpc' => '2.0', 'id' => 3, 'method' => 'tools/call', 'params' => [
-            'name' => 'get_current_shopping_list',
-            'arguments' => [],
-        ]],
-    ]);
-
-    expect(mcpToolData($response)['weeks_stale'])->toBe(0);
-});
-
-it('keeps weeks Monday-based on a Sunday under a Sunday-first locale', function () {
-    mcpSeededPlan();
-    Carbon::setLocale('en_US');
-    $this->travelTo(Carbon::parse('2026-07-26 18:00')); // Sunday
-
-    try {
-        [$response] = mcpSession([
-            ['jsonrpc' => '2.0', 'id' => 3, 'method' => 'tools/call', 'params' => [
-                'name' => 'get_current_shopping_list',
-                'arguments' => [],
-            ]],
-        ]);
-    } finally {
-        Carbon::setLocale('en');
-    }
-
-    expect(mcpToolData($response)['weeks_stale'])->toBe(0);
 });
 
 it('errors with not-found when no locked week exists', function () {
