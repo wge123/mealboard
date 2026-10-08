@@ -185,11 +185,7 @@ class McpServer
             'purchased_at' => $plan->purchased_at?->toIso8601String(),
             'items' => array_map(
                 fn (array $lines) => array_map(
-                    fn (array $line) => [
-                        ...Arr::only($line, ['name', 'qty', 'unit', 'notes', 'keywords']),
-                        'product_url' => $line['product_url'],
-                        'checked' => $line['checked'],
-                    ],
+                    fn (array $line) => Arr::only($line, ['name', 'qty', 'unit', 'notes', 'keywords', 'product_url', 'checked']),
                     $lines,
                 ),
                 $list['lines'],
@@ -286,7 +282,7 @@ class McpServer
             throw new McpError(self::INVALID_PARAMS, 'Invalid params: week_start must be YYYY-MM-DD.');
         }
 
-        $plan = MealPlan::query()->whereDate('week_start_date', $weekStart)->first();
+        $plan = MealPlan::forWeek($weekStart);
 
         if ($plan === null) {
             throw new McpError(self::NOT_FOUND, "No meal plan for week starting {$weekStart}.");

@@ -52,6 +52,12 @@ class MealPlan extends Model
             ->first();
     }
 
+    /** The plan whose week starts on the given date (YYYY-MM-DD), if any. */
+    public static function forWeek(string $weekStart): ?self
+    {
+        return static::query()->whereDate('week_start_date', $weekStart)->first();
+    }
+
     /**
      * How many whole weeks this plan is a stale week (GLOSSARY): positive
      * only for a locked week whose dates are past while no newer week is

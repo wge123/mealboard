@@ -7,6 +7,7 @@ use App\Enums\MealPlanStatus;
 use App\Models\MealPlan;
 use App\Walmart\ListBrowser;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class WalmartPushList extends Command
@@ -87,9 +88,9 @@ class WalmartPushList extends Command
         }
 
         $this->components->info(sprintf(
-            'Pushed %d item%s to the Walmart list. Review the list in the browser — nothing was carted or purchased.',
+            'Pushed %d %s to the Walmart list. Review the list in the browser — nothing was carted or purchased.',
             $total,
-            $total === 1 ? '' : 's',
+            Str::plural('item', $total),
         ));
 
         return self::SUCCESS;
@@ -104,7 +105,7 @@ class WalmartPushList extends Command
     private function plan(?string $weekStart): MealPlan
     {
         if ($weekStart !== null) {
-            $plan = MealPlan::query()->whereDate('week_start_date', $weekStart)->first()
+            $plan = MealPlan::forWeek($weekStart)
                 ?? throw new RuntimeException("No meal plan for week starting {$weekStart}.");
 
             if ($plan->status === MealPlanStatus::Draft) {
@@ -121,10 +122,10 @@ class WalmartPushList extends Command
             $week = $plan->week_start_date->toDateString();
 
             throw new RuntimeException(sprintf(
-                'The latest locked week (%s) is %d week%s stale — lock a newer week, or pass --week=%s to push it anyway.',
+                'The latest locked week (%s) is %d %s stale — lock a newer week, or pass --week=%s to push it anyway.',
                 $week,
                 $weeksStale,
-                $weeksStale === 1 ? '' : 's',
+                Str::plural('week', $weeksStale),
                 $week,
             ));
         }
