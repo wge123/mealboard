@@ -130,16 +130,55 @@ it('returns the latest locked week shopping list with keywords, product urls, an
     expect($data['week_start_date'])->toBe('2026-07-20')
         ->and($data['purchased_at'])->toBeNull();
 
-    [$onion] = $data['items']['produce'];
-    [$chicken] = $data['items']['meat'];
+    expect($data['items'])->toBe([
+        'produce' => [[
+            'name' => 'yellow onion',
+            'qty' => 2,
+            'unit' => 'count',
+            'notes' => [],
+            'keywords' => 'yellow onion',
+            'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
+            'checked' => false,
+        ]],
+        'meat' => [[
+            'name' => 'chicken thighs',
+            'qty' => 1,
+            'unit' => 'lb',
+            'notes' => [],
+            'keywords' => 'chicken thighs',
+            'product_url' => null,
+            'checked' => true,
+        ]],
+    ]);
+});
 
-    expect($onion['name'])->toBe('yellow onion')
-        ->and($onion['keywords'])->toBe('yellow onion')
-        ->and($onion['product_url'])->toBe('https://www.walmart.com/ip/yellow-onion/44390949')
-        ->and($onion['checked'])->toBeFalse()
-        ->and($chicken['name'])->toBe('chicken thighs')
-        ->and($chicken['product_url'])->toBeNull()
-        ->and($chicken['checked'])->toBeTrue();
+it('returns the buy list: one entry per ingredient still to buy', function () {
+    $plan = mcpSeededPlan();
+
+    // Cups and grams of flour are two lines but one thing to buy.
+    $flour = Ingredient::factory()->create(['name' => 'flour', 'category' => IngredientCategory::Pantry]);
+
+    foreach ([['2026-07-21', 2, 'cup'], ['2026-07-22', 500, 'g']] as [$date, $qty, $unit]) {
+        $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+        $recipe->ingredients()->attach($flour->id, ['qty' => $qty, 'unit' => $unit]);
+        $plan->plannedMeals()->create(['recipe_id' => $recipe->id, 'date' => $date, 'slot' => MealSlot::Dinner]);
+    }
+
+    [$response] = mcpSession([
+        ['jsonrpc' => '2.0', 'id' => 3, 'method' => 'tools/call', 'params' => [
+            'name' => 'get_current_shopping_list',
+            'arguments' => [],
+        ]],
+    ]);
+
+    $data = mcpToolData($response);
+
+    // The checked chicken thighs are handled, so they are not on it.
+    expect($data['items']['pantry'])->toHaveCount(2)
+        ->and($data['buy_list'])->toBe([
+            ['name' => 'yellow onion', 'keywords' => 'yellow onion', 'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949'],
+            ['name' => 'flour', 'keywords' => 'flour', 'product_url' => null],
+        ]);
 });
 
 it('picks the most recent locked week when several exist', function () {
