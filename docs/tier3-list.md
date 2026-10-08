@@ -1,6 +1,6 @@
 # Tier 3 — `walmart:push-list` (Walmart list page)
 
-Tier 3 pushes the locked week's unchecked shopping-list items onto a Walmart
+Tier 3 pushes the locked week's buy list onto a Walmart
 **list** (the "My Items"/lists feature — NOT the cart) by driving a headed
 Chrome. The user then shops that list themselves — on their phone, in-store, or
 by carting from it. The command never touches cart or checkout.
@@ -12,16 +12,15 @@ by carting from it. The command never touches cart or checkout.
 
 ## KNOWN (agent-buildable side, unit-tested)
 
-- **Item assembly** (`App\Actions\Planning\BuildListPushItems`): latest locked
-  week by default (`MealPlan::latestLocked()`), `--week=YYYY-MM-DD` override.
-  Without `--week` the command exits non-zero when that week is **stale**
+- **Item assembly** (in the command): latest locked week by default
+  (`MealPlan::latestLocked()`), `--week=YYYY-MM-DD` override. Without `--week`
+  the command exits non-zero when that week is **stale**
   (`MealPlan::weeksStale() > 0`: its dates are past and nothing newer is
   locked) — lock the current week, or name the stale one with `--week` to push
-  it anyway; items come from
-  `BuildShoppingList` (staples excluded), checked items are skipped
-  (`checked_items` keys are `name|unit`), each line reduces to cleaned keywords
-  via `CleanIngredientKeywords` ("2 cups diced yellow onion" → "yellow onion"),
-  duplicates dedupe. Returns a flat `list<string>`.
+  it anyway. It pushes the week's **buy list** from `BuildShoppingList`: one
+  entry per ingredient, its cleaned keywords ("2 cups diced yellow onion" →
+  "yellow onion"), leaving out pantry staples and ingredients whose every line
+  is checked. Two ingredients that clean to the same keywords stay two entries.
 - **Config** (both required; the command fails fast before launching anything
   when either is missing):
   - `MEALBOARD_CHROME_PROFILE` → set: `/Users/willem/.mealboard-chrome`
