@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Enums\MealPlanStatus;
 use App\Enums\RecipeStatus;
 use App\Models\MealPlan;
 use App\Models\Recipe;
@@ -39,10 +38,7 @@ class AppServiceProvider extends ServiceProvider
                     ? Recipe::query()->where('status', RecipeStatus::Pending)->count()
                     : 0,
                 'latestLockedPlanId' => auth()->check()
-                    ? MealPlan::query()
-                        ->where('status', MealPlanStatus::Locked)
-                        ->orderByDesc('week_start_date')
-                        ->value('id')
+                    ? MealPlan::latestLocked()?->id
                     : null,
             ]);
         });

@@ -12,6 +12,17 @@
         </a>
     </div>
 
+    @php($weeksStale = $mealPlan->weeksStale())
+    @if ($weeksStale > 0)
+        {{-- Stale week: dates already past, nothing newer locked (GLOSSARY). --}}
+        <div role="alert" class="alert alert-warning mb-5">
+            <span>
+                <strong>Stale week.</strong>
+                This week ended {{ $weeksStale }} {{ $weeksStale === 1 ? 'week' : 'weeks' }} ago and no newer week has been locked — lock the current week before shopping.
+            </span>
+        </div>
+    @endif
+
     {{-- Pantry staples toggle. --}}
     <label class="mb-5 flex min-h-11 w-fit cursor-pointer items-center gap-3">
         <input type="checkbox" class="toggle toggle-primary" wire:model.live="includeStaples">

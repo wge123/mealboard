@@ -2,16 +2,16 @@
 
 namespace App\Actions\Planning;
 
-use App\Enums\MealPlanStatus;
 use App\Models\MealPlan;
 use App\Support\CleanIngredientKeywords;
 use RuntimeException;
 
 /**
- * Pure assembly for walmart:push-list: resolve the target week, build its
- * shopping list, drop checked items, and reduce each remaining line to its
- * cleaned Walmart keywords (deduped — two unit buckets of one ingredient
- * should not push two identical list entries). No browser anywhere near this.
+ * Pure assembly for walmart:push-list: resolve the target week (refusing a
+ * stale latest locked week), build its shopping list, drop checked items,
+ * and reduce each remaining line to its cleaned Walmart keywords (deduped —
+ * two unit buckets of one ingredient should not push two identical list
+ * entries). No browser anywhere near this.
  */
 class BuildListPushItems
 {
@@ -59,13 +59,27 @@ class BuildListPushItems
             return $plan;
         }
 
-        $plan = MealPlan::query()
-            ->where('status', MealPlanStatus::Locked)
-            ->orderByDesc('week_start_date')
-            ->first();
+        $plan = MealPlan::latestLocked();
 
         if ($plan === null) {
             throw new RuntimeException('No locked week.');
+        }
+
+        // A stale week (GLOSSARY: locked, dates already past, nothing newer
+        // locked) is almost never the one meant — stop rather than push last
+        // month's groceries. Naming the week explicitly is the override.
+        $weeksStale = $plan->weeksStale();
+
+        if ($weeksStale > 0) {
+            $week = $plan->week_start_date->toDateString();
+
+            throw new RuntimeException(sprintf(
+                'The latest locked week (%s) is %d week%s stale — lock a newer week, or pass --week=%s to push it anyway.',
+                $week,
+                $weeksStale,
+                $weeksStale === 1 ? '' : 's',
+                $week,
+            ));
         }
 
         return $plan;
