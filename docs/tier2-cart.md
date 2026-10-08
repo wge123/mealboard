@@ -37,7 +37,7 @@ the run ends with the human reviewing the cart and placing the order themselves.
 4. **A locked week — the one you actually want.**
    `get_current_shopping_list` serves the latest *locked* plan by
    `week_start_date` and applies no recency rule whatsoever
-   (`McpServer::getCurrentShoppingList`), so a draft plan for this week loses
+   (`MealPlan::latestLocked`), so a draft plan for this week loses
    to a locked plan from a month ago. Lock the current week's plan in
    Mealboard first. The payload reports `weeks_stale` alongside the date —
    `0` is this week, anything higher is how many weeks old the list you are
@@ -122,16 +122,24 @@ Two more things worth knowing before the first run:
 ## The loop
 
 1. Call `get_current_shopping_list`. Check `weeks_stale` first — if it is not
-   `0`, say so and confirm the week before adding anything. It returns the
-   locked week's items grouped by store category; each item carries:
+   `0`, say so and confirm the week before adding anything. **Walk the
+   `buy_list`**: one entry per ingredient still to buy, in store-flow order.
+   Pantry staples and ingredients whose every line is checked (handled, don't
+   buy again) are already left out, and an ingredient with two lines (cups
+   and grams of flour) appears once, so add each entry once. Each entry
+   carries:
+   - `name` — the ingredient, as `save_product_match` expects it,
    - `keywords` — cleaned Walmart search keywords (quantities/units/prep
      stripped: "2 cups diced yellow onion" → "yellow onion"),
    - `product_url` — the remembered Walmart product when a previous run
-     confirmed a match, else `null`,
-   - `checked` — already in the cart (or otherwise handled); **skip these**.
-2. For each unchecked item, in list order:
+     confirmed a match, else `null`.
+
+   The payload's `items` are the shopping list's lines, grouped by store
+   category, with amounts and `checked` state. Read them for how much to buy
+   (both amounts of a two-line ingredient); never walk them to fill the cart.
+2. For each buy-list entry, in order:
    - **Known match** (`product_url` present): open the product page directly.
-   - **No match**: search walmart.com for the item's `keywords`.
+   - **No match**: search walmart.com for the entry's `keywords`.
 3. Add the product to the cart (the product page / search tile "Add to cart"
    button — never anything on the cart or checkout pages).
 4. **Ambiguous match → ask the human, never guess.** If the search results
@@ -140,11 +148,11 @@ Two more things worth knowing before the first run:
    show 2–3 candidates and let the human pick. A wrong guess poisons the match
    memory for every future week.
 5. **Write every confirmed pick back** via `save_product_match`
-   (`ingredient` = the shopping-list name, `product_url`, `product_name` as
+   (`ingredient` = the buy-list entry's `name`, `product_url`, `product_name` as
    listed on Walmart). This is what makes next week's run mostly step-2a
    direct-opens. Do this for *every* confirmed item, including ones that
    already had a `product_url` when the human confirms a different product.
-6. When every unchecked item is handled: report a summary (added / asked /
+6. When every buy-list entry is handled: report a summary (added / asked /
    skipped) and stop. **The human reviews the cart and places the order
    themselves.** After the order is placed, the human (or the agent, on the
    human's say-so) calls `mark_list_purchased` with the week's start date.
@@ -164,13 +172,14 @@ Two more things worth knowing before the first run:
 - Stay inside walmart.com pages needed for the run: search, product pages,
   and the cart page for verification counts only.
 
-## Worked example — one item
+## Worked example — one buy-list entry
 
-> Shopping list item: `{"name": "chicken thighs", "qty": 1, "unit": "lb",
-> "keywords": "chicken thighs", "product_url": null, "checked": false}`
+> Buy-list entry: `{"name": "chicken thighs", "keywords": "chicken thighs",
+> "product_url": null}`; its line in `items` asks for 1 lb.
 
 ```text
-Agent:  get_current_shopping_list → "chicken thighs" is unchecked, no saved match.
+Agent:  get_current_shopping_list → weeks_stale 0; "chicken thighs" is on the
+        buy list with no saved match (its line asks for 1 lb).
 Agent:  Searching walmart.com for "chicken thighs".
 Agent:  Results show (1) Freshness Guaranteed Boneless Skinless Chicken Thighs,
         1.7–2.1 lb tray, $4.32/lb; (2) Tyson Bone-In Chicken Thighs, 5 lb bag;
@@ -186,8 +195,8 @@ Agent:  save_product_match(
 Agent:  Next item…
 ```
 
-At the end of the run: "12 added, 2 you picked from candidates, 3 were already
-checked. Cart is ready for your review — I have not placed the order."
+At the end of the run: "12 added, 2 you picked from candidates. Cart is ready
+for your review — I have not placed the order."
 
 ## Done when
 
