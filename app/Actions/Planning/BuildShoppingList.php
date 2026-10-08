@@ -118,9 +118,12 @@ class BuildShoppingList
         $family = $this->family($unit);
 
         // Family units share a merge bucket; everything else merges per unit.
+        // The bucket, not the display unit, is the line's key, so a checked
+        // line stays checked when its amount crosses a display threshold.
         $key = $ingredient->name.'|'.($family ?? $unit ?? '');
 
         $lines[$key] ??= [
+            'key' => $key,
             'name' => $ingredient->name,
             'category' => $ingredient->category,
             'pantry_staple' => $ingredient->is_pantry_staple,
@@ -201,7 +204,7 @@ class BuildShoppingList
         }
 
         $qty = $qty === null ? null : round($qty, 2);
-        $key = $line['name'].'|'.($unit ?? '');
+        $key = $line['key'];
         $keywords = $this->cleanKeywords->handle($line['name']);
 
         return [

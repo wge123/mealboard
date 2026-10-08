@@ -45,7 +45,7 @@
                             {{-- Whole label row toggles the checkbox — big in-store tap target. --}}
                             <label class="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5">
                                 <input type="checkbox" class="checkbox checkbox-primary checkbox-lg shrink-0"
-                                       wire:click="toggleItem('{{ $line['key'] }}')" @checked($line['checked'])>
+                                       wire:click="toggleItem(@js($line['key']))" @checked($line['checked'])>
                                 <span class="min-w-0 {{ $line['checked'] ? 'line-through opacity-50' : '' }}">
                                     <span class="font-medium">{{ $line['label'] }}</span>
                                     @if ($line['notes'] !== [])

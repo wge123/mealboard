@@ -192,7 +192,7 @@ it('gives each line its key, label, checked state, product match, search keyword
     $peas = Ingredient::factory()->create(['name' => 'frozen peas', 'category' => IngredientCategory::Frozen]);
 
     attachMeal($plan, [[$onion, 2, 'count'], [$parsley, null, null], [$flour, 1.5, 'kg'], [$peas, 500, 'g']]);
-    $plan->update(['checked_items' => ['flour|kg']]);
+    $plan->update(['checked_items' => ['flour|mass']]);
 
     expect(shoppingList($plan)['lines'])->toBe([
         'produce' => [
@@ -223,7 +223,7 @@ it('gives each line its key, label, checked state, product match, search keyword
         ],
         'pantry' => [
             [
-                'key' => 'flour|kg',
+                'key' => 'flour|mass',
                 'name' => 'flour',
                 'qty' => 1.5,
                 'unit' => 'kg',
@@ -237,7 +237,7 @@ it('gives each line its key, label, checked state, product match, search keyword
         ],
         'frozen' => [
             [
-                'key' => 'frozen peas|g',
+                'key' => 'frozen peas|mass',
                 'name' => 'frozen peas',
                 'qty' => 500.0,
                 'unit' => 'g',
@@ -281,11 +281,11 @@ it('keeps an ingredient on the buy list until every one of its lines is checked'
     attachMeal($plan, [[$flour, 2, 'cup']]);
     attachMeal($plan, [[$flour, 500, 'g']]);
 
-    $plan->update(['checked_items' => ['flour|cup']]);
+    $plan->update(['checked_items' => ['flour|spoon']]);
 
     expect(collect(shoppingList($plan)['buy_list'])->pluck('name')->all())->toBe(['flour']);
 
-    $plan->update(['checked_items' => ['flour|cup', 'flour|g']]);
+    $plan->update(['checked_items' => ['flour|spoon', 'flour|mass']]);
 
     expect(shoppingList($plan)['buy_list'])->toBe([]);
 });
@@ -325,7 +325,7 @@ it('builds the cart link from the buy list\'s matched products only', function (
     // Onion is the only matched product still to buy: chicken is checked,
     // salt is a staple (shown, not bought), peas have no product match.
     attachMeal($plan, [[$onion, 2, 'count'], [$chicken, 500, 'g'], [$salt, 1, 'tsp'], [$peas, 500, 'g']]);
-    $plan->update(['checked_items' => ['chicken thighs|g']]);
+    $plan->update(['checked_items' => ['chicken thighs|mass']]);
 
     expect(shoppingList($plan, includeStaples: true)['cart_link'])
         ->toBe('https://affil.walmart.com/cart/addToCart?items=44390949');
@@ -341,7 +341,7 @@ it('has no cart link when nothing on the buy list is matched', function () {
     $peas = Ingredient::factory()->create(['name' => 'frozen peas', 'category' => IngredientCategory::Frozen]);
 
     attachMeal($plan, [[$chicken, 500, 'g'], [$peas, 500, 'g']]);
-    $plan->update(['checked_items' => ['chicken thighs|g']]);
+    $plan->update(['checked_items' => ['chicken thighs|mass']]);
 
     expect(shoppingList($plan)['cart_link'])->toBeNull();
 });
@@ -359,4 +359,21 @@ it('keeps a shown pantry staple\'s product match on its line', function () {
     $line = shoppingList($plan, includeStaples: true)['lines']['pantry'][0];
 
     expect($line['product_url'])->toBe('https://www.walmart.com/ip/salt/10315357');
+});
+
+it('keeps a checked line checked when its amount crosses a display-unit threshold', function () {
+    $plan = MealPlan::factory()->locked()->create();
+    $butter = Ingredient::factory()->create(['name' => 'butter', 'category' => IngredientCategory::Dairy]);
+
+    attachMeal($plan, [[$butter, 47, 'tsp']]);
+
+    $plan->update(['checked_items' => [shoppingList($plan)['lines']['dairy'][0]['key']]]);
+
+    // A recipe edit adds one more teaspoon: 48 tsp now reads as 1 cup.
+    attachMeal($plan, [[$butter, 1, 'tsp']]);
+
+    $line = shoppingList($plan->refresh())['lines']['dairy'][0];
+
+    expect($line['label'])->toBe('1 cup butter')
+        ->and($line['checked'])->toBeTrue();
 });
