@@ -2,7 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Planning\BuildListPushItems;
+use App\Actions\Planning\BuildShoppingList;
+use App\Models\MealPlan;
 use App\Walmart\ListBrowser;
 use Illuminate\Console\Command;
 use RuntimeException;
@@ -12,9 +13,9 @@ class WalmartPushList extends Command
     protected $signature = 'walmart:push-list
         {--week= : Week start date (YYYY-MM-DD, a Monday); defaults to the latest locked week}';
 
-    protected $description = "Push the week's unchecked shopping-list items onto the configured Walmart list via a headed Chrome (list adds only — never cart or checkout)";
+    protected $description = "Push the week's buy list onto the configured Walmart list via a headed Chrome (list adds only — never cart or checkout)";
 
-    public function handle(BuildListPushItems $buildItems): int
+    public function handle(BuildShoppingList $buildShoppingList): int
     {
         // Fail fast BEFORE any browser or DB work: both settings are required.
         $profile = config('mealboard.chrome_profile');
@@ -36,10 +37,10 @@ class WalmartPushList extends Command
             );
         }
 
-        $items = $buildItems->handle($this->option('week'));
+        $items = array_column($buildShoppingList->handle($this->plan($this->option('week')))['buy_list'], 'keywords');
 
         if ($items === []) {
-            $this->components->info('Nothing to push — every shopping-list item is already checked.');
+            $this->components->info('Nothing to push — the buy list is empty.');
 
             return self::SUCCESS;
         }
@@ -81,5 +82,35 @@ class WalmartPushList extends Command
         ));
 
         return self::SUCCESS;
+    }
+
+    /**
+     * The named week, else the latest locked one — refusing a stale latest
+     * week (GLOSSARY: Stale week), which is almost never the one meant.
+     * Naming the week explicitly is the override.
+     */
+    private function plan(?string $weekStart): MealPlan
+    {
+        if ($weekStart !== null) {
+            return MealPlan::query()->whereDate('week_start_date', $weekStart)->first()
+                ?? throw new RuntimeException("No meal plan for week starting {$weekStart}.");
+        }
+
+        $plan = MealPlan::latestLocked() ?? throw new RuntimeException('No locked week.');
+        $weeksStale = $plan->weeksStale();
+
+        if ($weeksStale > 0) {
+            $week = $plan->week_start_date->toDateString();
+
+            throw new RuntimeException(sprintf(
+                'The latest locked week (%s) is %d week%s stale — lock a newer week, or pass --week=%s to push it anyway.',
+                $week,
+                $weeksStale,
+                $weeksStale === 1 ? '' : 's',
+                $week,
+            ));
+        }
+
+        return $plan;
     }
 }
