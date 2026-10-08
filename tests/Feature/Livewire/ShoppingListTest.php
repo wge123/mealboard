@@ -174,6 +174,31 @@ it('still persists checked state with the tappable rows', function () {
     shoppingListPage($plan)->assertSeeHtml('line-through');
 });
 
+/**
+ * The key the browser sends when the page's only checkbox is clicked: the
+ * `toggleItem(...)` argument as the browser reads it, which must be one
+ * well-formed JS string literal.
+ */
+function clickedLineKey(Testable $page): string
+{
+    preg_match('/wire:click="toggleItem\((.*?)\)"/', $page->html(), $click);
+    $argument = html_entity_decode($click[1], ENT_QUOTES | ENT_HTML5);
+
+    expect($argument)->toMatch('/^\'(?:[^\'\\\\]|\\\\.)*\'$/');
+
+    return json_decode('"'.substr($argument, 1, -1).'"', flags: JSON_THROW_ON_ERROR);
+}
+
+it('toggles a line whose ingredient name has an apostrophe', function () {
+    $yeast = Ingredient::factory()->create(['name' => "baker's yeast", 'category' => IngredientCategory::Pantry]);
+    $plan = lockedPlanWith([[$yeast, 7, 'g']]);
+
+    $key = clickedLineKey(shoppingListPage($plan));
+
+    shoppingListPage($plan)->call('toggleItem', $key)->assertSeeHtml('line-through');
+    shoppingListPage($plan)->call('toggleItem', $key)->assertDontSeeHtml('line-through');
+});
+
 it('renders the cart link without a checked line', function () {
     $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
     WalmartMatch::factory()->create([
