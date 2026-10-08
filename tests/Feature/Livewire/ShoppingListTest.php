@@ -81,15 +81,15 @@ it('persists checked items across component reloads', function () {
     $flour = Ingredient::factory()->create(['name' => 'flour', 'category' => IngredientCategory::Pantry]);
     $plan = lockedPlanWith([[$flour, 500, 'g']]);
 
-    shoppingListPage($plan)->call('toggleItem', 'flour|g');
+    shoppingListPage($plan)->call('toggleItem', 'flour|mass');
 
-    expect($plan->refresh()->checked_items)->toBe(['flour|g']);
+    expect($plan->refresh()->checked_items)->toBe(['flour|mass']);
 
     // A brand-new component instance (fresh request) sees the checked state.
     shoppingListPage($plan)->assertSeeHtml('line-through');
 
     // Toggling again unchecks and persists that too.
-    shoppingListPage($plan)->call('toggleItem', 'flour|g');
+    shoppingListPage($plan)->call('toggleItem', 'flour|mass');
 
     expect($plan->refresh()->checked_items)->toBe([]);
 
@@ -188,7 +188,7 @@ it('renders the cart link without a checked line', function () {
     $plan = lockedPlanWith([[$onion, 2, 'count'], [$chicken, 500, 'g']]);
 
     shoppingListPage($plan)
-        ->call('toggleItem', 'chicken thighs|g')
+        ->call('toggleItem', 'chicken thighs|mass')
         ->assertSeeHtml('href="https://affil.walmart.com/cart/addToCart?items=44390949"')
         ->assertSee('Add matched items to Walmart cart');
 });
