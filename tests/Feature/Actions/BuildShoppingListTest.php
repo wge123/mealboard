@@ -180,7 +180,7 @@ it('builds a list for a completed week too', function () {
     expect(flatLines(shoppingList($plan)))->toHaveCount(1);
 });
 
-it('gives each line its key, label, checked state, product match and search link', function () {
+it('gives each line its key, label, checked state, product match, search keywords and search link', function () {
     $plan = MealPlan::factory()->locked()->create();
     $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
     WalmartMatch::factory()->create([
@@ -205,6 +205,7 @@ it('gives each line its key, label, checked state, product match and search link
                 'label' => 'parsley',
                 'checked' => false,
                 'product_url' => null,
+                'keywords' => 'parsley',
                 'search_url' => 'https://www.walmart.com/search?q=parsley',
             ],
             [
@@ -216,6 +217,7 @@ it('gives each line its key, label, checked state, product match and search link
                 'label' => '2 yellow onion',
                 'checked' => false,
                 'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
+                'keywords' => 'yellow onion',
                 'search_url' => 'https://www.walmart.com/search?q=yellow+onion',
             ],
         ],
@@ -229,6 +231,7 @@ it('gives each line its key, label, checked state, product match and search link
                 'label' => '1.5 kg flour',
                 'checked' => true,
                 'product_url' => null,
+                'keywords' => 'flour',
                 'search_url' => 'https://www.walmart.com/search?q=flour',
             ],
         ],
@@ -243,6 +246,7 @@ it('gives each line its key, label, checked state, product match and search link
                 'checked' => false,
                 'product_url' => null,
                 // "frozen" is a prep word: cleaning drops it from the search.
+                'keywords' => 'peas',
                 'search_url' => 'https://www.walmart.com/search?q=peas',
             ],
         ],

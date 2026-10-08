@@ -8,8 +8,6 @@ use App\Enums\MealSlot;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
-use App\Models\WalmartMatch;
-use App\Support\CleanIngredientKeywords;
 use Illuminate\Support\Arr;
 use Throwable;
 
@@ -37,7 +35,6 @@ class McpServer
     public function __construct(
         private BuildShoppingList $buildShoppingList,
         private SaveProductMatch $saveProductMatch,
-        private CleanIngredientKeywords $cleanKeywords,
     ) {}
 
     /**
@@ -161,9 +158,9 @@ class McpServer
     }
 
     /**
-     * The latest locked week's shopping list: category-grouped items with
-     * cleaned search keywords, the remembered Walmart product URL when one
-     * exists, and the shared checkbox state.
+     * The latest locked week's shopping list, read from the Shopping list
+     * module: the category-grouped lines (`items`) and the buy list, one
+     * entry per ingredient still to buy, which is what the cart agent walks.
      *
      * `weeks_stale` says how far behind today that week is (0 = this week),
      * because "latest locked" is not the same as "current": a week left in
@@ -180,35 +177,24 @@ class McpServer
             throw new McpError(self::NOT_FOUND, 'No locked week.');
         }
 
-        $items = $this->buildShoppingList->handle($plan)['lines'];
-        $checked = $plan->checked_items ?? [];
-
-        $names = collect($items)->collapse()->pluck('name');
-
-        $productUrls = WalmartMatch::query()
-            ->whereHas('ingredient', fn ($query) => $query->whereIn('name', $names))
-            ->with('ingredient')
-            ->get()
-            ->mapWithKeys(fn (WalmartMatch $match) => [$match->ingredient->name => $match->product_url]);
-
-        $list = [];
-
-        foreach ($items as $category => $lines) {
-            foreach ($lines as $item) {
-                $list[$category][] = [
-                    ...Arr::only($item, ['name', 'qty', 'unit', 'notes']),
-                    'keywords' => $this->cleanKeywords->handle($item['name']),
-                    'product_url' => $productUrls[$item['name']] ?? null,
-                    'checked' => in_array($item['name'].'|'.($item['unit'] ?? ''), $checked, true),
-                ];
-            }
-        }
+        $list = $this->buildShoppingList->handle($plan);
 
         return [
             'week_start_date' => $plan->week_start_date->toDateString(),
             'weeks_stale' => $plan->weeksStale(),
             'purchased_at' => $plan->purchased_at?->toIso8601String(),
-            'items' => $list,
+            'items' => array_map(
+                fn (array $lines) => array_map(
+                    fn (array $line) => [
+                        ...Arr::only($line, ['name', 'qty', 'unit', 'notes', 'keywords']),
+                        'product_url' => $line['product_url'],
+                        'checked' => $line['checked'],
+                    ],
+                    $lines,
+                ),
+                $list['lines'],
+            ),
+            'buy_list' => $list['buy_list'],
         ];
     }
 
@@ -342,7 +328,7 @@ class McpServer
         return [
             [
                 'name' => 'get_current_shopping_list',
-                'description' => "The latest locked week's shopping list: items grouped by store category, each with cleaned Walmart search keywords, the remembered product URL when one exists, and checked (already in cart) state. Read `weeks_stale` before shopping: 0 means this week, anything higher means the week you are about to shop is that many weeks old and is probably not the one intended.",
+                'description' => "The latest locked week's shopping list. `buy_list` is what to shop: one entry per ingredient still to buy (pantry staples and fully checked ingredients left out), each with cleaned Walmart search keywords and the remembered product URL when one exists; add each entry once. `items` are the lines grouped by store category, with checked (handled, don't buy again) state. Read `weeks_stale` before shopping: 0 means this week, anything higher means the week you are about to shop is that many weeks old and is probably not the one intended.",
                 'inputSchema' => ['type' => 'object', 'properties' => (object) []],
             ],
             [
