@@ -139,18 +139,18 @@ it('returns the latest locked week shopping list with keywords, product urls, an
             'qty' => 2,
             'unit' => 'count',
             'notes' => [],
-            'keywords' => 'yellow onion',
-            'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
             'checked' => false,
+            'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949',
+            'keywords' => 'yellow onion',
         ]],
         'meat' => [[
             'name' => 'chicken thighs',
             'qty' => 1,
             'unit' => 'lb',
             'notes' => [],
-            'keywords' => 'chicken thighs',
-            'product_url' => null,
             'checked' => true,
+            'product_url' => null,
+            'keywords' => 'chicken thighs',
         ]],
     ]);
 });
