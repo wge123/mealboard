@@ -187,6 +187,25 @@ it('reports zero weeks stale while the served list is the current week', functio
     expect(mcpToolData($response)['weeks_stale'])->toBe(0);
 });
 
+it('keeps weeks Monday-based on a Sunday under a Sunday-first locale', function () {
+    mcpSeededPlan();
+    Carbon::setLocale('en_US');
+    $this->travelTo(Carbon::parse('2026-07-26 18:00')); // Sunday
+
+    try {
+        [$response] = mcpSession([
+            ['jsonrpc' => '2.0', 'id' => 3, 'method' => 'tools/call', 'params' => [
+                'name' => 'get_current_shopping_list',
+                'arguments' => [],
+            ]],
+        ]);
+    } finally {
+        Carbon::setLocale('en');
+    }
+
+    expect(mcpToolData($response)['weeks_stale'])->toBe(0);
+});
+
 it('errors with not-found when no locked week exists', function () {
     [$response] = mcpSession([
         ['jsonrpc' => '2.0', 'id' => 3, 'method' => 'tools/call', 'params' => [

@@ -7,6 +7,11 @@ use App\Enums\MealType;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\Recipe;
+use Illuminate\Support\Carbon;
+
+// Every plan below is the week of Mon 2026-07-20; the clock sits inside it
+// so the latest locked week is never stale unless a test says so.
+beforeEach(fn () => $this->travelTo(Carbon::parse('2026-07-22 09:00')));
 
 /**
  * Give the plan one planned meal whose recipe uses the named ingredients
@@ -98,4 +103,23 @@ it('refuses a draft explicit week via the shopping-list guard', function () {
 
     expect(fn () => pushItems('2026-07-20'))
         ->toThrow(LogicException::class, 'Only locked weeks have a shopping list.');
+});
+
+it('stops on a stale latest locked week when no week is given', function () {
+    $plan = MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-20']);
+    pushListMeal($plan, [['yellow onion']]);
+
+    $this->travelTo(Carbon::parse('2026-08-30 09:00')); // five weeks on
+
+    expect(fn () => pushItems())
+        ->toThrow(RuntimeException::class, 'The latest locked week (2026-07-20) is 5 weeks stale');
+});
+
+it('still pushes a stale week when it is named explicitly', function () {
+    $plan = MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-20']);
+    pushListMeal($plan, [['yellow onion']]);
+
+    $this->travelTo(Carbon::parse('2026-08-30 09:00'));
+
+    expect(pushItems('2026-07-20'))->toBe(['yellow onion']);
 });

@@ -10,6 +10,7 @@ use App\Models\MealPlan;
 use App\Models\Recipe;
 use App\Models\User;
 use App\Models\WalmartMatch;
+use Illuminate\Support\Carbon;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
@@ -303,4 +304,20 @@ it('follows the staples toggle into the cart link', function () {
         ->assertSeeHtml('href="https://affil.walmart.com/cart/addToCart?items=44390949"')
         ->set('includeStaples', true)
         ->assertSeeHtml('href="https://affil.walmart.com/cart/addToCart?items=44390949,10315356"');
+});
+
+it('warns when the week it shows is stale', function () {
+    $plan = MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-20']);
+    $this->travelTo(Carbon::parse('2026-08-30 09:00')); // five weeks on
+
+    shoppingListPage($plan)
+        ->assertSee('Stale week')
+        ->assertSee('5 weeks ago');
+});
+
+it('shows no stale-week warning for this week', function () {
+    $plan = MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-20']);
+    $this->travelTo(Carbon::parse('2026-07-26 18:00')); // Sunday, still this week
+
+    shoppingListPage($plan)->assertDontSee('Stale week');
 });
