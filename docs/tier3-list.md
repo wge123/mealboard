@@ -13,7 +13,11 @@ by carting from it. The command never touches cart or checkout.
 ## KNOWN (agent-buildable side, unit-tested)
 
 - **Item assembly** (`App\Actions\Planning\BuildListPushItems`): latest locked
-  week by default, `--week=YYYY-MM-DD` override; items come from
+  week by default (`MealPlan::latestLocked()`), `--week=YYYY-MM-DD` override.
+  Without `--week` the command exits non-zero when that week is **stale**
+  (`MealPlan::weeksStale() > 0`: its dates are past and nothing newer is
+  locked) — lock the current week, or name the stale one with `--week` to push
+  it anyway; items come from
   `BuildShoppingList` (staples excluded), checked items are skipped
   (`checked_items` keys are `name|unit`), each line reduces to cleaned keywords
   via `CleanIngredientKeywords` ("2 cups diced yellow onion" → "yellow onion"),

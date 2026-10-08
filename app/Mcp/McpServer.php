@@ -4,7 +4,6 @@ namespace App\Mcp;
 
 use App\Actions\Planning\BuildShoppingList;
 use App\Actions\Planning\SaveProductMatch;
-use App\Enums\MealPlanStatus;
 use App\Enums\MealSlot;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
@@ -174,10 +173,7 @@ class McpServer
      */
     private function getCurrentShoppingList(): array
     {
-        $plan = MealPlan::query()
-            ->where('status', MealPlanStatus::Locked)
-            ->orderByDesc('week_start_date')
-            ->first();
+        $plan = MealPlan::latestLocked();
 
         if ($plan === null) {
             throw new McpError(self::NOT_FOUND, 'No locked week.');
@@ -209,21 +205,10 @@ class McpServer
 
         return [
             'week_start_date' => $plan->week_start_date->toDateString(),
-            'weeks_stale' => $this->weeksStale($plan),
+            'weeks_stale' => $plan->weeksStale(),
             'purchased_at' => $plan->purchased_at?->toIso8601String(),
             'items' => $list,
         ];
-    }
-
-    /**
-     * Whole weeks between the plan's week and the current one: 0 for this
-     * week, positive for a past week, negative for one still ahead.
-     */
-    private function weeksStale(MealPlan $plan): int
-    {
-        return (int) round(
-            $plan->week_start_date->copy()->startOfWeek()->diffInDays(now()->startOfWeek()) / 7
-        );
     }
 
     /**

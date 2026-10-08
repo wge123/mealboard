@@ -29,10 +29,7 @@ class PlanController extends Controller
      */
     public function current(): JsonResponse
     {
-        $plan = MealPlan::query()
-            ->where('status', MealPlanStatus::Locked)
-            ->orderByDesc('week_start_date')
-            ->first();
+        $plan = MealPlan::latestLocked();
 
         abort_unless($plan !== null, 404, 'No locked week.');
 
