@@ -12,6 +12,10 @@ _Avoid_: grocery list, push items
 One entry on the shopping list: an ingredient with its merged amount. One ingredient can have two lines when its amounts can't be added together (cups and grams of flour).
 _Avoid_: row, item
 
+**Merge bucket**:
+What a line's amounts are added up under: the unit family for units that convert into each other (spoon for tsp, tbsp and cup; mass for g and kg; volume for ml and l), else the raw unit. Part of the line key (ingredient name and merge bucket), so a checked line stays checked when its amount moves to another display unit.
+_Avoid_: unit group, unit key
+
 **Checked**:
 A line the household has handled and must not buy again: it is in the cart or already in the kitchen.
 _Avoid_: ticked, in cart, bought
