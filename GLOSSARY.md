@@ -2,6 +2,20 @@
 
 Plans a household's weekday meals, discovers new recipes, and turns a locked week into a shopping list that ends up in a Walmart cart.
 
+## Household
+
+**Household**:
+The people who share one kitchen and plan meals together. Recipes, plans, kitchen tools and preferences belong to the household, never to one person, even while it has a single member.
+_Avoid_: user, account, family
+
+**Kitchen tool**:
+A kind of equipment a recipe can require, from oven and stovetop to chef's knife and flat-top griddle. Named by kind ("skillet"), never by a specific item; owning any tool of that kind is enough.
+_Avoid_: equipment, utensil, gadget, appliance, tool (alone)
+
+**Tool inventory**:
+The kitchen tools the household owns, each owned or not, with no count. Starts with the common basics already in it; the household removes what its kitchen lacks and adds kinds the app does not know yet.
+_Avoid_: kitchen, equipment list
+
 ## Shopping
 
 **Shopping list**:
