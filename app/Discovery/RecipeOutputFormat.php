@@ -36,4 +36,17 @@ final class RecipeOutputFormat
         List every tool the recipe needs, once each. Put preparation (chopping, measuring, mixing a marinade) in an ingredient's prep_note and keep steps to the cooking.
         SCHEMA;
     }
+
+    /**
+     * The prompt section naming the tool words a model may use. Kinds only:
+     * the lanes that ask for a specific recipe ignore what the household owns.
+     *
+     * @param  iterable<string>  $kinds
+     */
+    public static function kindsSection(iterable $kinds): string
+    {
+        $list = implode(', ', is_array($kinds) ? $kinds : iterator_to_array($kinds, false));
+
+        return "Kitchen tool words you may use:\n{$list}\n\nPick tool words from this list; only use another word if none fits.";
+    }
 }
