@@ -170,16 +170,31 @@ class KitchenToolInventory
 
     /**
      * Give a kind to every recipe tool alternative that has none yet and
-     * whose word now resolves, on every recipe, saved ones included.
+     * whose word now resolves, on every recipe, saved ones included. The
+     * word-to-kind map is read once (kind names win over other names, as in
+     * resolve), then each kind's alternatives are updated in one query.
      */
     private function reResolveAlternatives(): void
     {
-        RecipeToolAlternative::query()
+        $unresolved = RecipeToolAlternative::query()
             ->whereNull('kitchen_tool_kind_id')
-            ->get()
-            ->each(function (RecipeToolAlternative $alternative) {
-                if ($kind = $this->resolve($alternative->word)) {
-                    $alternative->update(['kitchen_tool_kind_id' => $kind->id]);
+            ->get(['id', 'word']);
+
+        if ($unresolved->isEmpty()) {
+            return;
+        }
+
+        // The array + keeps the left side's keys, so a kind name wins over an other name.
+        $kindIdByWord = KitchenToolKind::query()->pluck('id', 'name')->all()
+            + KitchenToolOtherName::query()->pluck('kitchen_tool_kind_id', 'name')->all();
+
+        $unresolved
+            ->groupBy(fn (RecipeToolAlternative $alternative) => $kindIdByWord[$this->normalize($alternative->word)] ?? null)
+            ->each(function (Collection $alternatives, $kindId) {
+                if ($kindId !== '') {
+                    RecipeToolAlternative::query()
+                        ->whereKey($alternatives->modelKeys())
+                        ->update(['kitchen_tool_kind_id' => $kindId]);
                 }
             });
     }
