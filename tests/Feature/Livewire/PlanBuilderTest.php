@@ -4,6 +4,7 @@ use App\Enums\MealPlanStatus;
 use App\Enums\MealSlot;
 use App\Enums\MealType;
 use App\Livewire\PlanBuilder;
+use App\Models\KitchenToolKind;
 use App\Models\MealLog;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
@@ -246,4 +247,18 @@ it('clears a slot', function () {
     planBuilder()->call('clearSlot', $monday, 'lunch');
 
     expect($plan->plannedMeals()->count())->toBe(0);
+});
+
+it('badges a recipe with a missing tool in the picker and still allows the pick', function () {
+    KitchenToolKind::where('name', 'skillet')->update(['owned' => false]);
+    $plan = MealPlan::factory()->create();
+    $recipe = Recipe::factory()->approved()->shaped()->create(['meal_type' => MealType::Dinner, 'title' => 'Stir fry']);
+    $monday = $plan->week_start_date->toDateString();
+
+    planBuilder()
+        ->call('openPicker', $monday, 'dinner')
+        ->assertSee('needs: skillet')
+        ->call('choose', $recipe->id);
+
+    expect(PlannedMeal::where('recipe_id', $recipe->id)->exists())->toBeTrue();
 });

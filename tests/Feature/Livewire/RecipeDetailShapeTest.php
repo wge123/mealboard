@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Ingredient;
+use App\Models\KitchenToolKind;
 use App\Models\Recipe;
 use App\Models\User;
 
@@ -46,4 +47,20 @@ it('builds a shaped recipe from the factory state', function () {
 
     expect($recipe->hasShape())->toBeTrue()
         ->and($recipe->recipeTools()->first()->alternatives->first()->kind->name)->toBe('skillet');
+});
+
+it('marks a missing tool in the Tools list and leaves owned ones unmarked', function () {
+    KitchenToolKind::where('name', 'wok')->update(['owned' => false]);
+    KitchenToolKind::where('name', 'skillet')->update(['owned' => true]);
+    $recipe = Recipe::factory()->approved()->shaped()->create();
+    $recipe->recipeTools()->create(['position' => 2, 'count' => 1])->alternatives()->create([
+        'position' => 1,
+        'word' => 'wok',
+        'kitchen_tool_kind_id' => KitchenToolKind::where('name', 'wok')->value('id'),
+    ]);
+
+    $this->actingAs(User::factory()->create())->get("/recipes/{$recipe->id}")
+        ->assertOk()
+        ->assertSeeInOrder(['skillet', 'wok', 'missing'])
+        ->assertSee('data-missing-tool', false);
 });
