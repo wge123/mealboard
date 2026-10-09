@@ -4,7 +4,6 @@ namespace App\Discovery;
 
 use App\Actions\Recipes\ParsePastedIngredients;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Fallback driver: free TheMealDB API, no key required.
@@ -56,11 +55,7 @@ class TheMealDbDriver implements RecipeDiscoveryDriver
             'ingredients' => $this->ingredientRows($meal),
         ]);
 
-        if (! $check->passes()) {
-            Log::warning("discovery: discarded TheMealDB candidate \"{$meal['strMeal']}\": ".implode('; ', $check->errors));
-        }
-
-        return $check->candidate;
+        return $check->candidateOrDrop(trim((string) $meal['strMeal']) ?: '(untitled)');
     }
 
     /**

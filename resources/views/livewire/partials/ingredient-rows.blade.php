@@ -33,6 +33,7 @@
             </div>
         </div>
     @endforeach
+    @error('rows') <p class="text-sm text-error">{{ $message }}</p> @enderror
 
     <button type="button" class="btn btn-ghost btn-sm min-h-11 w-fit border border-base-300" wire:click="addRow">
         + Add ingredient

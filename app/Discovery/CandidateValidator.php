@@ -77,6 +77,14 @@ class CandidateValidator
     }
 
     /**
+     * The title of a raw candidate for messages, or "(untitled)".
+     */
+    public static function titleOf(mixed $item): string
+    {
+        return is_array($item) && is_string($item['title'] ?? null) && trim($item['title']) !== '' ? $item['title'] : '(untitled)';
+    }
+
+    /**
      * Check only the three parts of the recipe shape (tools, ingredients,
      * steps) with the same repairs, for input that has no title or source
      * (pasted text). The candidate holds those three keys.

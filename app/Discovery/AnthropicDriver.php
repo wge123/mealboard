@@ -130,18 +130,17 @@ class AnthropicDriver implements RecipeDiscoveryDriver
      */
     private function toolsSection(): string
     {
-        $kinds = $this->tools->kinds()->implode(', ');
+        $kindsSection = RecipeOutputFormat::kindsSection($this->tools->kinds());
         $owned = KitchenToolKind::query()->where('owned', true)->orderBy('name')->pluck('name')->implode(', ');
         $owned = $owned !== '' ? $owned : '(none)';
 
         return <<<SECTION
-        Kitchen tool words you may use:
-        {$kinds}
+        {$kindsSection}
 
         Tools the household owns:
         {$owned}
 
-        Pick tool words from the first list; only use another word if none fits. Prefer recipes that need no tools the household is missing.
+        Prefer recipes that need no tools the household is missing.
 
 
         SECTION;
@@ -166,7 +165,7 @@ class AnthropicDriver implements RecipeDiscoveryDriver
 
         foreach ($decoded as $i => $item) {
             foreach ($this->validator->check($item)->errors as $error) {
-                $errors[] = "candidates[{$i}] ".(is_array($item) && is_string($item['title'] ?? null) ? "\"{$item['title']}\" " : '').$error;
+                $errors[] = "candidates[{$i}] \"".CandidateValidator::titleOf($item).'" '.$error;
             }
         }
 
@@ -180,14 +179,7 @@ class AnthropicDriver implements RecipeDiscoveryDriver
      */
     private function checkShaped(mixed $item): ?array
     {
-        $check = $this->validator->check($item);
-
-        if (! $check->passes()) {
-            $title = is_array($item) && is_string($item['title'] ?? null) ? $item['title'] : '(untitled)';
-            Log::warning("discovery: discarded candidate \"{$title}\": ".implode('; ', $check->errors));
-        }
-
-        return $check->candidate;
+        return $this->validator->check($item)->candidateOrDrop(CandidateValidator::titleOf($item));
     }
 
     /**

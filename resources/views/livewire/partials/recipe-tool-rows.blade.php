@@ -4,8 +4,8 @@
         <div class="grid grid-cols-12 gap-2" wire:key="tool-{{ $index }}">
             <div class="col-span-12 md:col-span-8">
                 <input type="text" class="input min-h-11 w-full @error('tools.'.$index.'.alternatives') input-error @enderror"
-                       placeholder="Tool, or alternatives separated by commas (e.g. flat-top griddle, large skillet)"
-                       aria-label="Tool alternatives" wire:model="tools.{{ $index }}.alternatives">
+                       placeholder="Kitchen tool, or alternatives separated by commas (e.g. flat-top griddle, large skillet)"
+                       aria-label="Kitchen tool alternatives" wire:model="tools.{{ $index }}.alternatives">
                 @error('tools.'.$index.'.alternatives') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
             </div>
             <div class="col-span-8 md:col-span-3">
@@ -14,7 +14,7 @@
                 @error('tools.'.$index.'.count') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
             </div>
             <div class="col-span-4 md:col-span-1">
-                <button type="button" class="btn btn-ghost min-h-11 w-full text-error" aria-label="Remove tool"
+                <button type="button" class="btn btn-ghost min-h-11 w-full text-error" aria-label="Remove kitchen tool"
                         wire:click="removeTool({{ $index }})">&times;</button>
             </div>
         </div>
@@ -22,6 +22,6 @@
     @error('tools') <p class="text-sm text-error">{{ $message }}</p> @enderror
 
     <button type="button" class="btn btn-ghost btn-sm min-h-11 w-fit border border-base-300" wire:click="addTool">
-        + Add tool
+        + Add kitchen tool
     </button>
 </div>

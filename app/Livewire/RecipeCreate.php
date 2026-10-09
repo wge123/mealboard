@@ -66,7 +66,7 @@ class RecipeCreate extends Component
         }
 
         if (! $check->passes()) {
-            $this->parseError = 'AI parse could not read a full recipe from the pasted text: '.implode('; ', $check->errors);
+            $this->parseError = 'AI parse could not find kitchen tools, ingredients and cooking steps in the pasted text: '.implode('; ', $check->errors);
 
             return;
         }

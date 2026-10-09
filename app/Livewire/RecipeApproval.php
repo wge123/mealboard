@@ -103,7 +103,8 @@ class RecipeApproval extends Component
         return view('livewire.recipe-approval', [
             'recipe' => $recipe,
             'missing' => $missing,
-            'kinds' => $missing === [] ? collect() : KitchenToolKind::query()->orderBy('name')->get(),
+            // Owned kinds only: naming a word as one of them always clears the flag.
+            'kinds' => $missing === [] ? collect() : KitchenToolKind::query()->where('owned', true)->orderBy('name')->get(),
             'pending' => Recipe::query()->where('status', RecipeStatus::Pending)->count(),
         ]);
     }

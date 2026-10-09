@@ -106,7 +106,7 @@ class KitchenToolInventory
         }
 
         if (RecipeToolAlternative::query()->where('kitchen_tool_kind_id', $kind->id)->exists()) {
-            throw new KitchenToolRefused("{$kind->display_name} is used by a recipe's tools, so it cannot be deleted.");
+            throw new KitchenToolRefused("{$kind->display_name} is used by a recipe's kitchen tools, so it cannot be deleted.");
         }
 
         DB::transaction(function () use ($kind) {

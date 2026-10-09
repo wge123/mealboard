@@ -100,7 +100,7 @@
                                             <p class="font-medium">&ldquo;{{ $alt['word'] }}&rdquo; is not a kitchen tool you have listed.</p>
                                             <div class="mt-1 flex flex-wrap items-center gap-2" x-data="{ kindId: '' }">
                                                 <button type="button" class="btn btn-outline btn-sm min-h-11"
-                                                        wire:click='addAsNewTool(@js($alt['word']))'>Add as a new tool</button>
+                                                        wire:click='addAsNewTool(@js($alt['word']))'>Add as a new kitchen tool</button>
                                                 <select class="select select-bordered select-sm min-h-11" x-model="kindId"
                                                         aria-label="Which kitchen tool is {{ $alt['word'] }}?">
                                                     <option value="">It's my&hellip;</option>
