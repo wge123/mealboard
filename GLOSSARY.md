@@ -16,6 +16,22 @@ _Avoid_: equipment, utensil, gadget, appliance, tool (alone)
 The kitchen tools the household owns, each owned or not, with no count. Starts with the common basics already in it; the household removes what its kitchen lacks and adds kinds the app does not know yet.
 _Avoid_: kitchen, equipment list
 
+**Household preference**:
+A structured rule the household sets for itself, such as a number or a list, that the app reads and can check. Tastes written as prose live in the household's food notes instead.
+_Avoid_: setting, config, user preference
+
+**Household size**:
+How many people the household cooks for. Discovery looks for recipes that serve about this many.
+_Avoid_: headcount, servings (a recipe's own count)
+
+**Weekday limits**:
+The most total time and the most ingredients a recipe found by daily discovery may have, so it fits a Mon–Fri meal. Pantry staples do not count toward the ingredient limit. A recipe the household asked for is not bound by them, and changing them never removes a recipe already in the library.
+_Avoid_: weeknight caps, healthy/easy thresholds
+
+**Avoided ingredient**:
+An ingredient the household never wants in a meal. A hard exclusion: no discovered recipe may contain it, including recipes the household asked for, and auto-fill never plans a library recipe that does.
+_Avoid_: dislike, blocked ingredient, allergy (an allergy is one reason to avoid)
+
 ## Shopping
 
 **Shopping list**:
@@ -43,7 +59,7 @@ A locked week whose dates are already past when its shopping list is used, becau
 _Avoid_: old week, outdated list
 
 **Pantry staple**:
-An ingredient the household keeps in stock (salt, oil). Shown on the shopping list on request, never on the buy list.
+An ingredient the household keeps in stock (salt, oil); the household decides which ingredients are staples. Shown on the shopping list on request, never on the buy list.
 _Avoid_: staple item, basics
 
 **Product match**:
