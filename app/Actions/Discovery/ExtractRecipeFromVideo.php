@@ -2,10 +2,14 @@
 
 namespace App\Actions\Discovery;
 
+use App\Discovery\CandidateCheck;
 use App\Discovery\CandidateValidator;
 use App\Discovery\ClaudeCli;
+use App\Discovery\RecipeOutputFormat;
+use App\Discovery\RetryOnce;
 use App\Exceptions\DiscoveryEnvironmentException;
 use App\Models\DiscoveredVideo;
+use App\Support\KitchenToolInventory;
 use Illuminate\Support\Facades\Process;
 use RuntimeException;
 
@@ -37,6 +41,8 @@ class ExtractRecipeFromVideo
     public function __construct(
         private ClaudeCli $claude,
         private CandidateValidator $validator,
+        private RetryOnce $retry,
+        private KitchenToolInventory $tools,
     ) {}
 
     /**
@@ -106,29 +112,40 @@ class ExtractRecipeFromVideo
      */
     private function extract(DiscoveredVideo $video, string $transcript): array
     {
-        $output = $this->claude->run($this->prompt($video, $transcript));
+        $checked = $this->retry->run(
+            $this->prompt($video, $transcript),
+            fn (string $output) => $this->check($video, $output)->errors,
+        );
 
-        $item = json_decode($this->claude->extractJson($output), true);
-
-        if (is_array($item)) {
-            // The video IS the source — inject it before schema validation so
-            // the validator's source_url requirement holds on this path too.
-            $item['source_url'] = "https://www.youtube.com/watch?v={$video->video_id}";
-        }
-
-        $candidate = $this->validator->validate($item);
+        $candidate = $this->check($video, $checked->output)->candidate;
 
         if ($candidate === null) {
             throw new RuntimeException(
-                'claude recipe output failed schema validation: '.mb_substr(trim($output), 0, 300),
+                'claude recipe output failed schema validation: '.implode('; ', $checked->errors),
             );
         }
 
         return $candidate;
     }
 
+    private function check(DiscoveredVideo $video, string $output): CandidateCheck
+    {
+        $item = json_decode($this->claude->extractJson($output), true);
+
+        if (is_array($item)) {
+            // The video IS the source — inject it before the check so the
+            // source_url requirement holds on this path too.
+            $item['source_url'] = "https://www.youtube.com/watch?v={$video->video_id}";
+        }
+
+        return $this->validator->check($item);
+    }
+
     private function prompt(DiscoveredVideo $video, string $transcript): string
     {
+        $kinds = RecipeOutputFormat::kindsSection($this->tools->kinds());
+        $schema = RecipeOutputFormat::schema('null');
+
         return <<<PROMPT
         You are the recipe extraction engine for a household meal planner. Below is the transcript of a YouTube cooking video. Extract ONE cookable recipe from it.
 
@@ -138,21 +155,10 @@ class ExtractRecipeFromVideo
         Transcript:
         {$transcript}
 
+        {$kinds}
+
         Respond with STRICT JSON only: a single top-level object. No prose, no markdown fences, no trailing commentary. The object has exactly these keys:
-        {
-          "title": string,
-          "description": string (1-2 sentences),
-          "meal_type": "breakfast" | "lunch" | "dinner" | "any",
-          "prep_minutes": integer,
-          "cook_minutes": integer,
-          "servings": integer,
-          "instructions": string (numbered steps, markdown allowed),
-          "cuisine": string or null,
-          "tags": array of strings,
-          "source_url": null,
-          "ingredients": array of {"qty": number or null, "unit": string or null, "name": string, "note": string or null}
-        }
-        Allowed ingredient units: g, kg, ml, l, tsp, tbsp, cup, oz, lb, count, or null for unitless items.
+        {$schema}
         PROMPT;
     }
 }

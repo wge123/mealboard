@@ -38,6 +38,7 @@ class AnthropicDriver implements RecipeDiscoveryDriver
         private CandidateValidator $validator,
         private ComputeTasteProfile $profile,
         private KitchenToolInventory $tools,
+        private RetryOnce $retry,
     ) {}
 
     public function discover(int $n): array
@@ -56,11 +57,13 @@ class AnthropicDriver implements RecipeDiscoveryDriver
      */
     public function discoverFor(RecipeRequest $request, int $n): array
     {
-        // Requests keep the pre-shape contract (free-text instructions) until
-        // the requests ticket moves them over.
-        $output = $this->claude->run($this->prompt($n, $request));
+        $checked = $this->retry->run(
+            $this->prompt($n, $request),
+            fn (string $output) => $this->outputErrors($output),
+        );
 
-        return $this->parseCandidates($output, fn (mixed $item) => $this->validator->validate($item));
+        // After the retry, a candidate that still fails is dropped.
+        return $this->parseCandidates($checked->output, fn (mixed $item) => $this->checkShaped($item));
     }
 
     private function prompt(int $n, ?RecipeRequest $request = null): string
@@ -96,8 +99,12 @@ class AnthropicDriver implements RecipeDiscoveryDriver
             - Whole-food-leaning: minimally processed ingredients over packaged or ultra-processed ones.
             BRIEF;
 
-        $toolsSection = $request === null ? $this->toolsSection() : '';
-        $outputSpec = $request === null ? RecipeOutputFormat::schema() : $this->legacyOutputSpec();
+        // The request lanes ignore which tools the household owns: no owned
+        // list and no "prefer" line, only the words the model may use.
+        $toolsSection = $request === null
+            ? $this->toolsSection()
+            : RecipeOutputFormat::kindsSection($this->tools->kinds())."\n\n";
+        $outputSpec = RecipeOutputFormat::schema();
 
         return <<<PROMPT
         You are the recipe discovery engine for a household meal planner. Suggest exactly {$n} recipe candidates.
@@ -141,30 +148,33 @@ class AnthropicDriver implements RecipeDiscoveryDriver
     }
 
     /**
-     * The pre-shape output spec, used by the request lane only.
+     * Every check error across the candidates in a raw output, each naming
+     * its candidate, for the retry prompt. Not-a-list output is one error;
+     * parseCandidates reports the final failure of that kind.
+     *
+     * @return list<string>
      */
-    private function legacyOutputSpec(): string
+    private function outputErrors(string $output): array
     {
-        return <<<'SPEC'
-        {
-          "title": string,
-          "description": string (1-2 sentences),
-          "meal_type": "breakfast" | "lunch" | "dinner" | "any",
-          "prep_minutes": integer,
-          "cook_minutes": integer,
-          "servings": integer,
-          "instructions": string (numbered steps, markdown allowed),
-          "cuisine": string or null,
-          "tags": array of strings,
-          "source_url": string (see source rule below),
-          "ingredients": array of {"qty": number or null, "unit": string or null, "name": string, "note": string or null}
+        $decoded = json_decode($this->claude->extractJson($output), true);
+
+        if (! is_array($decoded) || ! array_is_list($decoded)) {
+            return ['output: must be a JSON array of candidates'];
         }
-        Allowed ingredient units: g, kg, ml, l, tsp, tbsp, cup, oz, lb, count, or null for unitless items.
-        SPEC;
+
+        $errors = [];
+
+        foreach ($decoded as $i => $item) {
+            foreach ($this->validator->check($item)->errors as $error) {
+                $errors[] = "candidates[{$i}] ".(is_array($item) && is_string($item['title'] ?? null) ? "\"{$item['title']}\" " : '').$error;
+            }
+        }
+
+        return $errors;
     }
 
     /**
-     * Shaped check; a failing candidate is dropped (scheduled lane: no retry).
+     * Shaped check; a failing candidate is logged and dropped (the scheduled lane never retries; the request lane retries before this).
      *
      * @return ?array<string, mixed>
      */

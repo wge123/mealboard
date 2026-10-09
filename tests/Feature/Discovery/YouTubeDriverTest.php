@@ -18,13 +18,14 @@ function driverRecipeObject(string $title): array
         'prep_minutes' => 5,
         'cook_minutes' => 15,
         'servings' => 2,
-        'instructions' => "1. Cook.\n2. Eat.",
         'cuisine' => null,
         'tags' => ['quick'],
         'source_url' => null,
+        'tools' => [['alternatives' => ['pan'], 'count' => 1]],
         'ingredients' => [
-            ['qty' => 1, 'unit' => null, 'name' => 'main thing', 'note' => null],
+            ['qty' => 1, 'unit' => null, 'name' => 'main thing', 'prep_note' => null],
         ],
+        'steps' => ['Cook.', 'Eat.'],
     ];
 }
 
