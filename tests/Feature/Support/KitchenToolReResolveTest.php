@@ -51,7 +51,7 @@ it('refuses to delete a kind an alternative points at', function () {
     recipeWithUnknownWord('tortilla press')->update(['kitchen_tool_kind_id' => $kind->id]);
 
     $inventory->deleteKind($kind);
-})->throws(KitchenToolRefused::class, 'Tortilla press');
+})->throws(KitchenToolRefused::class, 'Tortilla Press');
 
 it('deletes a kind once nothing references it', function () {
     $inventory = new KitchenToolInventory;
