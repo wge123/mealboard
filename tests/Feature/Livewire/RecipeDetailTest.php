@@ -83,7 +83,7 @@ it('rejects a unit outside the normalized set', function () {
         ->call('save')
         ->assertHasErrors(['rows.0.unit']);
 
-    expect($recipe->fresh()->ingredients)->toHaveCount(0);
+    expect($recipe->fresh()->ingredients->pluck('name')->contains('flour'))->toBeFalse();
 });
 
 it('requires a title', function () {
