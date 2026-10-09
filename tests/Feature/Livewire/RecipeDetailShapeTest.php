@@ -52,3 +52,15 @@ it('marks a missing tool in the Tools list and leaves owned ones unmarked', func
         ->assertSeeInOrder(['skillet', 'wok', 'missing'])
         ->assertSee('data-missing-tool', false);
 });
+
+it('badges a pantry staple in the mise en place and leaves other ingredients bare', function () {
+    $recipe = Recipe::factory()->approved()->create();
+    $recipe->ingredients()->attach(Ingredient::factory()->create(['name' => 'soy sauce', 'is_pantry_staple' => true])->id, ['qty' => 1, 'unit' => 'tbsp', 'note' => null]);
+    $recipe->ingredients()->attach(Ingredient::factory()->create(['name' => 'salmon', 'is_pantry_staple' => false])->id, ['qty' => 2, 'unit' => 'count', 'note' => null]);
+
+    $html = $this->actingAs(User::factory()->create())->get("/recipes/{$recipe->id}")->assertOk()->getContent();
+
+    expect(substr_count($html, '>staple<'))->toBe(1)
+        ->and(strpos($html, 'soy sauce'))->toBeLessThan(strpos($html, '>staple<'))
+        ->and(strpos($html, '>staple<'))->toBeLessThan(strpos($html, 'salmon'));
+});
