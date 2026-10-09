@@ -110,19 +110,49 @@ it('AI-parses paste into tools, ingredient rows and steps with an AI badge', fun
         ->assertSee('AI parsed');
 });
 
-it('falls back with a visible error when the shaping pass fails its check', function () {
+it('AI-parses a realistic pasted recipe (ingredients and method together) into all three groups', function () {
     config()->set('mealboard.claude_bin', '/fake/bin/claude');
-    Process::fake(['*claude*' => Process::result(output: json_encode(['title' => 'x']))]);
+    Process::fake(['*claude*' => Process::result(output: json_encode([
+        'tools' => [['alternatives' => ['saucepan'], 'count' => 1]],
+        'ingredients' => [
+            ['qty' => 2, 'unit' => 'cup', 'name' => 'rice', 'prep_note' => 'rinsed'],
+            ['qty' => 1, 'unit' => 'tsp', 'name' => 'salt', 'prep_note' => null],
+        ],
+        'steps' => ['Boil the rice.', 'Season.'],
+    ]))]);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('paste', "Simple Rice\n\nIngredients\n2 cups rice, rinsed\n1 tsp salt\n\nMethod\nBoil the rice in a saucepan. Season.")
+        ->call('aiParse')
+        ->assertSet('rows', [
+            ['name' => 'rice', 'qty' => '2', 'unit' => 'cup', 'prep_note' => 'rinsed'],
+            ['name' => 'salt', 'qty' => '1', 'unit' => 'tsp', 'prep_note' => ''],
+        ])
+        ->assertSet('tools', [['alternatives' => 'saucepan', 'count' => 1]])
+        ->assertSet('steps', ['Boil the rice.', 'Season.'])
+        ->assertSet('title', '')
+        ->assertSet('sourceUrl', '');
+
+    Process::assertRan(fn ($process) => str_contains($process->command[2] ?? '', '2 cups rice, rinsed')
+        && str_contains($process->command[2] ?? '', 'Boil the rice in a saucepan'));
+});
+
+it('shows the failed shape check on the form and fills nothing from a heuristic', function () {
+    config()->set('mealboard.claude_bin', '/fake/bin/claude');
+    Process::fake(['*claude*' => Process::result(output: json_encode(['tools' => [], 'ingredients' => [['name' => 'eggs']], 'steps' => []]))]);
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeCreate::class)
         ->set('paste', 'eggs')
         ->call('aiParse')
-        ->assertSet('parsedWith', 'fallback')
-        ->assertSee('AI parse failed');
+        ->assertSet('rows', [['name' => '', 'qty' => '', 'unit' => '', 'prep_note' => '']])
+        ->assertSet('parsedWith', '')
+        ->assertSee('tools: at least one tool is required')
+        ->assertSee('steps: at least one step is required');
 });
 
-it('falls back to the heuristic parser with a visible error when the CLI fails', function () {
+it('shows a claude CLI failure as the form error and fills nothing', function () {
     config()->set('mealboard.claude_bin', '/fake/bin/claude');
     Process::fake(['*claude*' => Process::result(output: '', errorOutput: 'model overloaded', exitCode: 1)]);
 
@@ -131,30 +161,21 @@ it('falls back to the heuristic parser with a visible error when the CLI fails',
         ->set('steps', ['Keep me.'])
         ->set('paste', "2 cups diced onion\n1/2 tsp salt")
         ->call('aiParse')
-        ->assertSet('rows', [
-            ['name' => 'onion', 'qty' => '2', 'unit' => 'cup', 'prep_note' => 'diced'],
-            ['name' => 'salt', 'qty' => '0.5', 'unit' => 'tsp', 'prep_note' => ''],
-        ])
+        ->assertSet('rows', [['name' => '', 'qty' => '', 'unit' => '', 'prep_note' => '']])
         ->assertSet('steps', ['Keep me.'])
-        ->assertSet('parsedWith', 'fallback')
-        ->assertSee('Heuristic parsed (AI unavailable)')
-        ->assertSee('AI parse failed');
+        ->assertSet('parsedWith', '')
+        ->assertSee('model overloaded');
 });
 
-it('falls back with a visible error when the CLI returns malformed JSON', function () {
+it('lets a bug in the AI parse path surface instead of masking it', function () {
     config()->set('mealboard.claude_bin', '/fake/bin/claude');
-    Process::fake(['*claude*' => Process::result(output: 'Sorry, I cannot help with that.')]);
+    Process::fake(['*claude*' => fn () => throw new LogicException('bug')]);
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeCreate::class)
         ->set('paste', 'eggs')
-        ->call('aiParse')
-        ->assertSet('rows', [
-            ['name' => 'eggs', 'qty' => '', 'unit' => '', 'prep_note' => ''],
-        ])
-        ->assertSet('parsedWith', 'fallback')
-        ->assertSee('Heuristic parsed (AI unavailable)');
-});
+        ->call('aiParse');
+})->throws(LogicException::class);
 
 it('requires a title and validates units against the normalized set', function () {
     Livewire::actingAs(User::factory()->create())

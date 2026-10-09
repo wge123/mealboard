@@ -1,5 +1,6 @@
 <?php
 
+use App\Discovery\ClaudeCliFailed;
 use App\Discovery\ShapingPass;
 use App\Models\KitchenToolKind;
 use Illuminate\Support\Facades\Process;
@@ -48,7 +49,7 @@ beforeEach(function () {
 it('returns a shaped candidate with estimated minutes, servings and meal type when the source has none', function () {
     Process::fake(['*' => Process::result(output: json_encode(shapedModelOutput()))]);
 
-    $check = app(ShapingPass::class)->handle(rawRecipe());
+    $check = app(ShapingPass::class)->once(rawRecipe());
 
     expect($check->passes())->toBeTrue()
         ->and($check->candidate['title'])->toBe('Lemon Garlic Salmon Bowls')
@@ -64,7 +65,7 @@ it('returns a shaped candidate with estimated minutes, servings and meal type wh
 it('keeps the values the source gives over the model estimate', function () {
     Process::fake(['*' => Process::result(output: json_encode(shapedModelOutput()))]);
 
-    $check = app(ShapingPass::class)->handle(rawRecipe([
+    $check = app(ShapingPass::class)->once(rawRecipe([
         'prep_minutes' => 5, 'cook_minutes' => 20, 'servings' => 6, 'meal_type' => 'lunch',
     ]));
 
@@ -77,7 +78,7 @@ it('puts the raw text, the shared format and the tool kinds in the prompt', func
     KitchenToolKind::query()->firstOrCreate(['name' => 'wok']);
     Process::fake(['*' => Process::result(output: json_encode(shapedModelOutput()))]);
 
-    app(ShapingPass::class)->handle(rawRecipe(['prep_minutes' => 5]));
+    app(ShapingPass::class)->once(rawRecipe(['prep_minutes' => 5]));
 
     Process::assertRan(function ($process) {
         $prompt = $process->command[2] ?? '';
@@ -93,7 +94,7 @@ it('puts the raw text, the shared format and the tool kinds in the prompt', func
 it('returns errors for output that fails the check and does not call the model again', function () {
     Process::fake(['*' => Process::result(output: json_encode(shapedModelOutput(['steps' => []])))]);
 
-    $check = app(ShapingPass::class)->handle(rawRecipe());
+    $check = app(ShapingPass::class)->once(rawRecipe());
 
     expect($check->passes())->toBeFalse()
         ->and($check->errors)->not->toBeEmpty();
@@ -103,7 +104,7 @@ it('returns errors for output that fails the check and does not call the model a
 it('returns errors when the output is not JSON', function () {
     Process::fake(['*' => Process::result(output: 'Sorry, I cannot do that.')]);
 
-    $check = app(ShapingPass::class)->handle(rawRecipe());
+    $check = app(ShapingPass::class)->once(rawRecipe());
 
     expect($check->passes())->toBeFalse()->and($check->errors)->not->toBeEmpty();
 });
@@ -113,18 +114,55 @@ it('retries once with the errors when asked, and returns the second result', fun
         ->push(Process::result(output: json_encode(shapedModelOutput(['steps' => []]))))
         ->push(Process::result(output: json_encode(shapedModelOutput())))]);
 
-    $check = app(ShapingPass::class)->handle(rawRecipe(), retry: true);
+    $check = app(ShapingPass::class)->withRetry(rawRecipe());
 
     expect($check->passes())->toBeTrue();
     Process::assertRanTimes(fn () => true, 2);
-    Process::assertRan(fn ($process) => str_contains($process->command[2] ?? '', 'steps'));
+    // The retry shows the model its own previous output and the check's errors.
+    Process::assertRan(fn ($process) => str_contains($process->command[2] ?? '', 'Your previous answer')
+        && str_contains($process->command[2] ?? '', '"steps":[]')
+        && str_contains($process->command[2] ?? '', 'steps: at least one step is required'));
 });
 
 it('retries only once even when the second attempt fails too', function () {
     Process::fake(['*' => Process::result(output: json_encode(shapedModelOutput(['steps' => []])))]);
 
-    $check = app(ShapingPass::class)->handle(rawRecipe(), retry: true);
+    $check = app(ShapingPass::class)->withRetry(rawRecipe());
 
     expect($check->passes())->toBeFalse();
     Process::assertRanTimes(fn () => true, 2);
+});
+
+it('lets a CLI failure through to the caller', function () {
+    Process::fake(['*' => Process::result(output: '', errorOutput: 'overloaded', exitCode: 1)]);
+
+    app(ShapingPass::class)->once(rawRecipe());
+})->throws(ClaudeCliFailed::class, 'overloaded');
+
+it('extracts ingredients, tools and steps from pasted text without a title or source url', function () {
+    Process::fake(['*' => Process::result(output: json_encode([
+        'tools' => [['alternatives' => ['skillet'], 'count' => 1]],
+        'ingredients' => [['qty' => 2, 'unit' => null, 'name' => 'eggs', 'prep_note' => null]],
+        'steps' => ['Fry the eggs.'],
+    ]))]);
+
+    $check = app(ShapingPass::class)->fromPastedText("Fried eggs\n2 eggs\nFry the eggs in a skillet.");
+
+    expect($check->passes())->toBeTrue()
+        ->and($check->candidate['ingredients'][0]['name'])->toBe('eggs')
+        ->and($check->candidate['steps'])->toBe(['Fry the eggs.']);
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2] ?? '';
+
+        return str_contains($prompt, '2 eggs') && ! str_contains($prompt, 'Do not invent ingredients');
+    });
+});
+
+it('reports which part of pasted text could not be extracted', function () {
+    Process::fake(['*' => Process::result(output: json_encode(['tools' => [], 'ingredients' => [], 'steps' => []]))]);
+
+    $check = app(ShapingPass::class)->fromPastedText('hello');
+
+    expect($check->passes())->toBeFalse()
+        ->and($check->errors)->toContain('tools: at least one tool is required', 'ingredients: at least one ingredient is required', 'steps: at least one step is required');
 });
