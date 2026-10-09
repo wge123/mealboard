@@ -126,9 +126,11 @@ it('badges a recipe whose kitchen tool is not owned', function () {
 
     $this->actingAs(User::factory()->create());
 
-    Livewire::test(RecipeLibrary::class)
+    $component = Livewire::test(RecipeLibrary::class)
         ->assertSee('needs: skillet')
-        ->assertSeeCount('needs:', 1);
+        ->assertSee('Plain toast');
+
+    expect(substr_count($component->html(), 'data-missing-badge'))->toBe(1);
 });
 
 it('shows no badge once the tool is owned', function () {
