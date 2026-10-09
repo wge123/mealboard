@@ -3,6 +3,7 @@
 use App\Enums\KitchenToolOrigin;
 use App\Livewire\KitchenTools;
 use App\Models\KitchenToolKind;
+use App\Models\Recipe;
 use App\Models\User;
 use App\Support\KitchenToolInventory;
 use Livewire\Livewire;
@@ -81,7 +82,7 @@ it('refuses to delete a catalog kind with a validation error', function () {
 
 it('shows the refusal as a validation error when a recipe still uses the kind', function () {
     $kind = (new KitchenToolInventory)->addKind('tortilla press');
-    $recipe = \App\Models\Recipe::factory()->shaped()->create();
+    $recipe = Recipe::factory()->shaped()->create();
     $recipe->recipeTools->first()->alternatives()->create(['position' => 2, 'word' => 'tortilla press', 'kitchen_tool_kind_id' => $kind->id]);
 
     Livewire::actingAs(User::factory()->create())
