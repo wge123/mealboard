@@ -4,7 +4,11 @@ namespace App\Livewire;
 
 use App\Actions\Recipes\SetRecipeStatus;
 use App\Enums\RecipeStatus;
+use App\Exceptions\KitchenToolRefused;
+use App\Models\KitchenToolKind;
 use App\Models\Recipe;
+use App\Support\KitchenToolInventory;
+use App\Support\MissingKitchenTools;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -32,6 +36,43 @@ class RecipeApproval extends Component
         $this->decide($recipeId, RecipeStatus::Rejected);
     }
 
+    /** Add an unknown tool word as a new kitchen tool kind the household owns. */
+    public function addAsNewTool(KitchenToolInventory $inventory, string $word): void
+    {
+        $this->guardTool(fn () => $inventory->addKind($word));
+    }
+
+    /** Name an unknown tool word as another name for a kind the household picked. */
+    public function nameAsMyTool(KitchenToolInventory $inventory, string $word, int $kindId): void
+    {
+        $kind = KitchenToolKind::query()->find($kindId);
+
+        if ($kind === null) {
+            $this->addError('tool', 'Pick which kitchen tool it is.');
+
+            return;
+        }
+
+        $this->guardTool(fn () => $inventory->addOtherName($kind, $word));
+    }
+
+    /** Mark a known kind owned. */
+    public function markToolOwned(KitchenToolInventory $inventory, int $kindId): void
+    {
+        $inventory->setOwned(KitchenToolKind::query()->findOrFail($kindId), true);
+    }
+
+    private function guardTool(callable $write): void
+    {
+        $this->resetErrorBag('tool');
+
+        try {
+            $write();
+        } catch (KitchenToolRefused $e) {
+            $this->addError('tool', $e->getMessage());
+        }
+    }
+
     /**
      * The id comes from the rendered card so a stale click (card already
      * decided elsewhere) is a no-op instead of touching the wrong recipe.
@@ -50,13 +91,19 @@ class RecipeApproval extends Component
 
     public function render(): View
     {
+        $recipe = Recipe::query()
+            ->with(['ingredients', 'recipeRequest'])
+            ->where('status', RecipeStatus::Pending)
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->first();
+
+        $missing = $recipe === null ? [] : app(MissingKitchenTools::class)->for($recipe);
+
         return view('livewire.recipe-approval', [
-            'recipe' => Recipe::query()
-                ->with(['ingredients', 'recipeRequest'])
-                ->where('status', RecipeStatus::Pending)
-                ->orderBy('created_at')
-                ->orderBy('id')
-                ->first(),
+            'recipe' => $recipe,
+            'missing' => $missing,
+            'kinds' => $missing === [] ? collect() : KitchenToolKind::query()->orderBy('name')->get(),
             'pending' => Recipe::query()->where('status', RecipeStatus::Pending)->count(),
         ]);
     }

@@ -89,6 +89,42 @@
                     </div>
                 @endif
 
+                @if ($missing !== [])
+                    <div class="mt-4" data-missing-tools>
+                        @foreach ($missing as $entry)
+                            <div class="mb-2 rounded-xl border border-warning/40 bg-warning/10 p-3" wire:key="missing-{{ $entry->tool->id }}">
+                                @include('livewire.partials.missing-tools-badge', ['missing' => [$entry]])
+                                @foreach ($entry->alternatives as $alt)
+                                    <div class="mt-2 text-sm" wire:key="missing-alt-{{ $entry->tool->id }}-{{ $loop->index }}">
+                                        @if ($alt['kind'] === null)
+                                            <p class="font-medium">&ldquo;{{ $alt['word'] }}&rdquo; is not a kitchen tool you have listed.</p>
+                                            <div class="mt-1 flex flex-wrap items-center gap-2" x-data="{ kindId: '' }">
+                                                <button type="button" class="btn btn-outline btn-sm min-h-11"
+                                                        wire:click='addAsNewTool(@js($alt['word']))'>Add as a new tool</button>
+                                                <select class="select select-bordered select-sm min-h-11" x-model="kindId"
+                                                        aria-label="Which kitchen tool is {{ $alt['word'] }}?">
+                                                    <option value="">It's my&hellip;</option>
+                                                    @foreach ($kinds as $kind)
+                                                        <option value="{{ $kind->id }}">{{ $kind->display_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="button" class="btn btn-outline btn-sm min-h-11" x-show="kindId !== ''"
+                                                        @click='$wire.nameAsMyTool(@js($alt['word']), Number(kindId))'>Save</button>
+                                            </div>
+                                        @else
+                                            <button type="button" class="btn btn-outline btn-sm min-h-11"
+                                                    wire:click="markToolOwned({{ $alt['kind']->id }})">Mark {{ $alt['kind']->display_name }} as owned</button>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endforeach
+                        @error('tool')
+                            <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @endif
+
                 <div class="mt-6 flex flex-col gap-2">
                     <button type="button" class="btn btn-primary btn-lg w-full"
                             wire:click="approve({{ $recipe->id }})"
