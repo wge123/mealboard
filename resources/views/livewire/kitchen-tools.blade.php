@@ -4,17 +4,29 @@
 
     <ul class="divide-y divide-base-300 rounded-2xl border border-base-300 bg-base-100">
         @foreach ($kinds as $kind)
-            <li class="flex items-center gap-3 px-4 py-3" wire:key="kind-{{ $kind->id }}">
-                <div class="min-w-0 flex-1">
-                    <span class="block truncate font-medium {{ $kind->owned ? '' : 'opacity-50' }}">{{ \Illuminate\Support\Str::title($kind->name) }}</span>
-                    @if ($kind->note)
-                        <span class="block truncate text-xs opacity-50">{{ $kind->note }}</span>
-                    @endif
+            <li class="px-4 py-3" wire:key="kind-{{ $kind->id }}">
+                <div class="flex items-center gap-3">
+                    <span class="min-w-0 flex-1 truncate font-medium {{ $kind->owned ? '' : 'opacity-50' }}">{{ \Illuminate\Support\Str::title($kind->name) }}</span>
+
+                    {{-- Owned toggle: one tap, 44 px target --}}
+                    <label class="flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-end gap-2">
+                        <span class="text-xs opacity-60">{{ $kind->owned ? 'Owned' : 'Not owned' }}</span>
+                        <input type="checkbox" class="toggle toggle-success"
+                               aria-label="Owned: {{ \Illuminate\Support\Str::title($kind->name) }}"
+                               @checked($kind->owned)
+                               wire:click="toggleOwned(@js($kind->name))">
+                    </label>
                 </div>
 
-                @if ($kind->owned)
-                    <span class="badge badge-soft badge-success badge-sm shrink-0">Owned</span>
-                @endif
+                {{-- Note: for people only, never used in matching --}}
+                <form class="mt-1 flex items-center gap-2" wire:submit="saveNote(@js($kind->name))">
+                    <input type="text" maxlength="255"
+                           class="input input-sm min-h-11 min-w-0 flex-1"
+                           placeholder="Add a note, e.g. 12-inch, cast iron"
+                           aria-label="Note for {{ \Illuminate\Support\Str::title($kind->name) }}"
+                           wire:model="notes.{{ $kind->name }}">
+                    <button type="submit" class="btn btn-ghost btn-sm min-h-11 min-w-11">Save</button>
+                </form>
             </li>
         @endforeach
     </ul>

@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\KitchenToolKind;
+use App\Support\KitchenToolInventory;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -12,6 +13,33 @@ use Livewire\Component;
 #[Title('Kitchen tools')]
 class KitchenTools extends Component
 {
+    /**
+     * Note field values, keyed by kind name.
+     *
+     * @var array<string, string>
+     */
+    public array $notes = [];
+
+    public function mount(): void
+    {
+        $this->notes = KitchenToolKind::query()
+            ->whereNotNull('note')
+            ->pluck('note', 'name')
+            ->all();
+    }
+
+    public function toggleOwned(KitchenToolInventory $inventory, string $kind): void
+    {
+        $inventory->setOwned($kind, ! $inventory->owns($kind));
+    }
+
+    public function saveNote(KitchenToolInventory $inventory, string $kind): void
+    {
+        $inventory->setNote($kind, $this->notes[$kind] ?? null);
+
+        $this->notes[$kind] = KitchenToolKind::query()->where('name', $kind)->value('note') ?? '';
+    }
+
     public function render(): View
     {
         // Owned kinds first, then the rest, each group alphabetical.

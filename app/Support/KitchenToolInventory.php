@@ -34,6 +34,35 @@ class KitchenToolInventory
             ->exists();
     }
 
+    /**
+     * Mark a kind owned or not owned.
+     *
+     * @throws \InvalidArgumentException when the kind is unknown
+     */
+    public function setOwned(string $kind, bool $owned): void
+    {
+        $this->findKind($kind)->update(['owned' => $owned]);
+    }
+
+    /**
+     * Set or clear a kind's note. A note is for people only and never takes
+     * part in matching; an empty or blank note is stored as no note.
+     *
+     * @throws \InvalidArgumentException when the kind is unknown
+     */
+    public function setNote(string $kind, ?string $note): void
+    {
+        $note = $note === null ? '' : trim($note);
+
+        $this->findKind($kind)->update(['note' => $note === '' ? null : $note]);
+    }
+
+    private function findKind(string $kind): KitchenToolKind
+    {
+        return KitchenToolKind::query()->where('name', $this->normalize($kind))->first()
+            ?? throw new \InvalidArgumentException("Unknown kitchen tool kind: {$kind}");
+    }
+
     private function normalize(string $word): string
     {
         return mb_strtolower(trim($word));
