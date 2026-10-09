@@ -6,6 +6,7 @@ use App\Enums\MealType;
 use App\Enums\RecipeStatus;
 use App\Models\MealLog;
 use App\Models\Recipe;
+use App\Support\MissingKitchenTools;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -64,8 +65,11 @@ class RecipeLibrary extends Component
                 ->select('planned_meals.recipe_id'));
         }
 
+        $recipes = $query->get();
+
         return view('livewire.recipe-library', [
-            'recipes' => $query->get(),
+            'recipes' => $recipes,
+            'missingTools' => app(MissingKitchenTools::class)->forMany($recipes),
             // Average rating per recipe id, for the card chip row.
             'ratings' => MealLog::query()
                 ->join('planned_meals', 'planned_meals.id', '=', 'meal_logs.planned_meal_id')

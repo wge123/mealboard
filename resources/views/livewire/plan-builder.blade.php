@@ -176,9 +176,12 @@
                                             wire:click="choose({{ $recipe->id }})"
                                             wire:loading.attr="disabled" wire:target="choose">
                                         <span class="font-medium">{{ $recipe->title }}</span>
-                                        @if ($minutes > 0)
-                                            <span class="badge badge-ghost badge-sm shrink-0">{{ $minutes }} min</span>
-                                        @endif
+                                        <span class="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                                            @include('livewire.partials.missing-tools-badge', ['missing' => $missingTools[$recipe->id]])
+                                            @if ($minutes > 0)
+                                                <span class="badge badge-ghost badge-sm">{{ $minutes }} min</span>
+                                            @endif
+                                        </span>
                                     </button>
                                 @endforeach
                             </div>

@@ -79,6 +79,9 @@
                             <li>
                                 @if ($tool->count > 1)<span class="tabular-nums opacity-70">{{ $tool->count }} &times;</span>@endif
                                 {{ $tool->alternatives->pluck('word')->implode(' or ') }}
+                                @if ($missingToolIds->has($tool->id))
+                                    <span class="badge badge-warning badge-sm ml-1" data-missing-tool>missing</span>
+                                @endif
                             </li>
                         @endforeach
                     </ul>

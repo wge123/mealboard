@@ -10,6 +10,7 @@ use App\Models\MealLog;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
 use App\Models\Recipe;
+use App\Support\MissingKitchenTools;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use LogicException;
@@ -48,6 +49,7 @@ class AutoFillWeek
     public function __construct(
         private Randomizer $randomizer = new Randomizer,
         private ComputeTasteProfile $tasteProfile = new ComputeTasteProfile,
+        private MissingKitchenTools $missingTools = new MissingKitchenTools,
     ) {}
 
     /**
@@ -68,6 +70,10 @@ class AutoFillWeek
             ->where('status', RecipeStatus::Approved)
             ->orderBy('id')
             ->get();
+
+        // A recipe with a kitchen tool the household lacks is never auto-planned.
+        $flagged = $this->missingTools->flaggedIds($candidates)->flip();
+        $candidates = $candidates->reject(fn (Recipe $recipe) => $flagged->has($recipe->id))->values();
 
         $profile = $this->tasteProfile->handle();
 

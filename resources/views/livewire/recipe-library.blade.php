@@ -93,6 +93,7 @@
                             @if ($minutes > 0)
                                 <span class="badge badge-ghost badge-sm">{{ $minutes }} min</span>
                             @endif
+                            @include('livewire.partials.missing-tools-badge', ['missing' => $missingTools[$recipe->id]])
                             @if ($avg !== null)
                                 @php($stars = (int) round((float) $avg))
                                 <span class="badge badge-ghost badge-sm gap-1" title="Average rating {{ number_format((float) $avg, 1) }}">
