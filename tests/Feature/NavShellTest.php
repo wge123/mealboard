@@ -27,7 +27,14 @@ it('shows a Settings link in the top navigation that opens the settings area', f
     $this->actingAs(User::factory()->create())
         ->get('/plan')
         ->assertOk()
-        ->assertSeeInOrder(['href="'.route('settings.channels').'"', 'Settings'], false);
+        ->assertSeeInOrder(['href="'.route('settings.kitchen-tools').'"', 'Settings'], false);
+});
+
+it('lists Kitchen tools first in the settings section menu', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/settings/channels')
+        ->assertOk()
+        ->assertSeeInOrder(['Kitchen tools', 'Channels']);
 });
 
 it('renders the settings section menu with Channels on the channels page', function () {
