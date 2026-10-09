@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\KitchenToolRefused;
 use App\Models\KitchenToolKind;
 use App\Support\KitchenToolInventory;
 
@@ -23,7 +24,7 @@ it('matches the kind name trimmed and lowercased when setting owned', function (
 
 it('rejects an unknown kind when setting owned', function () {
     (new KitchenToolInventory)->setOwned('tortilla press', true);
-})->throws(InvalidArgumentException::class);
+})->throws(KitchenToolRefused::class);
 
 it('saves, edits and clears a note', function () {
     $inventory = new KitchenToolInventory;
@@ -49,7 +50,7 @@ it('stores an empty or blank note as no note', function () {
 
 it('rejects an unknown kind when setting a note', function () {
     (new KitchenToolInventory)->setNote('tortilla press', 'x');
-})->throws(InvalidArgumentException::class);
+})->throws(KitchenToolRefused::class);
 
 it('does not let a note affect owning', function () {
     $inventory = new KitchenToolInventory;

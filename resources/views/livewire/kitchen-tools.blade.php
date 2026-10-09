@@ -14,7 +14,7 @@
                         <input type="checkbox" class="toggle toggle-success"
                                aria-label="Owned: {{ \Illuminate\Support\Str::title($kind->name) }}"
                                @checked($kind->owned)
-                               wire:click="toggleOwned(@js($kind->name))">
+                               wire:click="toggleOwned({{ $kind->id }})">
                     </label>
                     @if ($kind->origin === \App\Models\KitchenToolKind::ORIGIN_HOUSEHOLD)
                         <button type="button" class="btn btn-ghost btn-sm min-h-11 shrink-0 text-error"
@@ -26,12 +26,12 @@
                 </div>
 
                 {{-- Note: for people only, never used in matching --}}
-                <form class="mt-1 flex items-center gap-2" wire:submit="saveNote(@js($kind->name))">
+                <form class="mt-1 flex items-center gap-2" wire:submit="saveNote({{ $kind->id }})">
                     <input type="text" maxlength="255"
                            class="input input-sm min-h-11 min-w-0 flex-1"
                            placeholder="Add a note, e.g. 12-inch, cast iron"
                            aria-label="Note for {{ \Illuminate\Support\Str::title($kind->name) }}"
-                           wire:model="notes.{{ $kind->name }}">
+                           wire:model="notes.{{ $kind->id }}">
                     <button type="submit" class="btn btn-ghost btn-sm min-h-11 min-w-11">Save</button>
                 </form>
             </li>

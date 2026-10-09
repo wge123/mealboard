@@ -15,9 +15,10 @@ use Livewire\Component;
 class KitchenTools extends Component
 {
     /**
-     * Note field values, keyed by kind name.
+     * Note field values, keyed by kind id (a name can contain a dot, which
+     * would break the wire:model path).
      *
-     * @var array<string, string>
+     * @var array<int, string>
      */
     public array $notes = [];
 
@@ -25,20 +26,24 @@ class KitchenTools extends Component
     {
         $this->notes = KitchenToolKind::query()
             ->whereNotNull('note')
-            ->pluck('note', 'name')
+            ->pluck('note', 'id')
             ->all();
     }
 
-    public function toggleOwned(KitchenToolInventory $inventory, string $kind): void
+    public function toggleOwned(KitchenToolInventory $inventory, int $kindId): void
     {
-        $inventory->setOwned($kind, ! $inventory->owns($kind));
+        $kind = KitchenToolKind::query()->findOrFail($kindId);
+
+        $inventory->setOwned($kind->name, ! $kind->owned);
     }
 
-    public function saveNote(KitchenToolInventory $inventory, string $kind): void
+    public function saveNote(KitchenToolInventory $inventory, int $kindId): void
     {
-        $inventory->setNote($kind, $this->notes[$kind] ?? null);
+        $kind = KitchenToolKind::query()->findOrFail($kindId);
 
-        $this->notes[$kind] = KitchenToolKind::query()->where('name', $kind)->value('note') ?? '';
+        $inventory->setNote($kind->name, $this->notes[$kindId] ?? null);
+
+        $this->notes[$kindId] = $kind->fresh()->note ?? '';
     }
 
     public string $newKind = '';
@@ -46,13 +51,14 @@ class KitchenTools extends Component
     public function addKind(KitchenToolInventory $inventory): void
     {
         try {
-            $inventory->addKind($this->newKind);
+            $kind = $inventory->addKind($this->newKind);
         } catch (KitchenToolRefused $e) {
             $this->addError('newKind', $e->getMessage());
 
             return;
         }
 
+        $this->notes[$kind->id] = '';
         $this->reset('newKind');
     }
 
@@ -60,6 +66,7 @@ class KitchenTools extends Component
     {
         try {
             $inventory->deleteKind(KitchenToolKind::query()->findOrFail($kindId));
+            unset($this->notes[$kindId]);
         } catch (KitchenToolRefused $e) {
             $this->addError('delete', $e->getMessage());
         }
