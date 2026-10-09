@@ -79,6 +79,19 @@ it('refuses to delete a catalog kind with a validation error', function () {
     expect(KitchenToolKind::query()->where('name', 'wok')->exists())->toBeTrue();
 });
 
+it('shows the refusal as a validation error when a recipe still uses the kind', function () {
+    $kind = (new KitchenToolInventory)->addKind('tortilla press');
+    $recipe = \App\Models\Recipe::factory()->shaped()->create();
+    $recipe->recipeTools->first()->alternatives()->create(['position' => 2, 'word' => 'tortilla press', 'kitchen_tool_kind_id' => $kind->id]);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->call('deleteKind', $kind->id)
+        ->assertHasErrors('deleteKind');
+
+    expect(KitchenToolKind::query()->where('name', 'tortilla press')->exists())->toBeTrue();
+});
+
 it('saves a note on a kind added in the same session', function () {
     $component = Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)
