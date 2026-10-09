@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Actions\Recipes\CreateRecipe;
 use App\Actions\Recipes\ParsePastedIngredients;
+use App\Discovery\ClaudeCliFailed;
 use App\Discovery\ShapingPass;
 use App\Enums\MealType;
 use App\Enums\RecipeSource;
@@ -12,8 +13,6 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use RuntimeException;
-use Throwable;
 
 #[Layout('layouts.app')]
 #[Title('Add recipe')]
@@ -23,7 +22,7 @@ class RecipeCreate extends Component
 
     public string $paste = '';
 
-    /** Which parser produced the current rows: '', 'ai', 'heuristic', or 'fallback'. */
+    /** Which parser produced the current rows: '', 'ai', or 'heuristic'. */
     public string $parsedWith = '';
 
     public string $parseError = '';
@@ -57,30 +56,22 @@ class RecipeCreate extends Component
         $this->parseError = '';
 
         try {
-            // The pasted text is the raw method; title and source URL are the form's, with
-            // placeholders (never written back) so the pass can still check the shape.
-            $check = app(ShapingPass::class)->handle([
-                'title' => trim($this->title) !== '' ? $this->title : 'Pasted recipe',
-                'source_url' => filter_var($this->sourceUrl, FILTER_VALIDATE_URL) ? $this->sourceUrl : 'https://example.com/pasted-recipe',
-                'method' => $this->paste,
-            ]);
-
-            if (! $check->passes()) {
-                throw new RuntimeException('the pasted text did not parse into tools, ingredients and steps ('.implode('; ', $check->errors).')');
-            }
-
-            $parsed = $check->candidate;
-        } catch (Throwable $e) {
-            // External boundary (local claude CLI): degrade visibly to the
-            // heuristic parser — error shown, failure reported, never silent.
+            $check = app(ShapingPass::class)->fromPastedText($this->paste);
+        } catch (ClaudeCliFailed $e) {
+            // The claude CLI is the boundary; show why it failed and fill nothing.
             report($e);
-            $this->parseError = 'AI parse failed — used the heuristic parser instead. ('.$e->getMessage().')';
-            $this->fillRows(app(ParsePastedIngredients::class)->handle($this->paste));
-            $this->parsedWith = 'fallback';
-            $this->paste = '';
+            $this->parseError = 'AI parse failed: '.$e->getMessage();
 
             return;
         }
+
+        if (! $check->passes()) {
+            $this->parseError = 'AI parse could not read a full recipe from the pasted text: '.implode('; ', $check->errors);
+
+            return;
+        }
+
+        $parsed = $check->candidate;
 
         $this->fillRows($parsed['ingredients']);
         $this->fillTools($parsed['tools']);

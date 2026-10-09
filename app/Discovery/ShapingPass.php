@@ -7,7 +7,7 @@ use App\Support\KitchenToolInventory;
 /**
  * Turns one recipe's raw text into the recipe shape (tools, ingredients with
  * prep notes, steps). One model call through the claude CLI, then the shared
- * candidate check; with $retry the failed check's errors go back to the model
+ * candidate check; withRetry sends a failed check's errors back to the model
  * once.
  *
  * Raw input keys:
@@ -24,44 +24,73 @@ class ShapingPass
         private ClaudeCli $claude,
         private CandidateValidator $validator,
         private KitchenToolInventory $tools,
+        private RetryOnce $retry,
     ) {}
 
     /**
+     * One model call, no retry (scheduled discovery).
+     *
      * @param  array<string, mixed>  $raw
      */
-    public function handle(array $raw, bool $retry = false): CandidateCheck
+    public function once(array $raw): CandidateCheck
     {
-        $prompt = $this->prompt($raw);
-        $check = $this->attempt($raw, $prompt);
+        return $this->check($raw, $this->claude->run($this->prompt($raw)));
+    }
 
-        if ($check->passes() || ! $retry) {
-            return $check;
-        }
+    /**
+     * One model call, and when the check fails one more with the model's own
+     * output and the errors (the backfill).
+     *
+     * @param  array<string, mixed>  $raw
+     */
+    public function withRetry(array $raw): CandidateCheck
+    {
+        $checked = $this->retry->run(
+            $this->prompt($raw),
+            fn (string $output) => $this->check($raw, $output)->errors,
+        );
 
-        $errors = implode("\n", array_map(fn (string $error) => "- {$error}", $check->errors));
+        return $this->check($raw, $checked->output);
+    }
 
-        return $this->attempt($raw, <<<PROMPT
-        {$prompt}
+    /**
+     * Pull the tools, ingredients and steps out of pasted recipe text (the
+     * ingredients are in the text, not given separately). The text has no
+     * title or source, so the candidate holds only those three parts. No
+     * retry: the household is waiting on the form.
+     */
+    public function fromPastedText(string $text): CandidateCheck
+    {
+        $output = $this->claude->run($this->pastePrompt($text));
+        $decoded = $this->decode($output);
 
-        Your previous answer failed these checks:
-        {$errors}
-
-        Answer again with the full corrected JSON object.
-        PROMPT);
+        return $decoded === null
+            ? new CandidateCheck(null, ['output: must be one JSON object in the recipe shape'])
+            : $this->validator->checkParts($decoded);
     }
 
     /**
      * @param  array<string, mixed>  $raw
      */
-    private function attempt(array $raw, string $prompt): CandidateCheck
+    private function check(array $raw, string $output): CandidateCheck
     {
-        $decoded = json_decode($this->claude->extractJson($this->claude->run($prompt)), true);
+        $decoded = $this->decode($output);
 
-        if (! is_array($decoded) || array_is_list($decoded)) {
+        if ($decoded === null) {
             return new CandidateCheck(null, ['output: must be one JSON object in the recipe shape']);
         }
 
         return $this->validator->check($this->withSourceValues($decoded, $raw));
+    }
+
+    /**
+     * @return ?array<string, mixed> null unless the output holds one JSON object
+     */
+    private function decode(string $output): ?array
+    {
+        $decoded = json_decode($this->claude->extractJson($output), true);
+
+        return is_array($decoded) && ! array_is_list($decoded) ? $decoded : null;
     }
 
     /**
@@ -91,7 +120,7 @@ class ShapingPass
      */
     private function prompt(array $raw): string
     {
-        $kinds = $this->tools->kinds()->implode(', ');
+        $kindsSection = RecipeOutputFormat::kindsSection($this->tools->kinds());
         $schema = RecipeOutputFormat::schema((string) ($raw['source_url'] ?? ''));
         $ingredients = $this->ingredientLines($raw['ingredients'] ?? []);
         $method = trim((string) ($raw['method'] ?? ''));
@@ -119,12 +148,27 @@ class ShapingPass
         Method (free text):
         {$method}
 
-        Kitchen tool words you may use:
-        {$kinds}
-
-        Pick tool words from that list; only use another word if none fits.
+        {$kindsSection}
 
         Respond with STRICT JSON only: one object, no prose, no markdown fences, with exactly these keys:
+        {$schema}
+        PROMPT;
+    }
+
+    private function pastePrompt(string $text): string
+    {
+        $kindsSection = RecipeOutputFormat::kindsSection($this->tools->kinds());
+        $schema = RecipeOutputFormat::schema();
+
+        return <<<PROMPT
+        Below is the text of a recipe someone pasted. It may hold the ingredients and the method together, with headings or other page text around them. Extract the recipe's ingredients, the kitchen tools it needs and its cooking steps from that text. Do not change the dish.
+
+        Pasted text:
+        {$text}
+
+        {$kindsSection}
+
+        Respond with STRICT JSON only: one object, no prose, no markdown fences, in this format (the title, description and other keys may be your best reading of the text; only tools, ingredients and steps are used):
         {$schema}
         PROMPT;
     }

@@ -46,7 +46,7 @@ class TheMealDbDriver implements RecipeDiscoveryDriver
 
         // TheMealDB publishes no timings, servings or meal type: leave them
         // out and the shaping pass estimates them. Scheduled lane: no retry.
-        $check = $this->shaping->handle([
+        $check = $this->shaping->once([
             'title' => trim((string) $meal['strMeal']),
             'description' => $this->description($meal),
             'method' => trim((string) ($meal['strInstructions'] ?? '')),

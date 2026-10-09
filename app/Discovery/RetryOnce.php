@@ -23,12 +23,12 @@ class RetryOnce
         $errors = $errorsOf($output);
 
         if ($errors === []) {
-            return new CheckedOutput($output, [], retried: false);
+            return new CheckedOutput($output, []);
         }
 
         $output = $this->claude->run($this->retryPrompt($prompt, $output, $errors));
 
-        return new CheckedOutput($output, $errorsOf($output), retried: true);
+        return new CheckedOutput($output, $errorsOf($output));
     }
 
     /**

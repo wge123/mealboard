@@ -77,6 +77,30 @@ class CandidateValidator
     }
 
     /**
+     * Check only the three parts of the recipe shape (tools, ingredients,
+     * steps) with the same repairs, for input that has no title or source
+     * (pasted text). The candidate holds those three keys.
+     */
+    public function checkParts(mixed $item): CandidateCheck
+    {
+        if (! is_array($item)) {
+            return new CandidateCheck(null, ['candidate: must be a JSON object']);
+        }
+
+        $errors = [];
+
+        $tools = $this->checkTools($item['tools'] ?? null, $errors);
+        $ingredients = $this->checkIngredients($item['ingredients'] ?? null, $errors);
+        $steps = $this->checkSteps($item['steps'] ?? null, $errors);
+
+        if ($errors !== []) {
+            return new CandidateCheck(null, $errors);
+        }
+
+        return new CandidateCheck(['tools' => $tools, 'ingredients' => $ingredients, 'steps' => $steps]);
+    }
+
+    /**
      * @param  list<string>  $errors
      * @return list<array{alternatives: list<string>, count: int}>
      */

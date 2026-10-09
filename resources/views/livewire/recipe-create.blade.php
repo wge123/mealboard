@@ -15,7 +15,7 @@
                 One ingredient per line, e.g. <code class="rounded bg-base-300 px-1">2 cups diced onion</code> —
                 or paste anything and let AI parse it. Parsed rows land below and stay editable.
             </p>
-            <textarea rows="6" class="textarea textarea-lg mt-3 w-full" wire:model="paste" aria-label="Paste ingredients"></textarea>
+            <textarea rows="6" class="textarea textarea-lg mt-3 w-full" wire:model="paste" aria-label="Paste a recipe"></textarea>
             <div class="mt-2 flex flex-wrap items-center gap-2">
                 <button type="button" class="btn btn-outline btn-sm min-h-11" wire:click="parsePaste"
                         wire:loading.attr="disabled" wire:target="parsePaste">
@@ -34,8 +34,6 @@
                     <span class="badge badge-soft badge-success">AI parsed</span>
                 @elseif ($parsedWith === 'heuristic')
                     <span class="badge badge-soft badge-neutral">Heuristic parsed</span>
-                @elseif ($parsedWith === 'fallback')
-                    <span class="badge badge-soft badge-warning">Heuristic parsed (AI unavailable)</span>
                 @endif
             </div>
             @if ($parseError !== '')

@@ -3,7 +3,6 @@
 namespace App\Discovery;
 
 use Illuminate\Support\Facades\Process;
-use RuntimeException;
 use Symfony\Component\Process\ExecutableFinder;
 
 /**
@@ -19,7 +18,7 @@ class ClaudeCli
         ]);
 
         if ($result->failed()) {
-            throw new RuntimeException(
+            throw new ClaudeCliFailed(
                 'claude CLI failed (exit '.$result->exitCode().'): '
                 .trim($result->errorOutput() !== '' ? $result->errorOutput() : $result->output()),
             );
@@ -39,7 +38,7 @@ class ClaudeCli
         $found = (new ExecutableFinder)->find('claude');
 
         if ($found === null) {
-            throw new RuntimeException(
+            throw new ClaudeCliFailed(
                 'claude CLI not found on PATH — install Claude Code or set mealboard.claude_bin.',
             );
         }

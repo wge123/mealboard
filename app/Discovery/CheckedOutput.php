@@ -14,7 +14,6 @@ final readonly class CheckedOutput
     public function __construct(
         public string $output,
         public array $errors,
-        public bool $retried,
     ) {}
 
     public function passes(): bool

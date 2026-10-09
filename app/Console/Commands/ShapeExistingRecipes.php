@@ -3,12 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Actions\Recipes\UpdateRecipe;
+use App\Discovery\ClaudeCliFailed;
 use App\Discovery\ShapingPass;
 use App\Exceptions\RecipeShapeRefused;
 use App\Models\Recipe;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Schema;
-use RuntimeException;
 
 /**
  * One-off backfill: converts every recipe without the recipe shape (any
@@ -48,7 +48,7 @@ class ShapeExistingRecipes extends Command
             }
 
             try {
-                $check = $shapingPass->handle($this->raw($recipe), retry: true);
+                $check = $shapingPass->withRetry($this->raw($recipe));
 
                 if (! $check->passes()) {
                     $failures[] = [$recipe, implode('; ', $check->errors)];
@@ -73,7 +73,7 @@ class ShapeExistingRecipes extends Command
                     $candidate['tools'],
                     $candidate['steps'],
                 );
-            } catch (RuntimeException|RecipeShapeRefused $e) {
+            } catch (ClaudeCliFailed|RecipeShapeRefused $e) {
                 // The claude CLI failing (or a shape the write refuses) fails
                 // this recipe only; it is listed below and left untouched.
                 $failures[] = [$recipe, $e->getMessage()];
