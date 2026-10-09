@@ -32,6 +32,24 @@ _Avoid_: weeknight caps, healthy/easy thresholds
 An ingredient the household never wants in a meal. A hard exclusion: no discovered recipe may contain it, including recipes the household asked for, and auto-fill never plans a library recipe that does.
 _Avoid_: dislike, blocked ingredient, allergy (an allergy is one reason to avoid)
 
+## Recipes
+
+**Recipe shape**:
+The three parts every recipe has, in order: its kitchen tools, its mise en place, and its cooking steps. A recipe missing tools, ingredients or cooking steps is not a recipe.
+_Avoid_: recipe format, template
+
+**Mise en place**:
+The part of a recipe that gets everything ready before the heat goes on: each ingredient with its amount and its prep note. Always present, because a recipe always has ingredients.
+_Avoid_: prep section, ingredients section
+
+**Prep note**:
+What to do to one ingredient before cooking starts ("chopped", "whites and greens apart", "into the spice bowl"). Optional; a task spanning several ingredients is written on each of them.
+_Avoid_: prep step, prep task, instruction
+
+**Cooking step**:
+One plain-text action once the heat is on. It names tools and ingredients in words only; the recipe declares its tools once, not per step.
+_Avoid_: instruction, method step
+
 ## Shopping
 
 **Shopping list**:
