@@ -6,6 +6,7 @@
 --}}
 @php
     $sections = [
+        'Kitchen tools' => 'settings.kitchen-tools',
         'Channels' => 'settings.channels',
     ];
 @endphp
