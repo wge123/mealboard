@@ -24,7 +24,7 @@ class RecipeDetail extends Component
 
     public function mount(Recipe $recipe): void
     {
-        $this->recipe = $recipe->load('ingredients');
+        $this->recipe = $recipe;
     }
 
     public function startEditing(): void
@@ -38,17 +38,17 @@ class RecipeDetail extends Component
         $this->cookMinutes = $this->recipe->cook_minutes;
         $this->servings = $this->recipe->servings;
         $this->tagsInput = implode(', ', $this->recipe->tags ?? []);
-        $this->rows = $this->recipe->ingredients->map(fn ($ingredient) => [
+        $this->rows = $this->loadedRecipe()->ingredients->map(fn ($ingredient) => [
             'name' => $ingredient->name,
             'qty' => $ingredient->pivot->qty !== null ? (string) (float) $ingredient->pivot->qty : '',
             'unit' => $ingredient->pivot->unit ?? '',
             'prep_note' => $ingredient->pivot->note ?? '',
         ])->values()->all();
-        $this->tools = $this->recipe->recipeTools()->with('alternatives')->get()->map(fn ($tool) => [
+        $this->tools = $this->loadedRecipe()->recipeTools->map(fn ($tool) => [
             'alternatives' => $tool->alternatives->pluck('word')->implode(', '),
             'count' => $tool->count,
         ])->values()->all();
-        $this->steps = $this->recipe->cookingSteps->pluck('text')->all();
+        $this->steps = $this->loadedRecipe()->cookingSteps->pluck('text')->all();
 
         $this->resetErrorBag();
         $this->editing = true;
@@ -84,8 +84,16 @@ class RecipeDetail extends Component
         );
     }
 
+    /** The recipe with every relation the page reads, loaded once (the write actions hand back a refreshed model). */
+    private function loadedRecipe(): Recipe
+    {
+        return $this->recipe->loadMissing(['ingredients', 'recipeTools.alternatives', 'cookingSteps']);
+    }
+
     public function render(): View
     {
+        $this->loadedRecipe();
+
         $missingToolIds = collect(app(MissingKitchenTools::class)->for($this->recipe))
             ->mapWithKeys(fn (MissingTool $missing) => [$missing->tool->id => true]);
 

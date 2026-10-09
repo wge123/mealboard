@@ -74,7 +74,7 @@
             <section class="rounded-2xl border border-base-300 bg-base-100 p-4" data-section="tools">
                 <h2 class="font-[family-name:var(--font-display)] text-xl font-semibold">Tools</h2>
                 <ul class="mt-2 space-y-1">
-                    @foreach ($recipe->recipeTools()->with('alternatives')->get() as $tool)
+                    @foreach ($recipe->recipeTools as $tool)
                         <li>
                             @if ($tool->count > 1)<span class="tabular-nums opacity-70">{{ $tool->count }} &times;</span>@endif
                             {{ $tool->alternatives->pluck('word')->implode(' or ') }}
@@ -86,7 +86,7 @@
                 </ul>
             </section>
 
-            <section class="rounded-2xl border border-base-300 bg-base-100 lg:col-span-2" data-section="mise-en-place">
+            <section class="rounded-2xl border border-base-300 bg-base-100" data-section="mise-en-place">
                 <h2 class="px-4 pt-4 font-[family-name:var(--font-display)] text-xl font-semibold">Mise en place</h2>
                 <ul class="divide-y divide-base-300 p-2">
                     @foreach ($recipe->ingredients as $ingredient)
@@ -96,7 +96,7 @@
                                 {{ $ingredient->pivot->unit !== 'count' ? $ingredient->pivot->unit : '' }}
                             </span>
                             <span class="min-w-0">
-                                <span class="font-medium">{{ $ingredient->name }}</span>@if ($ingredient->pivot->note)<span class="opacity-60">, {{ $ingredient->pivot->note }}</span>@endif
+                                <span class="font-medium">{{ $ingredient->name }}</span>@if ($ingredient->is_pantry_staple)<span class="badge badge-ghost badge-xs ms-1 align-middle">staple</span>@endif@if ($ingredient->pivot->note)<span class="opacity-60">, {{ $ingredient->pivot->note }}</span>@endif
                             </span>
                         </li>
                     @endforeach
