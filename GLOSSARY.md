@@ -16,6 +16,10 @@ _Avoid_: equipment, utensil, gadget, appliance, tool (alone)
 The kitchen tools the household owns, each owned or not, with no count. Starts with the common basics already in it; the household removes what its kitchen lacks and adds kinds the app does not know yet.
 _Avoid_: kitchen, equipment list
 
+**Missing tool**:
+A kitchen tool a recipe needs where the tool inventory holds none of the recipe's alternatives for it; a kind the app does not know counts as missing. A recipe with a missing tool is still found, approved and kept, but shown as needing it, and auto-fill never plans it.
+_Avoid_: unowned tool, tool gap
+
 **Household preference**:
 A structured rule the household sets for itself, such as a number or a list, that the app reads and can check. Tastes written as prose live in the household's food notes instead.
 _Avoid_: setting, config, user preference
