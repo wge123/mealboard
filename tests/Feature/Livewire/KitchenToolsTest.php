@@ -77,3 +77,26 @@ it('refuses to delete a catalog kind with a validation error', function () {
 
     expect(KitchenToolKind::query()->where('name', 'wok')->exists())->toBeTrue();
 });
+
+it('saves a note on a kind added in the same session', function () {
+    $component = Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->set('newKind', 'Tortilla.Press')
+        ->call('addKind');
+
+    $id = KitchenToolKind::where('name', 'tortilla.press')->value('id');
+
+    $component->set('notes.'.$id, 'cast iron')->call('saveNote', $id);
+
+    expect(KitchenToolKind::find($id)->note)->toBe('cast iron');
+});
+
+it('drops the note entry of a deleted kind', function () {
+    $kind = KitchenToolKind::create(['name' => 'zester', 'origin' => KitchenToolKind::ORIGIN_HOUSEHOLD, 'owned' => true, 'note' => 'fine']);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->assertSet('notes.'.$kind->id, 'fine')
+        ->call('deleteKind', $kind->id)
+        ->assertSet('notes', fn ($n) => ! array_key_exists($kind->id, $n));
+});
