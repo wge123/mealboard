@@ -7,6 +7,7 @@ use App\Discovery\ShapingPass;
 use App\Exceptions\RecipeShapeRefused;
 use App\Models\Recipe;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
 /**
@@ -20,6 +21,9 @@ use RuntimeException;
  * servings and meal type are sent to the pass as source values. A stored 0
  * for prep or cook minutes (TheMealDB recipes) and a 0 for servings count as
  * unknown and are estimated.
+ *
+ * It reads the old free-text method column, which the migration that drops
+ * that column removes; run this command first. Delete it after landing.
  */
 class ShapeExistingRecipes extends Command
 {
@@ -29,6 +33,12 @@ class ShapeExistingRecipes extends Command
 
     public function handle(ShapingPass $shapingPass, UpdateRecipe $updateRecipe): int
     {
+        if (! Schema::hasColumn('recipes', 'instructions')) {
+            $this->error('The old method column is already dropped; there is nothing left to convert.');
+
+            return self::FAILURE;
+        }
+
         $converted = 0;
         $failures = [];
 

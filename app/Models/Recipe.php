@@ -28,7 +28,6 @@ class Recipe extends Model
         'prep_minutes',
         'cook_minutes',
         'servings',
-        'instructions',
         'cuisine',
         'tags',
         'image_url',

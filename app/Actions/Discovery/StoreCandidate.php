@@ -7,10 +7,8 @@ use App\Enums\RecipeSource;
 use App\Models\Recipe;
 
 /**
- * Store one discovered candidate as a pending recipe. A candidate in the
- * recipe shape (tools and steps) is saved with them; a pre-shape candidate
- * (free-text instructions, from the paths that have not moved over yet) is
- * saved as before.
+ * Store one discovered candidate (already checked, in the recipe shape) as a
+ * pending recipe, with its tools and steps.
  */
 class StoreCandidate
 {
@@ -23,8 +21,8 @@ class StoreCandidate
     public function handle(array $candidate, array $extraAttributes = []): Recipe
     {
         $ingredients = $candidate['ingredients'];
-        $tools = $candidate['tools'] ?? null;
-        $steps = $candidate['steps'] ?? null;
+        $tools = $candidate['tools'];
+        $steps = $candidate['steps'];
         unset($candidate['ingredients'], $candidate['tools'], $candidate['steps']);
 
         return $this->createRecipe->handle([

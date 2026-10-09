@@ -14,33 +14,26 @@ class UpdateRecipe
     ) {}
 
     /**
-     * Pass `$tools` and/or `$steps` to replace the recipe shape; leave both
-     * null to keep the saved shape. A shape with an empty part is refused
-     * before anything is saved.
+     * Replaces the recipe's shape with the one given; a shape with an empty
+     * part (no tools, ingredients or steps) is refused before anything is saved.
      *
      * @param  array<string, mixed>  $attributes
      * @param  array<int, array{name: string, qty?: mixed, unit?: ?string, note?: ?string, prep_note?: ?string}>  $ingredientRows
-     * @param  ?array<int, array{alternatives: array<int, string>, count?: ?int}>  $tools
-     * @param  ?array<int, string>  $steps
+     * @param  array<int, array{alternatives: array<int, string>, count?: ?int}>  $tools
+     * @param  array<int, string>  $steps
      *
      * @throws RecipeShapeRefused
      */
-    public function handle(Recipe $recipe, array $attributes, array $ingredientRows, ?array $tools = null, ?array $steps = null): Recipe
+    public function handle(Recipe $recipe, array $attributes, array $ingredientRows, array $tools, array $steps): Recipe
     {
-        $shaped = $tools !== null || $steps !== null;
+        $this->syncShape->assertComplete($tools, $ingredientRows, $steps);
 
-        if ($shaped) {
-            $this->syncShape->assertComplete($tools ?? [], $ingredientRows, $steps ?? []);
-        }
-
-        return DB::transaction(function () use ($recipe, $attributes, $ingredientRows, $tools, $steps, $shaped) {
+        return DB::transaction(function () use ($recipe, $attributes, $ingredientRows, $tools, $steps) {
             $recipe->update($attributes);
 
             $this->syncIngredients->handle($recipe, $ingredientRows);
 
-            if ($shaped) {
-                $this->syncShape->handle($recipe, $tools ?? [], $steps ?? []);
-            }
+            $this->syncShape->handle($recipe, $tools, $steps);
 
             return $recipe->refresh()->load('ingredients');
         });
