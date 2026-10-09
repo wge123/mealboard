@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\Recipes\SyncRecipeShape;
 use App\Enums\IngredientCategory;
 use App\Enums\MealType;
 use App\Enums\RecipeSource;
@@ -18,6 +19,8 @@ class RecipeSeeder extends Seeder
         $approver = User::where('email', 'willem@example.com')->first()
             ?? User::factory()->create(['email' => 'willem@example.com']);
 
+        $shape = app(SyncRecipeShape::class);
+
         foreach ($this->recipes() as $data) {
             $recipe = Recipe::create([
                 'title' => $data['title'],
@@ -29,7 +32,6 @@ class RecipeSeeder extends Seeder
                 'prep_minutes' => $data['prep_minutes'],
                 'cook_minutes' => $data['cook_minutes'],
                 'servings' => $data['servings'],
-                'instructions' => $data['instructions'],
                 'cuisine' => $data['cuisine'],
                 'tags' => $data['tags'],
                 'approved_at' => $data['status'] === RecipeStatus::Approved ? now() : null,
@@ -48,11 +50,26 @@ class RecipeSeeder extends Seeder
                     'note' => $note,
                 ]);
             }
+
+            $shape->handle($recipe, $this->tools($data['tools']), $data['steps']);
         }
     }
 
     /**
-     * Ingredient rows: [name, category, is_pantry_staple, qty, unit, note]
+     * @param  list<list<string>>  $tools  each entry is the alternative words for one tool
+     * @return list<array{alternatives: list<string>, count: int}>
+     */
+    private function tools(array $tools): array
+    {
+        return array_map(fn (array $words) => ['alternatives' => $words, 'count' => 1], $tools);
+    }
+
+    /**
+     * Each recipe is written by hand in the recipe shape: tools (the words are
+     * kitchen tool kinds or other names from the catalog), ingredients with
+     * their prep note, and cooking steps.
+     *
+     * Ingredient rows: [name, category, is_pantry_staple, qty, unit, prep note]
      *
      * @return array<int, array<string, mixed>>
      */
@@ -78,7 +95,18 @@ class RecipeSeeder extends Seeder
                 'servings' => 2,
                 'cuisine' => 'greek',
                 'tags' => ['quick', 'vegetarian', 'high-protein'],
-                'instructions' => "1. Whisk the eggs with a pinch of salt.\n2. Melt the butter in a nonstick pan over medium-low heat and wilt the spinach.\n3. Pour in the eggs and stir gently until barely set.\n4. Fold in the feta off the heat and serve immediately.",
+                'tools' => [
+                    ['skillet', 'frying pan'],
+                    ['mixing bowls'],
+                    ['whisk'],
+                    ['spatula'],
+                ],
+                'steps' => [
+                    'Whisk the eggs with a pinch of salt in a bowl.',
+                    'Melt the butter in the skillet over medium-low heat and wilt the spinach.',
+                    'Pour in the eggs and stir gently with the spatula until barely set.',
+                    'Fold in the feta off the heat and serve immediately.',
+                ],
                 'ingredients' => [
                     ['eggs', $dairy, false, 4, 'count', null],
                     ['baby spinach', $produce, false, 60, 'g', 'roughly chopped'],
@@ -98,7 +126,16 @@ class RecipeSeeder extends Seeder
                 'servings' => 2,
                 'cuisine' => null,
                 'tags' => ['healthy', 'vegetarian', 'make-ahead'],
-                'instructions' => "1. Combine the oats, milk, and a pinch of salt in a saucepan.\n2. Simmer 8 minutes, stirring occasionally.\n3. Mash in the banana, then stir in the frozen blueberries until warmed through.\n4. Finish with a drizzle of honey.",
+                'tools' => [
+                    ['saucepan'],
+                    ['wooden spoon'],
+                ],
+                'steps' => [
+                    'Combine the oats, milk and a pinch of salt in the saucepan.',
+                    'Simmer 8 minutes, stirring occasionally.',
+                    'Mash in the banana, then stir in the frozen blueberries until warmed through.',
+                    'Finish with a drizzle of honey.',
+                ],
                 'ingredients' => [
                     ['rolled oats', $pantry, false, 1, 'cup', null],
                     ['milk', $dairy, false, 2, 'cup', null],
@@ -119,7 +156,19 @@ class RecipeSeeder extends Seeder
                 'servings' => 2,
                 'cuisine' => 'american',
                 'tags' => ['quick', 'high-protein', 'packable'],
-                'instructions' => "1. Season the chicken with salt and pan-cook 4-5 minutes per side; rest and slice.\n2. Toss the romaine with the caesar dressing and parmesan.\n3. Pile the salad and chicken onto the tortillas.\n4. Roll tightly, slice in half, and serve.",
+                'tools' => [
+                    ['skillet', 'grill pan'],
+                    ['tongs'],
+                    ['cutting board'],
+                    ['chef\'s knife'],
+                    ['mixing bowls'],
+                ],
+                'steps' => [
+                    'Season the chicken with salt and pan-cook 4-5 minutes per side; rest and slice.',
+                    'Toss the romaine with the caesar dressing and parmesan.',
+                    'Pile the salad and chicken onto the tortillas.',
+                    'Roll tightly, slice in half and serve.',
+                ],
                 'ingredients' => [
                     ['chicken breast', $meat, false, 300, 'g', null],
                     ['romaine lettuce', $produce, false, 1, 'count', 'heart, chopped'],
@@ -140,7 +189,18 @@ class RecipeSeeder extends Seeder
                 'servings' => 3,
                 'cuisine' => 'thai',
                 'tags' => ['vegetarian', 'make-ahead', 'no-reheat'],
-                'instructions' => "1. Cook the rice noodles per the package, rinse cold, and drain.\n2. Whisk the peanut butter, soy sauce, lime juice, and a splash of water into a dressing.\n3. Toss the noodles with the cucumber and carrot.\n4. Coat with the dressing and chill until lunch.",
+                'tools' => [
+                    ['pots'],
+                    ['colander', 'strainer'],
+                    ['whisk'],
+                    ['mixing bowls'],
+                ],
+                'steps' => [
+                    'Cook the rice noodles per the package, rinse cold and drain.',
+                    'Whisk the peanut butter, soy sauce, lime juice and a splash of water into a dressing.',
+                    'Toss the noodles with the cucumber and carrot.',
+                    'Coat with the dressing and chill until lunch.',
+                ],
                 'ingredients' => [
                     ['rice noodles', $pantry, false, 200, 'g', null],
                     ['peanut butter', $pantry, false, 3, 'tbsp', 'smooth'],
@@ -161,7 +221,18 @@ class RecipeSeeder extends Seeder
                 'servings' => 4,
                 'cuisine' => 'italian',
                 'tags' => ['comfort', 'family', 'freezer-friendly'],
-                'instructions' => "1. Sweat the onion and garlic in olive oil until soft.\n2. Brown the beef, breaking it up as it cooks.\n3. Add the canned tomatoes, season with salt, and simmer 30 minutes.\n4. Cook the spaghetti, toss with the sauce, and serve.",
+                'tools' => [
+                    ['skillet', 'dutch oven'],
+                    ['pots'],
+                    ['wooden spoon'],
+                    ['colander'],
+                ],
+                'steps' => [
+                    'Sweat the onion and garlic in olive oil until soft.',
+                    'Brown the beef, breaking it up as it cooks.',
+                    'Add the canned tomatoes, season with salt and simmer 30 minutes.',
+                    'Cook the spaghetti, toss with the sauce and serve.',
+                ],
                 'ingredients' => [
                     ['ground beef', $meat, false, 500, 'g', null],
                     ['spaghetti', $pantry, false, 400, 'g', null],
@@ -183,7 +254,18 @@ class RecipeSeeder extends Seeder
                 'servings' => 4,
                 'cuisine' => 'indian',
                 'tags' => ['comfort', 'spicy', 'weekend'],
-                'instructions' => "1. Marinate the chicken in yogurt and half the garam masala for 20 minutes.\n2. Sear the chicken in oil until browned.\n3. Add the canned tomatoes, cream, and remaining spices; simmer 20 minutes.\n4. Serve over steamed basmati rice.",
+                'tools' => [
+                    ['skillet', 'dutch oven'],
+                    ['mixing bowls'],
+                    ['wooden spoon'],
+                    ['saucepan', 'pots'],
+                ],
+                'steps' => [
+                    'Marinate the chicken in yogurt and half the garam masala for 20 minutes.',
+                    'Sear the chicken in oil until browned.',
+                    'Add the canned tomatoes, cream and remaining spices; simmer 20 minutes.',
+                    'Cook the basmati rice and serve the chicken over it.',
+                ],
                 'ingredients' => [
                     ['chicken thighs', $meat, false, 600, 'g', 'boneless, cubed'],
                     ['yogurt', $dairy, false, 0.5, 'cup', 'plain'],
@@ -205,7 +287,17 @@ class RecipeSeeder extends Seeder
                 'servings' => 4,
                 'cuisine' => 'mexican',
                 'tags' => ['quick', 'family', 'crowd-pleaser'],
-                'instructions' => "1. Brown the beef with salt and cumin.\n2. Char the frozen corn in a dry skillet.\n3. Warm the tortillas.\n4. Assemble with cheddar and salsa; serve immediately.",
+                'tools' => [
+                    ['skillet'],
+                    ['spatula'],
+                    ['box grater', 'grater'],
+                ],
+                'steps' => [
+                    'Brown the beef with salt and cumin.',
+                    'Char the frozen corn in a dry skillet.',
+                    'Warm the tortillas.',
+                    'Assemble with cheddar and salsa; serve immediately.',
+                ],
                 'ingredients' => [
                     ['ground beef', $meat, false, 500, 'g', null],
                     ['corn tortillas', $bakery, false, 8, 'count', null],
@@ -227,7 +319,19 @@ class RecipeSeeder extends Seeder
                 'servings' => 2,
                 'cuisine' => 'japanese',
                 'tags' => ['healthy', 'quick', 'high-protein'],
-                'instructions' => "1. Simmer the soy sauce, honey, and grated ginger into a glaze.\n2. Sear the salmon skin-side down 4 minutes, flip, and brush with the glaze.\n3. Steam the broccoli until crisp-tender.\n4. Serve over rice with the remaining glaze spooned over.",
+                'tools' => [
+                    ['skillet', 'frying pan'],
+                    ['saucepan'],
+                    ['steamer basket', 'steamer'],
+                    ['rice cooker', 'pots'],
+                    ['spatula'],
+                ],
+                'steps' => [
+                    'Simmer the soy sauce, honey and grated ginger into a glaze.',
+                    'Sear the salmon skin-side down 4 minutes, flip and brush with the glaze.',
+                    'Steam the broccoli until crisp-tender.',
+                    'Serve over rice with the remaining glaze spooned over.',
+                ],
                 'ingredients' => [
                     ['salmon fillets', $meat, false, 2, 'count', 'skin-on'],
                     ['broccoli', $produce, false, 300, 'g', 'florets'],
@@ -248,7 +352,16 @@ class RecipeSeeder extends Seeder
                 'servings' => 2,
                 'cuisine' => 'italian',
                 'tags' => ['quick', 'vegetarian'],
-                'instructions' => "1. Heat the oven to 220°C with a tray inside.\n2. Brush the flatbreads with olive oil and top with tomato and torn mozzarella.\n3. Bake 10-12 minutes until blistered.\n4. Scatter with basil and a pinch of salt before serving.",
+                'tools' => [
+                    ['oven'],
+                    ['sheet pan', 'baking sheet'],
+                ],
+                'steps' => [
+                    'Heat the oven to 220°C with a tray inside.',
+                    'Brush the flatbreads with olive oil and top with tomato and torn mozzarella.',
+                    'Bake 10-12 minutes until blistered.',
+                    'Scatter with basil and a pinch of salt before serving.',
+                ],
                 'ingredients' => [
                     ['flatbread', $bakery, false, 2, 'count', null],
                     ['fresh mozzarella', $dairy, false, 125, 'g', 'torn'],
@@ -269,7 +382,17 @@ class RecipeSeeder extends Seeder
                 'servings' => 6,
                 'cuisine' => 'french',
                 'tags' => ['healthy', 'vegetarian', 'freezer-friendly', 'budget'],
-                'instructions' => "1. Sweat the onion, carrot, and celery in olive oil until softened.\n2. Add the lentils and vegetable stock.\n3. Simmer 35 minutes until the lentils are tender.\n4. Season with salt, then blend a third of the pot for body and serve.",
+                'tools' => [
+                    ['stockpot', 'pots'],
+                    ['immersion blender', 'blender'],
+                    ['wooden spoon'],
+                ],
+                'steps' => [
+                    'Sweat the onion, carrot and celery in olive oil until softened.',
+                    'Add the lentils and vegetable stock.',
+                    'Simmer 35 minutes until the lentils are tender.',
+                    'Season with salt, then blend a third of the pot for body and serve.',
+                ],
                 'ingredients' => [
                     ['brown lentils', $pantry, false, 300, 'g', 'rinsed'],
                     ['carrot', $produce, false, 2, 'count', 'diced'],
