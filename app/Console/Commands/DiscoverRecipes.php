@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Actions\Discovery\RunDiscovery;
-use App\Actions\Recipes\CreateRecipe;
+use App\Actions\Discovery\StoreCandidate;
 use App\Discovery\NearDuplicateFilter;
-use App\Enums\RecipeSource;
 use App\Models\DiscoveryRun;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +15,7 @@ class DiscoverRecipes extends Command
 
     protected $description = 'Run all discovery drivers and store new candidates as pending recipes';
 
-    public function handle(RunDiscovery $runDiscovery, CreateRecipe $createRecipe, NearDuplicateFilter $duplicates): int
+    public function handle(RunDiscovery $runDiscovery, StoreCandidate $store, NearDuplicateFilter $duplicates): int
     {
         // Idempotent per day — the scheduler fires daily (DECISIONS.md #1)
         // and a manual rerun should not double the day's candidates.
@@ -47,14 +46,7 @@ class DiscoverRecipes extends Command
                 continue;
             }
 
-            $ingredients = $candidate['ingredients'];
-            unset($candidate['ingredients']);
-
-            $createRecipe->handle([
-                ...$candidate,
-                'source' => RecipeSource::Discovered,
-                'discovered_at' => now(),
-            ], $ingredients);
+            $store->handle($candidate);
 
             $knownTitles[] = mb_strtolower(trim($candidate['title']));
             $created++;
