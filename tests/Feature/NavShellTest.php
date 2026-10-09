@@ -22,3 +22,22 @@ it('hides the Shop tab when no week is locked', function () {
         ->assertOk()
         ->assertDontSee('shopping-list');
 });
+
+it('shows a Settings link in the top navigation that opens the settings area', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/plan')
+        ->assertOk()
+        ->assertSeeInOrder(['href="'.route('settings.channels').'"', 'Settings'], false);
+});
+
+it('renders the settings section menu with Channels on the channels page', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/settings/channels')
+        ->assertOk()
+        ->assertSee('aria-label="Settings sections"', false)
+        ->assertSee('aria-current="page"', false);
+});
+
+it('redirects guests away from the settings area', function () {
+    $this->get('/settings/channels')->assertRedirect('/login');
+});
