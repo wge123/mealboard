@@ -7,6 +7,8 @@ use App\Actions\Recipes\UpdateRecipe;
 use App\Enums\RecipeStatus;
 use App\Livewire\Concerns\InteractsWithRecipeForm;
 use App\Models\Recipe;
+use App\Support\MissingKitchenTools;
+use App\Support\MissingTool;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -78,7 +80,10 @@ class RecipeDetail extends Component
 
     public function render(): View
     {
-        return view('livewire.recipe-detail')
+        $missingToolIds = collect(app(MissingKitchenTools::class)->for($this->recipe))
+            ->mapWithKeys(fn (MissingTool $missing) => [$missing->tool->id => true]);
+
+        return view('livewire.recipe-detail', ['missingToolIds' => $missingToolIds])
             ->title($this->recipe->title);
     }
 }

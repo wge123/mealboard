@@ -12,6 +12,7 @@ use App\Enums\RecipeStatus;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
 use App\Models\Recipe;
+use App\Support\MissingKitchenTools;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
@@ -152,6 +153,8 @@ class PlanBuilder extends Component
             ? $plan->plannedMeals->keyBy(fn (PlannedMeal $meal) => $meal->date->toDateString().'|'.$meal->slot->value)
             : collect();
 
+        $pickerRecipes = $this->pickerRecipes();
+
         return view('livewire.plan-builder', [
             'plan' => $plan,
             'plans' => MealPlan::query()->orderByDesc('week_start_date')->get(),
@@ -170,7 +173,8 @@ class PlanBuilder extends Component
             'completable' => $plan !== null
                 && $plan->status === MealPlanStatus::Locked
                 && $this->weekHasEnded($plan),
-            'pickerRecipes' => $this->pickerRecipes(),
+            'pickerRecipes' => $pickerRecipes,
+            'missingTools' => app(MissingKitchenTools::class)->forMany($pickerRecipes),
         ]);
     }
 

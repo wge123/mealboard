@@ -3,6 +3,7 @@
 use App\Enums\MealType;
 use App\Enums\RecipeStatus;
 use App\Livewire\RecipeLibrary;
+use App\Models\KitchenToolKind;
 use App\Models\MealLog;
 use App\Models\PlannedMeal;
 use App\Models\Recipe;
@@ -116,4 +117,27 @@ it('filters by minimum average rating', function () {
         ->assertSee('Crowd Pleaser Curry')
         ->assertDontSee('Forgettable Flatbread')
         ->assertDontSee('Unrated Udon');
+});
+
+it('badges a recipe whose kitchen tool is not owned', function () {
+    KitchenToolKind::where('name', 'skillet')->update(['owned' => false]);
+    Recipe::factory()->approved()->shaped()->create(['title' => 'Stir fry']);
+    Recipe::factory()->approved()->create(['title' => 'Plain toast']);
+
+    $this->actingAs(User::factory()->create());
+
+    $component = Livewire::test(RecipeLibrary::class)
+        ->assertSee('needs: skillet')
+        ->assertSee('Plain toast');
+
+    expect(substr_count($component->html(), 'data-missing-badge'))->toBe(1);
+});
+
+it('shows no badge once the tool is owned', function () {
+    KitchenToolKind::where('name', 'skillet')->update(['owned' => true]);
+    Recipe::factory()->approved()->shaped()->create();
+
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(RecipeLibrary::class)->assertDontSee('needs:');
 });
