@@ -6,6 +6,7 @@ use App\Enums\KitchenToolOrigin;
 use App\Exceptions\KitchenToolRefused;
 use App\Models\KitchenToolKind;
 use App\Models\KitchenToolOtherName;
+use App\Models\RecipeToolAlternative;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -80,15 +81,21 @@ class KitchenToolInventory
      */
     public function addKind(string $name): KitchenToolKind
     {
-        return KitchenToolKind::create([
+        $kind = KitchenToolKind::create([
             'name' => $this->newWord($name),
             'origin' => KitchenToolOrigin::Household,
             'owned' => true,
         ]);
+
+        $this->reResolveAlternatives();
+
+        return $kind;
     }
 
     /**
-     * Delete a household kind with its other names. Catalog kinds can only be marked not owned.
+     * Delete a household kind with its other names. Catalog kinds can only be
+     * marked not owned, and a kind a recipe's tool alternative points at
+     * cannot be deleted.
      *
      * @throws KitchenToolRefused
      */
@@ -96,6 +103,10 @@ class KitchenToolInventory
     {
         if ($kind->origin !== KitchenToolOrigin::Household) {
             throw new KitchenToolRefused("{$kind->display_name} is a catalog kitchen tool and cannot be deleted. Mark it not owned instead.");
+        }
+
+        if (RecipeToolAlternative::query()->where('kitchen_tool_kind_id', $kind->id)->exists()) {
+            throw new KitchenToolRefused("{$kind->display_name} is used by a recipe's tools, so it cannot be deleted.");
         }
 
         DB::transaction(function () use ($kind) {
@@ -112,10 +123,14 @@ class KitchenToolInventory
      */
     public function addOtherName(KitchenToolKind $kind, string $word): KitchenToolOtherName
     {
-        return $kind->otherNames()->create([
+        $otherName = $kind->otherNames()->create([
             'name' => $this->newWord($word),
             'origin' => KitchenToolOrigin::Household,
         ]);
+
+        $this->reResolveAlternatives();
+
+        return $otherName;
     }
 
     /**
@@ -151,6 +166,22 @@ class KitchenToolInventory
         }
 
         return $word;
+    }
+
+    /**
+     * Give a kind to every recipe tool alternative that has none yet and
+     * whose word now resolves, on every recipe, saved ones included.
+     */
+    private function reResolveAlternatives(): void
+    {
+        RecipeToolAlternative::query()
+            ->whereNull('kitchen_tool_kind_id')
+            ->get()
+            ->each(function (RecipeToolAlternative $alternative) {
+                if ($kind = $this->resolve($alternative->word)) {
+                    $alternative->update(['kitchen_tool_kind_id' => $kind->id]);
+                }
+            });
     }
 
     private function normalize(string $word): string
