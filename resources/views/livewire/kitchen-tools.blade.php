@@ -25,6 +25,21 @@
                     @endif
                 </div>
 
+                {{-- Other names the household added; catalog ones work but are not shown --}}
+                @if ($kind->otherNames->isNotEmpty())
+                    <ul class="mt-1 flex flex-wrap gap-2" aria-label="Other names for {{ \Illuminate\Support\Str::title($kind->name) }}">
+                        @foreach ($kind->otherNames as $otherName)
+                            <li class="badge badge-outline h-auto gap-1 py-1" wire:key="other-name-{{ $otherName->id }}">
+                                <span>{{ $otherName->name }}</span>
+                                <button type="button" class="btn btn-ghost btn-xs min-h-11 min-w-11"
+                                    data-test="remove-other-name-{{ $otherName->id }}"
+                                    wire:click="removeOtherName({{ $otherName->id }})"
+                                    aria-label="Remove other name {{ $otherName->name }}">&times;</button>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+
                 {{-- Note: for people only, never used in matching --}}
                 <form class="mt-1 flex items-center gap-2" wire:submit="saveNote({{ $kind->id }})">
                     <input type="text" maxlength="255"
@@ -37,6 +52,10 @@
             </li>
         @endforeach
     </ul>
+
+    @error('removeOtherName')
+        <p class="mt-2 text-sm text-error" role="alert">{{ $message }}</p>
+    @enderror
 
     @error('delete')
         <p class="mt-2 text-sm text-error" role="alert">{{ $message }}</p>

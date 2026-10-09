@@ -124,6 +124,44 @@ class KitchenToolInventory
         });
     }
 
+    /**
+     * Add a household other name to a kind. Refuses a word that already
+     * resolves to a kind name or another other name.
+     *
+     * @throws KitchenToolRefused
+     */
+    public function addOtherName(KitchenToolKind $kind, string $word): KitchenToolOtherName
+    {
+        $word = $this->normalize($word);
+
+        if ($word === '') {
+            throw new KitchenToolRefused('Enter a name for the tool.');
+        }
+
+        if ($existing = $this->resolve($word)) {
+            throw new KitchenToolRefused("\"{$word}\" is already known as ".Str::title($existing->name).'.');
+        }
+
+        return $kind->otherNames()->create([
+            'name' => $word,
+            'origin' => KitchenToolKind::ORIGIN_HOUSEHOLD,
+        ]);
+    }
+
+    /**
+     * Remove a household other name. Catalog other names cannot be removed.
+     *
+     * @throws KitchenToolRefused
+     */
+    public function removeOtherName(KitchenToolOtherName $otherName): void
+    {
+        if ($otherName->origin !== KitchenToolKind::ORIGIN_HOUSEHOLD) {
+            throw new KitchenToolRefused('"'.Str::title($otherName->name).'" is a built-in name and cannot be removed.');
+        }
+
+        $otherName->delete();
+    }
+
     private function normalize(string $word): string
     {
         return mb_strtolower(trim($word));

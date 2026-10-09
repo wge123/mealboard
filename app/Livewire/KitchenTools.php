@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Exceptions\KitchenToolRefused;
 use App\Models\KitchenToolKind;
+use App\Models\KitchenToolOtherName;
 use App\Support\KitchenToolInventory;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -72,10 +73,20 @@ class KitchenTools extends Component
         }
     }
 
+    public function removeOtherName(KitchenToolInventory $inventory, int $otherNameId): void
+    {
+        try {
+            $inventory->removeOtherName(KitchenToolOtherName::query()->findOrFail($otherNameId));
+        } catch (KitchenToolRefused $e) {
+            $this->addError('removeOtherName', $e->getMessage());
+        }
+    }
+
     public function render(): View
     {
         // Owned kinds first, then the rest, each group alphabetical.
         $kinds = KitchenToolKind::query()
+            ->with(['otherNames' => fn ($q) => $q->where('origin', KitchenToolKind::ORIGIN_HOUSEHOLD)->orderBy('name')])
             ->orderByDesc('owned')
             ->orderBy('name')
             ->get();
