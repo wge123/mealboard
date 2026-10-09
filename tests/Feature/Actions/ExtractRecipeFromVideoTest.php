@@ -1,8 +1,10 @@
 <?php
 
 use App\Actions\Discovery\ExtractRecipeFromVideo;
+use App\Discovery\RecipeOutputFormat;
 use App\Exceptions\DiscoveryEnvironmentException;
 use App\Models\DiscoveredVideo;
+use App\Support\KitchenToolInventory;
 use Illuminate\Support\Facades\Process;
 
 function validVideoRecipeObject(array $overrides = []): array
@@ -14,14 +16,18 @@ function validVideoRecipeObject(array $overrides = []): array
         'prep_minutes' => 5,
         'cook_minutes' => 10,
         'servings' => 2,
-        'instructions' => "1. Boil noodles.\n2. Sizzle garlic in butter.\n3. Toss together.",
         'cuisine' => null,
         'tags' => ['quick'],
         'source_url' => null,
-        'ingredients' => [
-            ['qty' => 200, 'unit' => 'g', 'name' => 'noodles', 'note' => null],
-            ['qty' => 3, 'unit' => null, 'name' => 'garlic cloves', 'note' => 'minced'],
+        'tools' => [
+            ['alternatives' => ['large pot', 'saucepan'], 'count' => 1],
+            ['alternatives' => ['skillet'], 'count' => 1],
         ],
+        'ingredients' => [
+            ['qty' => 200, 'unit' => 'g', 'name' => 'noodles', 'prep_note' => null],
+            ['qty' => 3, 'unit' => null, 'name' => 'garlic cloves', 'prep_note' => 'minced'],
+        ],
+        'steps' => ['Boil the noodles.', 'Sizzle the garlic in butter.', 'Toss together.'],
     ], $overrides);
 }
 
@@ -46,7 +52,9 @@ it('extracts a validated candidate from the transcript and stamps the row', func
     expect($candidate)->not->toBeNull()
         ->and($candidate['title'])->toBe('Garlic Butter Noodles')
         ->and($candidate['source_url'])->toBe('https://www.youtube.com/watch?v=vidNoodle01')
-        ->and($candidate['ingredients'])->toHaveCount(2);
+        ->and($candidate['ingredients'])->toHaveCount(2)
+        ->and($candidate['tools'][0])->toBe(['alternatives' => ['large pot', 'saucepan'], 'count' => 1])
+        ->and($candidate['steps'])->toBe(['Boil the noodles.', 'Sizzle the garlic in butter.', 'Toss together.']);
 
     expect($video->refresh()->processed_at)->not->toBeNull()
         ->and($video->error)->toBeNull();
@@ -65,6 +73,51 @@ it('extracts a validated candidate from the transcript and stamps the row', func
             && str_contains($process->command[2], 'boil the noodles then sizzle the garlic')
             && str_contains($process->command[2], 'GARLIC NOODLES in 15 minutes');
     });
+});
+
+it('puts the shared output format and the kinds list in the extraction prompt', function () {
+    $video = DiscoveredVideo::factory()->likelyRecipe()->create();
+
+    Process::fake([
+        '*python3*' => Process::result(output: 'a transcript'),
+        '*claude*' => Process::result(output: json_encode(validVideoRecipeObject())),
+    ]);
+
+    app(ExtractRecipeFromVideo::class)->handle($video);
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2] ?? '';
+
+        return ($process->command[0] ?? '') === '/fake/bin/claude'
+            && str_contains($prompt, RecipeOutputFormat::schema('null'))
+            && str_contains($prompt, "Kitchen tool words you may use:\n".app(KitchenToolInventory::class)->kinds()->implode(', '))
+            && ! str_contains($prompt, 'Tools the household owns')
+            && ! str_contains($prompt, 'Prefer recipes that need no');
+    });
+});
+
+it('retries once with its own output and the errors, then stores the corrected recipe', function () {
+    $video = DiscoveredVideo::factory()->likelyRecipe()->create();
+
+    Process::fake([
+        '*python3*' => Process::result(output: 'a transcript'),
+        '*claude*' => Process::sequence()
+            ->push(json_encode(validVideoRecipeObject(['title' => 'Almost Noodles', 'steps' => []])))
+            ->push(json_encode(validVideoRecipeObject())),
+    ]);
+
+    $candidate = app(ExtractRecipeFromVideo::class)->handle($video);
+
+    expect($candidate['title'])->toBe('Garlic Butter Noodles');
+
+    expect($video->refresh()->error)->toBeNull()
+        ->and($video->processed_at)->not->toBeNull();
+
+    Process::assertRanTimes(fn ($process) => ($process->command[0] ?? '') === '/fake/bin/claude', 2);
+
+    // Only the retry prompt can contain the first output and its errors.
+    Process::assertRan(fn ($process) => str_contains($process->command[2] ?? '', 'Almost Noodles')
+        && str_contains($process->command[2], 'steps: at least one step is required'));
 });
 
 it('records a captionless video failure without calling claude', function () {
@@ -120,7 +173,7 @@ it('records an empty transcript as a failure', function () {
         ->and($video->processed_at)->toBeNull();
 });
 
-it('records a schema-invalid claude response as a failure', function () {
+it('records the error on the video row when the retry also fails', function () {
     $video = DiscoveredVideo::factory()->likelyRecipe()->create();
 
     Process::fake([
@@ -131,5 +184,9 @@ it('records a schema-invalid claude response as a failure', function () {
     expect(app(ExtractRecipeFromVideo::class)->handle($video))->toBeNull();
 
     expect($video->refresh()->error)->toContain('failed schema validation')
+        ->and($video->error)->toContain('title: must be a non-empty string')
         ->and($video->processed_at)->toBeNull();
+
+    // One retry, never a third call.
+    Process::assertRanTimes(fn ($process) => ($process->command[0] ?? '') === '/fake/bin/claude', 2);
 });

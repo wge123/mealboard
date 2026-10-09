@@ -2,10 +2,12 @@
 
 use App\Actions\Discovery\ClassifyDiscoveredVideos;
 use App\Discovery\AnthropicDriver;
+use App\Discovery\RecipeOutputFormat;
 use App\Enums\RecipeStatus;
 use App\Models\DiscoveredVideo;
 use App\Models\Recipe;
 use App\Models\RecipeRequest;
+use App\Support\KitchenToolInventory;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 
@@ -23,14 +25,17 @@ function requestCandidate(): array
         'prep_minutes' => 25,
         'cook_minutes' => 35,
         'servings' => 4,
-        'instructions' => "1. Heat the griddle.\n2. Sear the steak.\n3. Fry the rice.",
         'cuisine' => 'Japanese',
         'tags' => ['griddle'],
         'source_url' => 'https://example.com/recipes/hibachi',
-        'ingredients' => [
-            ['qty' => 700, 'unit' => 'g', 'name' => 'sirloin steak', 'note' => 'cubed'],
-            ['qty' => 4, 'unit' => 'cup', 'name' => 'cooked rice', 'note' => 'day-old'],
+        'tools' => [
+            ['alternatives' => ['flat-top griddle', 'large skillet'], 'count' => 1],
         ],
+        'ingredients' => [
+            ['qty' => 700, 'unit' => 'g', 'name' => 'sirloin steak', 'prep_note' => 'cubed'],
+            ['qty' => 4, 'unit' => 'cup', 'name' => 'cooked rice', 'prep_note' => 'day-old'],
+        ],
+        'steps' => ['Heat the griddle.', 'Sear the steak.', 'Fry the rice.'],
     ];
 }
 
@@ -53,6 +58,23 @@ it('drops the time and ingredient caps from the generation prompt on a request',
             && str_contains($prompt, 'NO time limit and NO ingredient limit')
             && ! str_contains($prompt, 'must be 30 minutes or less')
             && ! str_contains($prompt, '10 ingredients or fewer');
+    });
+});
+
+it('puts the shared format and the kinds list in a request prompt but not the owned inventory', function () {
+    $request = RecipeRequest::factory()->create(['query' => 'hibachi']);
+
+    Process::fake(['*claude*' => Process::result(output: json_encode([requestCandidate()]))]);
+
+    app(AnthropicDriver::class)->discoverFor($request, 1);
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2];
+
+        return str_contains($prompt, RecipeOutputFormat::schema())
+            && str_contains($prompt, "Kitchen tool words you may use:\n".app(KitchenToolInventory::class)->kinds()->implode(', '))
+            && ! str_contains($prompt, 'Tools the household owns')
+            && ! str_contains($prompt, 'Prefer recipes that need no');
     });
 });
 
