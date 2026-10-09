@@ -4,6 +4,7 @@ namespace App\Discovery;
 
 use App\Actions\Recipes\ParsePastedIngredients;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Fallback driver: free TheMealDB API, no key required.
@@ -14,6 +15,7 @@ class TheMealDbDriver implements RecipeDiscoveryDriver
 
     public function __construct(
         private ParsePastedIngredients $parseIngredients,
+        private ShapingPass $shaping,
     ) {}
 
     public function discover(int $n): array
@@ -31,30 +33,34 @@ class TheMealDbDriver implements RecipeDiscoveryDriver
             $meals[$meal['idMeal']] = $meal;
         }
 
-        return array_values(array_map($this->toCandidate(...), $meals));
+        return array_values(array_filter(array_map($this->toCandidate(...), $meals)));
     }
 
     /**
      * @param  array<string, mixed>  $meal
-     * @return array<string, mixed>
+     * @return ?array<string, mixed> null when the shaped candidate fails the check
      */
-    private function toCandidate(array $meal): array
+    private function toCandidate(array $meal): ?array
     {
         $area = trim((string) ($meal['strArea'] ?? ''));
 
-        return [
+        // TheMealDB publishes no timings, servings or meal type: leave them
+        // out and the shaping pass estimates them. Scheduled lane: no retry.
+        $check = $this->shaping->handle([
             'title' => trim((string) $meal['strMeal']),
             'description' => $this->description($meal),
-            'meal_type' => 'any', // TheMealDB has no meal-type dimension.
-            'prep_minutes' => 0, // TheMealDB publishes no timings or servings;
-            'cook_minutes' => 0, // 0 = unknown, review happens at approval time.
-            'servings' => 4,
-            'instructions' => trim((string) ($meal['strInstructions'] ?? '')),
+            'method' => trim((string) ($meal['strInstructions'] ?? '')),
             'cuisine' => $area !== '' ? $area : null,
             'tags' => $this->tags($meal),
             'source_url' => $this->sourceUrl($meal),
             'ingredients' => $this->ingredientRows($meal),
-        ];
+        ]);
+
+        if (! $check->passes()) {
+            Log::warning("discovery: discarded TheMealDB candidate \"{$meal['strMeal']}\": ".implode('; ', $check->errors));
+        }
+
+        return $check->candidate;
     }
 
     /**
