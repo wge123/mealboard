@@ -88,7 +88,8 @@ it('shows the refusal as a validation error when a recipe still uses the kind', 
     Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)
         ->call('deleteKind', $kind->id)
-        ->assertHasErrors('deleteKind');
+        ->assertHasErrors('deleteKind')
+        ->assertSee('kitchen tools, so it cannot be deleted');
 
     expect(KitchenToolKind::query()->where('name', 'tortilla press')->exists())->toBeTrue();
 });

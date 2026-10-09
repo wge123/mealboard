@@ -24,7 +24,7 @@ it('shows the missing tools on the approval card', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeApproval::class)
         ->assertSee('needs: tortilla press')
-        ->assertSee('Add as a new tool');
+        ->assertSee('Add as a new kitchen tool');
 });
 
 it('shows no flag when the household owns the tool', function () {
@@ -85,4 +85,19 @@ it('shows an error and changes nothing when the word is already known', function
         ->test(RecipeApproval::class)
         ->call('addAsNewTool', 'skillet')
         ->assertHasErrors('tool');
+});
+
+it('offers only owned kinds under "It\'s my", so a pick always clears the flag', function () {
+    $inventory = app(KitchenToolInventory::class);
+    $inventory->setOwned($inventory->resolve('skillet'), true);
+    $inventory->setOwned($inventory->resolve('wok'), false);
+    pendingRecipeNeeding('braiser');
+
+    $html = Livewire::actingAs(User::factory()->create())
+        ->test(RecipeApproval::class)
+        ->assertSee('Skillet')
+        ->assertDontSee('<option value="'.$inventory->resolve('wok')->id.'">', false)
+        ->html();
+
+    expect($html)->toContain('<option value="'.$inventory->resolve('skillet')->id.'">');
 });

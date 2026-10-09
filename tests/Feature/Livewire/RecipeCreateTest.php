@@ -209,6 +209,24 @@ it('refuses a form with an empty tools, ingredients or steps group', function (s
     expect(Recipe::count())->toBe(0);
 })->with(['tools', 'rows', 'steps']);
 
+it('uses the glossary word kitchen tool on the tool rows', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->assertSee('Kitchen tool alternatives')
+        ->assertSee('Remove kitchen tool')
+        ->assertSee('+ Add kitchen tool')
+        ->assertDontSee('Add tool');
+});
+
+it('shows the empty ingredients error on the form', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('rows', [])
+        ->call('save')
+        ->assertHasErrors(['rows'])
+        ->assertSee('The rows field is required');
+});
+
 it('treats a blank tool or step as an empty group', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeCreate::class)
