@@ -100,3 +100,19 @@ it('drops the note entry of a deleted kind', function () {
         ->call('deleteKind', $kind->id)
         ->assertSet('notes', fn ($n) => ! array_key_exists($kind->id, $n));
 });
+
+it('renders the settings section menu on the kitchen tools page', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/settings/kitchen-tools')
+        ->assertOk()
+        ->assertSee('aria-label="Settings sections"', false)
+        ->assertSee('aria-current="page"', false)
+        ->assertSeeInOrder(['Kitchen tools', 'Channels']);
+});
+
+it('keeps item variants out of the catalog kinds and resolves them to their kind', function (string $variant) {
+    $inventory = new KitchenToolInventory;
+
+    expect($inventory->kinds())->not->toContain($variant)
+        ->and($inventory->resolve($variant)?->name)->toBe('skillet');
+})->with(['cast iron skillet', 'nonstick pan']);
