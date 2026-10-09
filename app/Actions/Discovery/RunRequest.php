@@ -2,10 +2,8 @@
 
 namespace App\Actions\Discovery;
 
-use App\Actions\Recipes\CreateRecipe;
 use App\Discovery\AnthropicDriver;
 use App\Discovery\NearDuplicateFilter;
-use App\Enums\RecipeSource;
 use App\Enums\RequestStatus;
 use App\Enums\VideoClassification;
 use App\Models\DiscoveredVideo;
@@ -29,7 +27,7 @@ class RunRequest
         private ExtractRecipeFromVideo $extract,
         private AnthropicDriver $anthropic,
         private NearDuplicateFilter $duplicates,
-        private CreateRecipe $createRecipe,
+        private StoreCandidate $storeCandidate,
     ) {}
 
     /**
@@ -131,15 +129,7 @@ class RunRequest
                 continue;
             }
 
-            $ingredients = $candidate['ingredients'];
-            unset($candidate['ingredients']);
-
-            $this->createRecipe->handle([
-                ...$candidate,
-                'source' => RecipeSource::Discovered,
-                'recipe_request_id' => $request->id,
-                'discovered_at' => now(),
-            ], $ingredients);
+            $this->storeCandidate->handle($candidate, ['recipe_request_id' => $request->id]);
 
             $knownTitles[] = mb_strtolower(trim($candidate['title']));
             $created++;

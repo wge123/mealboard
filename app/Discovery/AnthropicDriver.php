@@ -5,8 +5,11 @@ namespace App\Discovery;
 use App\Actions\Planning\ComputeTasteProfile;
 use App\Enums\RecipeStatus;
 use App\Models\BrainNote;
+use App\Models\KitchenToolKind;
 use App\Models\Recipe;
 use App\Models\RecipeRequest;
+use App\Support\KitchenToolInventory;
+use Closure;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -34,11 +37,14 @@ class AnthropicDriver implements RecipeDiscoveryDriver
         private ClaudeCli $claude,
         private CandidateValidator $validator,
         private ComputeTasteProfile $profile,
+        private KitchenToolInventory $tools,
     ) {}
 
     public function discover(int $n): array
     {
-        return $this->parseCandidates($this->claude->run($this->prompt($n)));
+        $output = $this->claude->run($this->prompt($n));
+
+        return $this->parseCandidates($output, fn (mixed $item) => $this->checkShaped($item));
     }
 
     /**
@@ -50,7 +56,11 @@ class AnthropicDriver implements RecipeDiscoveryDriver
      */
     public function discoverFor(RecipeRequest $request, int $n): array
     {
-        return $this->parseCandidates($this->claude->run($this->prompt($n, $request)));
+        // Requests keep the pre-shape contract (free-text instructions) until
+        // the requests ticket moves them over.
+        $output = $this->claude->run($this->prompt($n, $request));
+
+        return $this->parseCandidates($output, fn (mixed $item) => $this->validator->validate($item));
     }
 
     private function prompt(int $n, ?RecipeRequest $request = null): string
@@ -86,6 +96,9 @@ class AnthropicDriver implements RecipeDiscoveryDriver
             - Whole-food-leaning: minimally processed ingredients over packaged or ultra-processed ones.
             BRIEF;
 
+        $toolsSection = $request === null ? $this->toolsSection() : '';
+        $outputSpec = $request === null ? RecipeOutputFormat::schema() : $this->legacyOutputSpec();
+
         return <<<PROMPT
         You are the recipe discovery engine for a household meal planner. Suggest exactly {$n} recipe candidates.
 
@@ -97,7 +110,42 @@ class AnthropicDriver implements RecipeDiscoveryDriver
         Themes from previously rejected recipes — avoid these:
         {$rejectionSection}
 
-        Respond with STRICT JSON only: a top-level array of exactly {$n} objects. No prose, no markdown fences, no trailing commentary. Each object has exactly these keys:
+        {$toolsSection}Respond with STRICT JSON only: a top-level array of exactly {$n} objects. No prose, no markdown fences, no trailing commentary. Each object has exactly these keys:
+        {$outputSpec}
+
+        Source rule: every candidate MUST cite the real, published recipe page or cooking video it is based on as source_url (an http(s) URL on a recipe site or YouTube). Only cite URLs you are confident actually exist — NEVER invent or guess a URL. If you cannot cite a real source for an idea, replace it with a candidate you can cite. Cited URLs are checked; a dead link gets the candidate discarded.
+        PROMPT;
+    }
+
+    /**
+     * The kinds the model may name tools by, and what the household owns, so
+     * the daily lane can ask for recipes that need no missing tools.
+     */
+    private function toolsSection(): string
+    {
+        $kinds = $this->tools->kinds()->implode(', ');
+        $owned = KitchenToolKind::query()->where('owned', true)->orderBy('name')->pluck('name')->implode(', ');
+        $owned = $owned !== '' ? $owned : '(none)';
+
+        return <<<SECTION
+        Kitchen tool words you may use:
+        {$kinds}
+
+        Tools the household owns:
+        {$owned}
+
+        Pick tool words from the first list; only use another word if none fits. Prefer recipes that need no tools the household is missing.
+
+
+        SECTION;
+    }
+
+    /**
+     * The pre-shape output spec, used by the request lane only.
+     */
+    private function legacyOutputSpec(): string
+    {
+        return <<<'SPEC'
         {
           "title": string,
           "description": string (1-2 sentences),
@@ -112,9 +160,24 @@ class AnthropicDriver implements RecipeDiscoveryDriver
           "ingredients": array of {"qty": number or null, "unit": string or null, "name": string, "note": string or null}
         }
         Allowed ingredient units: g, kg, ml, l, tsp, tbsp, cup, oz, lb, count, or null for unitless items.
+        SPEC;
+    }
 
-        Source rule: every candidate MUST cite the real, published recipe page or cooking video it is based on as source_url (an http(s) URL on a recipe site or YouTube). Only cite URLs you are confident actually exist — NEVER invent or guess a URL. If you cannot cite a real source for an idea, replace it with a candidate you can cite. Cited URLs are checked; a dead link gets the candidate discarded.
-        PROMPT;
+    /**
+     * Shaped check; a failing candidate is dropped (scheduled lane: no retry).
+     *
+     * @return ?array<string, mixed>
+     */
+    private function checkShaped(mixed $item): ?array
+    {
+        $check = $this->validator->check($item);
+
+        if (! $check->passes()) {
+            $title = is_array($item) && is_string($item['title'] ?? null) ? $item['title'] : '(untitled)';
+            Log::warning("discovery: discarded candidate \"{$title}\": ".implode('; ', $check->errors));
+        }
+
+        return $check->candidate;
     }
 
     /**
@@ -212,9 +275,10 @@ class AnthropicDriver implements RecipeDiscoveryDriver
     }
 
     /**
+     * @param  Closure(mixed): ?array<string, mixed>  $validate
      * @return array<int, array<string, mixed>>
      */
-    private function parseCandidates(string $output): array
+    private function parseCandidates(string $output, Closure $validate): array
     {
         $decoded = json_decode($this->claude->extractJson($output), true);
 
@@ -227,7 +291,7 @@ class AnthropicDriver implements RecipeDiscoveryDriver
         $candidates = [];
 
         foreach ($decoded as $item) {
-            $candidate = $this->validator->validate($item);
+            $candidate = $validate($item);
 
             if ($candidate === null) {
                 continue;

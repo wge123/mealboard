@@ -1,11 +1,14 @@
 <?php
 
 use App\Discovery\AnthropicDriver;
+use App\Discovery\RecipeOutputFormat;
 use App\Models\BrainNote;
 use App\Models\Ingredient;
+use App\Models\KitchenToolKind;
 use App\Models\MealLog;
 use App\Models\PlannedMeal;
 use App\Models\Recipe;
+use App\Support\KitchenToolInventory;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 
@@ -18,15 +21,19 @@ function validClaudeCandidate(array $overrides = []): array
         'prep_minutes' => 10,
         'cook_minutes' => 15,
         'servings' => 2,
-        'instructions' => "1. Sear the salmon.\n2. Whisk the dressing.\n3. Assemble the bowls.",
         'cuisine' => 'Mediterranean',
         'tags' => ['fish', 'quick'],
         'source_url' => 'https://example.com/recipes/lemon-garlic-salmon-bowls',
-        'ingredients' => [
-            ['qty' => 2, 'unit' => null, 'name' => 'salmon fillets', 'note' => null],
-            ['qty' => 1, 'unit' => 'tbsp', 'name' => 'olive oil', 'note' => null],
-            ['qty' => 1, 'unit' => null, 'name' => 'lemon', 'note' => 'juiced'],
+        'tools' => [
+            ['alternatives' => ['skillet', 'frying pan'], 'count' => 1],
+            ['alternatives' => ['small bowl'], 'count' => 1],
         ],
+        'ingredients' => [
+            ['qty' => 2, 'unit' => null, 'name' => 'salmon fillets', 'prep_note' => null],
+            ['qty' => 1, 'unit' => 'tbsp', 'name' => 'olive oil', 'prep_note' => null],
+            ['qty' => 1, 'unit' => null, 'name' => 'lemon', 'prep_note' => 'juiced'],
+        ],
+        'steps' => ['Sear the salmon.', 'Whisk the dressing.', 'Assemble the bowls.'],
     ], $overrides);
 }
 
@@ -55,8 +62,10 @@ it('parses strict JSON output into schema-checked candidates', function () {
             'qty' => 2.0,
             'unit' => null,
             'name' => 'salmon fillets',
-            'note' => null,
+            'prep_note' => null,
         ])
+        ->and($candidates[0]['tools'][0])->toBe(['alternatives' => ['skillet', 'frying pan'], 'count' => 1])
+        ->and($candidates[0]['steps'][0])->toBe('Sear the salmon.')
         ->and($candidates[1]['title'])->toBe('Chickpea Spinach Skillet');
 });
 
@@ -76,7 +85,7 @@ it('discards a malformed candidate while keeping its valid sibling', function ()
     $json = json_encode([
         validClaudeCandidate(['title' => '']), // blank title -> discarded
         validClaudeCandidate(['meal_type' => 'brunch']), // invalid enum -> discarded
-        validClaudeCandidate(['ingredients' => [['qty' => 1, 'unit' => null, 'note' => null]]]), // no name -> discarded
+        validClaudeCandidate(['ingredients' => [['qty' => 1, 'unit' => null, 'prep_note' => null]]]), // no name -> discarded
         validClaudeCandidate(['title' => 'Survivor Stir-Fry']),
     ]);
 
@@ -278,4 +287,39 @@ it('summarizes rejected recipes into themes, never verbatim titles', function ()
             // A singleton group is not a theme.
             && ! str_contains($prompt, 'french dishes');
     });
+});
+
+it('puts the shared output format, the kinds list and the owned inventory in the daily prompt', function () {
+    KitchenToolKind::query()->update(['owned' => false]);
+    KitchenToolKind::where('name', 'wok')->update(['owned' => true]);
+
+    Process::fake(['*' => Process::result(output: json_encode([validClaudeCandidate()]))]);
+
+    app(AnthropicDriver::class)->discover(2);
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2];
+
+        return str_contains($prompt, RecipeOutputFormat::schema())
+            && str_contains($prompt, "Kitchen tool words you may use:\n".app(KitchenToolInventory::class)->kinds()->implode(', '))
+            && str_contains($prompt, "Tools the household owns:\nwok")
+            && str_contains($prompt, 'need no tools the household is missing')
+            && ! str_contains($prompt, '"instructions"');
+    });
+});
+
+it('drops a candidate that fails the check and does not call the model again', function () {
+    $json = json_encode([
+        validClaudeCandidate(['title' => 'No Steps Dish', 'steps' => []]),
+        validClaudeCandidate(),
+    ]);
+
+    Process::fake(['*' => Process::result(output: $json)]);
+
+    $candidates = app(AnthropicDriver::class)->discover(2);
+
+    expect($candidates)->toHaveCount(1)
+        ->and($candidates[0]['title'])->toBe('Lemon Garlic Salmon Bowls');
+
+    Process::assertRanTimes(fn () => true, 1);
 });
