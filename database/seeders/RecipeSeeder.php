@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Actions\Recipes\SyncRecipeShape;
+use App\Actions\Recipes\CreateRecipe;
 use App\Enums\IngredientCategory;
 use App\Enums\MealType;
 use App\Enums\RecipeSource;
 use App\Enums\RecipeStatus;
 use App\Models\Ingredient;
-use App\Models\Recipe;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -19,10 +18,23 @@ class RecipeSeeder extends Seeder
         $approver = User::where('email', 'willem@example.com')->first()
             ?? User::factory()->create(['email' => 'willem@example.com']);
 
-        $shape = app(SyncRecipeShape::class);
+        $create = app(CreateRecipe::class);
 
         foreach ($this->recipes() as $data) {
-            $recipe = Recipe::create([
+            $rows = [];
+
+            foreach ($data['ingredients'] as [$name, $category, $staple, $qty, $unit, $prepNote]) {
+                // Created first so the seeded category and pantry flag win; CreateRecipe then finds them by name.
+                Ingredient::firstOrCreate(
+                    ['name' => mb_strtolower($name)],
+                    ['category' => $category, 'is_pantry_staple' => $staple],
+                );
+
+                $rows[] = ['name' => $name, 'qty' => $qty, 'unit' => $unit, 'prep_note' => $prepNote];
+            }
+
+            // Through CreateRecipe, so a seeded recipe missing a part of the shape fails the seed.
+            $create->handle([
                 'title' => $data['title'],
                 'description' => $data['description'],
                 'source' => RecipeSource::Manual,
@@ -36,22 +48,7 @@ class RecipeSeeder extends Seeder
                 'tags' => $data['tags'],
                 'approved_at' => $data['status'] === RecipeStatus::Approved ? now() : null,
                 'approved_by' => $data['status'] === RecipeStatus::Approved ? $approver->id : null,
-            ]);
-
-            foreach ($data['ingredients'] as [$name, $category, $staple, $qty, $unit, $note]) {
-                $ingredient = Ingredient::firstOrCreate(
-                    ['name' => mb_strtolower($name)],
-                    ['category' => $category, 'is_pantry_staple' => $staple],
-                );
-
-                $recipe->ingredients()->attach($ingredient->id, [
-                    'qty' => $qty,
-                    'unit' => $unit,
-                    'note' => $note,
-                ]);
-            }
-
-            $shape->handle($recipe, $this->tools($data['tools']), $data['steps']);
+            ], $rows, $this->tools($data['tools']), $data['steps']);
         }
     }
 
