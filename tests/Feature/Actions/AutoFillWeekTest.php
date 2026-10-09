@@ -24,6 +24,9 @@ const AUTO_FILL_WEEK = '2026-09-07';
  */
 const AUTO_FILL_UNRELATED = '2026-01-05';
 
+// The factory's recipes need a skillet; the household owns it, so none is flagged.
+beforeEach(fn () => KitchenToolKind::where('name', 'skillet')->update(['owned' => true]));
+
 function autoFillAction(int $seed = 1): AutoFillWeek
 {
     return new AutoFillWeek(new Randomizer(new Mt19937($seed)));
@@ -49,11 +52,11 @@ function autoFillRate(Recipe $recipe, int ...$ratings): void
 }
 
 it('fills every empty weekday slot with a recipe matching the slot meal type or any', function () {
-    Recipe::factory()->unshaped()->approved()->count(5)->create(['meal_type' => MealType::Breakfast]);
-    Recipe::factory()->unshaped()->approved()->count(5)->create(['meal_type' => MealType::Lunch]);
-    Recipe::factory()->unshaped()->approved()->count(5)->create(['meal_type' => MealType::Dinner]);
-    Recipe::factory()->unshaped()->approved()->count(3)->create(['meal_type' => MealType::Any]);
-    Recipe::factory()->unshaped()->count(3)->create(['meal_type' => MealType::Dinner]); // pending — never eligible
+    Recipe::factory()->approved()->count(5)->create(['meal_type' => MealType::Breakfast]);
+    Recipe::factory()->approved()->count(5)->create(['meal_type' => MealType::Lunch]);
+    Recipe::factory()->approved()->count(5)->create(['meal_type' => MealType::Dinner]);
+    Recipe::factory()->approved()->count(3)->create(['meal_type' => MealType::Any]);
+    Recipe::factory()->count(3)->create(['meal_type' => MealType::Dinner]); // pending — never eligible
 
     $plan = autoFillPlan();
 
@@ -77,7 +80,7 @@ it('fills every empty weekday slot with a recipe matching the slot meal type or 
 });
 
 it('prefers higher-rated recipes and drops the lowest-rated when the pool overflows', function () {
-    $recipes = Recipe::factory()->unshaped()->approved()->count(6)->create(['meal_type' => MealType::Dinner]);
+    $recipes = Recipe::factory()->approved()->count(6)->create(['meal_type' => MealType::Dinner]);
 
     $best = $recipes->first();
     $worst = $recipes->last();
@@ -102,8 +105,8 @@ it('prefers higher-rated recipes and drops the lowest-rated when the pool overfl
 });
 
 it('penalizes recipes planned in the 14 days before the week start', function () {
-    $recent = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Dinner]);
-    $old = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Dinner]);
+    $recent = Recipe::factory()->approved()->create(['meal_type' => MealType::Dinner]);
+    $old = Recipe::factory()->approved()->create(['meal_type' => MealType::Dinner]);
 
     // Both unrated. One planned 3 days before week start (inside the window),
     // the other 15 days before (outside the window).
@@ -122,7 +125,7 @@ it('penalizes recipes planned in the 14 days before the week start', function ()
 });
 
 it('never repeats a recipe within the week when the pool is large enough', function () {
-    Recipe::factory()->unshaped()->approved()->count(15)->create(['meal_type' => MealType::Any]);
+    Recipe::factory()->approved()->count(15)->create(['meal_type' => MealType::Any]);
 
     $created = autoFillAction()->handle(autoFillPlan());
 
@@ -131,7 +134,7 @@ it('never repeats a recipe within the week when the pool is large enough', funct
 });
 
 it('fills only empty slots and counts existing planned recipes toward the no-repeat rule', function () {
-    $recipes = Recipe::factory()->unshaped()->approved()->count(15)->create(['meal_type' => MealType::Any]);
+    $recipes = Recipe::factory()->approved()->count(15)->create(['meal_type' => MealType::Any]);
 
     $plan = autoFillPlan();
 
@@ -152,7 +155,7 @@ it('fills only empty slots and counts existing planned recipes toward the no-rep
 });
 
 it('reuses recipes evenly when the pool is smaller than the week', function () {
-    Recipe::factory()->unshaped()->approved()->count(2)->create(['meal_type' => MealType::Any]);
+    Recipe::factory()->approved()->count(2)->create(['meal_type' => MealType::Any]);
 
     $created = autoFillAction()->handle(autoFillPlan());
 
@@ -166,7 +169,7 @@ it('reuses recipes evenly when the pool is smaller than the week', function () {
 });
 
 it('refuses to fill a plan that is not a draft', function () {
-    Recipe::factory()->unshaped()->approved()->count(3)->create(['meal_type' => MealType::Any]);
+    Recipe::factory()->approved()->count(3)->create(['meal_type' => MealType::Any]);
 
     $plan = MealPlan::factory()->locked()->create(['week_start_date' => AUTO_FILL_WEEK]);
 
@@ -179,15 +182,15 @@ it('refuses to fill a plan that is not a draft', function () {
 it('boosts recipes matching profile-favored cuisines', function () {
     // Profile source: a LUNCH recipe with two 5-star logs makes 'thai'
     // favored, without competing in the dinner pool under test.
-    $profiled = Recipe::factory()->unshaped()->approved()->create([
+    $profiled = Recipe::factory()->approved()->create([
         'meal_type' => MealType::Lunch, 'cuisine' => 'thai', 'tags' => [],
     ]);
     autoFillRate($profiled, 5, 5);
 
-    $thai = Recipe::factory()->unshaped()->approved()->create([
+    $thai = Recipe::factory()->approved()->create([
         'meal_type' => MealType::Dinner, 'cuisine' => 'thai', 'tags' => [],
     ]);
-    $italian = Recipe::factory()->unshaped()->approved()->create([
+    $italian = Recipe::factory()->approved()->create([
         'meal_type' => MealType::Dinner, 'cuisine' => 'italian', 'tags' => [],
     ]);
 
@@ -202,11 +205,11 @@ it('boosts recipes matching profile-favored cuisines', function () {
 });
 
 it('prefers faster breakfasts when the profile shows breakfasts are often skipped', function () {
-    $fast = Recipe::factory()->unshaped()->approved()->create([
+    $fast = Recipe::factory()->approved()->create([
         'meal_type' => MealType::Breakfast, 'prep_minutes' => 5, 'cook_minutes' => 5,
         'cuisine' => null, 'tags' => [],
     ]);
-    $slow = Recipe::factory()->unshaped()->approved()->create([
+    $slow = Recipe::factory()->approved()->create([
         'meal_type' => MealType::Breakfast, 'prep_minutes' => 30, 'cook_minutes' => 30,
         'cuisine' => null, 'tags' => [],
     ]);
@@ -235,7 +238,7 @@ it('prefers faster breakfasts when the profile shows breakfasts are often skippe
 
     // Skip pattern: 2 of 3 logged breakfasts uneaten, attached to a LUNCH
     // recipe so the breakfast pool under test stays [fast, slow].
-    $lunch = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Lunch, 'cuisine' => null, 'tags' => []]);
+    $lunch = Recipe::factory()->approved()->create(['meal_type' => MealType::Lunch, 'cuisine' => null, 'tags' => []]);
     foreach ([false, false, true] as $ate) {
         MealLog::factory()->create([
             'planned_meal_id' => PlannedMeal::factory()->create([
@@ -255,7 +258,7 @@ it('prefers faster breakfasts when the profile shows breakfasts are often skippe
 });
 
 it('produces an identical fill for the same seed', function () {
-    Recipe::factory()->unshaped()->approved()->count(10)->create(['meal_type' => MealType::Any]);
+    Recipe::factory()->approved()->count(10)->create(['meal_type' => MealType::Any]);
 
     $planA = autoFillPlan('2026-09-07');
     $planB = autoFillPlan('2026-10-05');
@@ -275,7 +278,10 @@ it('produces an identical fill for the same seed', function () {
 it('never plans a recipe with a missing kitchen tool', function () {
     KitchenToolKind::where('name', 'skillet')->update(['owned' => false]);
     $flagged = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
-    $fine = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Any]);
+    $fine = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+    $wok = KitchenToolKind::where('name', 'wok')->first();
+    $wok->update(['owned' => true]);
+    $fine->recipeTools->first()->alternatives()->update(['word' => 'wok', 'kitchen_tool_kind_id' => $wok->id]);
 
     $created = autoFillAction()->handle(autoFillPlan());
 
