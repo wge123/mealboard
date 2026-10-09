@@ -35,7 +35,7 @@ class RecipeDetail extends Component
         $this->prepMinutes = $this->recipe->prep_minutes;
         $this->cookMinutes = $this->recipe->cook_minutes;
         $this->servings = $this->recipe->servings;
-        $this->instructions = $this->recipe->instructions;
+        $this->instructions = $this->recipe->instructions ?? '';
         $this->tagsInput = implode(', ', $this->recipe->tags ?? []);
         $this->rows = $this->recipe->ingredients->map(fn ($ingredient) => [
             'name' => $ingredient->name,

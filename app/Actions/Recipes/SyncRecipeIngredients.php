@@ -12,7 +12,7 @@ class SyncRecipeIngredients
      * Replace the recipe's ingredient list with the given rows, finding or
      * creating ingredients by (lowercased) name.
      *
-     * @param  array<int, array{name: string, qty?: mixed, unit?: ?string, note?: ?string}>  $rows
+     * @param  array<int, array{name: string, qty?: mixed, unit?: ?string, note?: ?string, prep_note?: ?string}>  $rows
      */
     public function handle(Recipe $recipe, array $rows): void
     {
@@ -27,7 +27,8 @@ class SyncRecipeIngredients
             $pivot[$ingredient->id] = [
                 'qty' => ($row['qty'] ?? null) === '' ? null : ($row['qty'] ?? null),
                 'unit' => ($row['unit'] ?? null) ?: null,
-                'note' => ($row['note'] ?? null) ?: null,
+                // prep_note (the recipe shape's name for it) lands on the pivot note column.
+                'note' => ($row['prep_note'] ?? $row['note'] ?? null) ?: null,
             ];
         }
 

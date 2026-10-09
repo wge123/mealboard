@@ -5,6 +5,8 @@ namespace Database\Factories;
 use App\Enums\MealType;
 use App\Enums\RecipeSource;
 use App\Enums\RecipeStatus;
+use App\Models\Ingredient;
+use App\Models\KitchenToolKind;
 use App\Models\Recipe;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -46,6 +48,31 @@ class RecipeFactory extends Factory
             'approved_at' => now(),
             'approved_by' => $approver?->id ?? User::factory(),
         ]);
+    }
+
+    /**
+     * A recipe with the recipe shape: one tool (skillet), one ingredient with
+     * a prep note, and two cooking steps. The old method stays set.
+     */
+    public function shaped(): static
+    {
+        return $this->afterCreating(function (Recipe $recipe) {
+            $tool = $recipe->recipeTools()->create(['position' => 1, 'count' => 1]);
+            $tool->alternatives()->create([
+                'position' => 1,
+                'word' => 'skillet',
+                'kitchen_tool_kind_id' => KitchenToolKind::where('name', 'skillet')->value('id'),
+            ]);
+
+            $recipe->ingredients()->attach(
+                Ingredient::factory()->create()->id,
+                ['qty' => 1, 'unit' => 'count', 'note' => 'chopped'],
+            );
+
+            foreach ([1, 2] as $position) {
+                $recipe->cookingSteps()->create(['position' => $position, 'text' => fake()->sentence()]);
+            }
+        });
     }
 
     public function discovered(): static

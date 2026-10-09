@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Recipe extends Model
 {
@@ -62,6 +63,28 @@ class Recipe extends Model
         return $this->belongsToMany(Ingredient::class)
             ->withPivot(['qty', 'unit', 'note'])
             ->withTimestamps();
+    }
+
+    /** @return HasMany<RecipeTool, $this> */
+    public function recipeTools(): HasMany
+    {
+        return $this->hasMany(RecipeTool::class)->orderBy('position');
+    }
+
+    /** @return HasMany<CookingStep, $this> */
+    public function cookingSteps(): HasMany
+    {
+        return $this->hasMany(CookingStep::class)->orderBy('position');
+    }
+
+    /**
+     * Whether the recipe carries the recipe shape: tools, ingredients and cooking steps.
+     */
+    public function hasShape(): bool
+    {
+        return $this->recipeTools()->exists()
+            && $this->cookingSteps()->exists()
+            && $this->ingredients()->exists();
     }
 
     public function approvedBy(): BelongsTo
