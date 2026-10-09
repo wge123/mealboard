@@ -49,7 +49,7 @@ it('skips to the following Monday when next week is already planned', function (
 });
 
 it('auto-fills the empty slots of the selected week', function () {
-    Recipe::factory()->approved()->count(15)->create(['meal_type' => MealType::Any]);
+    Recipe::factory()->unshaped()->approved()->count(15)->create(['meal_type' => MealType::Any]);
     $plan = MealPlan::factory()->create();
 
     planBuilder()->call('autoFill');
@@ -61,8 +61,8 @@ it('swaps a slot recipe via the picker and keeps the slot unique', function () {
     $plan = MealPlan::factory()->create();
     $monday = $plan->week_start_date->toDateString();
 
-    $first = Recipe::factory()->approved()->create(['meal_type' => MealType::Dinner, 'title' => 'First Dinner']);
-    $second = Recipe::factory()->approved()->create(['meal_type' => MealType::Any, 'title' => 'Second Dinner']);
+    $first = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Dinner, 'title' => 'First Dinner']);
+    $second = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Any, 'title' => 'Second Dinner']);
 
     $component = planBuilder()
         ->call('openPicker', $monday, 'dinner')
@@ -83,10 +83,10 @@ it('swaps a slot recipe via the picker and keeps the slot unique', function () {
 it('only offers approved recipes matching the slot meal type or any in the picker', function () {
     MealPlan::factory()->create();
 
-    Recipe::factory()->approved()->create(['meal_type' => MealType::Dinner, 'title' => 'Dinner Fit']);
-    Recipe::factory()->approved()->create(['meal_type' => MealType::Any, 'title' => 'Anytime Fit']);
-    Recipe::factory()->approved()->create(['meal_type' => MealType::Breakfast, 'title' => 'Breakfast Misfit']);
-    Recipe::factory()->create(['meal_type' => MealType::Dinner, 'title' => 'Pending Misfit']);
+    Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Dinner, 'title' => 'Dinner Fit']);
+    Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Any, 'title' => 'Anytime Fit']);
+    Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Breakfast, 'title' => 'Breakfast Misfit']);
+    Recipe::factory()->unshaped()->create(['meal_type' => MealType::Dinner, 'title' => 'Pending Misfit']);
 
     planBuilder()
         ->call('openPicker', MealPlan::sole()->week_start_date->toDateString(), 'dinner')
@@ -98,7 +98,7 @@ it('only offers approved recipes matching the slot meal type or any in the picke
 
 it('rejects picking an ineligible recipe server-side', function () {
     $plan = MealPlan::factory()->create();
-    $breakfastOnly = Recipe::factory()->approved()->create(['meal_type' => MealType::Breakfast]);
+    $breakfastOnly = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Breakfast]);
 
     planBuilder()
         ->call('openPicker', $plan->week_start_date->toDateString(), 'dinner')
@@ -123,7 +123,7 @@ it('locks the selected draft week, stamping who locked it', function () {
 
 it('rejects mutations on a locked plan server-side', function (string $method, array $args) {
     $plan = MealPlan::factory()->locked()->create();
-    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+    $recipe = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Any]);
 
     $meal = $plan->plannedMeals()->create([
         'recipe_id' => $recipe->id,
@@ -203,7 +203,7 @@ it('keeps a draft plan fully editable after another week is locked', function ()
         'week_start_date' => $locked->week_start_date->copy()->addWeeks(600)->toDateString(),
     ]);
 
-    Recipe::factory()->approved()->count(3)->create(['meal_type' => MealType::Any]);
+    Recipe::factory()->unshaped()->approved()->count(3)->create(['meal_type' => MealType::Any]);
 
     planBuilder()
         ->set('planId', $draft->id)
@@ -239,7 +239,7 @@ it('clears a slot', function () {
     $monday = $plan->week_start_date->toDateString();
 
     $plan->plannedMeals()->create([
-        'recipe_id' => Recipe::factory()->approved()->create()->id,
+        'recipe_id' => Recipe::factory()->unshaped()->approved()->create()->id,
         'date' => $monday,
         'slot' => MealSlot::Lunch,
     ]);

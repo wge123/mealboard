@@ -33,10 +33,10 @@ it('redirects guests to login', function () {
 });
 
 it('lists only approved recipes', function () {
-    Recipe::factory()->approved()->create(['title' => 'Approved Green Curry']);
-    Recipe::factory()->create(['title' => 'Pending Ramen', 'status' => RecipeStatus::Pending]);
-    Recipe::factory()->create(['title' => 'Rejected Casserole', 'status' => RecipeStatus::Rejected]);
-    Recipe::factory()->create(['title' => 'Archived Stew', 'status' => RecipeStatus::Archived]);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Approved Green Curry']);
+    Recipe::factory()->unshaped()->create(['title' => 'Pending Ramen', 'status' => RecipeStatus::Pending]);
+    Recipe::factory()->unshaped()->create(['title' => 'Rejected Casserole', 'status' => RecipeStatus::Rejected]);
+    Recipe::factory()->unshaped()->create(['title' => 'Archived Stew', 'status' => RecipeStatus::Archived]);
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeLibrary::class)
@@ -47,9 +47,9 @@ it('lists only approved recipes', function () {
 });
 
 it('narrows results with text search on title and description', function () {
-    Recipe::factory()->approved()->create(['title' => 'Lemon Chicken', 'description' => 'Bright and zesty.']);
-    Recipe::factory()->approved()->create(['title' => 'Beef Tacos', 'description' => 'Weeknight favourite with lime crema.']);
-    Recipe::factory()->approved()->create(['title' => 'Mushroom Risotto', 'description' => 'Slow stirred.']);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Lemon Chicken', 'description' => 'Bright and zesty.']);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Beef Tacos', 'description' => 'Weeknight favourite with lime crema.']);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Mushroom Risotto', 'description' => 'Slow stirred.']);
 
     $component = Livewire::actingAs(User::factory()->create())->test(RecipeLibrary::class);
 
@@ -65,8 +65,8 @@ it('narrows results with text search on title and description', function () {
 });
 
 it('filters by meal type', function () {
-    Recipe::factory()->approved()->create(['title' => 'Overnight Oats', 'meal_type' => MealType::Breakfast]);
-    Recipe::factory()->approved()->create(['title' => 'Steak Frites', 'meal_type' => MealType::Dinner]);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Overnight Oats', 'meal_type' => MealType::Breakfast]);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Steak Frites', 'meal_type' => MealType::Dinner]);
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeLibrary::class)
@@ -76,8 +76,8 @@ it('filters by meal type', function () {
 });
 
 it('filters by cuisine', function () {
-    Recipe::factory()->approved()->create(['title' => 'Margherita Pizza', 'cuisine' => 'italian']);
-    Recipe::factory()->approved()->create(['title' => 'Pad Krapow', 'cuisine' => 'thai']);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Margherita Pizza', 'cuisine' => 'italian']);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Pad Krapow', 'cuisine' => 'thai']);
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeLibrary::class)
@@ -87,8 +87,8 @@ it('filters by cuisine', function () {
 });
 
 it('filters by tag', function () {
-    Recipe::factory()->approved()->create(['title' => 'Speedy Stir Fry', 'tags' => ['quick', 'healthy']]);
-    Recipe::factory()->approved()->create(['title' => 'Sunday Roast', 'tags' => ['comfort']]);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Speedy Stir Fry', 'tags' => ['quick', 'healthy']]);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Sunday Roast', 'tags' => ['comfort']]);
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeLibrary::class)
@@ -98,9 +98,9 @@ it('filters by tag', function () {
 });
 
 it('filters by minimum average rating', function () {
-    $loved = Recipe::factory()->approved()->create(['title' => 'Crowd Pleaser Curry']);
-    $meh = Recipe::factory()->approved()->create(['title' => 'Forgettable Flatbread']);
-    Recipe::factory()->approved()->create(['title' => 'Unrated Udon']);
+    $loved = Recipe::factory()->unshaped()->approved()->create(['title' => 'Crowd Pleaser Curry']);
+    $meh = Recipe::factory()->unshaped()->approved()->create(['title' => 'Forgettable Flatbread']);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Unrated Udon']);
 
     rateRecipe($loved, 4, 5); // avg 4.5
     rateRecipe($meh, 2, 2);   // avg 2.0
@@ -122,7 +122,7 @@ it('filters by minimum average rating', function () {
 it('badges a recipe whose kitchen tool is not owned', function () {
     KitchenToolKind::where('name', 'skillet')->update(['owned' => false]);
     Recipe::factory()->approved()->shaped()->create(['title' => 'Stir fry']);
-    Recipe::factory()->approved()->create(['title' => 'Plain toast']);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Plain toast']);
 
     $this->actingAs(User::factory()->create());
 

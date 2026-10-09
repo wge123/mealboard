@@ -11,7 +11,7 @@ use App\Models\User;
 use Illuminate\Database\QueryException;
 
 it('creates a recipe via factory with working enum casts', function () {
-    $recipe = Recipe::factory()->create([
+    $recipe = Recipe::factory()->unshaped()->create([
         'source' => 'discovered',
         'status' => 'pending',
         'meal_type' => 'dinner',
@@ -28,7 +28,7 @@ it('creates a recipe via factory with working enum casts', function () {
 
 it('sets approved metadata via the approved factory state', function () {
     $user = User::factory()->create();
-    $recipe = Recipe::factory()->approved($user)->create();
+    $recipe = Recipe::factory()->unshaped()->approved($user)->create();
 
     expect($recipe->status)->toBe(RecipeStatus::Approved)
         ->and($recipe->approved_at)->not->toBeNull()
@@ -56,7 +56,7 @@ it('rejects duplicate ingredient names', function () {
 });
 
 it('attaches ingredients to a recipe with qty, unit and note pivot data', function () {
-    $recipe = Recipe::factory()->create();
+    $recipe = Recipe::factory()->unshaped()->create();
     $flour = Ingredient::factory()->create(['name' => 'flour']);
     $milk = Ingredient::factory()->create(['name' => 'milk']);
 

@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Artisan;
  */
 function pushPlanMeal(MealPlan $plan, array $ingredients, MealSlot $slot = MealSlot::Dinner): void
 {
-    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+    $recipe = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Any]);
 
     foreach ($ingredients as $line) {
         $ingredient = Ingredient::query()->where('name', $line[0])->first()

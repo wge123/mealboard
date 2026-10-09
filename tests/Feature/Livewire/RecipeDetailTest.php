@@ -8,7 +8,7 @@ use App\Models\User;
 use Livewire\Livewire;
 
 it('renders the detail page with meta, markdown instructions, and ingredient rows', function () {
-    $recipe = Recipe::factory()->approved()->create([
+    $recipe = Recipe::factory()->unshaped()->approved()->create([
         'title' => 'Miso Salmon Bowl',
         'instructions' => "## Steps\n\n1. Marinate the salmon.",
         'cuisine' => 'japanese',
@@ -29,13 +29,13 @@ it('renders the detail page with meta, markdown instructions, and ingredient row
 });
 
 it('redirects guests to login', function () {
-    $recipe = Recipe::factory()->create();
+    $recipe = Recipe::factory()->unshaped()->create();
 
     $this->get("/recipes/{$recipe->id}")->assertRedirect('/login');
 });
 
 it('persists edits to fields and ingredient pivot rows', function () {
-    $recipe = Recipe::factory()->approved()->create(['title' => 'Old Title']);
+    $recipe = Recipe::factory()->unshaped()->approved()->create(['title' => 'Old Title']);
     $recipe->ingredients()->attach(
         Ingredient::factory()->create(['name' => 'old ingredient'])->id,
         ['qty' => 1, 'unit' => 'cup', 'note' => null],
@@ -72,7 +72,7 @@ it('persists edits to fields and ingredient pivot rows', function () {
 });
 
 it('rejects a unit outside the normalized set', function () {
-    $recipe = Recipe::factory()->approved()->create();
+    $recipe = Recipe::factory()->unshaped()->approved()->create();
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeDetail::class, ['recipe' => $recipe])
@@ -87,7 +87,7 @@ it('rejects a unit outside the normalized set', function () {
 });
 
 it('requires a title', function () {
-    $recipe = Recipe::factory()->approved()->create();
+    $recipe = Recipe::factory()->unshaped()->approved()->create();
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeDetail::class, ['recipe' => $recipe])
@@ -99,7 +99,7 @@ it('requires a title', function () {
 
 it('stamps approval attribution when approving', function () {
     $approver = User::factory()->create();
-    $recipe = Recipe::factory()->create(['status' => RecipeStatus::Pending]);
+    $recipe = Recipe::factory()->unshaped()->create(['status' => RecipeStatus::Pending]);
 
     Livewire::actingAs($approver)
         ->test(RecipeDetail::class, ['recipe' => $recipe])
@@ -113,7 +113,7 @@ it('stamps approval attribution when approving', function () {
 });
 
 it('can reject and archive a recipe', function (string $status) {
-    $recipe = Recipe::factory()->create(['status' => RecipeStatus::Pending]);
+    $recipe = Recipe::factory()->unshaped()->create(['status' => RecipeStatus::Pending]);
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeDetail::class, ['recipe' => $recipe])

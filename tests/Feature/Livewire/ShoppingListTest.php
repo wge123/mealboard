@@ -29,7 +29,7 @@ function shoppingListPage(MealPlan $plan): Testable
 function lockedPlanWith(array $lines): MealPlan
 {
     $plan = MealPlan::factory()->locked()->create();
-    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+    $recipe = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Any]);
 
     foreach ($lines as [$ingredient, $qty, $unit]) {
         $recipe->ingredients()->attach($ingredient->id, ['qty' => $qty, 'unit' => $unit]);

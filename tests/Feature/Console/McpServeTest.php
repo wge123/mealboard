@@ -53,7 +53,7 @@ function mcpToolData(array $response): array
 function mcpSeededPlan(): MealPlan
 {
     $plan = MealPlan::factory()->locked()->create(['week_start_date' => '2026-07-20']);
-    $recipe = Recipe::factory()->approved()->create([
+    $recipe = Recipe::factory()->unshaped()->approved()->create([
         'title' => 'Sheet-pan chicken',
         'meal_type' => MealType::Any,
     ]);
@@ -162,7 +162,7 @@ it('returns the buy list: one entry per ingredient still to buy', function () {
     $flour = Ingredient::factory()->create(['name' => 'flour', 'category' => IngredientCategory::Pantry]);
 
     foreach ([['2026-07-21', 2, 'cup'], ['2026-07-22', 500, 'g']] as [$date, $qty, $unit]) {
-        $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+        $recipe = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Any]);
         $recipe->ingredients()->attach($flour->id, ['qty' => $qty, 'unit' => $unit]);
         $plan->plannedMeals()->create(['recipe_id' => $recipe->id, 'date' => $date, 'slot' => MealSlot::Dinner]);
     }

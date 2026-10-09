@@ -51,12 +51,25 @@ class RecipeFactory extends Factory
     }
 
     /**
+     * Every recipe has the recipe shape unless a test asks for ->unshaped().
+     */
+    public function configure(): static
+    {
+        return $this->shaped();
+    }
+
+    /**
      * A recipe with the recipe shape: one tool (skillet), one ingredient with
-     * a prep note, and two cooking steps. The old method stays set.
+     * a prep note, and two cooking steps. The old method stays set. This is
+     * the default.
      */
     public function shaped(): static
     {
         return $this->afterCreating(function (Recipe $recipe) {
+            if ($recipe->hasShape()) {
+                return;
+            }
+
             $tool = $recipe->recipeTools()->create(['position' => 1, 'count' => 1]);
             $tool->alternatives()->create([
                 'position' => 1,
@@ -72,6 +85,19 @@ class RecipeFactory extends Factory
             foreach ([1, 2] as $position) {
                 $recipe->cookingSteps()->create(['position' => $position, 'text' => fake()->sentence()]);
             }
+        });
+    }
+
+    /**
+     * A recipe from before the shape: no tools, no ingredients, no steps,
+     * just the old free-text method. Runs after the default shape is added.
+     */
+    public function unshaped(): static
+    {
+        return $this->afterCreating(function (Recipe $recipe) {
+            $recipe->recipeTools()->delete();
+            $recipe->cookingSteps()->delete();
+            $recipe->ingredients()->detach();
         });
     }
 

@@ -6,7 +6,7 @@ use App\Models\Recipe;
 use App\Models\User;
 
 it('shows Tools, Mise en place and Cooking in order for a shaped recipe', function () {
-    $recipe = Recipe::factory()->approved()->create(['instructions' => null]);
+    $recipe = Recipe::factory()->unshaped()->approved()->create(['instructions' => null]);
     $tool = $recipe->recipeTools()->create(['position' => 1, 'count' => 2]);
     $tool->alternatives()->create(['position' => 1, 'word' => 'flat-top griddle']);
     $tool->alternatives()->create(['position' => 2, 'word' => 'large skillet']);
@@ -32,7 +32,7 @@ it('shows Tools, Mise en place and Cooking in order for a shaped recipe', functi
 });
 
 it('keeps showing the old method for a recipe without the shape', function () {
-    $recipe = Recipe::factory()->approved()->create(['instructions' => '1. Boil water.']);
+    $recipe = Recipe::factory()->unshaped()->approved()->create(['instructions' => '1. Boil water.']);
 
     $this->actingAs(User::factory()->create())
         ->get("/recipes/{$recipe->id}")

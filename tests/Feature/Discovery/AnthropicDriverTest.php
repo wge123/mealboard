@@ -179,10 +179,10 @@ it('serializes the taste profile into the generation prompt when data exists', f
     $garlic = Ingredient::factory()->create(['name' => 'garlic']);
     $cilantro = Ingredient::factory()->create(['name' => 'cilantro']);
 
-    $loved = Recipe::factory()->create(['cuisine' => 'thai', 'tags' => ['quick']]);
+    $loved = Recipe::factory()->unshaped()->create(['cuisine' => 'thai', 'tags' => ['quick']]);
     $loved->ingredients()->attach($garlic->id);
 
-    $skipped = Recipe::factory()->create(['cuisine' => null, 'tags' => []]);
+    $skipped = Recipe::factory()->unshaped()->create(['cuisine' => null, 'tags' => []]);
     $skipped->ingredients()->attach($cilantro->id);
 
     foreach ([5, 4] as $rating) {
@@ -254,15 +254,15 @@ it('caps synced brain-note content at 1500 characters in the prompt', function (
 it('summarizes rejected recipes into themes, never verbatim titles', function () {
     $cilantro = Ingredient::factory()->create(['name' => 'cilantro']);
 
-    $first = Recipe::factory()->create([
+    $first = Recipe::factory()->unshaped()->create([
         'status' => 'rejected', 'title' => 'Bangkok Fish Stew', 'cuisine' => 'thai',
         'tags' => ['seafood'], 'prep_minutes' => 20, 'cook_minutes' => 25,
     ]);
-    Recipe::factory()->create([
+    Recipe::factory()->unshaped()->create([
         'status' => 'rejected', 'title' => 'Chiang Mai Braise', 'cuisine' => 'thai',
         'tags' => ['seafood'], 'prep_minutes' => 30, 'cook_minutes' => 30,
     ]);
-    $herby = Recipe::factory()->create([
+    $herby = Recipe::factory()->unshaped()->create([
         'status' => 'rejected', 'title' => 'Herby Salad', 'cuisine' => 'french',
         'tags' => [], 'prep_minutes' => 5, 'cook_minutes' => 0,
     ]);

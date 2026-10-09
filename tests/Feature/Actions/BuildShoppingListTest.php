@@ -21,7 +21,7 @@ function attachMeal(MealPlan $plan, array $lines): void
 {
     static $offset = 0;
 
-    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+    $recipe = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Any]);
 
     foreach ($lines as $line) {
         [$ingredient, $qty, $unit] = $line;

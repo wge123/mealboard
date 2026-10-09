@@ -21,7 +21,7 @@ function tasteLog(Recipe $recipe, ?int $rating, bool $ate = true, string $slot =
 
 function tasteRecipe(array $attributes = []): Recipe
 {
-    return Recipe::factory()->create(array_merge(['cuisine' => null, 'tags' => []], $attributes));
+    return Recipe::factory()->unshaped()->create(array_merge(['cuisine' => null, 'tags' => []], $attributes));
 }
 
 it('surfaces top cuisines by average rating with at least two data points', function () {

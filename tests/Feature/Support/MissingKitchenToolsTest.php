@@ -78,7 +78,7 @@ it('clears the flag as soon as the kind is marked owned', function () {
 });
 
 it('gives a recipe without the shape no missing tools', function () {
-    $recipe = Recipe::factory()->approved()->create();
+    $recipe = Recipe::factory()->unshaped()->approved()->create();
 
     expect(app(MissingKitchenTools::class)->for($recipe))->toBeEmpty();
 });
@@ -86,7 +86,7 @@ it('gives a recipe without the shape no missing tools', function () {
 it('answers many recipes in a constant number of queries', function () {
     setOwnership('wok', false);
     $recipes = collect(range(1, 6))->map(fn () => shapedRecipeNeeding([['wok']]));
-    $unshaped = Recipe::factory()->approved()->create();
+    $unshaped = Recipe::factory()->unshaped()->approved()->create();
 
     DB::enableQueryLog();
     $byRecipe = app(MissingKitchenTools::class)->forMany($recipes->push($unshaped));
