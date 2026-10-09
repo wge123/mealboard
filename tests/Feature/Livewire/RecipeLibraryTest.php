@@ -121,7 +121,7 @@ it('filters by minimum average rating', function () {
 
 it('badges a recipe whose kitchen tool is not owned', function () {
     KitchenToolKind::where('name', 'skillet')->update(['owned' => false]);
-    Recipe::factory()->approved()->shaped()->create(['title' => 'Stir fry']);
+    Recipe::factory()->approved()->create(['title' => 'Stir fry']);
     Recipe::factory()->unshaped()->approved()->create(['title' => 'Plain toast']);
 
     $this->actingAs(User::factory()->create());
@@ -135,7 +135,7 @@ it('badges a recipe whose kitchen tool is not owned', function () {
 
 it('shows no badge once the tool is owned', function () {
     KitchenToolKind::where('name', 'skillet')->update(['owned' => true]);
-    Recipe::factory()->approved()->shaped()->create();
+    Recipe::factory()->approved()->create();
 
     $this->actingAs(User::factory()->create());
 

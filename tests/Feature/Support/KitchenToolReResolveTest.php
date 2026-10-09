@@ -7,7 +7,7 @@ use App\Support\KitchenToolInventory;
 
 function recipeWithUnknownWord(string $word): RecipeToolAlternative
 {
-    $recipe = Recipe::factory()->shaped()->create();
+    $recipe = Recipe::factory()->create();
     $tool = $recipe->recipeTools()->create(['position' => 2, 'count' => 1]);
 
     return $tool->alternatives()->create(['position' => 1, 'word' => $word, 'kitchen_tool_kind_id' => null]);
@@ -36,7 +36,7 @@ it('gives a kind to every unresolved alternative with the word after addOtherNam
 });
 
 it('leaves an alternative that already has a kind alone', function () {
-    $recipe = Recipe::factory()->shaped()->create();
+    $recipe = Recipe::factory()->create();
     $alternative = $recipe->recipeTools->first()->alternatives->first();
     $before = $alternative->kitchen_tool_kind_id;
 

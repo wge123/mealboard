@@ -10,7 +10,7 @@ use Livewire\Livewire;
 
 function pendingRecipeNeeding(string $word, ?KitchenToolKind $kind = null, array $attributes = []): Recipe
 {
-    $recipe = Recipe::factory()->shaped()->create($attributes);
+    $recipe = Recipe::factory()->create($attributes);
     $recipe->recipeTools()->each(fn ($tool) => $tool->delete());
     $recipe->recipeTools()->create(['position' => 1, 'count' => 1])
         ->alternatives()->create(['position' => 1, 'word' => $word, 'kitchen_tool_kind_id' => $kind?->id]);
@@ -29,7 +29,7 @@ it('shows the missing tools on the approval card', function () {
 
 it('shows no flag when the household owns the tool', function () {
     KitchenToolKind::where('name', 'skillet')->update(['owned' => true]);
-    Recipe::factory()->shaped()->create();
+    Recipe::factory()->create();
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeApproval::class)

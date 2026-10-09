@@ -58,7 +58,6 @@ it('saves a manual recipe with ingredient pivot rows and redirects to it', funct
         ->and($recipe->tags)->toBe(['quick', 'leftovers'])
         ->and($recipe->ingredients)->toHaveCount(2)
         ->and($recipe->hasShape())->toBeTrue()
-        ->and($recipe->instructions)->toBeNull()
         ->and($recipe->cookingSteps->pluck('text')->all())->toBe(['Fry aromatics.', 'Add rice.'])
         ->and($recipe->recipeTools)->toHaveCount(1)
         ->and($recipe->recipeTools[0]->alternatives->pluck('word')->all())->toBe(['wok', 'large skillet']);

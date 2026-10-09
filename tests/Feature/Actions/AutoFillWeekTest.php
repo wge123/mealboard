@@ -274,7 +274,7 @@ it('produces an identical fill for the same seed', function () {
 
 it('never plans a recipe with a missing kitchen tool', function () {
     KitchenToolKind::where('name', 'skillet')->update(['owned' => false]);
-    $flagged = Recipe::factory()->approved()->shaped()->create(['meal_type' => MealType::Any]);
+    $flagged = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
     $fine = Recipe::factory()->unshaped()->approved()->create(['meal_type' => MealType::Any]);
 
     $created = autoFillAction()->handle(autoFillPlan());

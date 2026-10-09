@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 /** A shaped recipe whose tools are the given entries (each a list of words). */
 function shapedRecipeNeeding(array $entries): Recipe
 {
-    $recipe = Recipe::factory()->approved()->shaped()->create();
+    $recipe = Recipe::factory()->approved()->create();
     $recipe->recipeTools()->delete();
 
     foreach ($entries as $position => $words) {

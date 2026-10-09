@@ -16,13 +16,12 @@ it('creates a recipe with ingredient pivot rows', function () {
         'prep_minutes' => 10,
         'cook_minutes' => 20,
         'servings' => 2,
-        'instructions' => "1. Simmer sauce.\n2. Poach eggs.",
         'cuisine' => 'middle eastern',
         'tags' => ['vegetarian'],
     ], [
         ['name' => 'Eggs', 'qty' => '4', 'unit' => 'count', 'note' => ''],
         ['name' => 'crushed tomatoes', 'qty' => '400', 'unit' => 'g', 'note' => 'canned'],
-    ]);
+    ], [['alternatives' => ['skillet']]], ['Simmer sauce.', 'Poach eggs.']);
 
     expect($recipe->exists)->toBeTrue()
         ->and($recipe->source)->toBe(RecipeSource::Manual)

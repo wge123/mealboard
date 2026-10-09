@@ -31,7 +31,6 @@ class RecipeFactory extends Factory
             'prep_minutes' => fake()->numberBetween(5, 45),
             'cook_minutes' => fake()->numberBetween(0, 90),
             'servings' => fake()->numberBetween(1, 8),
-            'instructions' => '1. '.fake()->sentence()."\n2. ".fake()->sentence(),
             'cuisine' => fake()->optional()->randomElement(['italian', 'mexican', 'thai', 'french', 'japanese']),
             'tags' => fake()->randomElements(['quick', 'healthy', 'vegetarian', 'comfort', 'spicy'], 2),
             'image_url' => null,
@@ -51,19 +50,10 @@ class RecipeFactory extends Factory
     }
 
     /**
-     * Every recipe has the recipe shape unless a test asks for ->unshaped().
+     * Every recipe has the recipe shape unless a test asks for ->unshaped():
+     * one tool (skillet), one ingredient with a prep note, and two cooking steps.
      */
     public function configure(): static
-    {
-        return $this->shaped();
-    }
-
-    /**
-     * A recipe with the recipe shape: one tool (skillet), one ingredient with
-     * a prep note, and two cooking steps. The old method stays set. This is
-     * the default.
-     */
-    public function shaped(): static
     {
         return $this->afterCreating(function (Recipe $recipe) {
             if ($recipe->hasShape()) {
@@ -89,8 +79,8 @@ class RecipeFactory extends Factory
     }
 
     /**
-     * A recipe from before the shape: no tools, no ingredients, no steps,
-     * just the old free-text method. Runs after the default shape is added.
+     * A recipe with none of the shape: no tools, no ingredients, no steps.
+     * Runs after the default shape is added. For the migration and backfill tests.
      */
     public function unshaped(): static
     {

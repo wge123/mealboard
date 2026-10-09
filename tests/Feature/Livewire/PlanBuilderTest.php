@@ -252,7 +252,7 @@ it('clears a slot', function () {
 it('badges a recipe with a missing tool in the picker and still allows the pick', function () {
     KitchenToolKind::where('name', 'skillet')->update(['owned' => false]);
     $plan = MealPlan::factory()->create();
-    $recipe = Recipe::factory()->approved()->shaped()->create(['meal_type' => MealType::Dinner, 'title' => 'Stir fry']);
+    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Dinner, 'title' => 'Stir fry']);
     $monday = $plan->week_start_date->toDateString();
 
     planBuilder()

@@ -4,8 +4,10 @@ use App\Enums\MealType;
 use App\Enums\RecipeStatus;
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Schema;
 
 function unshapedRecipe(string $title, RecipeStatus $status = RecipeStatus::Approved, array $attributes = []): Recipe
 {
@@ -13,9 +15,10 @@ function unshapedRecipe(string $title, RecipeStatus $status = RecipeStatus::Appr
         'title' => $title,
         'status' => $status,
         'source_url' => 'https://example.com/'.str($title)->slug(),
-        'instructions' => "1. Chop the onion.\n2. Fry it.",
         ...$attributes,
     ]);
+
+    DB::table('recipes')->where('id', $recipe->id)->update(['instructions' => "1. Chop the onion.\n2. Fry it."]);
 
     $recipe->ingredients()->attach(
         Ingredient::factory()->create(['name' => 'onion '.$recipe->id])->id,
@@ -45,6 +48,9 @@ function shapedAnswer(array $overrides = []): array
 }
 
 beforeEach(function () {
+    // The drop migration has run on the test database; bring the old method
+    // column back, as it is before the household lands the migration.
+    (require database_path('migrations/2026_10_09_200000_drop_recipe_instructions.php'))->down();
     config()->set('mealboard.claude_bin', '/fake/bin/claude');
     Http::preventStrayRequests();
 });
@@ -120,7 +126,7 @@ it('retries once, then lists a recipe that fails twice by id and title and leave
         ->assertFailed();
 
     expect($bad->fresh()->hasShape())->toBeFalse()
-        ->and($bad->fresh()->instructions)->toBe($bad->instructions)
+        ->and(DB::table('recipes')->where('id', $bad->id)->value('instructions'))->toBe("1. Chop the onion.\n2. Fry it.")
         ->and($bad->fresh()->recipeTools)->toBeEmpty()
         ->and($good->fresh()->hasShape())->toBeTrue();
     // good: 1 call, bad: 2 calls.
@@ -137,4 +143,12 @@ it('skips shaped recipes on a rerun and makes no model call for them', function 
 
     $this->artisan('recipes:shape-existing')->assertSuccessful();
     Process::assertRanTimes(fn () => true, 1);
+});
+
+it('refuses to run once the old method column is dropped', function () {
+    Schema::dropColumns('recipes', ['instructions']);
+
+    $this->artisan('recipes:shape-existing')
+        ->expectsOutputToContain('already dropped')
+        ->assertFailed();
 });

@@ -39,13 +39,14 @@ function discoveredCandidate(string $title, array $overrides = []): array
         'prep_minutes' => 10,
         'cook_minutes' => 15,
         'servings' => 2,
-        'instructions' => "1. Cook.\n2. Serve.",
+        'tools' => [['alternatives' => ['skillet'], 'count' => 1]],
+        'steps' => ['Cook.', 'Serve.'],
         'cuisine' => null,
         'tags' => ['quick'],
         'source_url' => 'https://www.youtube.com/watch?v=vid00000001',
         'ingredients' => [
-            ['qty' => 2.0, 'unit' => 'cup', 'name' => 'spinach', 'note' => null],
-            ['qty' => 1.0, 'unit' => null, 'name' => 'lemon', 'note' => 'juiced'],
+            ['qty' => 2.0, 'unit' => 'cup', 'name' => 'spinach', 'prep_note' => null],
+            ['qty' => 1.0, 'unit' => null, 'name' => 'lemon', 'prep_note' => 'juiced'],
         ],
     ], $overrides);
 }
@@ -200,7 +201,6 @@ it('stores claude candidates with tools, prep notes and steps when the claude CL
     $tool = $recipe->recipeTools()->with('alternatives.kind')->first();
 
     expect($recipe->hasShape())->toBeTrue()
-        ->and($recipe->instructions)->toBeNull()
         ->and($tool->count)->toBe(2)
         ->and($tool->alternatives->pluck('word')->all())->toBe(['skillet', 'wok'])
         ->and($tool->alternatives[0]->kind->name)->toBe('skillet')

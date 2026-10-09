@@ -6,7 +6,7 @@ use App\Models\Recipe;
 use App\Models\User;
 
 it('shows Tools, Mise en place and Cooking in order for a shaped recipe', function () {
-    $recipe = Recipe::factory()->unshaped()->approved()->create(['instructions' => null]);
+    $recipe = Recipe::factory()->unshaped()->approved()->create();
     $tool = $recipe->recipeTools()->create(['position' => 1, 'count' => 2]);
     $tool->alternatives()->create(['position' => 1, 'word' => 'flat-top griddle']);
     $tool->alternatives()->create(['position' => 2, 'word' => 'large skillet']);
@@ -27,23 +27,11 @@ it('shows Tools, Mise en place and Cooking in order for a shaped recipe', functi
             'Tools', '2 ×', 'flat-top griddle or large skillet', 'tongs',
             'Mise en place', 'scallion', 'whites and greens apart', 'salt',
             'Cooking', 'Heat the griddle.', 'Sear everything.',
-        ])
-        ->assertDontSee('Instructions');
-});
-
-it('keeps showing the old method for a recipe without the shape', function () {
-    $recipe = Recipe::factory()->unshaped()->approved()->create(['instructions' => '1. Boil water.']);
-
-    $this->actingAs(User::factory()->create())
-        ->get("/recipes/{$recipe->id}")
-        ->assertOk()
-        ->assertSee('Instructions')
-        ->assertSee('Boil water.')
-        ->assertDontSee('Mise en place');
+        ]);
 });
 
 it('builds a shaped recipe from the factory state', function () {
-    $recipe = Recipe::factory()->shaped()->create();
+    $recipe = Recipe::factory()->create();
 
     expect($recipe->hasShape())->toBeTrue()
         ->and($recipe->recipeTools()->first()->alternatives->first()->kind->name)->toBe('skillet');
@@ -52,7 +40,7 @@ it('builds a shaped recipe from the factory state', function () {
 it('marks a missing tool in the Tools list and leaves owned ones unmarked', function () {
     KitchenToolKind::where('name', 'wok')->update(['owned' => false]);
     KitchenToolKind::where('name', 'skillet')->update(['owned' => true]);
-    $recipe = Recipe::factory()->approved()->shaped()->create();
+    $recipe = Recipe::factory()->approved()->create();
     $recipe->recipeTools()->create(['position' => 2, 'count' => 1])->alternatives()->create([
         'position' => 1,
         'word' => 'wok',

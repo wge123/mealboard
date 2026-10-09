@@ -4,6 +4,11 @@ use App\Actions\Recipes\UpdateRecipe;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 
+beforeEach(function () {
+    $this->tools = [['alternatives' => ['skillet']]];
+    $this->steps = ['Cook.'];
+});
+
 it('updates attributes and replaces ingredient rows', function () {
     $recipe = Recipe::factory()->create(['title' => 'Before']);
     $recipe->ingredients()->attach(
@@ -16,7 +21,7 @@ it('updates attributes and replaces ingredient rows', function () {
         'servings' => 6,
     ], [
         ['name' => 'Fresh Basil', 'qty' => '0.5', 'unit' => 'cup', 'note' => 'torn'],
-    ]);
+    ], $this->tools, $this->steps);
 
     expect($updated->title)->toBe('After')
         ->and($updated->servings)->toBe(6)
@@ -35,7 +40,7 @@ it('reuses an existing ingredient regardless of case', function () {
 
     app(UpdateRecipe::class)->handle($recipe, [], [
         ['name' => 'Garlic', 'qty' => '2', 'unit' => 'count', 'note' => 'minced'],
-    ]);
+    ], $this->tools, $this->steps);
 
     expect(Ingredient::where('name', 'garlic')->count())->toBe(1)
         ->and($recipe->fresh()->ingredients->first()->id)->toBe($existing->id);
@@ -46,7 +51,7 @@ it('stores empty qty, unit, and note as null', function () {
 
     app(UpdateRecipe::class)->handle($recipe, [], [
         ['name' => 'eggs', 'qty' => '', 'unit' => '', 'note' => ''],
-    ]);
+    ], $this->tools, $this->steps);
 
     $pivot = $recipe->fresh()->ingredients->first()->pivot;
 

@@ -83,26 +83,13 @@ it('refuses a shape with an empty part and saves nothing', function (array $tool
     'blank steps' => [[['alternatives' => ['wok']]], shapeIngredients(), [' ', '']],
 ]);
 
-it('still creates a recipe without the shape when none is supplied', function () {
-    $recipe = app(CreateRecipe::class)->handle(
-        shapeAttributes(['instructions' => '1. Cook.']),
-        shapeIngredients(),
-    );
-
-    expect($recipe->hasShape())->toBeFalse()
-        ->and($recipe->instructions)->toBe('1. Cook.');
-});
-
-it('replaces the shape on update and keeps it when none is supplied', function () {
+it('replaces the shape on update', function () {
     $recipe = app(CreateRecipe::class)->handle(
         shapeAttributes(),
         shapeIngredients(),
         [['alternatives' => ['wok']]],
         ['Old step.'],
     );
-
-    app(UpdateRecipe::class)->handle($recipe, ['title' => 'Renamed'], shapeIngredients());
-    expect($recipe->refresh()->cookingSteps->pluck('text')->all())->toBe(['Old step.']);
 
     app(UpdateRecipe::class)->handle(
         $recipe,
