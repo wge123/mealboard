@@ -28,6 +28,7 @@ it('shows the missing tools on the approval card', function () {
 });
 
 it('shows no flag when the household owns the tool', function () {
+    KitchenToolKind::where('name', 'skillet')->update(['owned' => true]);
     Recipe::factory()->shaped()->create();
 
     Livewire::actingAs(User::factory()->create())
@@ -51,6 +52,7 @@ it('clears the flag everywhere when named as an owned kind through an other name
     $older = pendingRecipeNeeding('braiser', null, ['created_at' => now()->subDay()]);
     $other = pendingRecipeNeeding('braiser');
     $skillet = app(KitchenToolInventory::class)->resolve('skillet');
+    app(KitchenToolInventory::class)->setOwned($skillet, true);
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeApproval::class)
