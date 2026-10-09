@@ -35,7 +35,7 @@ it('redirects guests to login', function () {
 });
 
 it('persists edits to fields and ingredient pivot rows', function () {
-    $recipe = Recipe::factory()->approved()->create(['title' => 'Old Title']);
+    $recipe = Recipe::factory()->approved()->shaped()->create(['title' => 'Old Title']);
     $recipe->ingredients()->attach(
         Ingredient::factory()->create(['name' => 'old ingredient'])->id,
         ['qty' => 1, 'unit' => 'cup', 'note' => null],
@@ -48,8 +48,8 @@ it('persists edits to fields and ingredient pivot rows', function () {
         ->set('cuisine', 'Mexican')
         ->set('tagsInput', 'quick, Spicy')
         ->set('rows', [
-            ['name' => 'Black Beans', 'qty' => '1.5', 'unit' => 'cup', 'note' => 'rinsed'],
-            ['name' => 'lime', 'qty' => '1', 'unit' => 'count', 'note' => ''],
+            ['name' => 'Black Beans', 'qty' => '1.5', 'unit' => 'cup', 'prep_note' => 'rinsed'],
+            ['name' => 'lime', 'qty' => '1', 'unit' => 'count', 'prep_note' => ''],
         ])
         ->call('save')
         ->assertHasNoErrors()
@@ -72,13 +72,13 @@ it('persists edits to fields and ingredient pivot rows', function () {
 });
 
 it('rejects a unit outside the normalized set', function () {
-    $recipe = Recipe::factory()->approved()->create();
+    $recipe = Recipe::factory()->approved()->shaped()->create();
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeDetail::class, ['recipe' => $recipe])
         ->call('startEditing')
         ->set('rows', [
-            ['name' => 'flour', 'qty' => '2', 'unit' => 'handful', 'note' => ''],
+            ['name' => 'flour', 'qty' => '2', 'unit' => 'handful', 'prep_note' => ''],
         ])
         ->call('save')
         ->assertHasErrors(['rows.0.unit']);
@@ -87,7 +87,7 @@ it('rejects a unit outside the normalized set', function () {
 });
 
 it('requires a title', function () {
-    $recipe = Recipe::factory()->approved()->create();
+    $recipe = Recipe::factory()->approved()->shaped()->create();
 
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeDetail::class, ['recipe' => $recipe])
@@ -121,3 +121,69 @@ it('can reject and archive a recipe', function (string $status) {
 
     expect($recipe->fresh()->status)->toBe(RecipeStatus::from($status));
 })->with(['rejected', 'archived']);
+
+it('edits tools, prep notes and steps of a shaped recipe', function () {
+    $recipe = Recipe::factory()->approved()->shaped()->create();
+
+    $form = Livewire::actingAs(User::factory()->create())
+        ->test(RecipeDetail::class, ['recipe' => $recipe])
+        ->call('startEditing')
+        ->assertSet('tools', [['alternatives' => 'skillet', 'count' => 1]])
+        ->assertCount('steps', 2);
+
+    $form->set('tools', [['alternatives' => 'flat-top griddle, large skillet', 'count' => 2], ['alternatives' => 'tongs', 'count' => 1]])
+        ->set('steps', ['Heat the griddle.', 'Sear.'])
+        ->set('rows', [['name' => 'scallion', 'qty' => '3', 'unit' => 'count', 'prep_note' => 'sliced thin']])
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $recipe = $recipe->fresh();
+    expect($recipe->recipeTools)->toHaveCount(2)
+        ->and($recipe->recipeTools[0]->count)->toBe(2)
+        ->and($recipe->recipeTools[0]->alternatives->pluck('word')->all())->toBe(['flat-top griddle', 'large skillet'])
+        ->and($recipe->cookingSteps->pluck('text')->all())->toBe(['Heat the griddle.', 'Sear.'])
+        ->and($recipe->ingredients->first()->pivot->note)->toBe('sliced thin');
+});
+
+it('refuses to save an edit with an empty group', function (string $emptied) {
+    $recipe = Recipe::factory()->approved()->shaped()->create();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeDetail::class, ['recipe' => $recipe])
+        ->call('startEditing')
+        ->set($emptied, [])
+        ->call('save')
+        ->assertHasErrors([$emptied]);
+})->with(['tools', 'rows', 'steps']);
+
+it('shows the old method read-only when editing an unshaped recipe, and saving with the shape works', function () {
+    $recipe = Recipe::factory()->approved()->create(['instructions' => '1. Boil the kettle.']);
+    $recipe->ingredients()->attach(Ingredient::factory()->create(['name' => 'tea'])->id, ['qty' => 1, 'unit' => 'count', 'note' => null]);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeDetail::class, ['recipe' => $recipe])
+        ->call('startEditing')
+        ->assertSee('Old method')
+        ->assertSee('Boil the kettle.')
+        ->assertSet('tools', [])
+        ->assertSet('steps', [])
+        ->call('save')
+        ->assertHasErrors(['tools', 'steps'])
+        ->set('tools', [['alternatives' => 'kettle', 'count' => 1]])
+        ->set('steps', ['Boil the kettle.', 'Steep the tea.'])
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $recipe = $recipe->fresh();
+    expect($recipe->hasShape())->toBeTrue()
+        ->and($recipe->cookingSteps)->toHaveCount(2);
+});
+
+it('does not show the old-method panel when editing a shaped recipe', function () {
+    $recipe = Recipe::factory()->approved()->shaped()->create();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeDetail::class, ['recipe' => $recipe])
+        ->call('startEditing')
+        ->assertDontSee('Old method');
+});
