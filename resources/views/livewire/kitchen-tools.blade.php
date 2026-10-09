@@ -16,6 +16,13 @@
                                @checked($kind->owned)
                                wire:click="toggleOwned(@js($kind->name))">
                     </label>
+                    @if ($kind->origin === \App\Models\KitchenToolKind::ORIGIN_HOUSEHOLD)
+                        <button type="button" class="btn btn-ghost btn-sm min-h-11 shrink-0 text-error"
+                            data-test="delete-kind-{{ $kind->id }}"
+                            wire:click="deleteKind({{ $kind->id }})"
+                            wire:confirm="Delete {{ \Illuminate\Support\Str::title($kind->name) }}?"
+                            aria-label="Delete {{ \Illuminate\Support\Str::title($kind->name) }}">Delete</button>
+                    @endif
                 </div>
 
                 {{-- Note: for people only, never used in matching --}}
@@ -30,4 +37,20 @@
             </li>
         @endforeach
     </ul>
+
+    @error('delete')
+        <p class="mt-2 text-sm text-error" role="alert">{{ $message }}</p>
+    @enderror
+
+    <form wire:submit="addKind" class="mt-5" data-test="add-kind-form">
+        <label for="new-kind" class="mb-1 block text-sm font-medium">Add a tool the app doesn't know</label>
+        <div class="flex gap-2">
+            <input id="new-kind" type="text" wire:model="newKind" placeholder="Tortilla press"
+                class="input input-bordered min-h-11 flex-1">
+            <button type="submit" class="btn btn-primary min-h-11">Add</button>
+        </div>
+        @error('newKind')
+            <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p>
+        @enderror
+    </form>
 </x-settings.layout>
