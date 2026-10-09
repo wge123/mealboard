@@ -8,7 +8,7 @@ use App\Models\User;
 use Livewire\Livewire;
 
 it('renders the detail page with meta, markdown instructions, and ingredient rows', function () {
-    $recipe = Recipe::factory()->approved()->create([
+    $recipe = Recipe::factory()->approved()->unshaped()->create([
         'title' => 'Miso Salmon Bowl',
         'instructions' => "## Steps\n\n1. Marinate the salmon.",
         'cuisine' => 'japanese',
@@ -157,7 +157,7 @@ it('refuses to save an edit with an empty group', function (string $emptied) {
 })->with(['tools', 'rows', 'steps']);
 
 it('shows the old method read-only when editing an unshaped recipe, and saving with the shape works', function () {
-    $recipe = Recipe::factory()->approved()->create(['instructions' => '1. Boil the kettle.']);
+    $recipe = Recipe::factory()->approved()->unshaped()->create(['instructions' => '1. Boil the kettle.']);
     $recipe->ingredients()->attach(Ingredient::factory()->create(['name' => 'tea'])->id, ['qty' => 1, 'unit' => 'count', 'note' => null]);
 
     Livewire::actingAs(User::factory()->create())
