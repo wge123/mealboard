@@ -1,4 +1,4 @@
-# Mealboard
+# Mise
 
 Plans a household's weekday meals, discovers new recipes, and turns a locked week into a shopping list that ends up in a Walmart cart.
 
@@ -44,7 +44,7 @@ _Avoid_: recipe format, template
 
 **Mise en place**:
 The part of a recipe that gets everything ready before the heat goes on: each ingredient with its amount and its prep note. Always present, because a recipe always has ingredients.
-_Avoid_: prep section, ingredients section
+_Avoid_: mise (the app's name), prep section, ingredients section
 
 **Prep note**:
 What to do to one ingredient before cooking starts ("chopped", "whites and greens apart", "into the spice bowl"). Optional; a task spanning several ingredients is written on each of them.
