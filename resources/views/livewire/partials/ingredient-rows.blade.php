@@ -23,9 +23,9 @@
                 @error('rows.'.$index.'.name') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
             </div>
             <div class="col-span-9 md:col-span-4">
-                <input type="text" class="input min-h-11 w-full @error('rows.'.$index.'.note') input-error @enderror"
-                       placeholder="Note (e.g. diced)" aria-label="Note" wire:model="rows.{{ $index }}.note">
-                @error('rows.'.$index.'.note') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
+                <input type="text" class="input min-h-11 w-full @error('rows.'.$index.'.prep_note') input-error @enderror"
+                       placeholder="Prep note (e.g. diced)" aria-label="Prep note" wire:model="rows.{{ $index }}.prep_note">
+                @error('rows.'.$index.'.prep_note') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
             </div>
             <div class="col-span-3 md:col-span-1">
                 <button type="button" class="btn btn-ghost min-h-11 w-full text-error" aria-label="Remove ingredient"

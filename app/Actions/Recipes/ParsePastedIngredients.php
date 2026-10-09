@@ -6,7 +6,7 @@ class ParsePastedIngredients
 {
     /**
      * Aliases (including plurals) mapped onto the normalized Unit value set.
-     * Public so the AI parse path (ParsePastedRecipeWithAi) normalizes with
+     * Public so the AI parse path (shaping pass candidate check) normalizes with
      * the same table.
      *
      * @var array<string, string>

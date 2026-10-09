@@ -153,10 +153,16 @@
         <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Edit recipe</h1>
 
         <form wire:submit="save" class="mt-4">
-            @include('livewire.partials.recipe-form-fields')
+            @include('livewire.partials.recipe-form-fields', ['legacyInstructions' => $recipe->hasShape() ? null : $recipe->instructions])
+
+            <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Kitchen tools</h2>
+            @include('livewire.partials.recipe-tool-rows')
 
             <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Ingredients</h2>
             @include('livewire.partials.ingredient-rows')
+
+            <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Cooking steps</h2>
+            @include('livewire.partials.cooking-step-rows')
 
             <div class="mt-6 flex gap-2">
                 <button type="submit" class="btn btn-primary min-h-11"

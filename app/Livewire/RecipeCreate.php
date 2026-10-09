@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use App\Actions\Recipes\CreateRecipe;
 use App\Actions\Recipes\ParsePastedIngredients;
-use App\Actions\Recipes\ParsePastedRecipeWithAi;
+use App\Discovery\ShapingPass;
 use App\Enums\MealType;
 use App\Enums\RecipeSource;
 use App\Livewire\Concerns\InteractsWithRecipeForm;
@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use RuntimeException;
 use Throwable;
 
 #[Layout('layouts.app')]
@@ -31,6 +32,8 @@ class RecipeCreate extends Component
     {
         $this->mealType = MealType::Any->value;
         $this->addRow();
+        $this->addTool();
+        $this->addStep();
     }
 
     public function parsePaste(): void
@@ -54,7 +57,19 @@ class RecipeCreate extends Component
         $this->parseError = '';
 
         try {
-            $parsed = app(ParsePastedRecipeWithAi::class)->handle($this->paste);
+            // The pasted text is the raw method; title and source URL are the form's, with
+            // placeholders (never written back) so the pass can still check the shape.
+            $check = app(ShapingPass::class)->handle([
+                'title' => trim($this->title) !== '' ? $this->title : 'Pasted recipe',
+                'source_url' => filter_var($this->sourceUrl, FILTER_VALIDATE_URL) ? $this->sourceUrl : 'https://example.com/pasted-recipe',
+                'method' => $this->paste,
+            ]);
+
+            if (! $check->passes()) {
+                throw new RuntimeException('the pasted text did not parse into tools, ingredients and steps ('.implode('; ', $check->errors).')');
+            }
+
+            $parsed = $check->candidate;
         } catch (Throwable $e) {
             // External boundary (local claude CLI): degrade visibly to the
             // heuristic parser — error shown, failure reported, never silent.
@@ -68,7 +83,8 @@ class RecipeCreate extends Component
         }
 
         $this->fillRows($parsed['ingredients']);
-        $this->instructions = $parsed['instructions'];
+        $this->fillTools($parsed['tools']);
+        $this->fillSteps($parsed['steps']);
         $this->parsedWith = 'ai';
         $this->paste = '';
     }
@@ -77,7 +93,7 @@ class RecipeCreate extends Component
      * Map parsed rows into form-row shape and append them, keeping any rows
      * already filled in (parsed rows replace blank ones only).
      *
-     * @param  array<int, array{qty: ?float, unit: ?string, name: string, note: ?string}>  $parsed
+     * @param  array<int, array{qty: ?float, unit: ?string, name: string, note?: ?string, prep_note?: ?string}>  $parsed
      */
     private function fillRows(array $parsed): void
     {
@@ -85,11 +101,32 @@ class RecipeCreate extends Component
             'name' => $row['name'],
             'qty' => $row['qty'] !== null ? (string) $row['qty'] : '',
             'unit' => $row['unit'] ?? '',
-            'note' => $row['note'] ?? '',
+            'prep_note' => $row['prep_note'] ?? $row['note'] ?? '',
         ], $parsed);
 
         $this->discardBlankRows();
         $this->rows = array_merge($this->rows, $rows);
+    }
+
+    /**
+     * @param  array<int, array{alternatives: array<int, string>, count: int}>  $parsed
+     */
+    private function fillTools(array $parsed): void
+    {
+        $this->discardBlankRows();
+        $this->tools = array_merge($this->tools, array_map(fn (array $tool) => [
+            'alternatives' => implode(', ', $tool['alternatives']),
+            'count' => $tool['count'],
+        ], $parsed));
+    }
+
+    /**
+     * @param  array<int, string>  $parsed
+     */
+    private function fillSteps(array $parsed): void
+    {
+        $this->discardBlankRows();
+        $this->steps = array_merge($this->steps, $parsed);
     }
 
     public function save(): void
@@ -100,6 +137,8 @@ class RecipeCreate extends Component
         $recipe = app(CreateRecipe::class)->handle(
             [...$this->recipeAttributes(), 'source' => RecipeSource::Manual],
             $this->rows,
+            $this->toolsPayload(),
+            $this->stepsPayload(),
         );
 
         $this->redirect(route('recipes.show', $recipe));

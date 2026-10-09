@@ -37,14 +37,18 @@ class RecipeDetail extends Component
         $this->prepMinutes = $this->recipe->prep_minutes;
         $this->cookMinutes = $this->recipe->cook_minutes;
         $this->servings = $this->recipe->servings;
-        $this->instructions = $this->recipe->instructions ?? '';
         $this->tagsInput = implode(', ', $this->recipe->tags ?? []);
         $this->rows = $this->recipe->ingredients->map(fn ($ingredient) => [
             'name' => $ingredient->name,
             'qty' => $ingredient->pivot->qty !== null ? (string) (float) $ingredient->pivot->qty : '',
             'unit' => $ingredient->pivot->unit ?? '',
-            'note' => $ingredient->pivot->note ?? '',
+            'prep_note' => $ingredient->pivot->note ?? '',
         ])->values()->all();
+        $this->tools = $this->recipe->recipeTools()->with('alternatives')->get()->map(fn ($tool) => [
+            'alternatives' => $tool->alternatives->pluck('word')->implode(', '),
+            'count' => $tool->count,
+        ])->values()->all();
+        $this->steps = $this->recipe->cookingSteps->pluck('text')->all();
 
         $this->resetErrorBag();
         $this->editing = true;
@@ -64,6 +68,8 @@ class RecipeDetail extends Component
             $this->recipe,
             $this->recipeAttributes(),
             $this->rows,
+            $this->toolsPayload(),
+            $this->stepsPayload(),
         );
 
         $this->editing = false;
