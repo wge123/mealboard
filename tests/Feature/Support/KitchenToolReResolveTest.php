@@ -4,6 +4,7 @@ use App\Exceptions\KitchenToolRefused;
 use App\Models\Recipe;
 use App\Models\RecipeToolAlternative;
 use App\Support\KitchenToolInventory;
+use Illuminate\Support\Facades\DB;
 
 function recipeWithUnknownWord(string $word): RecipeToolAlternative
 {
@@ -63,4 +64,22 @@ it('deletes a kind once nothing references it', function () {
     $inventory->deleteKind($kind);
 
     expect($inventory->resolve('tortilla press'))->toBeNull();
+});
+
+it('re-resolves with a fixed number of word lookups however many alternatives wait', function () {
+    $alternatives = collect(range(1, 8))->map(fn (int $i) => recipeWithUnknownWord($i % 2 ? 'tortilla press' : "mystery {$i}"));
+    $inventory = new KitchenToolInventory;
+
+    $lookups = 0;
+    DB::listen(function ($query) use (&$lookups) {
+        if (str_starts_with($query->sql, 'select') && (str_contains($query->sql, 'kitchen_tool_kinds') || str_contains($query->sql, 'kitchen_tool_other_names'))) {
+            $lookups++;
+        }
+    });
+
+    $kind = $inventory->addKind('tortilla press');
+
+    // addKind's own duplicate check resolves the word once; re-resolving adds one lookup per table.
+    expect($lookups)->toBeLessThanOrEqual(4)
+        ->and($alternatives->filter(fn ($a) => $a->fresh()->kitchen_tool_kind_id === $kind->id))->toHaveCount(4);
 });
