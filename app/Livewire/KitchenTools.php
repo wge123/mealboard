@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\KitchenToolOrigin;
 use App\Exceptions\KitchenToolRefused;
 use App\Models\KitchenToolKind;
 use App\Models\KitchenToolOtherName;
@@ -35,16 +36,16 @@ class KitchenTools extends Component
     {
         $kind = KitchenToolKind::query()->findOrFail($kindId);
 
-        $inventory->setOwned($kind->name, ! $kind->owned);
+        $inventory->setOwned($kind, ! $kind->owned);
     }
 
     public function saveNote(KitchenToolInventory $inventory, int $kindId): void
     {
         $kind = KitchenToolKind::query()->findOrFail($kindId);
 
-        $inventory->setNote($kind->name, $this->notes[$kindId] ?? null);
+        $inventory->setNote($kind, $this->notes[$kindId] ?? null);
 
-        $this->notes[$kindId] = $kind->fresh()->note ?? '';
+        $this->notes[$kindId] = $kind->note ?? '';
     }
 
     public string $newKind = '';
@@ -54,7 +55,7 @@ class KitchenTools extends Component
         try {
             $kind = $inventory->addKind($this->newKind);
         } catch (KitchenToolRefused $e) {
-            $this->addError('newKind', $e->getMessage());
+            $this->addError('addKind', $e->getMessage());
 
             return;
         }
@@ -69,7 +70,7 @@ class KitchenTools extends Component
             $inventory->deleteKind(KitchenToolKind::query()->findOrFail($kindId));
             unset($this->notes[$kindId]);
         } catch (KitchenToolRefused $e) {
-            $this->addError('delete', $e->getMessage());
+            $this->addError('deleteKind', $e->getMessage());
         }
     }
 
@@ -86,7 +87,7 @@ class KitchenTools extends Component
     {
         // Owned kinds first, then the rest, each group alphabetical.
         $kinds = KitchenToolKind::query()
-            ->with(['otherNames' => fn ($q) => $q->where('origin', KitchenToolKind::ORIGIN_HOUSEHOLD)->orderBy('name')])
+            ->with(['otherNames' => fn ($q) => $q->where('origin', KitchenToolOrigin::Household)->orderBy('name')])
             ->orderByDesc('owned')
             ->orderBy('name')
             ->get();

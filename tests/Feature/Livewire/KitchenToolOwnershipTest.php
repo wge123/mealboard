@@ -18,7 +18,7 @@ it('toggles a kind owned and moves it into the owned group', function () {
         ->call('toggleOwned', kindId('wok'))
         ->assertSeeInOrder(['Pots', 'Wok', 'Air Fryer']);
 
-    expect((new KitchenToolInventory)->owns('wok'))->toBeTrue();
+    expect((new KitchenToolInventory)->owns(KitchenToolKind::where('name', 'wok')->firstOrFail()))->toBeTrue();
 });
 
 it('toggles an owned kind back to not owned', function () {
@@ -26,7 +26,7 @@ it('toggles an owned kind back to not owned', function () {
         ->test(KitchenTools::class)
         ->call('toggleOwned', kindId('oven'));
 
-    expect((new KitchenToolInventory)->owns('oven'))->toBeFalse();
+    expect((new KitchenToolInventory)->owns(KitchenToolKind::where('name', 'oven')->firstOrFail()))->toBeFalse();
 });
 
 it('saves a note on a kind and shows it', function () {
@@ -44,7 +44,7 @@ it('saves a note on a kind and shows it', function () {
 });
 
 it('prefills the note field from the stored note', function () {
-    (new KitchenToolInventory)->setNote('skillet', 'cast iron');
+    (new KitchenToolInventory)->setNote(KitchenToolKind::where('name', 'skillet')->firstOrFail(), 'cast iron');
 
     Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)

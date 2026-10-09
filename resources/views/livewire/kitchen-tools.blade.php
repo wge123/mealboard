@@ -6,28 +6,28 @@
         @foreach ($kinds as $kind)
             <li class="px-4 py-3" wire:key="kind-{{ $kind->id }}">
                 <div class="flex items-center gap-3">
-                    <span class="min-w-0 flex-1 truncate font-medium {{ $kind->owned ? '' : 'opacity-50' }}">{{ \Illuminate\Support\Str::title($kind->name) }}</span>
+                    <span class="min-w-0 flex-1 truncate font-medium {{ $kind->owned ? '' : 'opacity-50' }}">{{ $kind->display_name }}</span>
 
                     {{-- Owned toggle: one tap, 44 px target --}}
                     <label class="flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-end gap-2">
                         <span class="text-xs opacity-60">{{ $kind->owned ? 'Owned' : 'Not owned' }}</span>
                         <input type="checkbox" class="toggle toggle-success"
-                               aria-label="Owned: {{ \Illuminate\Support\Str::title($kind->name) }}"
+                               aria-label="Owned: {{ $kind->display_name }}"
                                @checked($kind->owned)
                                wire:click="toggleOwned({{ $kind->id }})">
                     </label>
-                    @if ($kind->origin === \App\Models\KitchenToolKind::ORIGIN_HOUSEHOLD)
+                    @if ($kind->origin === \App\Enums\KitchenToolOrigin::Household)
                         <button type="button" class="btn btn-ghost btn-sm min-h-11 shrink-0 text-error"
                             data-test="delete-kind-{{ $kind->id }}"
                             wire:click="deleteKind({{ $kind->id }})"
-                            wire:confirm="Delete {{ \Illuminate\Support\Str::title($kind->name) }}?"
-                            aria-label="Delete {{ \Illuminate\Support\Str::title($kind->name) }}">Delete</button>
+                            wire:confirm="Delete {{ $kind->display_name }}?"
+                            aria-label="Delete {{ $kind->display_name }}">Delete</button>
                     @endif
                 </div>
 
                 {{-- Other names the household added; catalog ones work but are not shown --}}
                 @if ($kind->otherNames->isNotEmpty())
-                    <ul class="mt-1 flex flex-wrap gap-2" aria-label="Other names for {{ \Illuminate\Support\Str::title($kind->name) }}">
+                    <ul class="mt-1 flex flex-wrap gap-2" aria-label="Other names for {{ $kind->display_name }}">
                         @foreach ($kind->otherNames as $otherName)
                             <li class="badge badge-outline h-auto gap-1 py-1" wire:key="other-name-{{ $otherName->id }}">
                                 <span>{{ $otherName->name }}</span>
@@ -45,7 +45,7 @@
                     <input type="text" maxlength="255"
                            class="input input-sm min-h-11 min-w-0 flex-1"
                            placeholder="Add a note, e.g. 12-inch, cast iron"
-                           aria-label="Note for {{ \Illuminate\Support\Str::title($kind->name) }}"
+                           aria-label="Note for {{ $kind->display_name }}"
                            wire:model="notes.{{ $kind->id }}">
                     <button type="submit" class="btn btn-ghost btn-sm min-h-11 min-w-11">Save</button>
                 </form>
@@ -57,18 +57,18 @@
         <p class="mt-2 text-sm text-error" role="alert">{{ $message }}</p>
     @enderror
 
-    @error('delete')
+    @error('deleteKind')
         <p class="mt-2 text-sm text-error" role="alert">{{ $message }}</p>
     @enderror
 
     <form wire:submit="addKind" class="mt-5" data-test="add-kind-form">
-        <label for="new-kind" class="mb-1 block text-sm font-medium">Add a tool the app doesn't know</label>
+        <label for="new-kind" class="mb-1 block text-sm font-medium">Add a kitchen tool the app doesn't know</label>
         <div class="flex gap-2">
             <input id="new-kind" type="text" wire:model="newKind" placeholder="Tortilla press"
                 class="input input-bordered min-h-11 flex-1">
             <button type="submit" class="btn btn-primary min-h-11">Add</button>
         </div>
-        @error('newKind')
+        @error('addKind')
             <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p>
         @enderror
     </form>

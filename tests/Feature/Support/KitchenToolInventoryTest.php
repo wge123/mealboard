@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\KitchenToolOrigin;
 use App\Exceptions\KitchenToolRefused;
 use App\Models\KitchenToolKind;
 use App\Models\KitchenToolOtherName;
@@ -9,7 +10,7 @@ it('starts owning the basics', function () {
     $inventory = new KitchenToolInventory;
 
     foreach (['oven', 'stovetop', "chef's knife", 'cutting board', 'pots', 'mixing bowls'] as $basic) {
-        expect($inventory->owns($basic))->toBeTrue("expected {$basic} to be owned");
+        expect($inventory->owns(KitchenToolKind::where('name', $basic)->firstOrFail()))->toBeTrue("expected {$basic} to be owned");
     }
 });
 
@@ -23,11 +24,7 @@ it('knows the named catalog kinds', function () {
 });
 
 it('does not own catalog kinds outside the basics', function () {
-    expect((new KitchenToolInventory)->owns('wok'))->toBeFalse();
-});
-
-it('does not own a kind it does not know', function () {
-    expect((new KitchenToolInventory)->owns('tortilla press'))->toBeFalse();
+    expect((new KitchenToolInventory)->owns(KitchenToolKind::where('name', 'wok')->firstOrFail()))->toBeFalse();
 });
 
 it('resolves a word by kind name and by catalog other name', function () {
@@ -63,8 +60,8 @@ it('adds a household kind that is owned and listed', function () {
     $kind = $inventory->addKind('  Tortilla Press ');
 
     expect($kind->name)->toBe('tortilla press')
-        ->and($kind->origin)->toBe(KitchenToolKind::ORIGIN_HOUSEHOLD)
-        ->and($inventory->owns('tortilla press'))->toBeTrue()
+        ->and($kind->origin)->toBe(KitchenToolOrigin::Household)
+        ->and($inventory->owns(KitchenToolKind::where('name', 'tortilla press')->firstOrFail()))->toBeTrue()
         ->and($inventory->kinds())->toContain('tortilla press')
         ->and($inventory->resolve('Tortilla Press')->is($kind))->toBeTrue();
 });
@@ -90,7 +87,7 @@ it('deletes a household kind together with its other names', function () {
     KitchenToolOtherName::create([
         'kitchen_tool_kind_id' => $kind->id,
         'name' => 'masa press',
-        'origin' => KitchenToolKind::ORIGIN_HOUSEHOLD,
+        'origin' => KitchenToolOrigin::Household,
     ]);
 
     $inventory->deleteKind($kind);

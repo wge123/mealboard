@@ -45,9 +45,7 @@ return new class extends Migration
         'microwave' => ['microwave oven'],
         'waffle iron' => ['waffle maker'],
         // Cookware
-        'skillet' => ['frying pan', 'fry pan'],
-        'cast iron skillet' => ['cast-iron pan'],
-        'nonstick pan' => ['non-stick pan'],
+        'skillet' => ['frying pan', 'fry pan', 'cast iron skillet', 'cast-iron pan', 'nonstick pan', 'non-stick pan'],
         'dutch oven' => ['casserole pot', 'cocotte'],
         'wok' => [],
         'flat-top griddle' => ['griddle', 'flat top', 'plancha'],

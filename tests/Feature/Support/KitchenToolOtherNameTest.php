@@ -1,7 +1,7 @@
 <?php
 
+use App\Enums\KitchenToolOrigin;
 use App\Exceptions\KitchenToolRefused;
-use App\Models\KitchenToolKind;
 use App\Models\KitchenToolOtherName;
 use App\Support\KitchenToolInventory;
 
@@ -12,7 +12,7 @@ it('resolves a household other name once added', function () {
     $otherName = $inventory->addOtherName($skillet, '  Big Pan ');
 
     expect($otherName->name)->toBe('big pan')
-        ->and($otherName->origin)->toBe(KitchenToolKind::ORIGIN_HOUSEHOLD)
+        ->and($otherName->origin)->toBe(KitchenToolOrigin::Household)
         ->and($inventory->resolve('Big Pan')->name)->toBe('skillet');
 });
 

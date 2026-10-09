@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\KitchenToolOrigin;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class KitchenToolKind extends Model
 {
-    public const ORIGIN_CATALOG = 'catalog';
-
-    public const ORIGIN_HOUSEHOLD = 'household';
-
     protected $fillable = ['name', 'origin', 'owned', 'note'];
 
     /**
@@ -20,7 +19,18 @@ class KitchenToolKind extends Model
     {
         return [
             'owned' => 'boolean',
+            'origin' => KitchenToolOrigin::class,
         ];
+    }
+
+    /**
+     * The name as shown to the household (the stored name is lowercase).
+     *
+     * @return Attribute<string, never>
+     */
+    protected function displayName(): Attribute
+    {
+        return Attribute::get(fn (): string => Str::title($this->name));
     }
 
     /**

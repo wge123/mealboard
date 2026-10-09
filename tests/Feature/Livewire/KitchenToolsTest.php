@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\KitchenToolOrigin;
 use App\Livewire\KitchenTools;
 use App\Models\KitchenToolKind;
 use App\Models\User;
@@ -34,7 +35,7 @@ it('adds a kind the app does not know, owned straight away', function () {
         ->assertSet('newKind', '')
         ->assertSee('Tortilla Press');
 
-    expect((new KitchenToolInventory)->owns('tortilla press'))->toBeTrue();
+    expect((new KitchenToolInventory)->owns(KitchenToolKind::where('name', 'tortilla press')->firstOrFail()))->toBeTrue();
 });
 
 it('shows a validation error when the new kind already exists', function (string $word) {
@@ -42,7 +43,7 @@ it('shows a validation error when the new kind already exists', function (string
         ->test(KitchenTools::class)
         ->set('newKind', $word)
         ->call('addKind')
-        ->assertHasErrors('newKind');
+        ->assertHasErrors('addKind');
 })->with(['skillet', 'Frying Pan']);
 
 it('shows a delete control on household kinds only', function () {
@@ -73,7 +74,7 @@ it('refuses to delete a catalog kind with a validation error', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)
         ->call('deleteKind', $catalog->id)
-        ->assertHasErrors('delete');
+        ->assertHasErrors('deleteKind');
 
     expect(KitchenToolKind::query()->where('name', 'wok')->exists())->toBeTrue();
 });
@@ -92,7 +93,7 @@ it('saves a note on a kind added in the same session', function () {
 });
 
 it('drops the note entry of a deleted kind', function () {
-    $kind = KitchenToolKind::create(['name' => 'zester', 'origin' => KitchenToolKind::ORIGIN_HOUSEHOLD, 'owned' => true, 'note' => 'fine']);
+    $kind = KitchenToolKind::create(['name' => 'zester', 'origin' => KitchenToolOrigin::Household, 'owned' => true, 'note' => 'fine']);
 
     Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)

@@ -1,61 +1,44 @@
 <?php
 
-use App\Exceptions\KitchenToolRefused;
 use App\Models\KitchenToolKind;
 use App\Support\KitchenToolInventory;
 
 it('marks a kind owned and not owned', function () {
     $inventory = new KitchenToolInventory;
 
-    $inventory->setOwned('wok', true);
-    expect($inventory->owns('wok'))->toBeTrue();
+    $inventory->setOwned(KitchenToolKind::where('name', 'wok')->firstOrFail(), true);
+    expect($inventory->owns(KitchenToolKind::where('name', 'wok')->firstOrFail()))->toBeTrue();
 
-    $inventory->setOwned('wok', false);
-    expect($inventory->owns('wok'))->toBeFalse();
+    $inventory->setOwned(KitchenToolKind::where('name', 'wok')->firstOrFail(), false);
+    expect($inventory->owns(KitchenToolKind::where('name', 'wok')->firstOrFail()))->toBeFalse();
 });
-
-it('matches the kind name trimmed and lowercased when setting owned', function () {
-    $inventory = new KitchenToolInventory;
-
-    $inventory->setOwned('  Wok ', true);
-
-    expect($inventory->owns('wok'))->toBeTrue();
-});
-
-it('rejects an unknown kind when setting owned', function () {
-    (new KitchenToolInventory)->setOwned('tortilla press', true);
-})->throws(KitchenToolRefused::class);
 
 it('saves, edits and clears a note', function () {
     $inventory = new KitchenToolInventory;
 
-    $inventory->setNote('skillet', '12-inch, cast iron');
+    $inventory->setNote(KitchenToolKind::where('name', 'skillet')->firstOrFail(), '12-inch, cast iron');
     expect(KitchenToolKind::where('name', 'skillet')->value('note'))->toBe('12-inch, cast iron');
 
-    $inventory->setNote('skillet', '  10-inch  ');
+    $inventory->setNote(KitchenToolKind::where('name', 'skillet')->firstOrFail(), '  10-inch  ');
     expect(KitchenToolKind::where('name', 'skillet')->value('note'))->toBe('10-inch');
 
-    $inventory->setNote('skillet', null);
+    $inventory->setNote(KitchenToolKind::where('name', 'skillet')->firstOrFail(), null);
     expect(KitchenToolKind::where('name', 'skillet')->value('note'))->toBeNull();
 });
 
 it('stores an empty or blank note as no note', function () {
     $inventory = new KitchenToolInventory;
-    $inventory->setNote('skillet', 'cast iron');
+    $inventory->setNote(KitchenToolKind::where('name', 'skillet')->firstOrFail(), 'cast iron');
 
-    $inventory->setNote('skillet', '   ');
+    $inventory->setNote(KitchenToolKind::where('name', 'skillet')->firstOrFail(), '   ');
 
     expect(KitchenToolKind::where('name', 'skillet')->value('note'))->toBeNull();
 });
 
-it('rejects an unknown kind when setting a note', function () {
-    (new KitchenToolInventory)->setNote('tortilla press', 'x');
-})->throws(KitchenToolRefused::class);
-
 it('does not let a note affect owning', function () {
     $inventory = new KitchenToolInventory;
 
-    $inventory->setNote('wok', 'owned');
+    $inventory->setNote(KitchenToolKind::where('name', 'wok')->firstOrFail(), 'owned');
 
-    expect($inventory->owns('wok'))->toBeFalse();
+    expect($inventory->owns(KitchenToolKind::where('name', 'wok')->firstOrFail()))->toBeFalse();
 });
