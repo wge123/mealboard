@@ -53,9 +53,13 @@
         @error('tagsInput') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
     </div>
 
-    <div class="col-span-12">
-        <label class="mb-1 block text-sm font-medium" for="instructions">Instructions (markdown)</label>
-        <textarea id="instructions" rows="8" class="textarea w-full @error('instructions') textarea-error @enderror" wire:model="instructions"></textarea>
-        @error('instructions') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
-    </div>
+    @if (isset($legacyInstructions) && filled($legacyInstructions))
+        <div class="col-span-12 rounded-2xl border border-base-300 bg-base-200 p-4" data-legacy-method>
+            <h2 class="font-[family-name:var(--font-display)] text-lg font-semibold">Old method (for reference)</h2>
+            <p class="mt-1 text-sm opacity-60">This recipe has no tools or steps yet. Type them below; this text is not saved again.</p>
+            <div class="prose-mb mt-2">
+                {!! \Illuminate\Support\Str::markdown($legacyInstructions, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
+            </div>
+        </div>
+    @endif
 </div>
