@@ -12,6 +12,7 @@ use App\Enums\RecipeStatus;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
 use App\Models\Recipe;
+use App\Support\HouseholdPreferences;
 use App\Support\MissingKitchenTools;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\View\View;
@@ -175,6 +176,8 @@ class PlanBuilder extends Component
                 && $this->weekHasEnded($plan),
             'pickerRecipes' => $pickerRecipes,
             'missingTools' => app(MissingKitchenTools::class)->forMany($pickerRecipes),
+            // Marked, not hidden: the household may still pick one for guests.
+            'avoidedIngredients' => app(HouseholdPreferences::class)->avoidedInRecipes($pickerRecipes),
         ]);
     }
 

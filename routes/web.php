@@ -5,7 +5,9 @@ use App\Livewire\ChannelSettings;
 use App\Livewire\DailyCatchUp;
 use App\Livewire\Insights;
 use App\Livewire\KitchenTools;
+use App\Livewire\PantryStaples;
 use App\Livewire\PlanBuilder;
+use App\Livewire\Preferences;
 use App\Livewire\RecipeApproval;
 use App\Livewire\RecipeCreate;
 use App\Livewire\RecipeDetail;
@@ -29,6 +31,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/approve', RecipeApproval::class)->name('recipes.approve');
     Route::get('/insights', Insights::class)->name('insights');
     Route::get('/settings/kitchen-tools', KitchenTools::class)->name('settings.kitchen-tools');
+    Route::get('/settings/preferences', Preferences::class)->name('settings.preferences');
+    Route::get('/settings/pantry-staples', PantryStaples::class)->name('settings.pantry-staples');
     Route::get('/settings/channels', ChannelSettings::class)->name('settings.channels');
 });
 

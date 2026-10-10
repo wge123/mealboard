@@ -7,6 +7,8 @@
 @php
     $sections = [
         'Kitchen tools' => 'settings.kitchen-tools',
+        'Preferences' => 'settings.preferences',
+        'Pantry staples' => 'settings.pantry-staples',
         'Channels' => 'settings.channels',
     ];
 @endphp

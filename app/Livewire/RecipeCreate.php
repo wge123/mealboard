@@ -9,6 +9,7 @@ use App\Discovery\ShapingPass;
 use App\Enums\MealType;
 use App\Enums\RecipeSource;
 use App\Livewire\Concerns\InteractsWithRecipeForm;
+use App\Support\HouseholdPreferences;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -27,9 +28,11 @@ class RecipeCreate extends Component
 
     public string $parseError = '';
 
-    public function mount(): void
+    public function mount(HouseholdPreferences $preferences): void
     {
         $this->mealType = MealType::Any->value;
+        // A new recipe starts at the household size; editing keeps the recipe's own servings.
+        $this->servings = $preferences->householdSize();
         $this->addRow();
         $this->addTool();
         $this->addStep();

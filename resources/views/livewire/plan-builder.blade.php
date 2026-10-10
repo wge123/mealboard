@@ -178,6 +178,9 @@
                                         <span class="font-medium">{{ $recipe->title }}</span>
                                         <span class="flex shrink-0 flex-wrap items-center justify-end gap-1">
                                             @include('livewire.partials.missing-tools-badge', ['missing' => $missingTools[$recipe->id]])
+                                            @foreach ($avoidedIngredients[$recipe->id] as $word)
+                                                <span class="badge badge-error badge-soft badge-sm" data-avoided-badge>contains: {{ $word }}</span>
+                                            @endforeach
                                             @if ($minutes > 0)
                                                 <span class="badge badge-ghost badge-sm">{{ $minutes }} min</span>
                                             @endif

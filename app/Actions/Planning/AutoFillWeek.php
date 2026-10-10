@@ -10,6 +10,7 @@ use App\Models\MealLog;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
 use App\Models\Recipe;
+use App\Support\HouseholdPreferences;
 use App\Support\MissingKitchenTools;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -50,6 +51,7 @@ class AutoFillWeek
         private Randomizer $randomizer = new Randomizer,
         private ComputeTasteProfile $tasteProfile = new ComputeTasteProfile,
         private MissingKitchenTools $missingTools = new MissingKitchenTools,
+        private HouseholdPreferences $preferences = new HouseholdPreferences,
     ) {}
 
     /**
@@ -71,9 +73,13 @@ class AutoFillWeek
             ->orderBy('id')
             ->get();
 
-        // A recipe with a kitchen tool the household lacks is never auto-planned.
+        // A recipe with a kitchen tool the household lacks, or with an
+        // ingredient it avoids, is never auto-planned.
         $flagged = $this->missingTools->flaggedIds($candidates)->flip();
-        $candidates = $candidates->reject(fn (Recipe $recipe) => $flagged->has($recipe->id))->values();
+        $avoided = $this->preferences->avoidedInRecipes($candidates);
+        $candidates = $candidates
+            ->reject(fn (Recipe $recipe) => $flagged->has($recipe->id) || $avoided[$recipe->id] !== [])
+            ->values();
 
         $profile = $this->tasteProfile->handle();
 
