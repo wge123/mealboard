@@ -34,7 +34,7 @@ class YouTubeDriver implements RecipeDiscoveryDriver
         // broken video is never retried run after run.
         //
         // Request-sourced videos are excluded too: they were scored against a
-        // household request, not against the weeknight rubric, so their scores
+        // household request, not against the weekday limits, so their scores
         // are not comparable with these and RunRequest owns their extraction.
         $survivors = DiscoveredVideo::query()
             ->where('classification', VideoClassification::LikelyRecipe)

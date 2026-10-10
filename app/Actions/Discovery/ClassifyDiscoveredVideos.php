@@ -98,6 +98,9 @@ class ClassifyDiscoveredVideos
         );
 
         $limits = $this->preferences->weekdayLimits();
+        $size = $this->preferences->householdSize();
+        $avoidedPrompt = $this->preferences->avoidedPromptLine();
+        $avoidedLine = $avoidedPrompt !== '' ? "\n            - {$avoidedPrompt}" : '';
 
         if ($request !== null) {
             $criteria = <<<CRITERIA
@@ -105,17 +108,16 @@ class ClassifyDiscoveredVideos
             "{$request->query}"
 
             Score 0-100 purely on how well the video delivers THAT request. The household's usual weekday limits ({$limits['minutes']} minutes, {$limits['ingredients']} ingredients) DO NOT apply here: they asked for this dish by name, so a long cook or a long ingredient list is not a mark against it. A video that is a fine recipe but not what was asked for scores low.
+            - Unless the request says otherwise, the recipe serves about {$size}.{$avoidedLine}
             CRITERIA;
         } else {
-            $staples = $this->preferences->staples();
-            $staplesLine = $staples->isNotEmpty()
-                ? " Pantry staples the household keeps in stock do not count: {$staples->implode(', ')}."
-                : '';
+            $staplesLine = $this->preferences->staplesPromptLine();
 
             $criteria = <<<CRITERIA
             Score 0-100 how well it fits the household's criteria (healthy + easy):
             - Total time (prep + cook) {$limits['minutes']} minutes or less.
-            - {$limits['ingredients']} ingredients or fewer.{$staplesLine}
+            - {$limits['ingredients']} ingredients or fewer. {$staplesLine}
+            - The recipe serves about {$size}.{$avoidedLine}
             - Whole-food-leaning: minimally processed ingredients over packaged or ultra-processed ones.
             CRITERIA;
         }

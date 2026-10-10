@@ -37,18 +37,26 @@ class Preferences extends Component
     public function saveLimits(HouseholdPreferences $preferences): void
     {
         $this->validate([
-            'weekdayMinutes' => 'required|integer|min:1',
-            'weekdayIngredients' => 'required|integer|min:1',
+            'weekdayMinutes' => 'required|integer',
+            'weekdayIngredients' => 'required|integer',
         ]);
 
-        $preferences->setWeekdayLimits((int) $this->weekdayMinutes, (int) $this->weekdayIngredients);
+        try {
+            $preferences->setWeekdayLimits((int) $this->weekdayMinutes, (int) $this->weekdayIngredients);
+        } catch (HouseholdPreferenceRefused $e) {
+            $this->addError('weekdayLimits', $e->getMessage());
+        }
     }
 
     public function saveHouseholdSize(HouseholdPreferences $preferences): void
     {
-        $this->validate(['householdSize' => 'required|integer|min:1']);
+        $this->validate(['householdSize' => 'required|integer']);
 
-        $preferences->setHouseholdSize((int) $this->householdSize);
+        try {
+            $preferences->setHouseholdSize((int) $this->householdSize);
+        } catch (HouseholdPreferenceRefused $e) {
+            $this->addError('householdSize', $e->getMessage());
+        }
     }
 
     public function avoid(HouseholdPreferences $preferences): void

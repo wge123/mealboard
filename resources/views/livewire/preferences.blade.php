@@ -29,6 +29,7 @@
                 </button>
             </div>
         </form>
+        @error('weekdayLimits') <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p> @enderror
     </section>
 
     <section class="mt-4 rounded-2xl border border-base-300 bg-base-100 p-4">

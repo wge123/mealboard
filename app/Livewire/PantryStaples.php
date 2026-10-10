@@ -47,17 +47,17 @@ class PantryStaples extends Component
 
     public function render(): View
     {
-        // Staples first, then the rest, each group alphabetical.
-        $ingredients = Ingredient::query()
+        $matching = fn () => Ingredient::query()
             ->when(trim($this->search) !== '', fn ($query) => $query->where('name', 'like', '%'.trim($this->search).'%'))
-            ->orderByDesc('is_pantry_staple')
-            ->orderBy('name')
-            ->limit(self::LIMIT)
-            ->get();
+            ->orderBy('name');
+
+        // Every staple is listed; only the other ingredients are capped.
+        $staples = $matching()->where('is_pantry_staple', true)->get();
+        $others = $matching()->where('is_pantry_staple', false)->limit(self::LIMIT)->get();
 
         return view('livewire.pantry-staples', [
-            'ingredients' => $ingredients,
-            'truncated' => $ingredients->count() === self::LIMIT,
+            'ingredients' => $staples->concat($others),
+            'truncated' => $others->count() === self::LIMIT,
         ]);
     }
 }

@@ -72,7 +72,7 @@ class AnthropicDriver implements RecipeDiscoveryDriver
     {
         $tasteProfile = $this->tasteProfile();
         // On a request, the "over 30 minutes" theme is dropped: it is an
-        // artifact of the weeknight rubric, and leaving it in would tell the
+        // artifact of the weekday limits, and leaving it in would tell the
         // model to avoid long recipes two lines after telling it there is no
         // time limit. Cuisine, tag and ingredient themes still apply, because
         // those are real dislikes rather than a scheduling constraint.
@@ -82,10 +82,8 @@ class AnthropicDriver implements RecipeDiscoveryDriver
         $rejectionSection = $rejections !== '' ? $rejections : '(none yet)';
 
         $size = $this->preferences->householdSize();
-        $avoided = $this->preferences->avoidedIngredients();
-        $avoidedLine = $avoided->isNotEmpty()
-            ? "- Never use these ingredients (a household rule, no exceptions): {$avoided->implode(', ')}.\n"
-            : '';
+        $avoidedPrompt = $this->preferences->avoidedPromptLine();
+        $avoidedLine = $avoidedPrompt !== '' ? "- {$avoidedPrompt}\n" : '';
 
         if ($request !== null) {
             $brief = <<<BRIEF
@@ -101,10 +99,7 @@ class AnthropicDriver implements RecipeDiscoveryDriver
             BRIEF;
         } else {
             $limits = $this->preferences->weekdayLimits();
-            $staples = $this->preferences->staples();
-            $staplesLine = $staples->isNotEmpty()
-                ? "Pantry staples the household keeps in stock, which do not count toward the ingredient limit: {$staples->implode(', ')}."
-                : 'The household has marked no pantry staples yet, so every ingredient counts toward the limit.';
+            $staplesLine = $this->preferences->staplesPromptLine();
 
             $brief = <<<BRIEF
             Suggest candidates the household has plausibly never tried.
@@ -227,7 +222,7 @@ class AnthropicDriver implements RecipeDiscoveryDriver
         }
 
         if ($profile['avoidedIngredients'] !== []) {
-            $lines[] = 'Avoid these ingredients: '.implode(', ', $profile['avoidedIngredients']);
+            $lines[] = 'Ingredients the household has tended to reject: '.implode(', ', $profile['avoidedIngredients']);
         }
 
         foreach ($profile['slotPatterns'] as $slot => $rate) {

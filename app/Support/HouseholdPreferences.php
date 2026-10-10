@@ -128,6 +128,31 @@ class HouseholdPreferences
     }
 
     /**
+     * The prompt sentence naming the pantry staples, which do not count toward
+     * the ingredient limit; says so when there are none yet.
+     */
+    public function staplesPromptLine(): string
+    {
+        $staples = $this->staples();
+
+        return $staples->isNotEmpty()
+            ? "Pantry staples the household keeps in stock, which do not count toward the ingredient limit: {$staples->implode(', ')}."
+            : 'The household has marked no pantry staples yet, so every ingredient counts toward the limit.';
+    }
+
+    /**
+     * The prompt sentence for the avoided ingredients; empty when none.
+     */
+    public function avoidedPromptLine(): string
+    {
+        $avoided = $this->avoidedIngredients();
+
+        return $avoided->isNotEmpty()
+            ? "Never use these ingredients (a household rule, no exceptions): {$avoided->implode(', ')}."
+            : '';
+    }
+
+    /**
      * Why a shaped candidate is refused on this lane; empty when it passes.
      * Avoided ingredients refuse on both lanes. The weekday limits refuse on
      * the scheduled lane only: a total time of 0 is unknown and passes, and
@@ -159,7 +184,11 @@ class HouseholdPreferences
         }
 
         $staples = $this->staples()->flip();
-        $counted = count(array_filter($names, fn (string $name) => ! $staples->has($this->normalize($name))));
+        $counted = collect($names)
+            ->map(fn (string $name) => $this->normalize($name))
+            ->reject(fn (string $name) => $staples->has($name))
+            ->unique()
+            ->count();
 
         if ($counted > $limits['ingredients']) {
             $reasons[] = "{$counted} ingredients beyond the pantry staples is over the weekday limit of {$limits['ingredients']}";

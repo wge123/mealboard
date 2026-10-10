@@ -2,7 +2,7 @@
     <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Request a recipe</h1>
     <p class="mt-1 mb-5 text-sm opacity-60">
         Ask for a specific dish and Mealboard searches YouTube and asks Claude for it. Requests ignore the
-        30-minute and 10-ingredient limits that shape the daily suggestions.
+        weekday limits that shape the daily suggestions.
     </p>
 
     <form wire:submit="submit" class="mb-6">
