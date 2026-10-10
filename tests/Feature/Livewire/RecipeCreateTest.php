@@ -5,6 +5,7 @@ use App\Enums\RecipeStatus;
 use App\Livewire\RecipeCreate;
 use App\Models\Recipe;
 use App\Models\User;
+use App\Support\HouseholdPreferences;
 use Illuminate\Support\Facades\Process;
 use Livewire\Livewire;
 
@@ -235,4 +236,12 @@ it('treats a blank tool or step as an empty group', function () {
         ->set('steps', [''])
         ->call('save')
         ->assertHasErrors(['tools', 'steps']);
+});
+
+it('starts servings at the household size on the create form', function () {
+    app(HouseholdPreferences::class)->setHouseholdSize(4);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->assertSet('servings', 4);
 });

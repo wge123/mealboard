@@ -4,12 +4,14 @@ use App\Enums\MealPlanStatus;
 use App\Enums\MealSlot;
 use App\Enums\MealType;
 use App\Livewire\PlanBuilder;
+use App\Models\Ingredient;
 use App\Models\KitchenToolKind;
 use App\Models\MealLog;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
 use App\Models\Recipe;
 use App\Models\User;
+use App\Support\HouseholdPreferences;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
@@ -264,4 +266,22 @@ it('badges a recipe with a missing tool in the picker and still allows the pick'
         ->call('choose', $recipe->id);
 
     expect(PlannedMeal::where('recipe_id', $recipe->id)->exists())->toBeTrue();
+});
+
+it('marks a recipe containing an avoided ingredient in the picker and still allows the pick', function () {
+    app(HouseholdPreferences::class)->avoid('cilantro');
+    $plan = MealPlan::factory()->create();
+    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Dinner, 'title' => 'Herby tacos']);
+    $recipe->ingredients()->attach(Ingredient::factory()->create(['name' => 'fresh cilantro'])->id, ['qty' => 1, 'unit' => null, 'note' => null]);
+    $plain = Recipe::factory()->approved()->create(['meal_type' => MealType::Dinner, 'title' => 'Plain rice']);
+    $monday = $plan->week_start_date->toDateString();
+
+    planBuilder()
+        ->call('openPicker', $monday, 'dinner')
+        ->assertSee('contains: cilantro')
+        ->assertSeeHtml('data-avoided-badge')
+        ->call('choose', $recipe->id);
+
+    expect(PlannedMeal::where('recipe_id', $recipe->id)->exists())->toBeTrue()
+        ->and(PlannedMeal::where('recipe_id', $plain->id)->exists())->toBeFalse();
 });

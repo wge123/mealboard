@@ -3,11 +3,13 @@
 use App\Actions\Planning\AutoFillWeek;
 use App\Enums\MealSlot;
 use App\Enums\MealType;
+use App\Models\Ingredient;
 use App\Models\KitchenToolKind;
 use App\Models\MealLog;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
 use App\Models\Recipe;
+use App\Support\HouseholdPreferences;
 use Random\Engine\Mt19937;
 use Random\Randomizer;
 
@@ -288,4 +290,17 @@ it('never plans a recipe with a missing kitchen tool', function () {
     expect($created)->not->toBeEmpty()
         ->and($created->pluck('recipe_id')->unique()->all())->toBe([$fine->id])
         ->and($created->pluck('recipe_id'))->not->toContain($flagged->id);
+});
+
+it('never plans a recipe containing an avoided ingredient', function () {
+    app(HouseholdPreferences::class)->avoid('cilantro');
+
+    $herby = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+    $herby->ingredients()->attach(Ingredient::factory()->create(['name' => 'fresh cilantro'])->id, ['qty' => 1, 'unit' => null, 'note' => null]);
+    $safe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+
+    $created = autoFillAction()->handle(autoFillPlan());
+
+    expect($created)->toHaveCount(15)
+        ->and($created->pluck('recipe_id')->unique()->all())->toBe([$safe->id]);
 });

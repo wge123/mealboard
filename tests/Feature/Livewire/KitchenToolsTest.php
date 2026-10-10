@@ -123,7 +123,7 @@ it('renders the settings section menu on the kitchen tools page', function () {
         ->assertOk()
         ->assertSee('aria-label="Settings sections"', false)
         ->assertSee('aria-current="page"', false)
-        ->assertSeeInOrder(['Kitchen tools', 'Channels']);
+        ->assertSeeInOrder(['Kitchen tools', 'Preferences', 'Pantry staples', 'Channels']);
 });
 
 it('keeps item variants out of the catalog kinds and resolves them to their kind', function (string $variant) {
