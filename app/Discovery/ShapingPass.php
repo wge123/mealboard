@@ -7,8 +7,7 @@ use App\Support\KitchenToolInventory;
 /**
  * Turns one recipe's raw text into the recipe shape (tools, ingredients with
  * prep notes, steps). One model call through the claude CLI, then the shared
- * candidate check; withRetry sends a failed check's errors back to the model
- * once.
+ * candidate check.
  *
  * Raw input keys:
  *   title (required), source_url (required),
@@ -24,33 +23,16 @@ class ShapingPass
         private ClaudeCli $claude,
         private CandidateValidator $validator,
         private KitchenToolInventory $tools,
-        private RetryOnce $retry,
     ) {}
 
     /**
-     * One model call, no retry (scheduled discovery).
+     * One model call, no retry.
      *
      * @param  array<string, mixed>  $raw
      */
     public function once(array $raw): CandidateCheck
     {
         return $this->check($raw, $this->claude->run($this->prompt($raw)));
-    }
-
-    /**
-     * One model call, and when the check fails one more with the model's own
-     * output and the errors (the backfill).
-     *
-     * @param  array<string, mixed>  $raw
-     */
-    public function withRetry(array $raw): CandidateCheck
-    {
-        $checked = $this->retry->run(
-            $this->prompt($raw),
-            fn (string $output) => $this->check($raw, $output)->errors,
-        );
-
-        return $this->check($raw, $checked->output);
     }
 
     /**

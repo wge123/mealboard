@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Schema;
  * The free-text method goes: every recipe now has the recipe shape (tools,
  * ingredients, cooking steps). Dropping the column loses the old text, so
  * refuse while any recipe still lacks part of the shape and name those
- * recipes; run `php artisan recipes:shape-existing` and fix the listed
- * failures in the edit form first.
+ * recipes so they can be fixed in the edit form first.
  */
 return new class extends Migration
 {
@@ -27,7 +26,7 @@ return new class extends Migration
         if ($unshaped->isNotEmpty()) {
             $list = $unshaped->map(fn (object $recipe) => "#{$recipe->id} {$recipe->title}")->implode('; ');
 
-            throw new RuntimeException("Cannot drop the old recipe method: {$unshaped->count()} recipe(s) lack a tool, an ingredient or a cooking step: {$list}. Run recipes:shape-existing and fix the failures in the edit form, then migrate again.");
+            throw new RuntimeException("Cannot drop the old recipe method: {$unshaped->count()} recipe(s) lack a tool, an ingredient or a cooking step: {$list}. Fix them in the edit form, then migrate again.");
         }
 
         Schema::table('recipes', function (Blueprint $table) {
