@@ -5,7 +5,9 @@ namespace App\Console\Commands;
 use App\Actions\Discovery\RunDiscovery;
 use App\Actions\Discovery\StoreCandidate;
 use App\Discovery\NearDuplicateFilter;
+use App\Enums\DiscoveryLane;
 use App\Models\DiscoveryRun;
+use App\Support\HouseholdPreferences;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -15,7 +17,7 @@ class DiscoverRecipes extends Command
 
     protected $description = 'Run all discovery drivers and store new candidates as pending recipes';
 
-    public function handle(RunDiscovery $runDiscovery, StoreCandidate $store, NearDuplicateFilter $duplicates): int
+    public function handle(RunDiscovery $runDiscovery, StoreCandidate $store, NearDuplicateFilter $duplicates, HouseholdPreferences $preferences): int
     {
         // Idempotent per day — the scheduler fires daily (DECISIONS.md #1)
         // and a manual rerun should not double the day's candidates.
@@ -38,10 +40,23 @@ class DiscoverRecipes extends Command
 
         $created = 0;
         $skipped = 0;
+        $refused = 0;
 
         foreach ($result['candidates'] as $candidate) {
             if ($duplicates->isDuplicate($candidate['title'], $knownTitles)) {
                 $skipped++;
+
+                continue;
+            }
+
+            // The household's own check, after the prompts asked nicely: a
+            // candidate over a weekday limit or with an avoided ingredient is
+            // dropped whichever driver found it.
+            $refusals = $preferences->refusals($candidate, DiscoveryLane::Scheduled);
+
+            if ($refusals !== []) {
+                Log::info("recipes:discover refused candidate \"{$candidate['title']}\": ".implode('; ', $refusals));
+                $refused++;
 
                 continue;
             }
@@ -53,6 +68,7 @@ class DiscoverRecipes extends Command
         }
 
         $this->info("Created {$created} pending recipe(s), skipped {$skipped} duplicate(s).");
+        $this->info("Refused {$refused} candidate(s) by the household preferences.");
 
         // A driver that threw is a real failure even when the surviving drivers
         // produced candidates, and the exit code is the only thing the

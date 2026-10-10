@@ -4,10 +4,13 @@ namespace App\Actions\Discovery;
 
 use App\Discovery\AnthropicDriver;
 use App\Discovery\NearDuplicateFilter;
+use App\Enums\DiscoveryLane;
 use App\Enums\RequestStatus;
 use App\Enums\VideoClassification;
 use App\Models\DiscoveredVideo;
 use App\Models\RecipeRequest;
+use App\Support\HouseholdPreferences;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
@@ -28,6 +31,7 @@ class RunRequest
         private AnthropicDriver $anthropic,
         private NearDuplicateFilter $duplicates,
         private StoreCandidate $storeCandidate,
+        private HouseholdPreferences $preferences,
     ) {}
 
     /**
@@ -126,6 +130,16 @@ class RunRequest
 
         foreach ($candidates as $candidate) {
             if ($this->duplicates->isDuplicate($candidate['title'], $knownTitles)) {
+                continue;
+            }
+
+            // A requested dish is not bound by the weekday limits, but an
+            // avoided ingredient is avoided on every lane.
+            $refusals = $this->preferences->refusals($candidate, DiscoveryLane::Request);
+
+            if ($refusals !== []) {
+                Log::info("recipes:request refused candidate \"{$candidate['title']}\": ".implode('; ', $refusals));
+
                 continue;
             }
 

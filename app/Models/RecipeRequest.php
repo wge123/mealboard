@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * One household ask for a specific dish ("hibachi for 4 on a flat-top
  * griddle"). Unlike scheduled discovery, a request is exempt from the
- * weeknight caps (30 minutes total, 10 ingredients): the household asked for
- * this dish by name, so the dish decides its own shape.
+ * household's weekday limits: the household asked for this dish by name, so
+ * the dish decides its own shape. Its avoided ingredients still bind.
  */
 class RecipeRequest extends Model
 {

@@ -8,6 +8,7 @@ use App\Enums\VideoClassification;
 use App\Models\DiscoveredVideo;
 use App\Models\Recipe;
 use App\Models\RecipeRequest;
+use App\Support\HouseholdPreferences;
 use Illuminate\Support\Collection;
 use RuntimeException;
 
@@ -23,15 +24,16 @@ class ClassifyDiscoveredVideos
 
     public function __construct(
         private ClaudeCli $claude,
+        private HouseholdPreferences $preferences,
     ) {}
 
     /**
      * Classify one batch of unclassified videos.
      *
      * The two lanes are scored on DIFFERENT rubrics and must never be mixed.
-     * Scheduled discovery judges a video against the household's weeknight
-     * criteria (fast, few ingredients); a request judges it against what the
-     * household actually asked for. Scoring request videos on the weeknight
+     * Scheduled discovery judges a video against the household's weekday
+     * limits (fast, few ingredients); a request judges it against what the
+     * household actually asked for. Scoring request videos on the weekday
      * rubric is not a cosmetic mismatch: YouTubeDriver and RunRequest both take
      * survivors orderByDesc('score'), so a correctly found hibachi video would
      * be marked down for being a 45-minute cook and lose to whatever generic
@@ -95,19 +97,28 @@ class ClassifyDiscoveredVideos
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
         );
 
-        $criteria = $request !== null
-            ? <<<CRITERIA
+        $limits = $this->preferences->weekdayLimits();
+
+        if ($request !== null) {
+            $criteria = <<<CRITERIA
             The household has asked for this specifically:
             "{$request->query}"
 
-            Score 0-100 purely on how well the video delivers THAT request. The household's usual weeknight limits (30 minutes, 10 ingredients) DO NOT apply here: they asked for this dish by name, so a long cook or a long ingredient list is not a mark against it. A video that is a fine recipe but not what was asked for scores low.
-            CRITERIA
-            : <<<'CRITERIA'
+            Score 0-100 purely on how well the video delivers THAT request. The household's usual weekday limits ({$limits['minutes']} minutes, {$limits['ingredients']} ingredients) DO NOT apply here: they asked for this dish by name, so a long cook or a long ingredient list is not a mark against it. A video that is a fine recipe but not what was asked for scores low.
+            CRITERIA;
+        } else {
+            $staples = $this->preferences->staples();
+            $staplesLine = $staples->isNotEmpty()
+                ? " Pantry staples the household keeps in stock do not count: {$staples->implode(', ')}."
+                : '';
+
+            $criteria = <<<CRITERIA
             Score 0-100 how well it fits the household's criteria (healthy + easy):
-            - Total time (prep + cook) 30 minutes or less.
-            - 10 ingredients or fewer.
+            - Total time (prep + cook) {$limits['minutes']} minutes or less.
+            - {$limits['ingredients']} ingredients or fewer.{$staplesLine}
             - Whole-food-leaning: minimally processed ingredients over packaged or ultra-processed ones.
             CRITERIA;
+        }
 
         return <<<PROMPT
         You are the pre-filter for a household meal planner's YouTube discovery pipeline. For each video below, judge from its title and description whether it likely contains a cookable recipe, then score it.

@@ -8,6 +8,7 @@ use App\Models\BrainNote;
 use App\Models\KitchenToolKind;
 use App\Models\Recipe;
 use App\Models\RecipeRequest;
+use App\Support\HouseholdPreferences;
 use App\Support\KitchenToolInventory;
 use Closure;
 use Illuminate\Http\Client\ConnectionException;
@@ -39,6 +40,7 @@ class AnthropicDriver implements RecipeDiscoveryDriver
         private ComputeTasteProfile $profile,
         private KitchenToolInventory $tools,
         private RetryOnce $retry,
+        private HouseholdPreferences $preferences,
     ) {}
 
     public function discover(int $n): array
@@ -50,8 +52,8 @@ class AnthropicDriver implements RecipeDiscoveryDriver
 
     /**
      * Same driver, aimed at one household request instead of at open-ended
-     * discovery. The weeknight caps are dropped: the household named the dish,
-     * and a hibachi spread for four does not fit in 10 ingredients.
+     * discovery. The weekday limits are dropped: the household named the dish,
+     * and a hibachi spread for four does not fit in a weekday's ingredients.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -79,25 +81,41 @@ class AnthropicDriver implements RecipeDiscoveryDriver
         $tasteProfileSection = $tasteProfile !== '' ? $tasteProfile : '(none yet)';
         $rejectionSection = $rejections !== '' ? $rejections : '(none yet)';
 
-        $brief = $request !== null
-            ? <<<BRIEF
+        $size = $this->preferences->householdSize();
+        $avoided = $this->preferences->avoidedIngredients();
+        $avoidedLine = $avoided->isNotEmpty()
+            ? "- Never use these ingredients (a household rule, no exceptions): {$avoided->implode(', ')}.\n"
+            : '';
+
+        if ($request !== null) {
+            $brief = <<<BRIEF
             The household has asked for this specifically:
             "{$request->query}"
 
             Every candidate must be a genuine answer to that request. Prefer the authentic version of what was asked for over a lighter or faster reinterpretation of it.
 
             Constraints for EVERY candidate:
-            - There is NO time limit and NO ingredient limit. The household's usual weeknight caps do not apply to a requested dish; give the recipe the time and the ingredients it actually takes.
-            - Whole-food-leaning where the dish allows it, without compromising what makes the dish itself.
-            BRIEF
-            : <<<'BRIEF'
+            - There is NO time limit and NO ingredient limit. The household's usual weekday limits do not apply to a requested dish; give the recipe the time and the ingredients it actually takes.
+            - Unless the request says otherwise, the recipe serves about {$size}.
+            {$avoidedLine}- Whole-food-leaning where the dish allows it, without compromising what makes the dish itself.
+            BRIEF;
+        } else {
+            $limits = $this->preferences->weekdayLimits();
+            $staples = $this->preferences->staples();
+            $staplesLine = $staples->isNotEmpty()
+                ? "Pantry staples the household keeps in stock, which do not count toward the ingredient limit: {$staples->implode(', ')}."
+                : 'The household has marked no pantry staples yet, so every ingredient counts toward the limit.';
+
+            $brief = <<<BRIEF
             Suggest candidates the household has plausibly never tried.
 
             Hard constraints for EVERY candidate (healthy + easy):
-            - Total time (prep_minutes + cook_minutes) must be 30 minutes or less.
-            - 10 ingredients or fewer.
-            - Whole-food-leaning: minimally processed ingredients over packaged or ultra-processed ones.
+            - Total time (prep_minutes + cook_minutes) must be {$limits['minutes']} minutes or less.
+            - {$limits['ingredients']} ingredients or fewer. {$staplesLine}
+            - The recipe serves about {$size}.
+            {$avoidedLine}- Whole-food-leaning: minimally processed ingredients over packaged or ultra-processed ones.
             BRIEF;
+        }
 
         // The request lanes ignore which tools the household owns: no owned
         // list and no "prefer" line, only the words the model may use.
