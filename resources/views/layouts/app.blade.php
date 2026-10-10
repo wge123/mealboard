@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? config('app.name', 'Mealboard') }}</title>
+    <title>{{ $title ?? config('app.name', 'Mise') }}</title>
     <script>
         // Apply persisted theme before first paint (system = no attribute).
         (() => {
@@ -35,7 +35,7 @@
     {{-- Desktop top navbar (lg+ only; phones get the bottom tab bar). --}}
     <header class="hidden border-b border-base-300 bg-base-100 lg:block">
         <nav class="mx-auto flex w-full max-w-6xl items-center gap-1 px-6 py-3">
-            <a href="{{ url('/') }}" class="mr-6 font-[family-name:var(--font-display)] text-2xl font-semibold text-primary">Mealboard</a>
+            <a href="{{ url('/') }}" class="mr-6 font-[family-name:var(--font-display)] text-2xl font-semibold text-primary">Mise</a>
             @auth
                 <div class="flex items-center gap-1">
                     <a href="{{ route('plan.builder') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('plan.builder') ? 'text-primary' : '' }}">Plan</a>
