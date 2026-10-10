@@ -1,4 +1,4 @@
-<div class="mx-auto w-full max-w-2xl">
+<x-settings.layout>
     <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">YouTube channels</h1>
     <p class="mt-1 mb-5 text-sm opacity-60">Active channels are polled daily for new recipe videos.</p>
 
@@ -60,4 +60,4 @@
             @endforeach
         </ul>
     @endif
-</div>
+</x-settings.layout>

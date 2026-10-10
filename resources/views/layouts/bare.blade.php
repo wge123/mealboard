@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>@yield('title', config('app.name', 'Mealboard'))</title>
+    <title>@yield('title', config('app.name', 'Mise'))</title>
     <script>
         // Apply persisted theme before first paint (system = no attribute).
         (() => {

@@ -1,11 +1,11 @@
 @extends('layouts.bare')
 
-@section('title', 'Log in — Mealboard')
+@section('title', 'Log in — Mise')
 
 @section('content')
     <div class="w-full max-w-sm">
         <h1 class="mb-6 text-center font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-primary">
-            Mealboard
+            Mise
         </h1>
 
         <div class="rounded-2xl border border-base-300 bg-base-100 p-6">

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? config('app.name', 'Mealboard') }}</title>
+    <title>{{ $title ?? config('app.name', 'Mise') }}</title>
     <script>
         // Apply persisted theme before first paint (system = no attribute).
         (() => {
@@ -35,7 +35,7 @@
     {{-- Desktop top navbar (lg+ only; phones get the bottom tab bar). --}}
     <header class="hidden border-b border-base-300 bg-base-100 lg:block">
         <nav class="mx-auto flex w-full max-w-6xl items-center gap-1 px-6 py-3">
-            <a href="{{ url('/') }}" class="mr-6 font-[family-name:var(--font-display)] text-2xl font-semibold text-primary">Mealboard</a>
+            <a href="{{ url('/') }}" class="mr-6 font-[family-name:var(--font-display)] text-2xl font-semibold text-primary">Mise</a>
             @auth
                 <div class="flex items-center gap-1">
                     <a href="{{ route('plan.builder') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('plan.builder') ? 'text-primary' : '' }}">Plan</a>
@@ -49,7 +49,7 @@
                     </a>
                     <a href="{{ route('log.catch-up') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('log.*') ? 'text-primary' : '' }}">Log</a>
                     <a href="{{ route('insights') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('insights') ? 'text-primary' : '' }}">Insights</a>
-                    <a href="{{ route('settings.channels') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('settings.*') ? 'text-primary' : '' }}">Channels</a>
+                    <a href="{{ route('settings.kitchen-tools') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('settings.*') ? 'text-primary' : '' }}">Settings</a>
                 </div>
             @endauth
             <div class="ms-auto flex items-center gap-2">
@@ -168,11 +168,11 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('settings.channels') }}" class="min-h-11 {{ request()->routeIs('settings.*') ? 'text-primary' : '' }}">
+                                <a href="{{ route('settings.kitchen-tools') }}" class="min-h-11 {{ request()->routeIs('settings.*') ? 'text-primary' : '' }}">
                                     <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125Z" />
                                     </svg>
-                                    Channels
+                                    Settings
                                 </a>
                             </li>
                         </ul>

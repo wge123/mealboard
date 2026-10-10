@@ -12,6 +12,10 @@ _Avoid_: user, account, family
 A kind of equipment a recipe can require, from oven and stovetop to chef's knife and flat-top griddle. Named by kind ("skillet"), never by a specific item; owning any tool of that kind is enough.
 _Avoid_: equipment, utensil, gadget, appliance, tool (alone)
 
+**Other name**:
+Another word for a kitchen tool's kind ("frying pan" for skillet), so a recipe that uses it still finds the tool. The app knows some; the household adds its own when a recipe flags a tool it already owns.
+_Avoid_: alias, synonym, nickname
+
 **Tool inventory**:
 The kitchen tools the household owns, each owned or not, with no count. Starts with the common basics already in it; the household removes what its kitchen lacks and adds kinds the app does not know yet.
 _Avoid_: kitchen, equipment list
