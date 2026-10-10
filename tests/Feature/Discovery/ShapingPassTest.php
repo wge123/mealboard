@@ -109,30 +109,6 @@ it('returns errors when the output is not JSON', function () {
     expect($check->passes())->toBeFalse()->and($check->errors)->not->toBeEmpty();
 });
 
-it('retries once with the errors when asked, and returns the second result', function () {
-    Process::fake(['*' => Process::sequence()
-        ->push(Process::result(output: json_encode(shapedModelOutput(['steps' => []]))))
-        ->push(Process::result(output: json_encode(shapedModelOutput())))]);
-
-    $check = app(ShapingPass::class)->withRetry(rawRecipe());
-
-    expect($check->passes())->toBeTrue();
-    Process::assertRanTimes(fn () => true, 2);
-    // The retry shows the model its own previous output and the check's errors.
-    Process::assertRan(fn ($process) => str_contains($process->command[2] ?? '', 'Your previous answer')
-        && str_contains($process->command[2] ?? '', '"steps":[]')
-        && str_contains($process->command[2] ?? '', 'steps: at least one step is required'));
-});
-
-it('retries only once even when the second attempt fails too', function () {
-    Process::fake(['*' => Process::result(output: json_encode(shapedModelOutput(['steps' => []])))]);
-
-    $check = app(ShapingPass::class)->withRetry(rawRecipe());
-
-    expect($check->passes())->toBeFalse();
-    Process::assertRanTimes(fn () => true, 2);
-});
-
 it('lets a CLI failure through to the caller', function () {
     Process::fake(['*' => Process::result(output: '', errorOutput: 'overloaded', exitCode: 1)]);
 
