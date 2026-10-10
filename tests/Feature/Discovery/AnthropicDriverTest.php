@@ -8,6 +8,7 @@ use App\Models\KitchenToolKind;
 use App\Models\MealLog;
 use App\Models\PlannedMeal;
 use App\Models\Recipe;
+use App\Support\HouseholdPreferences;
 use App\Support\KitchenToolInventory;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
@@ -322,4 +323,28 @@ it('drops a candidate that fails the check and does not call the model again', f
         ->and($candidates[0]['title'])->toBe('Lemon Garlic Salmon Bowls');
 
     Process::assertRanTimes(fn () => true, 1);
+});
+
+it('puts the household limits, staples, avoided ingredients and size in the daily prompt', function () {
+    $preferences = app(HouseholdPreferences::class);
+    $preferences->setWeekdayLimits(45, 12);
+    $preferences->setHouseholdSize(4);
+    $preferences->avoid('cilantro');
+    $preferences->setStaple('soy sauce', true);
+
+    Process::fake(['*' => Process::result(output: json_encode([validClaudeCandidate()]))]);
+
+    app(AnthropicDriver::class)->discover(1);
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2];
+
+        return str_contains($prompt, 'must be 45 minutes or less')
+            && str_contains($prompt, '12 ingredients or fewer')
+            && str_contains($prompt, 'do not count toward the ingredient limit: soy sauce')
+            && str_contains($prompt, 'serves about 4')
+            && str_contains($prompt, 'Never use these ingredients (a household rule, no exceptions): cilantro')
+            && ! str_contains($prompt, '30 minutes or less')
+            && ! str_contains($prompt, '10 ingredients or fewer');
+    });
 });

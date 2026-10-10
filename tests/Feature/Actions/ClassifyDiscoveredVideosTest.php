@@ -4,6 +4,7 @@ use App\Actions\Discovery\ClassifyDiscoveredVideos;
 use App\Enums\VideoClassification;
 use App\Models\DiscoveredVideo;
 use App\Models\Recipe;
+use App\Support\HouseholdPreferences;
 use Illuminate\Support\Facades\Process;
 
 beforeEach(function () {
@@ -144,5 +145,27 @@ it('includes youtube approve/reject history in the classifier prompt', function 
             && ! str_contains($prompt, 'Manual Pasta')
             && ! str_contains($prompt, 'Pending YouTube Soup')
             && ! str_contains($prompt, "Classification history from past runs:\n(none yet)");
+    });
+});
+
+it('scores scheduled videos against the household limits and names the pantry staples', function () {
+    $preferences = app(HouseholdPreferences::class);
+    $preferences->setWeekdayLimits(45, 12);
+    $preferences->setStaple('soy sauce', true);
+    DiscoveredVideo::factory()->create(['video_id' => 'vidLimit001']);
+
+    Process::fake(['*' => Process::result(output: json_encode([
+        ['video_id' => 'vidLimit001', 'classification' => 'likely_recipe', 'score' => 90],
+    ]))]);
+
+    app(ClassifyDiscoveredVideos::class)->handle();
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2];
+
+        return str_contains($prompt, 'Total time (prep + cook) 45 minutes or less')
+            && str_contains($prompt, '12 ingredients or fewer')
+            && str_contains($prompt, 'do not count: soy sauce')
+            && ! str_contains($prompt, '30 minutes or less');
     });
 });

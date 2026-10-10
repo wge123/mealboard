@@ -5,6 +5,7 @@ use App\Enums\RequestStatus;
 use App\Models\DiscoveredVideo;
 use App\Models\Recipe;
 use App\Models\RecipeRequest;
+use App\Support\HouseholdPreferences;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 
@@ -213,4 +214,26 @@ it('drops a claude-lane candidate that fails the check twice', function () {
         ->and(RecipeRequest::sole()->status)->toBe(RequestStatus::Completed);
 
     Process::assertRanTimes(fn ($process) => ($process->command[0] ?? '') === '/fake/bin/claude', 2);
+});
+
+it('stores a requested recipe over the weekday limits but drops one with an avoided ingredient', function () {
+    $preferences = app(HouseholdPreferences::class);
+    $preferences->setWeekdayLimits(10, 1);
+    $preferences->avoid('anchovies');
+
+    $withAnchovies = json_decode(hibachiCandidateJson('Anchovy Hibachi'), true);
+    $withAnchovies[0]['ingredients'][] = ['qty' => 4, 'unit' => null, 'name' => 'Anchovies', 'prep_note' => 'chopped'];
+
+    Process::fake([
+        '*yt-dlp*' => Process::result(output: ''),
+        '*claude*' => Process::result(output: json_encode([
+            json_decode(hibachiCandidateJson('Long Hibachi'), true)[0],
+            $withAnchovies[0],
+        ])),
+    ]);
+
+    $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
+
+    expect(Recipe::pluck('title')->all())->toBe(['Long Hibachi'])
+        ->and(RecipeRequest::sole()->candidates_found)->toBe(1);
 });

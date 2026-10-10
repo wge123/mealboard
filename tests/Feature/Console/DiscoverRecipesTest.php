@@ -7,6 +7,7 @@ use App\Enums\RecipeStatus;
 use App\Models\DiscoveryRun;
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use App\Support\HouseholdPreferences;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
@@ -206,4 +207,38 @@ it('stores claude candidates with tools, prep notes and steps when the claude CL
         ->and($tool->alternatives[0]->kind->name)->toBe('skillet')
         ->and($recipe->cookingSteps->pluck('text')->all())->toBe(['Sear the salmon.', 'Serve.'])
         ->and($recipe->ingredients->first()->pivot->note)->toBe('juiced');
+});
+
+it('drops a scheduled candidate over a weekday limit or with an avoided ingredient and stores the rest', function () {
+    $preferences = app(HouseholdPreferences::class);
+    $preferences->setWeekdayLimits(30, 3);
+    $preferences->avoid('cilantro');
+    Ingredient::factory()->pantryStaple()->create(['name' => 'salt']);
+
+    FakeDiscoveryDriver::$candidates = [
+        discoveredCandidate('Slow Braise', ['prep_minutes' => 20, 'cook_minutes' => 20]),
+        discoveredCandidate('Everything Bowl', ['ingredients' => [
+            ['qty' => 1, 'unit' => null, 'name' => 'rice', 'prep_note' => null],
+            ['qty' => 1, 'unit' => null, 'name' => 'beans', 'prep_note' => null],
+            ['qty' => 1, 'unit' => null, 'name' => 'corn', 'prep_note' => null],
+            ['qty' => 1, 'unit' => null, 'name' => 'avocado', 'prep_note' => null],
+        ]]),
+        discoveredCandidate('Herby Tacos', ['ingredients' => [
+            ['qty' => 1, 'unit' => null, 'name' => 'Fresh cilantro', 'prep_note' => 'chopped'],
+        ]]),
+        discoveredCandidate('Three Plus Salt', ['ingredients' => [
+            ['qty' => 1, 'unit' => null, 'name' => 'rice', 'prep_note' => null],
+            ['qty' => 1, 'unit' => null, 'name' => 'beans', 'prep_note' => null],
+            ['qty' => 1, 'unit' => null, 'name' => 'corn', 'prep_note' => null],
+            ['qty' => 1, 'unit' => 'tsp', 'name' => 'salt', 'prep_note' => null],
+        ]]),
+        discoveredCandidate('Unknown Time Soup', ['prep_minutes' => 0, 'cook_minutes' => 0]),
+    ];
+
+    $this->artisan('recipes:discover')
+        ->expectsOutputToContain('Created 2 pending recipe(s), skipped 0 duplicate(s).')
+        ->expectsOutputToContain('Refused 3 candidate(s) by the household preferences.')
+        ->assertSuccessful();
+
+    expect(Recipe::pluck('title')->sort()->values()->all())->toBe(['Three Plus Salt', 'Unknown Time Soup']);
 });

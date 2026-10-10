@@ -7,6 +7,7 @@ use App\Enums\RecipeStatus;
 use App\Models\DiscoveredVideo;
 use App\Models\Recipe;
 use App\Models\RecipeRequest;
+use App\Support\HouseholdPreferences;
 use App\Support\KitchenToolInventory;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
@@ -168,4 +169,38 @@ it('keeps the two classification lanes apart', function () {
     app(ClassifyDiscoveredVideos::class)->handle($request);
 
     expect($requested->fresh()->classification)->not->toBeNull();
+});
+
+it('tells a request prompt the avoided ingredients and the household size but no limits', function () {
+    $preferences = app(HouseholdPreferences::class);
+    $preferences->setHouseholdSize(3);
+    $preferences->avoid('cilantro');
+    $request = RecipeRequest::factory()->create(['query' => 'hibachi']);
+
+    Process::fake(['*claude*' => Process::result(output: json_encode([requestCandidate()]))]);
+
+    app(AnthropicDriver::class)->discoverFor($request, 1);
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->command[2];
+
+        return str_contains($prompt, 'Never use these ingredients (a household rule, no exceptions): cilantro')
+            && str_contains($prompt, 'serves about 3')
+            && str_contains($prompt, 'NO time limit and NO ingredient limit')
+            && ! str_contains($prompt, 'do not count toward the ingredient limit');
+    });
+});
+
+it('names the household limits in the request video rubric as the ones that do not apply', function () {
+    app(HouseholdPreferences::class)->setWeekdayLimits(45, 12);
+    $request = RecipeRequest::factory()->create(['query' => 'hibachi for 4']);
+    DiscoveredVideo::factory()->create(['video_id' => 'vidReq002', 'recipe_request_id' => $request->id, 'classification' => null]);
+
+    Process::fake(['*claude*' => Process::result(output: json_encode([
+        ['video_id' => 'vidReq002', 'classification' => 'likely_recipe', 'score' => 95],
+    ]))]);
+
+    app(ClassifyDiscoveredVideos::class)->handle($request);
+
+    Process::assertRan(fn ($process) => str_contains($process->command[2], '(45 minutes, 12 ingredients) DO NOT apply here'));
 });
