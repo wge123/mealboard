@@ -64,3 +64,16 @@ it('shows the refusal for a blank staple name', function () {
 
     expect(Ingredient::count())->toBe(0);
 });
+
+it('lists every staple even when the other ingredients are capped', function () {
+    Ingredient::factory()->count(70)->create();
+    foreach (range(1, 65) as $i) {
+        Ingredient::factory()->pantryStaple()->create(['name' => sprintf('zz staple %02d', $i)]);
+    }
+
+    $component = Livewire::actingAs(User::factory()->create())->test(PantryStaples::class);
+
+    foreach (range(1, 65) as $i) {
+        $component->assertSee(sprintf('zz staple %02d', $i));
+    }
+});

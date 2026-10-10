@@ -46,12 +46,19 @@ it('refuses a limit or size that is not a whole number of at least 1', function 
     Livewire::actingAs(User::factory()->create())
         ->test(Preferences::class)
         ->set('weekdayMinutes', 0)
+        ->set('weekdayIngredients', 5)
+        ->call('saveLimits')
+        ->assertHasErrors('weekdayLimits')
+        ->set('weekdayMinutes', 20)
         ->set('weekdayIngredients', 'ten')
         ->call('saveLimits')
-        ->assertHasErrors(['weekdayMinutes' => 'min', 'weekdayIngredients' => 'integer'])
+        ->assertHasErrors(['weekdayIngredients' => 'integer'])
         ->set('householdSize', '')
         ->call('saveHouseholdSize')
-        ->assertHasErrors(['householdSize' => 'required']);
+        ->assertHasErrors(['householdSize' => 'required'])
+        ->set('householdSize', 0)
+        ->call('saveHouseholdSize')
+        ->assertHasErrors('householdSize');
 
     expect((new HouseholdPreferences)->weekdayLimits())->toBe(['minutes' => 30, 'ingredients' => 10])
         ->and((new HouseholdPreferences)->householdSize())->toBe(2);

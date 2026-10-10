@@ -4,6 +4,7 @@ use App\Actions\Discovery\ClassifyDiscoveredVideos;
 use App\Enums\VideoClassification;
 use App\Models\DiscoveredVideo;
 use App\Models\Recipe;
+use App\Models\RecipeRequest;
 use App\Support\HouseholdPreferences;
 use Illuminate\Support\Facades\Process;
 
@@ -165,7 +166,25 @@ it('scores scheduled videos against the household limits and names the pantry st
 
         return str_contains($prompt, 'Total time (prep + cook) 45 minutes or less')
             && str_contains($prompt, '12 ingredients or fewer')
-            && str_contains($prompt, 'do not count: soy sauce')
+            && str_contains($prompt, 'do not count toward the ingredient limit: soy sauce')
             && ! str_contains($prompt, '30 minutes or less');
     });
 });
+
+it('tells the scheduled and request scoring prompts the avoided ingredients and the household size', function (bool $request) {
+    $preferences = app(HouseholdPreferences::class);
+    $preferences->avoid('cilantro');
+    $preferences->setHouseholdSize(5);
+    $recipeRequest = $request ? RecipeRequest::factory()->create(['query' => 'hibachi']) : null;
+    DiscoveredVideo::factory()->create(['video_id' => 'vidBoth0001', 'recipe_request_id' => $recipeRequest?->id]);
+
+    Process::fake(['*' => Process::result(output: json_encode([
+        ['video_id' => 'vidBoth0001', 'classification' => 'likely_recipe', 'score' => 90],
+    ]))]);
+
+    app(ClassifyDiscoveredVideos::class)->handle($recipeRequest);
+
+    Process::assertRan(fn ($process) => str_contains($process->command[2], 'Never use these ingredients')
+        && str_contains($process->command[2], 'cilantro')
+        && str_contains($process->command[2], 'serves about 5'));
+})->with([false, true]);

@@ -111,6 +111,15 @@ it('refuses a scheduled candidate over the ingredient limit without counting pan
         ->and($preferences->refusals($threePlusStaples, DiscoveryLane::Scheduled))->toBe([]);
 });
 
+it('counts an ingredient listed twice once toward the ingredient limit', function () {
+    $preferences = new HouseholdPreferences;
+    $preferences->setWeekdayLimits(30, 3);
+
+    $listedTwice = candidateWithIngredients(['chicken', 'Rice', 'rice', 'peas', 'chicken']);
+
+    expect($preferences->refusals($listedTwice, DiscoveryLane::Scheduled))->toBe([]);
+});
+
 it('refuses an avoided ingredient as a whole word, ignoring case, on both lanes', function () {
     $preferences = new HouseholdPreferences;
     $preferences->avoid('cilantro');

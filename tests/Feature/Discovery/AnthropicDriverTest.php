@@ -212,7 +212,7 @@ it('serializes the taste profile into the generation prompt when data exists', f
         return str_contains($prompt, 'Favored cuisines: thai (avg 4.5)')
             && str_contains($prompt, 'Favored tags: quick (avg 4.5)')
             && str_contains($prompt, 'Favored ingredients: garlic')
-            && str_contains($prompt, 'Avoid these ingredients: cilantro')
+            && str_contains($prompt, 'Ingredients the household has tended to reject: cilantro')
             && str_contains($prompt, 'breakfast is skipped 100% of logged opportunities')
             && ! str_contains($prompt, "Taste profile:\n(none yet)");
     });
