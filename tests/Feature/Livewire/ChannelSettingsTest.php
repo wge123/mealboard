@@ -66,3 +66,24 @@ it('removes a channel', function () {
 
     expect(YouTubeChannel::count())->toBe(0);
 });
+
+it('tells the settings menu when a channel is added, paused or removed', function () {
+    $channel = YouTubeChannel::factory()->create();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(ChannelSettings::class)
+        ->call('toggle', $channel->id)
+        ->assertDispatched('settings-changed');
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(ChannelSettings::class)
+        ->set('channelId', 'UCnew999')
+        ->set('name', 'New One')
+        ->call('add')
+        ->assertDispatched('settings-changed');
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(ChannelSettings::class)
+        ->call('remove', $channel->id)
+        ->assertDispatched('settings-changed');
+});
