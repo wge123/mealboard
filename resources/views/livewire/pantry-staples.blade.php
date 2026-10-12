@@ -19,10 +19,12 @@
     @else
         <ul class="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-5">
             @foreach ($ingredients as $ingredient)
-                <li wire:key="ingredient-{{ $ingredient->id }}">
+                {{-- The keys order the tile the way render() does once tapped: staples by name, the rest by recipe count. --}}
+                <li wire:key="ingredient-{{ $ingredient->id }}" style="view-transition-name: staple-{{ $ingredient->id }}"
+                    data-key-on="{{ $ingredient->name }}" data-key-off="{{ sprintf('%06d %s', 999999 - $ingredient->recipes_count, $ingredient->name) }}">
                     <x-check-tile :label="$ingredient->name" :on="$ingredient->is_pantry_staple"
                                   ::class="picked.includes({{ $ingredient->id }}) && 'ring-2 ring-primary ring-offset-2 ring-offset-base-100'"
-                                  x-on:click="tap({{ $ingredient->id }}, () => $wire.toggle({{ $ingredient->id }}))"
+                                  x-on:click="tap({{ $ingredient->id }}, () => $wire.toggle({{ $ingredient->id }}), $el)"
                                   aria-label="Staple: {{ $ingredient->name }}" />
                 </li>
             @endforeach

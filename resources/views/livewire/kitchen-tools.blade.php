@@ -13,17 +13,17 @@
     @else
         <ul class="grid grid-cols-3 gap-2 sm:grid-cols-5 xl:grid-cols-7">
             @foreach ($kinds as $kind)
-                <li class="relative" wire:key="kind-{{ $kind->id }}">
+                <li class="relative" wire:key="kind-{{ $kind->id }}" style="view-transition-name: tool-{{ $kind->id }}"
+                    data-key-on="{{ $kind->name }}" data-key-off="{{ $kind->name }}">
+                    {{-- The look follows aria-pressed, so a tap can flip it before the server answers. --}}
                     <button type="button"
-                            class="flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-xl border px-1 py-3 text-center transition {{ $kind->owned ? 'border-base-300 bg-base-100' : 'border-dashed border-base-300 text-base-content/70' }}"
+                            class="group flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-xl border border-base-300 px-1 py-3 text-center transition aria-pressed:bg-base-100 aria-[pressed=false]:border-dashed aria-[pressed=false]:text-base-content/70"
                             :class="picked.includes({{ $kind->id }}) && 'ring-2 ring-primary ring-offset-2 ring-offset-base-100'"
-                            x-on:click="tap({{ $kind->id }}, () => $wire.toggleOwned({{ $kind->id }}))"
+                            x-on:click="tap({{ $kind->id }}, () => $wire.toggleOwned({{ $kind->id }}), $el)"
                             aria-pressed="{{ $kind->owned ? 'true' : 'false' }}"
                             aria-label="Owned: {{ $kind->display_name }}">
-                        @if ($kind->owned)
-                            <span aria-hidden="true" class="absolute top-1.5 left-1.5 grid size-4 place-items-center rounded-full bg-primary text-[10px] text-primary-content">✓</span>
-                        @endif
-                        <span class="text-2xl {{ $kind->owned ? '' : 'opacity-50 grayscale' }}" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($kind->name) }}</span>
+                        <span aria-hidden="true" class="absolute top-1.5 left-1.5 hidden size-4 place-items-center rounded-full bg-primary text-[10px] text-primary-content group-aria-pressed:grid">✓</span>
+                        <span class="text-2xl group-aria-[pressed=false]:opacity-50 group-aria-[pressed=false]:grayscale" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($kind->name) }}</span>
                         <span class="text-xs leading-tight font-medium">{{ $kind->display_name }}</span>
                         @if ($kind->note)
                             <span class="line-clamp-1 text-[11px] text-base-content/70">{{ $kind->note }}</span>

@@ -74,7 +74,7 @@ class PantryStaples extends Component
         // ones most recipes use first. Until recipe import cleans ingredient
         // names, names that start with a quantity ("200g tomato") are left out
         // unless searched for.
-        $staples = $this->filter === PantryFilter::Others ? collect() : $matching()->where('is_pantry_staple', true)->orderBy('name')->get();
+        $staples = $this->filter === PantryFilter::Others ? collect() : $matching()->where('is_pantry_staple', true)->withCount('recipes')->orderBy('name')->get();
         $others = $this->filter === PantryFilter::Staples ? collect() : $matching()
             ->where('is_pantry_staple', false)
             ->when($search === '', fn ($query) => $query->whereRaw("substr(name, 1, 1) not between '0' and '9'"))

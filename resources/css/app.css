@@ -159,3 +159,16 @@
         color: color-mix(in oklab, var(--slot-accent) 55%, var(--color-base-content));
     }
 }
+
+/* A tapped settings tile slides to its new place (tileSelect in app.js). */
+::view-transition-group(*) {
+    animation-duration: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none;
+    }
+}
