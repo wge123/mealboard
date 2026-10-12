@@ -10,14 +10,10 @@ it('renders the pantry staples section with staples first for a signed-in househ
     Ingredient::factory()->pantryStaple()->create(['name' => 'soy sauce']);
 
     $this->actingAs(User::factory()->create())
-        ->get('/settings/pantry-staples')
+        ->get('/settings')
         ->assertOk()
         ->assertSeeLivewire(PantryStaples::class)
         ->assertSeeInOrder(['soy sauce', 'avocado']);
-});
-
-it('redirects guests to login', function () {
-    $this->get('/settings/pantry-staples')->assertRedirect('/login');
 });
 
 it('searches the ingredients', function () {

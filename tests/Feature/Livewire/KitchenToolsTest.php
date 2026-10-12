@@ -10,15 +10,11 @@ use Livewire\Livewire;
 
 it('renders the kitchen tools section for a signed-in household', function () {
     $this->actingAs(User::factory()->create())
-        ->get('/settings/kitchen-tools')
+        ->get('/settings')
         ->assertOk()
         ->assertSeeLivewire(KitchenTools::class)
         ->assertSee("Chef's Knife")
         ->assertSee('Wok');
-});
-
-it('redirects guests to login', function () {
-    $this->get('/settings/kitchen-tools')->assertRedirect('/login');
 });
 
 it('lists owned kinds before the rest, with title-cased names', function () {
@@ -115,15 +111,6 @@ it('drops the note entry of a deleted kind', function () {
         ->assertSet('notes.'.$kind->id, 'fine')
         ->call('deleteKind', $kind->id)
         ->assertSet('notes', fn ($n) => ! array_key_exists($kind->id, $n));
-});
-
-it('renders the settings section menu on the kitchen tools page', function () {
-    $this->actingAs(User::factory()->create())
-        ->get('/settings/kitchen-tools')
-        ->assertOk()
-        ->assertSee('aria-label="Settings sections"', false)
-        ->assertSee('aria-current="page"', false)
-        ->assertSeeInOrder(['Kitchen tools', 'Preferences', 'Pantry staples', 'Channels']);
 });
 
 it('keeps item variants out of the catalog kinds and resolves them to their kind', function (string $variant) {

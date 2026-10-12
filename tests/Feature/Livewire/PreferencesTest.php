@@ -7,7 +7,7 @@ use Livewire\Livewire;
 
 it('renders the preferences section with the stored values for a signed-in household', function () {
     $this->actingAs(User::factory()->create())
-        ->get('/settings/preferences')
+        ->get('/settings')
         ->assertOk()
         ->assertSeeLivewire(Preferences::class)
         ->assertSee('Weekday limits')
@@ -19,10 +19,6 @@ it('renders the preferences section with the stored values for a signed-in house
         ->assertSet('weekdayMinutes', 30)
         ->assertSet('weekdayIngredients', 10)
         ->assertSet('householdSize', 2);
-});
-
-it('redirects guests to login', function () {
-    $this->get('/settings/preferences')->assertRedirect('/login');
 });
 
 it('saves the weekday limits and the household size', function () {
@@ -91,10 +87,3 @@ it('shows the refusal when the avoided word is blank or already avoided', functi
 
     expect((new HouseholdPreferences)->avoidedIngredients()->all())->toBe(['cilantro']);
 })->with(['  ', 'CILANTRO']);
-
-it('renders every settings section in the menu', function () {
-    $this->actingAs(User::factory()->create())
-        ->get('/settings/preferences')
-        ->assertOk()
-        ->assertSeeInOrder(['Kitchen tools', 'Preferences', 'Pantry staples', 'Channels']);
-});

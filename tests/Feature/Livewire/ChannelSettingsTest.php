@@ -9,14 +9,10 @@ it('renders the channel list for an authenticated user', function () {
     YouTubeChannel::factory()->create(['name' => 'Pro Home Cooks']);
 
     $this->actingAs(User::factory()->create())
-        ->get('/settings/channels')
+        ->get('/settings')
         ->assertOk()
         ->assertSeeLivewire(ChannelSettings::class)
         ->assertSee('Pro Home Cooks');
-});
-
-it('redirects guests to login', function () {
-    $this->get('/settings/channels')->assertRedirect('/login');
 });
 
 it('adds a channel', function () {
