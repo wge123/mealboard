@@ -23,7 +23,7 @@
                             aria-pressed="{{ $kind->owned ? 'true' : 'false' }}"
                             aria-label="Owned: {{ $kind->display_name }}">
                         <span aria-hidden="true" class="absolute top-1.5 left-1.5 hidden size-4 place-items-center rounded-full bg-primary text-[10px] text-primary-content group-aria-pressed:grid">✓</span>
-                        <span class="text-2xl group-aria-[pressed=false]:opacity-50 group-aria-[pressed=false]:grayscale" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($kind->name) }}</span>
+                        <span class="size-7 group-aria-pressed:text-primary group-aria-[pressed=false]:opacity-50 [&>svg]:size-full" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($kind->name) }}</span>
                         <span class="text-xs leading-tight font-medium">{{ $kind->display_name }}</span>
                         @if ($kind->note)
                             <span class="line-clamp-1 text-[11px] text-base-content/70">{{ $kind->note }}</span>
@@ -59,7 +59,7 @@
              x-on:keydown.escape.window="$wire.closeDetails()">
             <div class="modal-box">
                 <div class="flex items-center gap-3">
-                    <span class="text-3xl" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($detail->name) }}</span>
+                    <span class="size-9 text-primary [&>svg]:size-full" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($detail->name) }}</span>
                     <h3 class="flex-1 text-lg font-semibold">{{ $detail->display_name }}</h3>
                     <button type="button" class="btn btn-circle btn-ghost min-h-11 min-w-11" wire:click="closeDetails" aria-label="Close">&times;</button>
                 </div>
