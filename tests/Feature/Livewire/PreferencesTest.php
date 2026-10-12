@@ -87,3 +87,57 @@ it('shows the refusal when the avoided word is blank or already avoided', functi
 
     expect((new HouseholdPreferences)->avoidedIngredients()->all())->toBe(['cilantro']);
 })->with(['  ', 'CILANTRO']);
+
+it('saves a preset tile straight away', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(Preferences::class)
+        ->call('pickMinutes', 45)
+        ->call('pickIngredients', 8)
+        ->call('pickHouseholdSize', 4)
+        ->assertHasNoErrors()
+        ->assertSet('weekdayMinutes', 45)
+        ->assertSet('householdSize', 4);
+
+    $preferences = new HouseholdPreferences;
+
+    expect($preferences->weekdayLimits())->toBe(['minutes' => 45, 'ingredients' => 8])
+        ->and($preferences->householdSize())->toBe(4);
+});
+
+it('marks the preset tile that matches the stored value', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(Preferences::class)
+        ->assertSeeHtml('data-test="minutes-30" aria-pressed="true"')
+        ->assertSeeHtml('data-test="minutes-other" aria-pressed="false"');
+});
+
+it('marks Other when the stored value is not one of the presets', function () {
+    (new HouseholdPreferences)->setWeekdayLimits(35, 10);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(Preferences::class)
+        ->assertSeeHtml('data-test="minutes-other" aria-pressed="true"')
+        ->assertSeeHtml('data-test="minutes-30" aria-pressed="false"');
+});
+
+it('avoids a suggested ingredient with one tap and stops with another', function () {
+    $component = Livewire::actingAs(User::factory()->create())
+        ->test(Preferences::class)
+        ->assertSeeHtml('data-test="avoid-cilantro" aria-pressed="false"')
+        ->call('toggleAvoided', 'cilantro')
+        ->assertSeeHtml('data-test="avoid-cilantro" aria-pressed="true"');
+
+    expect((new HouseholdPreferences)->avoidedIngredients()->all())->toBe(['cilantro']);
+
+    $component->call('toggleAvoided', 'cilantro');
+
+    expect((new HouseholdPreferences)->avoidedIngredients()->all())->toBe([]);
+});
+
+it('shows an avoided word that is not a suggestion as its own tile', function () {
+    (new HouseholdPreferences)->avoid('durian');
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(Preferences::class)
+        ->assertSeeHtml('data-test="avoid-durian" aria-pressed="true"');
+});
