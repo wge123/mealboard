@@ -176,3 +176,27 @@ it('finds the avoided words in many recipes, with a key for every recipe', funct
 
     expect($preferences->avoidedInRecipes([$herby, $plain]))->toBe([$herby->id => ['cilantro'], $plain->id => []]);
 });
+
+it('marks several ingredients as staples or not in one go', function () {
+    $salt = Ingredient::factory()->create(['name' => 'salt']);
+    $rice = Ingredient::factory()->create(['name' => 'rice']);
+    $preferences = new HouseholdPreferences;
+
+    $preferences->setStaplesMany([$salt->id, $rice->id], true);
+
+    expect($preferences->staples()->all())->toBe(['rice', 'salt']);
+
+    $preferences->setStaplesMany([$rice->id], false);
+
+    expect($preferences->staples()->all())->toBe(['salt']);
+});
+
+it('marks no staples when one of the ingredients does not exist', function () {
+    $salt = Ingredient::factory()->create(['name' => 'salt']);
+    $preferences = new HouseholdPreferences;
+
+    expect(fn () => $preferences->setStaplesMany([$salt->id, 999999], true))
+        ->toThrow(HouseholdPreferenceRefused::class);
+
+    expect($preferences->staples()->all())->toBe([]);
+});

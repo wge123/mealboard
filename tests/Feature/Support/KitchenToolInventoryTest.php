@@ -106,3 +106,29 @@ it('refuses to delete a catalog kind', function () {
         expect($inventory->resolve('frying pan'))->not->toBeNull();
     }
 })->throws(KitchenToolRefused::class);
+
+it('marks several kinds owned or not owned in one go', function () {
+    $inventory = new KitchenToolInventory;
+    $wok = KitchenToolKind::where('name', 'wok')->firstOrFail();
+    $skillet = KitchenToolKind::where('name', 'skillet')->firstOrFail();
+
+    $inventory->setOwnedMany([$wok->id, $skillet->id], true);
+
+    expect($inventory->owns($wok))->toBeTrue()
+        ->and($inventory->owns($skillet))->toBeTrue();
+
+    $inventory->setOwnedMany([$wok->id], false);
+
+    expect($inventory->owns($wok))->toBeFalse()
+        ->and($inventory->owns($skillet))->toBeTrue();
+});
+
+it('marks nothing when one of the kinds does not exist', function () {
+    $inventory = new KitchenToolInventory;
+    $wok = KitchenToolKind::where('name', 'wok')->firstOrFail();
+
+    expect(fn () => $inventory->setOwnedMany([$wok->id, 999999], true))
+        ->toThrow(KitchenToolRefused::class);
+
+    expect($inventory->owns($wok))->toBeFalse();
+});
