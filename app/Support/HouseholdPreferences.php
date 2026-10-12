@@ -128,6 +128,26 @@ class HouseholdPreferences
     }
 
     /**
+     * Mark several existing ingredients as staples or not at once. All or
+     * nothing: an id that names no ingredient refuses the whole change.
+     *
+     * @param  list<int>  $ingredientIds
+     *
+     * @throws HouseholdPreferenceRefused
+     */
+    public function setStaplesMany(array $ingredientIds, bool $staple): void
+    {
+        $ingredientIds = array_values(array_unique($ingredientIds));
+
+        // Counted rather than read from update(): MySQL reports changed rows, not matched ones.
+        if (Ingredient::query()->whereKey($ingredientIds)->count() !== count($ingredientIds)) {
+            throw new HouseholdPreferenceRefused('Some of those ingredients no longer exist. Reload and try again.');
+        }
+
+        Ingredient::query()->whereKey($ingredientIds)->update(['is_pantry_staple' => $staple]);
+    }
+
+    /**
      * The prompt sentence naming the pantry staples, which do not count toward
      * the ingredient limit; says so when there are none yet.
      */

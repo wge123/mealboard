@@ -48,6 +48,26 @@ class KitchenToolInventory
     }
 
     /**
+     * Mark several kinds owned or not owned at once. All or nothing: an id
+     * that names no kind refuses the whole change.
+     *
+     * @param  list<int>  $kindIds
+     *
+     * @throws KitchenToolRefused
+     */
+    public function setOwnedMany(array $kindIds, bool $owned): void
+    {
+        $kindIds = array_values(array_unique($kindIds));
+
+        // Counted rather than read from update(): MySQL reports changed rows, not matched ones.
+        if (KitchenToolKind::query()->whereKey($kindIds)->count() !== count($kindIds)) {
+            throw new KitchenToolRefused('Some of those kitchen tools no longer exist. Reload and try again.');
+        }
+
+        KitchenToolKind::query()->whereKey($kindIds)->update(['owned' => $owned]);
+    }
+
+    /**
      * Set or clear a kind's note. A note is for people only and never takes
      * part in matching; an empty or blank note is stored as no note.
      */
