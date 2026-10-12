@@ -1,5 +1,5 @@
-<x-settings.layout>
-    <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Pantry staples</h1>
+<div>
+    <h2 class="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">Pantry staples</h2>
     <p class="mt-1 mb-5 text-sm opacity-60">What you keep in stock. Staples never land on the buy list and don't count toward the weekday ingredient limit. Staples come first.</p>
 
     <form wire:submit="addStaple" class="mb-4" data-test="add-staple-form">
@@ -44,4 +44,4 @@
             <p class="mt-2 text-sm opacity-60">Showing the first {{ $ingredients->count() }}. Search to find the rest.</p>
         @endif
     @endif
-</x-settings.layout>
+</div>

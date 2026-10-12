@@ -49,7 +49,7 @@
                     </a>
                     <a href="{{ route('log.catch-up') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('log.*') ? 'text-primary' : '' }}">Log</a>
                     <a href="{{ route('insights') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('insights') ? 'text-primary' : '' }}">Insights</a>
-                    <a href="{{ route('settings.kitchen-tools') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('settings.*') ? 'text-primary' : '' }}">Settings</a>
+                    <a href="{{ route('settings') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('settings') ? 'text-primary' : '' }}">Settings</a>
                 </div>
             @endauth
             <div class="ms-auto flex items-center gap-2">
@@ -142,7 +142,7 @@
                     <button
                         type="button"
                         tabindex="0"
-                        class="flex min-h-14 w-full flex-col items-center justify-center gap-0.5 pt-1.5 pb-1 {{ request()->routeIs('recipes.index', 'recipes.show', 'recipes.create', 'insights', 'settings.*') ? 'text-primary' : 'text-base-content/60' }}"
+                        class="flex min-h-14 w-full flex-col items-center justify-center gap-0.5 pt-1.5 pb-1 {{ request()->routeIs('recipes.index', 'recipes.show', 'recipes.create', 'insights', 'settings') ? 'text-primary' : 'text-base-content/60' }}"
                     >
                         <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
@@ -168,7 +168,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('settings.kitchen-tools') }}" class="min-h-11 {{ request()->routeIs('settings.*') ? 'text-primary' : '' }}">
+                                <a href="{{ route('settings') }}" class="min-h-11 {{ request()->routeIs('settings') ? 'text-primary' : '' }}">
                                     <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125Z" />
                                     </svg>

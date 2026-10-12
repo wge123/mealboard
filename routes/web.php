@@ -1,18 +1,15 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
-use App\Livewire\ChannelSettings;
 use App\Livewire\DailyCatchUp;
 use App\Livewire\Insights;
-use App\Livewire\KitchenTools;
-use App\Livewire\PantryStaples;
 use App\Livewire\PlanBuilder;
-use App\Livewire\Preferences;
 use App\Livewire\RecipeApproval;
 use App\Livewire\RecipeCreate;
 use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeLibrary;
 use App\Livewire\RecipeRequester;
+use App\Livewire\Settings;
 use App\Livewire\ShoppingList;
 use Illuminate\Support\Facades\Route;
 
@@ -30,10 +27,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/request', RecipeRequester::class)->name('recipes.request');
     Route::get('/approve', RecipeApproval::class)->name('recipes.approve');
     Route::get('/insights', Insights::class)->name('insights');
-    Route::get('/settings/kitchen-tools', KitchenTools::class)->name('settings.kitchen-tools');
-    Route::get('/settings/preferences', Preferences::class)->name('settings.preferences');
-    Route::get('/settings/pantry-staples', PantryStaples::class)->name('settings.pantry-staples');
-    Route::get('/settings/channels', ChannelSettings::class)->name('settings.channels');
+    Route::get('/settings', Settings::class)->name('settings');
+    // The sections used to be pages of their own; old links land on their section.
+    Route::permanentRedirect('/settings/kitchen-tools', '/settings#tools');
+    Route::permanentRedirect('/settings/preferences', '/settings#preferences');
+    Route::permanentRedirect('/settings/pantry-staples', '/settings#pantry');
+    Route::permanentRedirect('/settings/channels', '/settings#channels');
 });
 
 Route::middleware('guest')->group(function () {

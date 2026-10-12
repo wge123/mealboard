@@ -6,7 +6,7 @@
             <p class="text-6xl" aria-hidden="true">🎉</p>
             <p class="mt-4 font-[family-name:var(--font-display)] text-2xl font-semibold">All caught up</p>
             <p class="mt-1 text-sm opacity-60">Nothing pending to review.</p>
-            <a class="btn btn-ghost btn-sm mt-5 min-h-11 border border-base-300" href="{{ route('settings.channels') }}">
+            <a class="btn btn-ghost btn-sm mt-5 min-h-11 border border-base-300" href="{{ route('settings').'#channels' }}">
                 Add YouTube channels to discover more
             </a>
         </div>

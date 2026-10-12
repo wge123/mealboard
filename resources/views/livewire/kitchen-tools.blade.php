@@ -1,5 +1,5 @@
-<x-settings.layout>
-    <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Kitchen tools</h1>
+<div>
+    <h2 class="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">Kitchen tools</h2>
     <p class="mt-1 mb-5 text-sm opacity-60">The kinds of kitchen tool the app knows. Owned kinds come first.</p>
 
     <ul class="divide-y divide-base-300 rounded-2xl border border-base-300 bg-base-100">
@@ -72,4 +72,4 @@
             <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p>
         @enderror
     </form>
-</x-settings.layout>
+</div>

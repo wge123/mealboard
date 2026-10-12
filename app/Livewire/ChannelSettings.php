@@ -4,15 +4,11 @@ namespace App\Livewire;
 
 use App\Models\YouTubeChannel;
 use Illuminate\Contracts\View\View;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
  * DECISIONS.md #5 — phone-editable YouTube channel list.
  */
-#[Layout('layouts.app')]
-#[Title('YouTube channels')]
 class ChannelSettings extends Component
 {
     public string $channelId = '';

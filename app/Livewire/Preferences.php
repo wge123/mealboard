@@ -5,16 +5,12 @@ namespace App\Livewire;
 use App\Exceptions\HouseholdPreferenceRefused;
 use App\Support\HouseholdPreferences;
 use Illuminate\Contracts\View\View;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
  * Settings section for the household preferences: the weekday limits, the
  * household size and the avoided ingredients.
  */
-#[Layout('layouts.app')]
-#[Title('Preferences')]
 class Preferences extends Component
 {
     public int|string $weekdayMinutes = '';

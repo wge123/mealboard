@@ -1,5 +1,5 @@
-<x-settings.layout>
-    <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">YouTube channels</h1>
+<div>
+    <h2 class="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">YouTube channels</h2>
     <p class="mt-1 mb-5 text-sm opacity-60">Active channels are polled daily for new recipe videos.</p>
 
     {{-- Add-channel form: joined inputs stack vertically on phones. --}}
@@ -60,4 +60,4 @@
             @endforeach
         </ul>
     @endif
-</x-settings.layout>
+</div>

@@ -1,5 +1,5 @@
-<x-settings.layout>
-    <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Preferences</h1>
+<div>
+    <h2 class="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">Preferences</h2>
     <p class="mt-1 mb-5 text-sm opacity-60">The rules daily discovery and auto-fill follow. A recipe you ask for is not bound by the weekday limits.</p>
 
     <section class="rounded-2xl border border-base-300 bg-base-100 p-4">
@@ -80,4 +80,4 @@
             </ul>
         @endif
     </section>
-</x-settings.layout>
+</div>

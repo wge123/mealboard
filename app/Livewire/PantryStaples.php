@@ -6,16 +6,12 @@ use App\Exceptions\HouseholdPreferenceRefused;
 use App\Models\Ingredient;
 use App\Support\HouseholdPreferences;
 use Illuminate\Contracts\View\View;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
  * Settings section for the pantry staples: which ingredients the household
  * keeps in stock, so the buy list leaves them out.
  */
-#[Layout('layouts.app')]
-#[Title('Pantry staples')]
 class PantryStaples extends Component
 {
     /** Rows shown at once; the search narrows the rest. */

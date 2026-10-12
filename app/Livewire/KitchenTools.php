@@ -8,12 +8,8 @@ use App\Models\KitchenToolKind;
 use App\Models\KitchenToolOtherName;
 use App\Support\KitchenToolInventory;
 use Illuminate\Contracts\View\View;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Layout('layouts.app')]
-#[Title('Kitchen tools')]
 class KitchenTools extends Component
 {
     /**
