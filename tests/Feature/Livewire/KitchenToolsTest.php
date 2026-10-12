@@ -189,3 +189,13 @@ it('names the filter in plain words when nothing matches', function () {
 it('keeps small words like and lowercase in a kitchen tool name', function () {
     expect((new KitchenToolKind)->forceFill(['name' => 'mortar and pestle'])->display_name)->toBe('Mortar and Pestle');
 });
+
+it('gives every tile the sort keys the browser re-sorts a tapped tile by, matching the server order', function () {
+    KitchenToolKind::query()->update(['owned' => false]);
+    KitchenToolKind::query()->whereIn('name', ['wok', 'oven'])->update(['owned' => true]);
+
+    [$server, $browser] = tileOrders(Livewire::actingAs(User::factory()->create())->test(KitchenTools::class)->html());
+
+    expect(array_slice($server, 0, 2))->toBe(['Owned: Oven', 'Owned: Wok'])
+        ->and($browser)->toBe($server);
+});

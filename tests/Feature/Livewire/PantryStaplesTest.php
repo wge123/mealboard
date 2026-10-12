@@ -160,3 +160,21 @@ it('says how many of the other ingredients it shows when they are capped', funct
         ->test(PantryStaples::class)
         ->assertSee('Showing the 60 most used. Search to find the rest.');
 });
+
+it('gives every tile the sort keys the browser re-sorts a tapped tile by, matching the server order', function () {
+    $rice = Ingredient::factory()->create(['name' => 'rice']);
+    $basil = Ingredient::factory()->create(['name' => 'basil']);
+    Ingredient::factory()->create(['name' => 'avocado']);
+    $salt = Ingredient::factory()->pantryStaple()->create(['name' => 'salt']);
+    Ingredient::factory()->pantryStaple()->create(['name' => 'cumin']);
+
+    foreach (Recipe::factory()->count(3)->create() as $recipe) {
+        $recipe->ingredients()->attach([$rice->id => ['qty' => 1, 'unit' => 'cup'], $salt->id => ['qty' => 1, 'unit' => 'tsp']]);
+    }
+    Recipe::factory()->create()->ingredients()->attach($basil->id, ['qty' => 1, 'unit' => 'count']);
+
+    [$server, $browser] = tileOrders(Livewire::actingAs(User::factory()->create())->test(PantryStaples::class)->html());
+
+    expect($server)->toBe(['Staple: cumin', 'Staple: salt', 'Staple: rice', 'Staple: basil', 'Staple: avocado'])
+        ->and($browser)->toBe($server);
+});

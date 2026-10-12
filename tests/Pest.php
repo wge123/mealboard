@@ -44,7 +44,31 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * The tiles of a settings grid as [server order, browser order]: the browser
+ * re-sorts a tapped tile the way resources/js/app.js does, pressed tiles
+ * first, each ordered by its data-key-on or data-key-off. Each tile is named
+ * by its button's aria-label.
+ *
+ * @return array{0: list<string>, 1: list<string>}
+ */
+function tileOrders(string $html): array
 {
-    // ..
+    $dom = new DOMDocument;
+    @$dom->loadHTML('<?xml encoding="utf-8">'.$html);
+
+    $tiles = [];
+    foreach ((new DOMXPath($dom))->query('//li[@data-key-on]') as $li) {
+        $button = (new DOMXPath($dom))->query('.//button[@aria-pressed]', $li)->item(0);
+        $pressed = $button->getAttribute('aria-pressed') === 'true';
+        $tiles[] = [
+            'name' => $button->getAttribute('aria-label'),
+            'sort' => [$pressed ? 0 : 1, $li->getAttribute($pressed ? 'data-key-on' : 'data-key-off')],
+        ];
+    }
+
+    $server = array_column($tiles, 'name');
+    usort($tiles, fn ($a, $b) => strcmp($a['sort'][0].' '.$a['sort'][1], $b['sort'][0].' '.$b['sort'][1]));
+
+    return [$server, array_column($tiles, 'name')];
 }
