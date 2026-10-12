@@ -28,11 +28,46 @@ class KitchenTools extends Component
             ->all();
     }
 
+    /** Which tiles show: all, owned or missing. */
+    public string $filter = 'all';
+
+    /** The kind whose details sheet is open, if any. */
+    public ?int $detailId = null;
+
     public function toggleOwned(KitchenToolInventory $inventory, int $kindId): void
     {
         $kind = KitchenToolKind::query()->findOrFail($kindId);
 
         $inventory->setOwned($kind, ! $kind->owned);
+        $this->dispatch('settings-changed');
+    }
+
+    /**
+     * Mark the tiles picked in select mode owned or not owned.
+     *
+     * @param  list<int>  $kindIds
+     */
+    public function markMany(KitchenToolInventory $inventory, array $kindIds, bool $owned): void
+    {
+        try {
+            $inventory->setOwnedMany($kindIds, $owned);
+        } catch (KitchenToolRefused $e) {
+            $this->addError('markMany', $e->getMessage());
+
+            return;
+        }
+
+        $this->dispatch('settings-changed');
+    }
+
+    public function openDetails(int $kindId): void
+    {
+        $this->detailId = KitchenToolKind::query()->findOrFail($kindId)->id;
+    }
+
+    public function closeDetails(): void
+    {
+        $this->detailId = null;
     }
 
     public function saveNote(KitchenToolInventory $inventory, int $kindId): void
@@ -58,6 +93,7 @@ class KitchenTools extends Component
 
         $this->notes[$kind->id] = '';
         $this->reset('newKind');
+        $this->dispatch('settings-changed');
     }
 
     public function deleteKind(KitchenToolInventory $inventory, int $kindId): void
@@ -65,6 +101,8 @@ class KitchenTools extends Component
         try {
             $inventory->deleteKind(KitchenToolKind::query()->findOrFail($kindId));
             unset($this->notes[$kindId]);
+            $this->detailId = null;
+            $this->dispatch('settings-changed');
         } catch (KitchenToolRefused $e) {
             $this->addError('deleteKind', $e->getMessage());
         }
@@ -83,11 +121,16 @@ class KitchenTools extends Component
     {
         // Owned kinds first, then the rest, each group alphabetical.
         $kinds = KitchenToolKind::query()
-            ->with(['otherNames' => fn ($q) => $q->where('origin', KitchenToolOrigin::Household)->orderBy('name')])
+            ->when($this->filter !== 'all', fn ($q) => $q->where('owned', $this->filter === 'owned'))
             ->orderByDesc('owned')
             ->orderBy('name')
             ->get();
 
-        return view('livewire.kitchen-tools', ['kinds' => $kinds]);
+        // Only the open kind's household other names are shown; catalog ones work but are not listed.
+        $detail = $this->detailId === null ? null : KitchenToolKind::query()
+            ->with(['otherNames' => fn ($q) => $q->where('origin', KitchenToolOrigin::Household)->orderBy('name')])
+            ->find($this->detailId);
+
+        return view('livewire.kitchen-tools', ['kinds' => $kinds, 'detail' => $detail]);
     }
 }
