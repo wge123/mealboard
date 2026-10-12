@@ -13,7 +13,7 @@
     @else
         <ul class="grid grid-cols-3 gap-2 sm:grid-cols-5 xl:grid-cols-7">
             @foreach ($kinds as $kind)
-                <li class="relative" wire:key="kind-{{ $kind->id }}" style="view-transition-name: tool-{{ $kind->id }}"
+                <li class="group/tile relative" wire:key="kind-{{ $kind->id }}" style="view-transition-name: tool-{{ $kind->id }}"
                     data-key-on="{{ $kind->name }}" data-key-off="{{ $kind->name }}">
                     {{-- The look follows aria-pressed, so a tap can flip it before the server answers. --}}
                     <button type="button"
@@ -29,7 +29,8 @@
                             <span class="line-clamp-1 text-[11px] text-base-content/70">{{ $kind->note }}</span>
                         @endif
                     </button>
-                    <button type="button" class="btn btn-ghost btn-xs absolute top-0 right-0 min-h-11 min-w-11 opacity-50 hover:opacity-100"
+                    {{-- Always shown on phones; on desktop it appears on hover or keyboard focus. --}}
+                    <button type="button" class="btn btn-ghost btn-xs absolute top-0 right-0 min-h-11 min-w-11 text-base text-base-content/60 hover:text-base-content lg:opacity-0 lg:group-hover/tile:opacity-100 lg:focus-visible:opacity-100"
                             x-show="! selecting"
                             wire:click="openDetails({{ $kind->id }})"
                             aria-label="Details for {{ $kind->display_name }}">⋯</button>
@@ -51,7 +52,7 @@
         @error('addKind') <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p> @enderror
     </form>
 
-    @include('livewire.partials.tile-grid-bar', ['offLabel' => "Don't have", 'onLabel' => 'Mark owned'])
+    @include('livewire.partials.tile-grid-bar', ['offLabel' => 'Mark not owned', 'onLabel' => 'Mark owned'])
 
     {{-- Details sheet: note, household other names, delete --}}
     @if ($detail)

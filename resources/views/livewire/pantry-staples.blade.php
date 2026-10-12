@@ -47,5 +47,5 @@
         @error('newStaple') <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p> @enderror
     </form>
 
-    @include('livewire.partials.tile-grid-bar', ['offLabel' => 'Not staples', 'onLabel' => 'Make staples'])
+    @include('livewire.partials.tile-grid-bar', ['offLabel' => 'Remove staples', 'onLabel' => 'Make staples'])
 </div>

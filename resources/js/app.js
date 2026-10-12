@@ -38,3 +38,20 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 });
+
+// The settings menu marks the section in view: the last one reaching into the
+// upper third of the screen, so a section takes over as its heading arrives.
+document.addEventListener('alpine:init', () => {
+    window.Alpine.data('settingsMenu', () => ({
+        current: null,
+        init() {
+            const visible = new Set();
+            const sections = [...document.querySelectorAll('nav[aria-label="Settings sections"] ~ div > section[id]')];
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((e) => (e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id)));
+                this.current = sections.findLast((s) => visible.has(s.id))?.id ?? this.current;
+            }, { rootMargin: '0px 0px -66% 0px' });
+            sections.forEach((s) => observer.observe(s));
+        },
+    }));
+});
