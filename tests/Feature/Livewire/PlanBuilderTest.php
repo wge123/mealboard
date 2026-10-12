@@ -347,7 +347,7 @@ it('shows in the tray how often each recipe is already planned this week', funct
 
     planBuilder()
         ->call('openPicker', $plan->week_start_date->copy()->addDay()->toDateString(), 'dinner')
-        ->assertSeeInOrder(['Twice Soup', '×2 this week']);
+        ->assertSeeInOrder(['Twice Soup', '2 this week']);
 });
 
 function weekOf(int $weeksFromNow, bool $locked): MealPlan

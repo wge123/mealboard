@@ -149,21 +149,7 @@ it('lets both users log the same meal independently', function () {
         ->and(MealLog::where('user_id', $partner->id)->sole()->ate_it)->toBeFalse();
 });
 
-it('shows quick-log controls on the builder for past slots of a locked week', function () {
-    $plan = MealPlan::factory()->locked()->create([
-        'week_start_date' => now()->startOfWeek(CarbonInterface::MONDAY)->subWeeks(2)->toDateString(),
-    ]);
-
-    // The slot must sit inside the plan's rendered Mon–Fri grid. Child
-    // components only render full HTML on the INITIAL render, so the plan
-    // must be the one mount() auto-selects (it's the only plan).
-    lockedMealOn($plan, $plan->week_start_date->toDateString());
-
-    Livewire::actingAs(User::factory()->create())
-        ->test(PlanBuilder::class)
-        ->assertSee('Ate it?');
-});
-
+// Opening a past meal to log it is covered in PlanBuilderTest.
 it('hides quick-log controls for future weeks and draft plans', function (MealPlan $plan) {
     Livewire::actingAs(User::factory()->create())
         ->test(PlanBuilder::class)
