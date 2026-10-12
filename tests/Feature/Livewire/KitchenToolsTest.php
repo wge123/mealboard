@@ -183,5 +183,5 @@ it('names the filter in plain words when nothing matches', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)
         ->set('filter', 'not-owned')
-        ->assertSee("You have every kitchen tool the app knows.");
+        ->assertSee('You have every kitchen tool the app knows.');
 });
