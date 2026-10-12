@@ -81,121 +81,154 @@
             </div>
         @endif
 
-        {{-- Day cards: stacked on phones, five columns on lg+. --}}
-        <div class="grid grid-cols-1 gap-4 lg:grid-cols-5 lg:gap-3">
-            @foreach ($days as $day)
-                @php($isToday = $day->isToday())
-                <section class="rounded-2xl border bg-base-200 {{ $isToday ? 'border-primary/50' : 'border-base-300' }}">
-                    <header class="flex items-center justify-between px-3 pt-3 pb-1">
-                        <h2 class="text-sm font-semibold {{ $isToday ? 'text-primary' : '' }}">
-                            {{ $day->format('D') }}
-                            <span class="font-normal opacity-60">{{ $day->format('j M') }}</span>
-                        </h2>
-                        @if ($isToday)
-                            <span class="badge badge-primary badge-sm">Today</span>
-                        @endif
-                    </header>
+        @php
+            $cellKey = fn ($day, $slot) => $day->toDateString().'|'.$slot->value;
+            $openCell = $pickerDate && $pickerSlot ? $pickerDate.'|'.$pickerSlot : null;
+            $minutesOf = fn ($recipe) => (int) $recipe->prep_minutes + (int) $recipe->cook_minutes;
+            // The pinned meal column: its shadows paint over the gutter and the gap beside it, so scrolled days never peek out.
+            $pin = 'sticky left-0 z-10 bg-base-100 shadow-[-1.5rem_0_0_var(--color-base-100),0.5rem_0_0_var(--color-base-100)]';
+        @endphp
 
-                    <div class="flex flex-col gap-2 p-3 pt-2">
-                        @foreach ($slots as $slot)
-                            @php($meal = $meals->get($day->toDateString().'|'.$slot->value))
-                            <div class="slot-row rounded-xl bg-base-100 p-3" style="--slot-accent: var(--meal-{{ $slot->value }})">
-                                <div class="slot-label text-[10px] font-semibold tracking-widest uppercase">{{ $slot->value }}</div>
+        <p class="mb-2 text-sm text-base-content/70">{{ $meals->count() }} of {{ $days->count() * count($slots) }} meals planned</p>
 
-                                @if ($meal)
-                                    <a href="{{ route('recipes.show', $meal->recipe) }}"
-                                       class="mt-0.5 block font-[family-name:var(--font-display)] leading-snug font-semibold hover:text-primary">
-                                        {{ $meal->recipe->title }}
-                                    </a>
-
-                                    @php($minutes = (int) $meal->recipe->prep_minutes + (int) $meal->recipe->cook_minutes)
-                                    @if ($minutes > 0)
-                                        <span class="badge badge-ghost badge-sm mt-1.5">{{ $minutes }} min</span>
-                                    @endif
-
-                                    @if ($editable)
-                                        <div class="mt-1.5 flex gap-1">
-                                            <button type="button" class="btn btn-ghost btn-sm min-h-11 px-2"
-                                                    wire:click="openPicker('{{ $day->toDateString() }}', '{{ $slot->value }}')">
-                                                Swap
-                                            </button>
-                                            <button type="button" class="btn btn-ghost btn-sm min-h-11 px-2 text-error"
-                                                    wire:click="clearSlot('{{ $day->toDateString() }}', '{{ $slot->value }}')"
-                                                    wire:loading.attr="disabled" wire:target="clearSlot">
-                                                Clear
-                                            </button>
-                                        </div>
-                                    @endif
-
-                                    {{-- Past slots (date-only, today included) on locked/completed weeks get quick-log controls. --}}
-                                    @if ($loggable && $day->lte(today()))
-                                        <livewire:meal-log-controls :planned-meal="$meal" :key="'log-'.$meal->id" />
-                                    @endif
-                                @else
-                                    @if ($editable)
-                                        <button type="button"
-                                                class="btn btn-ghost mt-1.5 min-h-11 w-full justify-start border border-dashed border-base-300 font-normal text-base-content/60"
-                                                wire:click="openPicker('{{ $day->toDateString() }}', '{{ $slot->value }}')">
-                                            + Add
-                                        </button>
-                                    @else
-                                        <div class="mt-1 text-sm text-base-content/40">—</div>
-                                    @endif
-                                @endif
-                            </div>
+        {{-- Meals by days. On phones the meal column stays put and the days
+             scroll sideways, snapping to whole days. The scroll padding is
+             the gutter, the meal column and two cell gaps, so a snapped day
+             starts just right of the meal column. --}}
+        <div class="-mx-4 snap-x snap-mandatory scroll-ps-[6.25rem] overflow-x-auto px-4 pb-2 lg:mx-0 lg:overflow-visible lg:px-0">
+            <table class="w-full min-w-[calc(4.5rem+5*9.5rem)] table-fixed border-separate border-spacing-1.5">
+                <colgroup><col class="w-18"></colgroup>
+                <thead>
+                    <tr>
+                        <th class="{{ $pin }}"><span class="sr-only">Meal</span></th>
+                        @foreach ($days as $day)
+                            <th scope="col" class="snap-start text-left text-sm font-semibold {{ $day->isToday() ? 'text-primary' : '' }}">
+                                {{ $day->format('D') }} <span class="font-normal text-base-content/60">{{ $day->format('j M') }}</span>
+                            </th>
                         @endforeach
-                    </div>
-                </section>
-            @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($slots as $slot)
+                        <tr style="--slot-accent: var(--meal-{{ $slot->value }})">
+                            <th scope="row" class="slot-label {{ $pin }} pe-1 text-left text-[10px] font-semibold tracking-widest uppercase">{{ $slot->value }}</th>
+                            @foreach ($days as $day)
+                                @php
+                                    $meal = $meals->get($cellKey($day, $slot));
+                                    $label = $slot->value.' '.$day->format('l');
+                                    $open = $openCell === $cellKey($day, $slot);
+                                    $tile = 'flex h-24 w-full flex-col justify-between gap-1 rounded-xl p-2 text-left transition '.($open ? 'ring-2 ring-primary ring-offset-2 ring-offset-base-100 ' : '');
+                                @endphp
+                                <td class="align-top">
+                                    @if ($meal)
+                                        @php
+                                            $minutes = $minutesOf($meal->recipe);
+                                            $facts = collect([$minutes > 0 ? $minutes.' min' : null, $meal->recipe->cuisine ? \Illuminate\Support\Str::ucfirst($meal->recipe->cuisine) : null])->filter()->implode(' · ');
+                                        @endphp
+                                        @if ($editable || ($loggable && $day->lte(today())))
+                                            <button type="button" class="slot-tile {{ $tile }}" aria-label="{{ $label }}: {{ $meal->recipe->title }}"
+                                                    wire:click="{{ $editable ? 'openPicker' : 'openMeal' }}('{{ $day->toDateString() }}', '{{ $slot->value }}')">
+                                                <span class="line-clamp-3 text-sm leading-tight font-semibold">{{ $meal->recipe->title }}</span>
+                                                <span class="truncate text-[11px] text-base-content/70">{{ $facts }}</span>
+                                            </button>
+                                        @else
+                                            <a href="{{ route('recipes.show', $meal->recipe) }}" class="slot-tile {{ $tile }} hover:brightness-95">
+                                                <span class="line-clamp-3 text-sm leading-tight font-semibold">{{ $meal->recipe->title }}</span>
+                                                <span class="truncate text-[11px] text-base-content/70">{{ $facts }}</span>
+                                            </a>
+                                        @endif
+                                    @elseif ($editable)
+                                        <button type="button" class="{{ $tile }} items-center justify-center border border-dashed border-base-300 text-xl text-base-content/50 hover:border-base-content/40"
+                                                wire:click="openPicker('{{ $day->toDateString() }}', '{{ $slot->value }}')"
+                                                aria-label="Add {{ $label }}">+</button>
+                                    @else
+                                        <div class="grid h-24 place-items-center rounded-xl border border-dashed border-base-300 text-base-content/40">—</div>
+                                    @endif
+                                </td>
+                            @endforeach
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <th scope="row" class="{{ $pin }} pe-1 text-left text-[10px] font-semibold tracking-widest text-base-content/60 uppercase">Cook time</th>
+                        @foreach ($days as $day)
+                            @php
+                                $dayMinutes = collect($slots)->sum(fn ($slot) => $meals->has($cellKey($day, $slot)) ? $minutesOf($meals->get($cellKey($day, $slot))->recipe) : 0);
+                            @endphp
+                            <td class="px-2 text-xs text-base-content/70">{{ $dayMinutes > 0 ? $dayMinutes.' min' : '—' }}</td>
+                        @endforeach
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        {{-- Recipe picker: Livewire-driven daisyUI modal. --}}
-        @if ($pickerDate && $pickerSlot)
-            <div class="modal modal-open modal-bottom sm:modal-middle" role="dialog" aria-modal="true">
-                <div class="modal-box border border-base-300">
-                    <div class="slot-label text-[10px] font-semibold tracking-widest uppercase" style="--slot-accent: var(--meal-{{ $pickerSlot }})">
-                        {{ $pickerSlot }}
+        {{-- The tray: recipes to pick on a draft week, the meal to log on a locked one.
+             It sits above the phone tab bar. --}}
+        @if ($openCell)
+            @php
+                $trayDay = \Illuminate\Support\Carbon::parse($pickerDate);
+                $trayMeal = $meals->get($openCell);
+            @endphp
+            <div class="fixed inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 max-h-[50vh] overflow-y-auto rounded-t-3xl lg:max-h-[60vh] border-t border-base-300 bg-base-100 px-4 pt-4 pb-6 shadow-2xl lg:bottom-0"
+                 role="dialog" aria-label="{{ ucfirst($pickerSlot) }} {{ $trayDay->format('l') }}"
+                 x-data x-on:keydown.escape.window="$wire.closePicker()">
+                <div class="mx-auto max-w-5xl">
+                    <div class="mb-3 flex flex-wrap items-center gap-2">
+                        <div class="me-auto" style="--slot-accent: var(--meal-{{ $pickerSlot }})">
+                            <div class="slot-label text-[10px] font-semibold tracking-widest uppercase">{{ $pickerSlot }}</div>
+                            <h3 class="font-[family-name:var(--font-display)] text-lg font-semibold">{{ $trayDay->format('D j M') }}</h3>
+                        </div>
+                        @if ($editable)
+                            <input type="search" class="input min-h-11 w-44 sm:w-64" placeholder="Search recipes…"
+                                   wire:model.live.debounce.300ms="pickerSearch" aria-label="Search recipes">
+                            @if ($trayMeal)
+                                <button type="button" class="btn btn-ghost min-h-11 text-error"
+                                        wire:click="clearSlot('{{ $pickerDate }}', '{{ $pickerSlot }}')"
+                                        wire:loading.attr="disabled" wire:target="clearSlot">Clear</button>
+                            @endif
+                        @endif
+                        <button type="button" class="btn btn-circle btn-ghost min-h-11 min-w-11" wire:click="closePicker" aria-label="Close">&times;</button>
                     </div>
-                    <h3 class="mt-0.5 font-[family-name:var(--font-display)] text-xl font-semibold">
-                        Pick a recipe — {{ \Illuminate\Support\Carbon::parse($pickerDate)->format('D j M') }}
-                    </h3>
 
-                    <input type="search" class="input mt-3 min-h-11 w-full" placeholder="Search recipes…"
-                           wire:model.live.debounce.300ms="pickerSearch" aria-label="Search recipes">
-
-                    <div class="mt-3 max-h-80 overflow-y-auto">
-                        @if ($pickerRecipes->isEmpty())
-                            <p class="py-4 text-center text-sm opacity-60">No approved recipes match this slot.</p>
-                        @else
-                            <div class="flex flex-col gap-1.5">
-                                @foreach ($pickerRecipes as $recipe)
-                                    @php($minutes = (int) $recipe->prep_minutes + (int) $recipe->cook_minutes)
+                    @if (! $editable && $trayMeal)
+                        <a href="{{ route('recipes.show', $trayMeal->recipe) }}" class="font-[family-name:var(--font-display)] text-xl font-semibold hover:text-primary">{{ $trayMeal->recipe->title }}</a>
+                        <div data-test="log-meal-{{ $trayMeal->id }}">
+                            <livewire:meal-log-controls :planned-meal="$trayMeal" :key="'log-'.$trayMeal->id" />
+                        </div>
+                    @elseif ($pickerRecipes->isEmpty())
+                        <p class="py-4 text-center text-sm text-base-content/70">No approved recipes match this slot.</p>
+                    @else
+                        <ul class="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+                            @foreach ($pickerRecipes as $recipe)
+                                @php
+                                    $minutes = $minutesOf($recipe);
+                                    $uses = $usesThisWeek->get($recipe->id, 0);
+                                @endphp
+                                <li wire:key="pick-{{ $recipe->id }}">
                                     <button type="button"
-                                            class="slot-row flex min-h-11 w-full items-center justify-between gap-2 rounded-lg bg-base-200 px-3 py-2 text-left hover:bg-base-300"
-                                            style="--slot-accent: var(--meal-{{ $recipe->meal_type->value }})"
+                                            class="flex h-full min-h-24 w-full flex-col justify-between gap-1 rounded-xl border border-base-300 p-2 text-left hover:border-primary aria-pressed:border-primary aria-pressed:bg-primary/10"
+                                            aria-pressed="{{ $trayMeal?->recipe_id === $recipe->id ? 'true' : 'false' }}"
                                             wire:click="choose({{ $recipe->id }})"
                                             wire:loading.attr="disabled" wire:target="choose">
-                                        <span class="font-medium">{{ $recipe->title }}</span>
-                                        <span class="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                                        <span class="line-clamp-3 text-sm leading-tight font-medium">{{ $recipe->title }}</span>
+                                        {{-- Badges wrap onto two lines inside a narrow tile instead of overflowing. --}}
+                                        <span class="flex flex-wrap gap-1 [&_.badge]:h-auto [&_.badge]:py-0.5 [&_.badge]:text-left [&_.badge]:leading-tight">
                                             @include('livewire.partials.missing-tools-badge', ['missing' => $missingTools[$recipe->id]])
                                             @foreach ($avoidedIngredients[$recipe->id] as $word)
                                                 <span class="badge badge-error badge-soft badge-sm" data-avoided-badge>contains: {{ $word }}</span>
                                             @endforeach
-                                            @if ($minutes > 0)
-                                                <span class="badge badge-ghost badge-sm">{{ $minutes }} min</span>
+                                        </span>
+                                        <span class="flex justify-between gap-1 text-[11px] text-base-content/70">
+                                            <span>{{ $minutes > 0 ? $minutes.' min' : '' }}</span>
+                                            @if ($uses > 0)
+                                                <span>×{{ $uses }} this week</span>
                                             @endif
                                         </span>
                                     </button>
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-
-                    <div class="modal-action">
-                        <button type="button" class="btn btn-ghost min-h-11" wire:click="closePicker">Cancel</button>
-                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
                 </div>
-                <button type="button" class="modal-backdrop" wire:click="closePicker" aria-label="Close"></button>
             </div>
         @endif
     @endif

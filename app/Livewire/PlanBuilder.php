@@ -133,7 +133,26 @@ class PlanBuilder extends Component
             ['recipe_id' => $recipe->id],
         );
 
-        $this->closePicker();
+        $this->moveToNextEmptyCell($plan);
+    }
+
+    /**
+     * Open a past meal of a locked or completed week in the tray, where it
+     * is logged. Read-only: nothing about the plan changes.
+     */
+    public function openMeal(string $date, string $slot): void
+    {
+        $plan = $this->plan();
+
+        abort_unless($plan !== null, 404);
+        abort_unless(in_array($plan->status, [MealPlanStatus::Locked, MealPlanStatus::Completed], true), 403, 'Only locked weeks are logged.');
+        abort_unless($this->weekDates($plan)->contains($date), 422);
+        abort_unless(Carbon::parse($date)->lte(today()), 403, 'That day has not happened yet.');
+        abort_unless($plan->plannedMeals()->whereDate('date', $date)->where('slot', MealSlot::from($slot))->exists(), 404);
+
+        $this->pickerDate = $date;
+        $this->pickerSlot = $slot;
+        $this->pickerSearch = '';
     }
 
     public function clearSlot(string $date, string $slot): void
@@ -175,10 +194,40 @@ class PlanBuilder extends Component
                 && $plan->status === MealPlanStatus::Locked
                 && $this->weekHasEnded($plan),
             'pickerRecipes' => $pickerRecipes,
+            // How many cells each recipe already fills this week, for the tray tiles.
+            'usesThisWeek' => $plan ? $plan->plannedMeals->countBy('recipe_id') : collect(),
             'missingTools' => app(MissingKitchenTools::class)->forMany($pickerRecipes),
             // Marked, not hidden: the household may still pick one for guests.
             'avoidedIngredients' => app(HouseholdPreferences::class)->avoidedInRecipes($pickerRecipes),
         ]);
+    }
+
+    /**
+     * After a pick the tray moves to the next empty cell, reading the grid
+     * row by row (each meal across the week) and wrapping to the top; it
+     * closes when the week is full.
+     */
+    private function moveToNextEmptyCell(MealPlan $plan): void
+    {
+        $filled = $plan->plannedMeals()->get()
+            ->map(fn (PlannedMeal $meal) => $meal->date->toDateString().'|'.$meal->slot->value)
+            ->flip();
+
+        $cells = collect(MealSlot::cases())
+            ->flatMap(fn (MealSlot $slot) => $this->weekDates($plan)->map(fn (string $date) => $date.'|'.$slot->value));
+
+        $from = $cells->search($this->pickerDate.'|'.$this->pickerSlot);
+        $next = $cells->slice($from + 1)->concat($cells->take($from))
+            ->first(fn (string $cell) => ! $filled->has($cell));
+
+        if ($next === null) {
+            $this->closePicker();
+
+            return;
+        }
+
+        [$this->pickerDate, $this->pickerSlot] = explode('|', $next);
+        $this->pickerSearch = '';
     }
 
     private function weekHasEnded(MealPlan $plan): bool
@@ -220,7 +269,8 @@ class PlanBuilder extends Component
      */
     private function pickerRecipes(): Collection
     {
-        if ($this->pickerSlot === null) {
+        // A locked week's tray shows the meal to log, not recipes to pick.
+        if ($this->pickerSlot === null || $this->plan()?->status !== MealPlanStatus::Draft) {
             return collect();
         }
 

@@ -158,6 +158,11 @@
     .slot-label {
         color: color-mix(in oklab, var(--slot-accent) 55%, var(--color-base-content));
     }
+
+    /* A planned meal on the plan grid, tinted by its slot. */
+    .slot-tile {
+        background: color-mix(in oklab, var(--slot-accent) 22%, var(--color-base-100));
+    }
 }
 
 /* A tapped settings tile slides to its new place (tileSelect in app.js). */
