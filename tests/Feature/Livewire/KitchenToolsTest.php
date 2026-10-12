@@ -43,13 +43,16 @@ it('shows a validation error when the new kind already exists', function (string
         ->assertHasErrors('addKind');
 })->with(['skillet', 'Frying Pan']);
 
-it('shows a delete control on household kinds only', function () {
+it('shows a delete control in the details of household kinds only', function () {
     $kind = (new KitchenToolInventory)->addKind('tortilla press');
     $catalog = KitchenToolKind::query()->where('name', 'wok')->firstOrFail();
 
     Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)
+        ->assertDontSeeHtml("data-test=\"delete-kind-{$kind->id}\"")
+        ->call('openDetails', $kind->id)
         ->assertSeeHtml("data-test=\"delete-kind-{$kind->id}\"")
+        ->call('openDetails', $catalog->id)
         ->assertDontSeeHtml("data-test=\"delete-kind-{$catalog->id}\"");
 });
 
@@ -119,3 +122,51 @@ it('keeps item variants out of the catalog kinds and resolves them to their kind
     expect($inventory->kinds())->not->toContain($variant)
         ->and($inventory->resolve($variant)?->name)->toBe('skillet');
 })->with(['cast iron skillet', 'nonstick pan']);
+
+it('filters the tiles to owned or missing kinds', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->set('filter', 'missing')
+        ->assertSee('Wok')
+        ->assertDontSee("Chef's Knife")
+        ->set('filter', 'owned')
+        ->assertSee("Chef's Knife")
+        ->assertDontSee('Wok');
+});
+
+it('marks the picked kinds owned or not owned in one go and tells the settings menu', function () {
+    $wok = KitchenToolKind::where('name', 'wok')->firstOrFail();
+    $oven = KitchenToolKind::where('name', 'oven')->firstOrFail();
+    $inventory = new KitchenToolInventory;
+
+    $component = Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->call('markMany', [$wok->id], true)
+        ->assertDispatched('settings-changed');
+
+    expect($inventory->owns($wok))->toBeTrue();
+
+    $component->call('markMany', [$wok->id, $oven->id], false);
+
+    expect($inventory->owns($wok))->toBeFalse()
+        ->and($inventory->owns($oven))->toBeFalse();
+});
+
+it('tells the settings menu when one tap changes ownership', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->call('toggleOwned', KitchenToolKind::where('name', 'wok')->value('id'))
+        ->assertDispatched('settings-changed');
+});
+
+it('shows a kind\'s note field only in its details, and closes them', function () {
+    $wok = KitchenToolKind::where('name', 'wok')->firstOrFail();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->assertDontSeeHtml('aria-label="Note for Wok"')
+        ->call('openDetails', $wok->id)
+        ->assertSeeHtml('aria-label="Note for Wok"')
+        ->call('closeDetails')
+        ->assertDontSeeHtml('aria-label="Note for Wok"');
+});

@@ -12,6 +12,7 @@ it('lists a household other name under its kind with a remove control', function
 
     Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)
+        ->call('openDetails', $otherName->kitchen_tool_kind_id)
         ->assertSee('big pan')
         ->assertSeeHtml("data-test=\"remove-other-name-{$otherName->id}\"");
 });
@@ -21,6 +22,7 @@ it('does not show catalog other names', function () {
 
     Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)
+        ->call('openDetails', $catalog->kitchen_tool_kind_id)
         ->assertDontSee('frying pan')
         ->assertDontSeeHtml("data-test=\"remove-other-name-{$catalog->id}\"");
 });
@@ -31,6 +33,7 @@ it('removes a household other name from the section', function () {
 
     Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)
+        ->call('openDetails', $otherName->kitchen_tool_kind_id)
         ->call('removeOtherName', $otherName->id)
         ->assertHasNoErrors()
         ->assertDontSee('big pan');
