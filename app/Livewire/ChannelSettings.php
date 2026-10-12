@@ -28,17 +28,20 @@ class ChannelSettings extends Component
         ]);
 
         $this->reset('channelId', 'name');
+        $this->dispatch('settings-changed');
     }
 
     public function toggle(int $id): void
     {
         $channel = YouTubeChannel::findOrFail($id);
         $channel->update(['active' => ! $channel->active]);
+        $this->dispatch('settings-changed');
     }
 
     public function remove(int $id): void
     {
         YouTubeChannel::findOrFail($id)->delete();
+        $this->dispatch('settings-changed');
     }
 
     public function render(): View

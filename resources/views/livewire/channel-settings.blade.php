@@ -1,9 +1,9 @@
 <div>
     <h2 class="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">YouTube channels</h2>
-    <p class="mt-1 mb-5 text-sm opacity-60">Active channels are polled daily for new recipe videos.</p>
+    <p class="mt-1 mb-4 text-sm opacity-60">Active channels are polled daily for new recipe videos.</p>
 
     {{-- Add-channel form: joined inputs stack vertically on phones. --}}
-    <form wire:submit="add" class="mb-6">
+    <form wire:submit="add" class="mb-4">
         <div class="join join-vertical w-full sm:join-horizontal">
             <input type="text" class="input join-item min-h-11 w-full sm:flex-1 {{ $errors->has('channelId') ? 'input-error' : '' }}"
                    placeholder="Channel ID (UC…)" wire:model="channelId" aria-label="Channel ID">
@@ -29,17 +29,14 @@
             <p class="mt-1 text-sm opacity-60">Add a YouTube channel above to start discovering recipes.</p>
         </div>
     @else
-        <ul class="divide-y divide-base-300 rounded-2xl border border-base-300 bg-base-100">
+        <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ($channels as $channel)
-                <li class="flex items-center gap-3 px-4 py-3" wire:key="channel-{{ $channel->id }}">
+                <li class="flex items-center gap-3 rounded-xl border border-base-300 bg-base-100 p-3 {{ $channel->active ? '' : 'opacity-60' }}" wire:key="channel-{{ $channel->id }}">
+                    <span aria-hidden="true" class="grid size-10 shrink-0 place-items-center rounded-full bg-secondary font-semibold text-secondary-content">{{ mb_strtoupper(mb_substr($channel->name, 0, 1)) }}</span>
                     <div class="min-w-0 flex-1">
-                        <span class="block truncate font-medium {{ $channel->active ? '' : 'opacity-50' }}">{{ $channel->name }}</span>
-                        <span class="block truncate text-xs opacity-50">{{ $channel->channel_id }}</span>
+                        <span class="block truncate font-medium">{{ $channel->name }}</span>
+                        <span class="block truncate text-xs opacity-50">{{ $channel->active ? 'Polled daily' : 'Inactive' }} · {{ $channel->channel_id }}</span>
                     </div>
-
-                    @unless ($channel->active)
-                        <span class="badge badge-soft badge-neutral badge-sm shrink-0">Inactive</span>
-                    @endunless
 
                     {{-- min-h-11 label pads the toggle's hit area to tap-target size. --}}
                     <label class="flex min-h-11 shrink-0 cursor-pointer items-center">
@@ -49,13 +46,11 @@
                                aria-label="{{ $channel->active ? 'Deactivate' : 'Activate' }} {{ $channel->name }}">
                     </label>
 
-                    <button type="button" class="btn btn-ghost btn-sm min-h-11 shrink-0 text-error"
+                    <button type="button" class="btn btn-ghost btn-sm min-h-11 min-w-11 shrink-0 text-error"
                             wire:click="remove({{ $channel->id }})"
                             wire:confirm="Remove {{ $channel->name }}?"
-                            wire:loading.attr="disabled" wire:target="remove">
-                        <span wire:loading wire:target="remove" class="loading loading-spinner loading-xs"></span>
-                        Remove
-                    </button>
+                            wire:loading.attr="disabled" wire:target="remove"
+                            aria-label="Remove {{ $channel->name }}">&times;</button>
                 </li>
             @endforeach
         </ul>
