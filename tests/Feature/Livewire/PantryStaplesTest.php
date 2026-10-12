@@ -73,3 +73,49 @@ it('lists every staple even when the other ingredients are capped', function () 
         $component->assertSee(sprintf('zz staple %02d', $i));
     }
 });
+
+it('filters the tiles to staples or to everything else', function () {
+    Ingredient::factory()->create(['name' => 'avocado']);
+    Ingredient::factory()->pantryStaple()->create(['name' => 'soy sauce']);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(PantryStaples::class)
+        ->set('filter', 'staples')
+        ->assertSee('soy sauce')
+        ->assertDontSee('avocado')
+        ->set('filter', 'others')
+        ->assertSee('avocado')
+        ->assertDontSee('soy sauce');
+});
+
+it('marks the picked ingredients as staples or not in one go and tells the settings menu', function () {
+    $salt = Ingredient::factory()->create(['name' => 'salt']);
+    $rice = Ingredient::factory()->create(['name' => 'rice']);
+
+    $component = Livewire::actingAs(User::factory()->create())
+        ->test(PantryStaples::class)
+        ->call('markMany', [$salt->id, $rice->id], true)
+        ->assertDispatched('settings-changed');
+
+    expect($salt->refresh()->is_pantry_staple)->toBeTrue()
+        ->and($rice->refresh()->is_pantry_staple)->toBeTrue();
+
+    $component->call('markMany', [$rice->id], false);
+
+    expect($rice->refresh()->is_pantry_staple)->toBeFalse();
+});
+
+it('tells the settings menu when a tap or a new staple changes the staples', function () {
+    $salt = Ingredient::factory()->create(['name' => 'salt']);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(PantryStaples::class)
+        ->call('toggle', $salt->id)
+        ->assertDispatched('settings-changed');
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(PantryStaples::class)
+        ->set('newStaple', 'cumin')
+        ->call('addStaple')
+        ->assertDispatched('settings-changed');
+});
