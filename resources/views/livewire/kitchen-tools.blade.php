@@ -54,16 +54,23 @@
 
     @include('livewire.partials.tile-grid-bar', ['offLabel' => 'Mark not owned', 'onLabel' => 'Mark owned'])
 
-    {{-- Details sheet: note, household other names, delete --}}
+    {{-- Details sheet: owned toggle, note, other names, delete --}}
     @if ($detail)
         <div class="modal modal-open modal-bottom sm:modal-middle" role="dialog" aria-label="{{ $detail->display_name }} details"
              x-on:keydown.escape.window="$wire.closeDetails()">
-            <div class="modal-box">
+            <div class="modal-box [scrollbar-gutter:stable]">
                 <div class="flex items-center gap-3">
                     <span class="size-9 text-primary [&>svg]:size-full" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($detail->name) }}</span>
                     <h3 class="flex-1 text-lg font-semibold">{{ $detail->display_name }}</h3>
                     <button type="button" class="btn btn-circle btn-ghost min-h-11 min-w-11" wire:click="closeDetails" aria-label="Close">&times;</button>
                 </div>
+
+                <label class="mt-4 flex min-h-11 cursor-pointer items-center justify-between gap-3">
+                    <span class="text-sm font-medium">I have this</span>
+                    <input type="checkbox" class="toggle toggle-success"
+                           data-test="detail-owned" @checked($detail->owned)
+                           wire:click="toggleOwned({{ $detail->id }})">
+                </label>
 
                 <form class="mt-4" wire:submit="saveNote({{ $detail->id }})">
                     <label for="note-{{ $detail->id }}" class="mb-1 block text-sm font-medium">Note</label>
@@ -78,21 +85,34 @@
                     <p class="mt-1 text-xs text-base-content/70">For you only; never used to match recipes.</p>
                 </form>
 
-                @if ($detail->otherNames->isNotEmpty())
-                    <h4 class="mt-4 mb-1 text-sm font-medium">Other names you added</h4>
+                <h4 class="mt-4 mb-1 text-sm font-medium">Other names</h4>
+                @if ($detail->otherNames->isEmpty())
+                    <p class="text-sm text-base-content/70">No other names yet. Add one so recipes that call it something else still match.</p>
+                @else
                     <ul class="flex flex-wrap gap-2" aria-label="Other names for {{ $detail->display_name }}">
                         @foreach ($detail->otherNames as $otherName)
                             <li class="badge badge-outline h-auto gap-1 py-1" wire:key="other-name-{{ $otherName->id }}">
                                 <span>{{ $otherName->name }}</span>
-                                <button type="button" class="btn btn-ghost btn-xs min-h-11 min-w-11"
-                                        data-test="remove-other-name-{{ $otherName->id }}"
-                                        wire:click="removeOtherName({{ $otherName->id }})"
-                                        aria-label="Remove other name {{ $otherName->name }}">&times;</button>
+                                @if ($otherName->origin === \App\Enums\KitchenToolOrigin::Household)
+                                    <button type="button" class="btn btn-ghost btn-xs min-h-11 min-w-11"
+                                            data-test="remove-other-name-{{ $otherName->id }}"
+                                            wire:click="removeOtherName({{ $otherName->id }})"
+                                            aria-label="Remove other name {{ $otherName->name }}">&times;</button>
+                                @endif
                             </li>
                         @endforeach
                     </ul>
                 @endif
                 @error('removeOtherName') <p class="mt-2 text-sm text-error" role="alert">{{ $message }}</p> @enderror
+
+                <form class="mt-2 flex gap-2" wire:submit="addOtherName({{ $detail->id }})" data-test="add-other-name-form">
+                    <input type="text" maxlength="255" class="input min-h-11 min-w-0 flex-1"
+                           placeholder="Another name for it"
+                           aria-label="Add an other name for {{ $detail->display_name }}"
+                           wire:model="newOtherName">
+                    <button type="submit" class="btn min-h-11">Add</button>
+                </form>
+                @error('addOtherName') <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p> @enderror
 
                 @if ($detail->origin === \App\Enums\KitchenToolOrigin::Household)
                     <div class="mt-6 border-t border-base-300 pt-4">

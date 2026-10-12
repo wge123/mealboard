@@ -4,6 +4,7 @@
     $pick (method a tile calls with its number), $model (the field's property),
     $save (method the Other field submits to), $suffix (shown under each number).
 --}}
+{{-- Six presets plus Other: on a phone (four columns) Other spans two, so the second row has no orphan. --}}
 @php $isPreset = in_array((int) $value, $presets, true); @endphp
 
 <div x-data="{ other: false }">
@@ -11,14 +12,14 @@
     <div class="grid grid-cols-4 gap-2 sm:grid-cols-7">
         @foreach ($presets as $preset)
             <button type="button" data-test="{{ $key }}-{{ $preset }}" aria-pressed="{{ (int) $value === $preset ? 'true' : 'false' }}"
-                    class="flex min-h-14 flex-col items-center justify-center rounded-xl border {{ (int) $value === $preset ? 'border-primary bg-primary text-primary-content' : 'border-base-300 bg-base-100' }}"
+                    class="flex min-h-14 flex-col items-center justify-center rounded-xl border {{ (int) $value === $preset ? 'border-primary bg-primary/10 font-medium' : 'border-base-300 bg-base-100' }}"
                     wire:click="{{ $pick }}({{ $preset }})" x-on:click="other = false">
                 <span class="text-lg leading-none font-semibold tabular-nums">{{ $preset }}</span>
                 @if ($suffix) <span class="text-[11px] opacity-70">{{ $suffix }}</span> @endif
             </button>
         @endforeach
         <button type="button" data-test="{{ $key }}-other" aria-pressed="{{ $isPreset ? 'false' : 'true' }}"
-                class="flex min-h-14 flex-col items-center justify-center rounded-xl border {{ $isPreset ? 'border-dashed border-base-300' : 'border-primary bg-primary text-primary-content' }}"
+                class="col-span-2 flex min-h-14 flex-col items-center justify-center rounded-xl border sm:col-span-1 {{ $isPreset ? 'border-dashed border-base-300' : 'border-primary bg-primary/10 font-medium' }}"
                 x-on:click="other = ! other">
             @if ($isPreset)
                 <span class="text-sm font-medium">Other</span>

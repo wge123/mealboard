@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Enums\KitchenToolFilter;
-use App\Enums\KitchenToolOrigin;
 use App\Exceptions\KitchenToolRefused;
 use App\Models\KitchenToolKind;
 use App\Models\KitchenToolOtherName;
@@ -63,6 +62,8 @@ class KitchenTools extends Component
     public function openDetails(int $kindId): void
     {
         $this->detailId = KitchenToolKind::query()->findOrFail($kindId)->id;
+        $this->reset('newOtherName');
+        $this->resetErrorBag('addOtherName');
     }
 
     public function closeDetails(): void
@@ -108,6 +109,21 @@ class KitchenTools extends Component
         }
     }
 
+    public string $newOtherName = '';
+
+    public function addOtherName(KitchenToolInventory $inventory, int $kindId): void
+    {
+        try {
+            $inventory->addOtherName(KitchenToolKind::query()->findOrFail($kindId), $this->newOtherName);
+        } catch (KitchenToolRefused $e) {
+            $this->addError('addOtherName', $e->getMessage());
+
+            return;
+        }
+
+        $this->reset('newOtherName');
+    }
+
     public function removeOtherName(KitchenToolInventory $inventory, int $otherNameId): void
     {
         try {
@@ -126,9 +142,9 @@ class KitchenTools extends Component
             ->orderBy('name')
             ->get();
 
-        // Only the open kind's household other names are shown; catalog ones work but are not listed.
+        // The open kind's other names: household ones can be removed, catalog ones are only listed.
         $detail = $this->detailId === null ? null : KitchenToolKind::query()
-            ->with(['otherNames' => fn ($q) => $q->where('origin', KitchenToolOrigin::Household)->orderBy('name')])
+            ->with(['otherNames' => fn ($q) => $q->orderBy('name')])
             ->find($this->detailId);
 
         return view('livewire.kitchen-tools', ['kinds' => $kinds, 'detail' => $detail]);
