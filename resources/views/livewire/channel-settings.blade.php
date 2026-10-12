@@ -31,7 +31,7 @@
     @else
         <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ($channels as $channel)
-                <li class="flex items-center gap-3 rounded-xl border border-base-300 bg-base-100 p-3 {{ $channel->active ? '' : 'opacity-60' }}" wire:key="channel-{{ $channel->id }}">
+                <li class="flex items-center gap-3 rounded-2xl border border-base-300 bg-base-100 p-3 {{ $channel->active ? '' : 'opacity-60' }}" wire:key="channel-{{ $channel->id }}">
                     <span aria-hidden="true" class="grid size-10 shrink-0 place-items-center rounded-full bg-secondary font-semibold text-secondary-content">{{ mb_strtoupper(mb_substr($channel->name, 0, 1)) }}</span>
                     <div class="min-w-0 flex-1">
                         <span class="block truncate font-medium">{{ $channel->name }}</span>

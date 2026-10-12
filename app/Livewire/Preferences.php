@@ -40,17 +40,32 @@ class Preferences extends Component
         $this->householdSize = $preferences->householdSize();
     }
 
-    public function saveLimits(HouseholdPreferences $preferences): void
+    /**
+     * Save the minutes limit alone; the ingredient limit is re-saved from
+     * storage, never from its field, so an unsent draft there stays unsent.
+     */
+    public function saveMinutes(HouseholdPreferences $preferences): void
     {
-        $this->validate([
-            'weekdayMinutes' => 'required|integer',
-            'weekdayIngredients' => 'required|integer',
-        ]);
+        $this->validate(['weekdayMinutes' => 'required|integer']);
 
         try {
-            $preferences->setWeekdayLimits((int) $this->weekdayMinutes, (int) $this->weekdayIngredients);
+            $preferences->setWeekdayLimits((int) $this->weekdayMinutes, $preferences->weekdayLimits()['ingredients']);
         } catch (HouseholdPreferenceRefused $e) {
-            $this->addError('weekdayLimits', $e->getMessage());
+            $this->addError('weekdayMinutes', $e->getMessage());
+        }
+    }
+
+    /**
+     * Save the ingredient limit alone; the minutes limit is re-saved from storage.
+     */
+    public function saveIngredients(HouseholdPreferences $preferences): void
+    {
+        $this->validate(['weekdayIngredients' => 'required|integer']);
+
+        try {
+            $preferences->setWeekdayLimits($preferences->weekdayLimits()['minutes'], (int) $this->weekdayIngredients);
+        } catch (HouseholdPreferenceRefused $e) {
+            $this->addError('weekdayIngredients', $e->getMessage());
         }
     }
 
@@ -68,13 +83,13 @@ class Preferences extends Component
     public function pickMinutes(HouseholdPreferences $preferences, int $minutes): void
     {
         $this->weekdayMinutes = $minutes;
-        $this->saveLimits($preferences);
+        $this->saveMinutes($preferences);
     }
 
     public function pickIngredients(HouseholdPreferences $preferences, int $ingredients): void
     {
         $this->weekdayIngredients = $ingredients;
-        $this->saveLimits($preferences);
+        $this->saveIngredients($preferences);
     }
 
     public function pickHouseholdSize(HouseholdPreferences $preferences, int $size): void
@@ -85,7 +100,7 @@ class Preferences extends Component
 
     public function toggleAvoided(HouseholdPreferences $preferences, string $word): void
     {
-        if ($preferences->avoidedIngredients()->contains(mb_strtolower(trim($word)))) {
+        if ($preferences->avoids($word)) {
             $preferences->stopAvoiding($word);
 
             return;
@@ -120,7 +135,9 @@ class Preferences extends Component
     {
         $avoided = $preferences->avoidedIngredients();
 
+        // Tiles mark what is stored, not what a field holds after a refused save.
         return view('livewire.preferences', [
+            'stored' => [...$preferences->weekdayLimits(), 'size' => $preferences->householdSize()],
             'avoided' => $avoided,
             // Suggestions first, then the household's own words, each once.
             'avoidTiles' => collect(self::AVOID_SUGGESTIONS)->merge($avoided)->unique()->values(),

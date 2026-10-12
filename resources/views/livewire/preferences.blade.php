@@ -8,21 +8,20 @@
         <h3 id="weekday-limits" class="sr-only">Weekday limits</h3>
         @include('livewire.partials.preset-tiles', [
             'key' => 'minutes', 'label' => 'Weekday limits: minutes total', 'presets' => $this::MINUTE_PRESETS,
-            'value' => $weekdayMinutes, 'pick' => 'pickMinutes', 'model' => 'weekdayMinutes', 'save' => 'saveLimits', 'suffix' => 'min',
+            'value' => $stored['minutes'], 'pick' => 'pickMinutes', 'model' => 'weekdayMinutes', 'save' => 'saveMinutes', 'suffix' => 'min',
         ])
         @error('weekdayMinutes') <p class="text-sm text-error">{{ $message }}</p> @enderror
         @include('livewire.partials.preset-tiles', [
             'key' => 'ingredients', 'label' => 'Weekday limits: ingredients (pantry staples don\'t count)', 'presets' => $this::INGREDIENT_PRESETS,
-            'value' => $weekdayIngredients, 'pick' => 'pickIngredients', 'model' => 'weekdayIngredients', 'save' => 'saveLimits', 'suffix' => null,
+            'value' => $stored['ingredients'], 'pick' => 'pickIngredients', 'model' => 'weekdayIngredients', 'save' => 'saveIngredients', 'suffix' => null,
         ])
         @error('weekdayIngredients') <p class="text-sm text-error">{{ $message }}</p> @enderror
-        @error('weekdayLimits') <p class="text-sm text-error" role="alert">{{ $message }}</p> @enderror
     </section>
 
     <section>
         @include('livewire.partials.preset-tiles', [
             'key' => 'size', 'label' => 'Household size: how many people you cook for', 'presets' => $this::SIZE_PRESETS,
-            'value' => $householdSize, 'pick' => 'pickHouseholdSize', 'model' => 'householdSize', 'save' => 'saveHouseholdSize', 'suffix' => null,
+            'value' => $stored['size'], 'pick' => 'pickHouseholdSize', 'model' => 'householdSize', 'save' => 'saveHouseholdSize', 'suffix' => null,
         ])
         @error('householdSize') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
     </section>

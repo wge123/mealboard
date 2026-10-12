@@ -1,39 +1,13 @@
-@php
-    // A picture per kind, matched on a word in its name; the first match wins.
-    $icons = [
-        'knife' => '🔪', 'board' => '🪵', 'grater' => '🧀', 'peeler' => '🥕', 'mortar' => '🫙', 'scale' => '⚖️',
-        'measuring' => '🥄', 'bowls' => '🥣', 'colander' => '🍝', 'rolling' => '🥖', 'can opener' => '🥫',
-        'toaster' => '🍞', 'dutch oven' => '🍲', 'oven' => '🔥', 'wok' => '🥡', 'stovetop' => '🔥', 'pot' => '🍲',
-        'griddle' => '🥞', 'steamer' => '♨️', 'cake' => '🎂', 'loaf' => '🍞', 'muffin' => '🧁', 'pie' => '🥧',
-        'rack' => '🧇', 'sheet' => '🍪', 'baking' => '🥘', 'pan' => '🍳', 'skillet' => '🍳', 'fryer' => '🍟',
-        'blender' => '🥤', 'processor' => '⚙️', 'mixer' => '🌀', 'microwave' => '📡', 'rice' => '🍚', 'cooker' => '🍲',
-        'waffle' => '🧇', 'thermometer' => '🌡️', 'ladle' => '🥄', 'spatula' => '🍳', 'tongs' => '🥢', 'whisk' => '🥚',
-        'spoon' => '🥄',
-    ];
-    $iconFor = fn (string $name) => collect($icons)->first(fn ($icon, $word) => str_contains($name, $word)) ?? '🍴';
-@endphp
-
-<div x-data="{ selecting: false, picked: [] }"
-     x-on:keydown.escape.window="selecting = false; picked = []">
-    <div class="mb-1 flex flex-wrap items-end justify-between gap-2">
-        <h2 class="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">Kitchen tools</h2>
-        <div class="flex gap-2">
-            <div class="join" role="group" aria-label="Show">
-                @foreach (['all' => 'All', 'owned' => 'Owned', 'missing' => 'Missing'] as $value => $label)
-                    <button type="button" class="btn join-item btn-sm min-h-11 {{ $filter === $value ? 'btn-neutral' : '' }}"
-                            wire:click="$set('filter', '{{ $value }}')"
-                            aria-pressed="{{ $filter === $value ? 'true' : 'false' }}">{{ $label }}</button>
-                @endforeach
-            </div>
-            <button type="button" class="btn btn-sm min-h-11" :class="selecting && 'btn-primary'"
-                    x-on:click="selecting = ! selecting; picked = []"
-                    x-text="selecting ? 'Cancel' : 'Select'">Select</button>
-        </div>
-    </div>
-    <p class="mb-4 text-sm opacity-60">Tap a tile to mark it owned or missing. <span aria-hidden="true">⋯</span> opens a tool's note and other names.</p>
+<div x-data="tileSelect" x-on:keydown.escape.window="selecting && toggleSelecting()">
+    @include('livewire.partials.tile-grid-controls', ['title' => 'Kitchen tools', 'filters' => \App\Enums\KitchenToolFilter::cases(), 'current' => $filter])
+    <p class="mb-4 text-sm opacity-60">Tap a tile to mark it owned or not. <span aria-hidden="true">⋯</span> opens a tool's note and other names.</p>
 
     @if ($kinds->isEmpty())
-        <p class="rounded-2xl bg-base-200 py-8 text-center text-sm opacity-60">No {{ $filter }} kitchen tools.</p>
+        <p class="rounded-2xl bg-base-200 py-8 text-center text-sm opacity-60">{{ match ($filter) {
+            \App\Enums\KitchenToolFilter::Owned => 'You have marked no kitchen tool owned yet.',
+            \App\Enums\KitchenToolFilter::NotOwned => 'You have every kitchen tool the app knows.',
+            \App\Enums\KitchenToolFilter::All => 'The app knows no kitchen tools yet.',
+        } }}</p>
     @else
         <ul class="grid grid-cols-3 gap-2 sm:grid-cols-5 xl:grid-cols-7">
             @foreach ($kinds as $kind)
@@ -41,17 +15,15 @@
                     <button type="button"
                             class="flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-xl border px-1 py-3 text-center transition {{ $kind->owned ? 'border-base-300 bg-base-100' : 'border-transparent bg-base-200 opacity-60' }}"
                             :class="picked.includes({{ $kind->id }}) && 'ring-2 ring-primary ring-offset-2 ring-offset-base-100 opacity-100'"
-                            x-on:click="selecting
-                                ? (picked.includes({{ $kind->id }}) ? picked = picked.filter(id => id !== {{ $kind->id }}) : picked.push({{ $kind->id }}))
-                                : $wire.toggleOwned({{ $kind->id }})"
+                            x-on:click="tap({{ $kind->id }}, () => $wire.toggleOwned({{ $kind->id }}))"
                             aria-pressed="{{ $kind->owned ? 'true' : 'false' }}"
                             aria-label="Owned: {{ $kind->display_name }}">
-                        <span class="text-2xl" aria-hidden="true">{{ $iconFor($kind->name) }}</span>
+                        <span class="text-2xl" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($kind->name) }}</span>
                         <span class="text-xs leading-tight font-medium">{{ $kind->display_name }}</span>
                         @if ($kind->note)
                             <span class="line-clamp-1 text-[11px] opacity-60">{{ $kind->note }}</span>
                         @elseif (! $kind->owned)
-                            <span class="text-[10px] font-semibold uppercase opacity-60">Missing</span>
+                            <span class="text-[10px] font-semibold uppercase opacity-60">Don't have</span>
                         @endif
                     </button>
                     <button type="button" class="btn btn-ghost btn-xs absolute top-0 right-0 min-h-11 min-w-11 opacity-50 hover:opacity-100"
@@ -76,15 +48,7 @@
         @error('addKind') <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p> @enderror
     </form>
 
-    {{-- Select mode: what to do with the picked tiles --}}
-    <div x-show="selecting" x-cloak x-transition
-         class="fixed inset-x-4 bottom-24 z-40 mx-auto flex max-w-md items-center gap-2 rounded-2xl border border-base-300 bg-base-100 p-2 shadow-xl lg:bottom-8">
-        <span class="flex-1 px-2 text-sm"><b x-text="picked.length">0</b> picked</span>
-        <button type="button" class="btn btn-sm min-h-11" :disabled="picked.length === 0"
-                x-on:click="$wire.markMany(picked, false).then(() => { selecting = false; picked = [] })">Missing</button>
-        <button type="button" class="btn btn-primary btn-sm min-h-11" :disabled="picked.length === 0"
-                x-on:click="$wire.markMany(picked, true).then(() => { selecting = false; picked = [] })">Mark owned</button>
-    </div>
+    @include('livewire.partials.tile-grid-bar', ['offLabel' => "Don't have", 'onLabel' => 'Mark owned'])
 
     {{-- Details sheet: note, household other names, delete --}}
     @if ($detail)
@@ -92,8 +56,8 @@
              x-on:keydown.escape.window="$wire.closeDetails()">
             <div class="modal-box">
                 <div class="flex items-center gap-3">
-                    <span class="text-3xl" aria-hidden="true">{{ $iconFor($detail->name) }}</span>
-                    <h3 class="flex-1 font-[family-name:var(--font-display)] text-xl font-semibold">{{ $detail->display_name }}</h3>
+                    <span class="text-3xl" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($detail->name) }}</span>
+                    <h3 class="flex-1 text-lg font-semibold">{{ $detail->display_name }}</h3>
                     <button type="button" class="btn btn-circle btn-ghost min-h-11 min-w-11" wire:click="closeDetails" aria-label="Close">&times;</button>
                 </div>
 

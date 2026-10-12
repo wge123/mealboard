@@ -57,14 +57,9 @@ class KitchenToolInventory
      */
     public function setOwnedMany(array $kindIds, bool $owned): void
     {
-        $kindIds = array_values(array_unique($kindIds));
-
-        // Counted rather than read from update(): MySQL reports changed rows, not matched ones.
-        if (KitchenToolKind::query()->whereKey($kindIds)->count() !== count($kindIds)) {
+        if (! AllOrNothingUpdate::apply(KitchenToolKind::query(), $kindIds, ['owned' => $owned])) {
             throw new KitchenToolRefused('Some of those kitchen tools no longer exist. Reload and try again.');
         }
-
-        KitchenToolKind::query()->whereKey($kindIds)->update(['owned' => $owned]);
     }
 
     /**

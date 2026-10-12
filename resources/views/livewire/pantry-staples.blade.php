@@ -1,20 +1,5 @@
-<div x-data="{ selecting: false, picked: [] }"
-     x-on:keydown.escape.window="selecting = false; picked = []">
-    <div class="mb-1 flex flex-wrap items-end justify-between gap-2">
-        <h2 class="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">Pantry staples</h2>
-        <div class="flex gap-2">
-            <div class="join" role="group" aria-label="Show">
-                @foreach (['all' => 'All', 'staples' => 'On hand', 'others' => 'Everything else'] as $value => $label)
-                    <button type="button" class="btn join-item btn-sm min-h-11 {{ $filter === $value ? 'btn-neutral' : '' }}"
-                            wire:click="$set('filter', '{{ $value }}')"
-                            aria-pressed="{{ $filter === $value ? 'true' : 'false' }}">{{ $label }}</button>
-                @endforeach
-            </div>
-            <button type="button" class="btn btn-sm min-h-11" :class="selecting && 'btn-primary'"
-                    x-on:click="selecting = ! selecting; picked = []"
-                    x-text="selecting ? 'Cancel' : 'Select'">Select</button>
-        </div>
-    </div>
+<div x-data="tileSelect" x-on:keydown.escape.window="selecting && toggleSelecting()">
+    @include('livewire.partials.tile-grid-controls', ['title' => 'Pantry staples', 'filters' => \App\Enums\PantryFilter::cases(), 'current' => $filter])
     <p class="mb-4 text-sm opacity-60">What you keep in stock. Staples never land on the buy list and don't count toward the weekday ingredient limit. Tap a tile to switch it.</p>
 
     <div class="mb-3 flex flex-col gap-2 sm:flex-row">
@@ -43,9 +28,7 @@
                     <button type="button"
                             class="flex min-h-12 w-full items-center gap-2 rounded-xl border px-3 text-left text-sm {{ $ingredient->is_pantry_staple ? 'border-success bg-success/10 font-medium' : 'border-base-300 bg-base-100 opacity-80' }}"
                             :class="picked.includes({{ $ingredient->id }}) && 'ring-2 ring-primary ring-offset-2 ring-offset-base-100'"
-                            x-on:click="selecting
-                                ? (picked.includes({{ $ingredient->id }}) ? picked = picked.filter(id => id !== {{ $ingredient->id }}) : picked.push({{ $ingredient->id }}))
-                                : $wire.toggle({{ $ingredient->id }})"
+                            x-on:click="tap({{ $ingredient->id }}, () => $wire.toggle({{ $ingredient->id }}))"
                             aria-pressed="{{ $ingredient->is_pantry_staple ? 'true' : 'false' }}"
                             aria-label="Staple: {{ $ingredient->name }}">
                         <span aria-hidden="true" class="grid size-4 shrink-0 place-items-center rounded border text-[10px] {{ $ingredient->is_pantry_staple ? 'border-success bg-success text-success-content' : 'border-base-300' }}">{{ $ingredient->is_pantry_staple ? '✓' : '' }}</span>
@@ -60,13 +43,5 @@
         @endif
     @endif
 
-    {{-- Select mode: what to do with the picked tiles --}}
-    <div x-show="selecting" x-cloak x-transition
-         class="fixed inset-x-4 bottom-24 z-40 mx-auto flex max-w-md items-center gap-2 rounded-2xl border border-base-300 bg-base-100 p-2 shadow-xl lg:bottom-8">
-        <span class="flex-1 px-2 text-sm"><b x-text="picked.length">0</b> picked</span>
-        <button type="button" class="btn btn-sm min-h-11" :disabled="picked.length === 0"
-                x-on:click="$wire.markMany(picked, false).then(() => { selecting = false; picked = [] })">Not staples</button>
-        <button type="button" class="btn btn-primary btn-sm min-h-11" :disabled="picked.length === 0"
-                x-on:click="$wire.markMany(picked, true).then(() => { selecting = false; picked = [] })">Make staples</button>
-    </div>
+    @include('livewire.partials.tile-grid-bar', ['offLabel' => 'Not staples', 'onLabel' => 'Make staples'])
 </div>

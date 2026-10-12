@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\PantryFilter;
 use App\Exceptions\HouseholdPreferenceRefused;
 use App\Models\Ingredient;
 use App\Support\HouseholdPreferences;
@@ -21,15 +22,14 @@ class PantryStaples extends Component
 
     public string $newStaple = '';
 
-    /** Which tiles show: all, staples or others. */
-    public string $filter = 'all';
+    public PantryFilter $filter = PantryFilter::All;
 
     public function toggle(HouseholdPreferences $preferences, int $ingredientId): void
     {
         $ingredient = Ingredient::query()->findOrFail($ingredientId);
 
         $preferences->setStaple($ingredient->name, ! $ingredient->is_pantry_staple);
-        $this->dispatch('settings-changed');
+        $this->dispatch(Settings::CHANGED);
     }
 
     /**
@@ -47,7 +47,7 @@ class PantryStaples extends Component
             return;
         }
 
-        $this->dispatch('settings-changed');
+        $this->dispatch(Settings::CHANGED);
     }
 
     public function addStaple(HouseholdPreferences $preferences): void
@@ -61,7 +61,7 @@ class PantryStaples extends Component
         }
 
         $this->reset('newStaple');
-        $this->dispatch('settings-changed');
+        $this->dispatch(Settings::CHANGED);
     }
 
     public function render(): View
@@ -71,8 +71,8 @@ class PantryStaples extends Component
             ->orderBy('name');
 
         // Every staple is listed; only the other ingredients are capped.
-        $staples = $this->filter === 'others' ? collect() : $matching()->where('is_pantry_staple', true)->get();
-        $others = $this->filter === 'staples' ? collect() : $matching()->where('is_pantry_staple', false)->limit(self::LIMIT)->get();
+        $staples = $this->filter === PantryFilter::Others ? collect() : $matching()->where('is_pantry_staple', true)->get();
+        $others = $this->filter === PantryFilter::Staples ? collect() : $matching()->where('is_pantry_staple', false)->limit(self::LIMIT)->get();
 
         return view('livewire.pantry-staples', [
             'ingredients' => $staples->concat($others),

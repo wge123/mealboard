@@ -20,7 +20,10 @@ use Livewire\Component;
 #[Title('Settings')]
 class Settings extends Component
 {
-    #[On('settings-changed')]
+    /** The event a section dispatches when it changes a count the menu shows. */
+    public const string CHANGED = 'settings-changed';
+
+    #[On(self::CHANGED)]
     public function refreshCounts(): void
     {
         // Re-rendering is the whole job: the counts are read in render().

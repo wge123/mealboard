@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\KitchenToolFilter;
 use App\Enums\KitchenToolOrigin;
 use App\Exceptions\KitchenToolRefused;
 use App\Models\KitchenToolKind;
@@ -28,8 +29,7 @@ class KitchenTools extends Component
             ->all();
     }
 
-    /** Which tiles show: all, owned or missing. */
-    public string $filter = 'all';
+    public KitchenToolFilter $filter = KitchenToolFilter::All;
 
     /** The kind whose details sheet is open, if any. */
     public ?int $detailId = null;
@@ -39,7 +39,7 @@ class KitchenTools extends Component
         $kind = KitchenToolKind::query()->findOrFail($kindId);
 
         $inventory->setOwned($kind, ! $kind->owned);
-        $this->dispatch('settings-changed');
+        $this->dispatch(Settings::CHANGED);
     }
 
     /**
@@ -57,7 +57,7 @@ class KitchenTools extends Component
             return;
         }
 
-        $this->dispatch('settings-changed');
+        $this->dispatch(Settings::CHANGED);
     }
 
     public function openDetails(int $kindId): void
@@ -93,7 +93,7 @@ class KitchenTools extends Component
 
         $this->notes[$kind->id] = '';
         $this->reset('newKind');
-        $this->dispatch('settings-changed');
+        $this->dispatch(Settings::CHANGED);
     }
 
     public function deleteKind(KitchenToolInventory $inventory, int $kindId): void
@@ -102,7 +102,7 @@ class KitchenTools extends Component
             $inventory->deleteKind(KitchenToolKind::query()->findOrFail($kindId));
             unset($this->notes[$kindId]);
             $this->detailId = null;
-            $this->dispatch('settings-changed');
+            $this->dispatch(Settings::CHANGED);
         } catch (KitchenToolRefused $e) {
             $this->addError('deleteKind', $e->getMessage());
         }
@@ -121,7 +121,7 @@ class KitchenTools extends Component
     {
         // Owned kinds first, then the rest, each group alphabetical.
         $kinds = KitchenToolKind::query()
-            ->when($this->filter !== 'all', fn ($q) => $q->where('owned', $this->filter === 'owned'))
+            ->when($this->filter !== KitchenToolFilter::All, fn ($q) => $q->where('owned', $this->filter === KitchenToolFilter::Owned))
             ->orderByDesc('owned')
             ->orderBy('name')
             ->get();

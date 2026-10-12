@@ -88,6 +88,14 @@ class HouseholdPreferences
         AvoidedIngredient::create(['word' => $word]);
     }
 
+    /**
+     * Whether this word is avoided, matched trimmed and lowercased.
+     */
+    public function avoids(string $word): bool
+    {
+        return AvoidedIngredient::query()->where('word', $this->normalize($word))->exists();
+    }
+
     public function stopAvoiding(string $word): void
     {
         AvoidedIngredient::query()->where('word', $this->normalize($word))->delete();
@@ -137,14 +145,9 @@ class HouseholdPreferences
      */
     public function setStaplesMany(array $ingredientIds, bool $staple): void
     {
-        $ingredientIds = array_values(array_unique($ingredientIds));
-
-        // Counted rather than read from update(): MySQL reports changed rows, not matched ones.
-        if (Ingredient::query()->whereKey($ingredientIds)->count() !== count($ingredientIds)) {
+        if (! AllOrNothingUpdate::apply(Ingredient::query(), $ingredientIds, ['is_pantry_staple' => $staple])) {
             throw new HouseholdPreferenceRefused('Some of those ingredients no longer exist. Reload and try again.');
         }
-
-        Ingredient::query()->whereKey($ingredientIds)->update(['is_pantry_staple' => $staple]);
     }
 
     /**

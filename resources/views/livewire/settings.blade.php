@@ -1,14 +1,14 @@
 {{--
     The settings page. To add a settings section, add ONE entry to $sections
-    (anchor => [label, component]) and give the component a settings-changed
-    dispatch if it changes a count the menu shows.
+    (anchor => [label, component, menu count or null]) and have the component dispatch
+    Settings::CHANGED if it changes a count the menu shows.
 --}}
 @php
     $sections = [
         'tools' => ['Kitchen tools', 'kitchen-tools', $ownedCount],
         'preferences' => ['Preferences', 'preferences', null],
         'pantry' => ['Pantry staples', 'pantry-staples', $stapleCount],
-        'channels' => ['Channels', 'channel-settings', $activeChannelCount],
+        'channels' => ['YouTube channels', 'channel-settings', $activeChannelCount],
     ];
 @endphp
 
