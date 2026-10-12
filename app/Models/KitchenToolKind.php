@@ -30,7 +30,7 @@ class KitchenToolKind extends Model
      */
     protected function displayName(): Attribute
     {
-        return Attribute::get(fn (): string => Str::title($this->name));
+        return Attribute::get(fn (): string => Str::apa($this->name));
     }
 
     /**

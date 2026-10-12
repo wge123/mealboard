@@ -1,15 +1,16 @@
 <div>
-    <h2 class="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">YouTube channels</h2>
-    <p class="mt-1 mb-4 text-sm opacity-60">Active channels are polled daily for new recipe videos.</p>
+    @include('livewire.partials.section-header', [
+        'title' => 'YouTube channels',
+        'help' => 'Active channels are checked daily for new recipe videos.',
+    ])
 
-    {{-- Add-channel form: joined inputs stack vertically on phones. --}}
-    <form wire:submit="add" class="mb-4">
-        <div class="join join-vertical w-full sm:join-horizontal">
-            <input type="text" class="input join-item min-h-11 w-full sm:flex-1 {{ $errors->has('channelId') ? 'input-error' : '' }}"
+    <form wire:submit="add" class="mb-5">
+        <div class="flex flex-col gap-2 sm:flex-row">
+            <input type="text" class="input min-h-11 w-full sm:flex-1 {{ $errors->has('channelId') ? 'input-error' : '' }}"
                    placeholder="Channel ID (UC…)" wire:model="channelId" aria-label="Channel ID">
-            <input type="text" class="input join-item min-h-11 w-full sm:flex-1 {{ $errors->has('name') ? 'input-error' : '' }}"
+            <input type="text" class="input min-h-11 w-full sm:flex-1 {{ $errors->has('name') ? 'input-error' : '' }}"
                    placeholder="Channel name" wire:model="name" aria-label="Channel name">
-            <button type="submit" class="btn btn-primary join-item min-h-11"
+            <button type="submit" class="btn btn-primary min-h-11"
                     wire:loading.attr="disabled" wire:target="add">
                 <span wire:loading wire:target="add" class="loading loading-spinner loading-xs"></span>
                 Add
@@ -26,7 +27,7 @@
     @if ($channels->isEmpty())
         <div class="rounded-2xl border border-base-300 bg-base-200 px-6 py-12 text-center">
             <p class="font-[family-name:var(--font-display)] text-xl font-semibold">No channels yet</p>
-            <p class="mt-1 text-sm opacity-60">Add a YouTube channel above to start discovering recipes.</p>
+            <p class="mt-1 text-sm text-base-content/70">Add a YouTube channel above to start discovering recipes.</p>
         </div>
     @else
         <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
@@ -35,7 +36,7 @@
                     <span aria-hidden="true" class="grid size-10 shrink-0 place-items-center rounded-full bg-secondary font-semibold text-secondary-content">{{ mb_strtoupper(mb_substr($channel->name, 0, 1)) }}</span>
                     <div class="min-w-0 flex-1">
                         <span class="block truncate font-medium">{{ $channel->name }}</span>
-                        <span class="block truncate text-xs opacity-50">{{ $channel->active ? 'Polled daily' : 'Inactive' }} · {{ $channel->channel_id }}</span>
+                        <span class="block truncate text-xs text-base-content/60">{{ $channel->active ? 'Polled daily' : 'Inactive' }} · {{ $channel->channel_id }}</span>
                     </div>
 
                     {{-- min-h-11 label pads the toggle's hit area to tap-target size. --}}

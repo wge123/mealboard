@@ -1,9 +1,11 @@
 <div x-data="tileSelect" x-on:keydown.escape.window="selecting && toggleSelecting()">
-    @include('livewire.partials.tile-grid-controls', ['title' => 'Kitchen tools', 'filters' => \App\Enums\KitchenToolFilter::cases(), 'current' => $filter])
-    <p class="mb-4 text-sm opacity-60">Tap a tile to mark it owned or not. <span aria-hidden="true">⋯</span> opens a tool's note and other names.</p>
+    @include('livewire.partials.section-header', [
+        'title' => 'Kitchen tools', 'filters' => \App\Enums\KitchenToolFilter::cases(), 'current' => $filter,
+        'help' => 'Tap a tool to mark it owned or not. ⋯ opens its note and other names.',
+    ])
 
     @if ($kinds->isEmpty())
-        <p class="rounded-2xl bg-base-200 py-8 text-center text-sm opacity-60">{{ match ($filter) {
+        <p class="rounded-2xl bg-base-200 py-8 text-center text-sm text-base-content/70">{{ match ($filter) {
             \App\Enums\KitchenToolFilter::Owned => 'You have marked no kitchen tool owned yet.',
             \App\Enums\KitchenToolFilter::NotOwned => 'You have every kitchen tool the app knows.',
             \App\Enums\KitchenToolFilter::All => 'The app knows no kitchen tools yet.',
@@ -13,17 +15,18 @@
             @foreach ($kinds as $kind)
                 <li class="relative" wire:key="kind-{{ $kind->id }}">
                     <button type="button"
-                            class="flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-xl border px-1 py-3 text-center transition {{ $kind->owned ? 'border-base-300 bg-base-100' : 'border-transparent bg-base-200 opacity-60' }}"
-                            :class="picked.includes({{ $kind->id }}) && 'ring-2 ring-primary ring-offset-2 ring-offset-base-100 opacity-100'"
+                            class="flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-xl border px-1 py-3 text-center transition {{ $kind->owned ? 'border-base-300 bg-base-100' : 'border-dashed border-base-300 text-base-content/70' }}"
+                            :class="picked.includes({{ $kind->id }}) && 'ring-2 ring-primary ring-offset-2 ring-offset-base-100'"
                             x-on:click="tap({{ $kind->id }}, () => $wire.toggleOwned({{ $kind->id }}))"
                             aria-pressed="{{ $kind->owned ? 'true' : 'false' }}"
                             aria-label="Owned: {{ $kind->display_name }}">
-                        <span class="text-2xl" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($kind->name) }}</span>
+                        @if ($kind->owned)
+                            <span aria-hidden="true" class="absolute top-1.5 left-1.5 grid size-4 place-items-center rounded-full bg-primary text-[10px] text-primary-content">✓</span>
+                        @endif
+                        <span class="text-2xl {{ $kind->owned ? '' : 'opacity-50 grayscale' }}" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($kind->name) }}</span>
                         <span class="text-xs leading-tight font-medium">{{ $kind->display_name }}</span>
                         @if ($kind->note)
-                            <span class="line-clamp-1 text-[11px] opacity-60">{{ $kind->note }}</span>
-                        @elseif (! $kind->owned)
-                            <span class="text-[10px] font-semibold uppercase opacity-60">Don't have</span>
+                            <span class="line-clamp-1 text-[11px] text-base-content/70">{{ $kind->note }}</span>
                         @endif
                     </button>
                     <button type="button" class="btn btn-ghost btn-xs absolute top-0 right-0 min-h-11 min-w-11 opacity-50 hover:opacity-100"
@@ -71,7 +74,7 @@
                                wire:model="notes.{{ $detail->id }}">
                         <button type="submit" class="btn min-h-11">Save</button>
                     </div>
-                    <p class="mt-1 text-xs opacity-60">For you only; never used to match recipes.</p>
+                    <p class="mt-1 text-xs text-base-content/70">For you only; never used to match recipes.</p>
                 </form>
 
                 @if ($detail->otherNames->isNotEmpty())

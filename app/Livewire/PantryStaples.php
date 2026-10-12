@@ -66,17 +66,28 @@ class PantryStaples extends Component
 
     public function render(): View
     {
+        $search = trim($this->search);
         $matching = fn () => Ingredient::query()
-            ->when(trim($this->search) !== '', fn ($query) => $query->where('name', 'like', '%'.trim($this->search).'%'))
-            ->orderBy('name');
+            ->when($search !== '', fn ($query) => $query->where('name', 'like', '%'.$search.'%'));
 
-        // Every staple is listed; only the other ingredients are capped.
-        $staples = $this->filter === PantryFilter::Others ? collect() : $matching()->where('is_pantry_staple', true)->get();
-        $others = $this->filter === PantryFilter::Staples ? collect() : $matching()->where('is_pantry_staple', false)->limit(self::LIMIT)->get();
+        // Every staple is listed; only the other ingredients are capped, the
+        // ones most recipes use first. Until recipe import cleans ingredient
+        // names, names that start with a quantity ("200g tomato") are left out
+        // unless searched for.
+        $staples = $this->filter === PantryFilter::Others ? collect() : $matching()->where('is_pantry_staple', true)->orderBy('name')->get();
+        $others = $this->filter === PantryFilter::Staples ? collect() : $matching()
+            ->where('is_pantry_staple', false)
+            ->when($search === '', fn ($query) => $query->whereRaw("substr(name, 1, 1) not between '0' and '9'"))
+            ->withCount('recipes')
+            ->orderByDesc('recipes_count')
+            ->orderBy('name')
+            ->limit(self::LIMIT)
+            ->get();
 
         return view('livewire.pantry-staples', [
             'ingredients' => $staples->concat($others),
             'truncated' => $others->count() === self::LIMIT,
+            'limit' => self::LIMIT,
         ]);
     }
 }
