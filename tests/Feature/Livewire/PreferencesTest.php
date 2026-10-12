@@ -21,33 +21,33 @@ it('renders the preferences section with the stored values for a signed-in house
         ->assertSet('householdSize', 2);
 });
 
-it('saves the weekday limits and the household size', function () {
+it('saves each weekday limit and the household size from its Other field', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(Preferences::class)
-        ->set('weekdayMinutes', 45)
-        ->set('weekdayIngredients', 12)
-        ->call('saveLimits')
+        ->set('weekdayMinutes', 35)
+        ->call('saveMinutes')
         ->assertHasNoErrors()
-        ->set('householdSize', 4)
+        ->set('weekdayIngredients', 11)
+        ->call('saveIngredients')
+        ->assertHasNoErrors()
+        ->set('householdSize', 7)
         ->call('saveHouseholdSize')
         ->assertHasNoErrors();
 
     $preferences = new HouseholdPreferences;
 
-    expect($preferences->weekdayLimits())->toBe(['minutes' => 45, 'ingredients' => 12])
-        ->and($preferences->householdSize())->toBe(4);
+    expect($preferences->weekdayLimits())->toBe(['minutes' => 35, 'ingredients' => 11])
+        ->and($preferences->householdSize())->toBe(7);
 });
 
 it('refuses a limit or size that is not a whole number of at least 1', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(Preferences::class)
         ->set('weekdayMinutes', 0)
-        ->set('weekdayIngredients', 5)
-        ->call('saveLimits')
-        ->assertHasErrors('weekdayLimits')
-        ->set('weekdayMinutes', 20)
+        ->call('saveMinutes')
+        ->assertHasErrors('weekdayMinutes')
         ->set('weekdayIngredients', 'ten')
-        ->call('saveLimits')
+        ->call('saveIngredients')
         ->assertHasErrors(['weekdayIngredients' => 'integer'])
         ->set('householdSize', '')
         ->call('saveHouseholdSize')
@@ -58,6 +58,24 @@ it('refuses a limit or size that is not a whole number of at least 1', function 
 
     expect((new HouseholdPreferences)->weekdayLimits())->toBe(['minutes' => 30, 'ingredients' => 10])
         ->and((new HouseholdPreferences)->householdSize())->toBe(2);
+});
+
+it('saves one limit without saving an unsent draft of the other', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(Preferences::class)
+        ->set('weekdayIngredients', 99)
+        ->call('pickMinutes', 45);
+
+    expect((new HouseholdPreferences)->weekdayLimits())->toBe(['minutes' => 45, 'ingredients' => 10]);
+});
+
+it('keeps marking the stored value when a new one is refused', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(Preferences::class)
+        ->set('weekdayMinutes', 0)
+        ->call('saveMinutes')
+        ->assertHasErrors('weekdayMinutes')
+        ->assertSeeHtml('data-test="minutes-30" aria-pressed="true"');
 });
 
 it('adds and removes an avoided ingredient', function () {

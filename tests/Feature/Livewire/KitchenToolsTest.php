@@ -123,10 +123,10 @@ it('keeps item variants out of the catalog kinds and resolves them to their kind
         ->and($inventory->resolve($variant)?->name)->toBe('skillet');
 })->with(['cast iron skillet', 'nonstick pan']);
 
-it('filters the tiles to owned or missing kinds', function () {
+it('filters the tiles to owned kinds or kinds the household does not have', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(KitchenTools::class)
-        ->set('filter', 'missing')
+        ->set('filter', 'not-owned')
         ->assertSee('Wok')
         ->assertDontSee("Chef's Knife")
         ->set('filter', 'owned')
@@ -169,4 +169,19 @@ it('shows a kind\'s note field only in its details, and closes them', function (
         ->assertSeeHtml('aria-label="Note for Wok"')
         ->call('closeDetails')
         ->assertDontSeeHtml('aria-label="Note for Wok"');
+});
+
+it('refuses a filter it does not know', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->set('filter', 'bogus');
+})->throws(ValueError::class);
+
+it('names the filter in plain words when nothing matches', function () {
+    KitchenToolKind::query()->update(['owned' => true]);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->set('filter', 'not-owned')
+        ->assertSee("You have every kitchen tool the app knows.");
 });

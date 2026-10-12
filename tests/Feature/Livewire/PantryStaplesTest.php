@@ -119,3 +119,9 @@ it('tells the settings menu when a tap or a new staple changes the staples', fun
         ->call('addStaple')
         ->assertDispatched('settings-changed');
 });
+
+it('refuses a filter it does not know', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(PantryStaples::class)
+        ->set('filter', 'bogus');
+})->throws(ValueError::class);

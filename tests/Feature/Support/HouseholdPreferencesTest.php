@@ -200,3 +200,11 @@ it('marks no staples when one of the ingredients does not exist', function () {
 
     expect($preferences->staples()->all())->toBe([]);
 });
+
+it('says whether a word is avoided, ignoring case and spaces', function () {
+    $preferences = new HouseholdPreferences;
+    $preferences->avoid('cilantro');
+
+    expect($preferences->avoids(' Cilantro '))->toBeTrue()
+        ->and($preferences->avoids('parsley'))->toBeFalse();
+});
