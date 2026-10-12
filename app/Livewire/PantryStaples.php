@@ -21,11 +21,33 @@ class PantryStaples extends Component
 
     public string $newStaple = '';
 
+    /** Which tiles show: all, staples or others. */
+    public string $filter = 'all';
+
     public function toggle(HouseholdPreferences $preferences, int $ingredientId): void
     {
         $ingredient = Ingredient::query()->findOrFail($ingredientId);
 
         $preferences->setStaple($ingredient->name, ! $ingredient->is_pantry_staple);
+        $this->dispatch('settings-changed');
+    }
+
+    /**
+     * Mark the tiles picked in select mode as staples or not.
+     *
+     * @param  list<int>  $ingredientIds
+     */
+    public function markMany(HouseholdPreferences $preferences, array $ingredientIds, bool $staple): void
+    {
+        try {
+            $preferences->setStaplesMany($ingredientIds, $staple);
+        } catch (HouseholdPreferenceRefused $e) {
+            $this->addError('markMany', $e->getMessage());
+
+            return;
+        }
+
+        $this->dispatch('settings-changed');
     }
 
     public function addStaple(HouseholdPreferences $preferences): void
@@ -39,6 +61,7 @@ class PantryStaples extends Component
         }
 
         $this->reset('newStaple');
+        $this->dispatch('settings-changed');
     }
 
     public function render(): View
@@ -48,8 +71,8 @@ class PantryStaples extends Component
             ->orderBy('name');
 
         // Every staple is listed; only the other ingredients are capped.
-        $staples = $matching()->where('is_pantry_staple', true)->get();
-        $others = $matching()->where('is_pantry_staple', false)->limit(self::LIMIT)->get();
+        $staples = $this->filter === 'others' ? collect() : $matching()->where('is_pantry_staple', true)->get();
+        $others = $this->filter === 'staples' ? collect() : $matching()->where('is_pantry_staple', false)->limit(self::LIMIT)->get();
 
         return view('livewire.pantry-staples', [
             'ingredients' => $staples->concat($others),
