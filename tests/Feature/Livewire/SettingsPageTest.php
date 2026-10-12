@@ -4,6 +4,7 @@ use App\Livewire\ChannelSettings;
 use App\Livewire\KitchenTools;
 use App\Livewire\PantryStaples;
 use App\Livewire\Preferences;
+use App\Models\KitchenToolKind;
 use App\Models\User;
 
 it('shows every settings section on one page, kitchen tools first', function () {
@@ -46,4 +47,23 @@ it('points the Settings link in the top navigation at the settings page', functi
         ->get('/plan')
         ->assertOk()
         ->assertSeeInOrder(['href="'.route('settings').'"', 'Settings'], false);
+});
+
+it('says what each menu count counts and leaves out a count of zero', function () {
+    KitchenToolKind::query()->update(['owned' => false]);
+    KitchenToolKind::query()->where('name', 'wok')->update(['owned' => true]);
+
+    $this->actingAs(User::factory()->create())
+        ->get('/settings')
+        ->assertOk()
+        ->assertSee('aria-label="1 owned"', false)
+        ->assertDontSee('aria-label="0 on hand"', false)
+        ->assertDontSee('aria-label="0 active"', false);
+});
+
+it('gives each section a short menu label for phones', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/settings')
+        ->assertOk()
+        ->assertSeeInOrder(['Tools', 'Kitchen tools', 'Preferences', 'Pantry', 'Pantry staples', 'Channels', 'YouTube channels']);
 });

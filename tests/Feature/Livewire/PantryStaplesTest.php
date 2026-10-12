@@ -180,3 +180,11 @@ it('gives every tile the sort keys the browser re-sorts a tapped tile by, matchi
         ->and(array_search('Staple: basil', $server))->toBeLessThan(array_search('Staple: avocado', $server))
         ->and($browser)->toBe($server);
 });
+
+it('gives select mode a way out and action labels that say what they do', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(PantryStaples::class)
+        ->assertSee('aria-label="Stop selecting"', false)
+        ->assertSee('Remove staples')
+        ->assertSee('Make staples');
+});

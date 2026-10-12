@@ -199,3 +199,11 @@ it('gives every tile the sort keys the browser re-sorts a tapped tile by, matchi
     expect(array_slice($server, 0, 2))->toBe(['Owned: Oven', 'Owned: Wok'])
         ->and($browser)->toBe($server);
 });
+
+it('gives select mode a way out and action labels that say what they do', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->assertSee('aria-label="Stop selecting"', false)
+        ->assertSee('Mark not owned')
+        ->assertSee('Mark owned');
+});
