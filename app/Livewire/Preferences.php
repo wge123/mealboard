@@ -13,6 +13,16 @@ use Livewire\Component;
  */
 class Preferences extends Component
 {
+    /** The tiles offered for each setting; any other whole number goes through the Other tile. */
+    public const array MINUTE_PRESETS = [15, 20, 30, 45, 60, 90];
+
+    public const array INGREDIENT_PRESETS = [5, 6, 8, 10, 12, 15];
+
+    public const array SIZE_PRESETS = [1, 2, 3, 4, 5, 6];
+
+    /** Common dislikes offered as one-tap tiles. */
+    public const array AVOID_SUGGESTIONS = ['anchovy', 'blue cheese', 'cilantro', 'coconut', 'eggplant', 'liver', 'mushroom', 'olive', 'peanut', 'pork', 'shellfish', 'tofu'];
+
     public int|string $weekdayMinutes = '';
 
     public int|string $weekdayIngredients = '';
@@ -55,6 +65,39 @@ class Preferences extends Component
         }
     }
 
+    public function pickMinutes(HouseholdPreferences $preferences, int $minutes): void
+    {
+        $this->weekdayMinutes = $minutes;
+        $this->saveLimits($preferences);
+    }
+
+    public function pickIngredients(HouseholdPreferences $preferences, int $ingredients): void
+    {
+        $this->weekdayIngredients = $ingredients;
+        $this->saveLimits($preferences);
+    }
+
+    public function pickHouseholdSize(HouseholdPreferences $preferences, int $size): void
+    {
+        $this->householdSize = $size;
+        $this->saveHouseholdSize($preferences);
+    }
+
+    public function toggleAvoided(HouseholdPreferences $preferences, string $word): void
+    {
+        if ($preferences->avoidedIngredients()->contains(mb_strtolower(trim($word)))) {
+            $preferences->stopAvoiding($word);
+
+            return;
+        }
+
+        try {
+            $preferences->avoid($word);
+        } catch (HouseholdPreferenceRefused $e) {
+            $this->addError('newAvoided', $e->getMessage());
+        }
+    }
+
     public function avoid(HouseholdPreferences $preferences): void
     {
         try {
@@ -75,8 +118,12 @@ class Preferences extends Component
 
     public function render(HouseholdPreferences $preferences): View
     {
+        $avoided = $preferences->avoidedIngredients();
+
         return view('livewire.preferences', [
-            'avoided' => $preferences->avoidedIngredients(),
+            'avoided' => $avoided,
+            // Suggestions first, then the household's own words, each once.
+            'avoidTiles' => collect(self::AVOID_SUGGESTIONS)->merge($avoided)->unique()->values(),
         ]);
     }
 }
