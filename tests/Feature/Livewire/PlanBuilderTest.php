@@ -12,6 +12,7 @@ use App\Models\PlannedMeal;
 use App\Models\Recipe;
 use App\Models\User;
 use App\Support\HouseholdPreferences;
+use Carbon\CarbonInterface;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
@@ -285,3 +286,109 @@ it('marks a recipe containing an avoided ingredient in the picker and still allo
     expect(PlannedMeal::where('recipe_id', $recipe->id)->exists())->toBeTrue()
         ->and(PlannedMeal::where('recipe_id', $plain->id)->exists())->toBeFalse();
 });
+
+it('lays the week out as meals by days with a planned count and a cook time per day', function () {
+    $plan = MealPlan::factory()->create();
+    $monday = $plan->week_start_date;
+
+    $plan->plannedMeals()->create(['recipe_id' => Recipe::factory()->approved()->create(['title' => 'Grid Pasta', 'prep_minutes' => 10, 'cook_minutes' => 20])->id, 'date' => $monday->toDateString(), 'slot' => MealSlot::Dinner]);
+    $plan->plannedMeals()->create(['recipe_id' => Recipe::factory()->approved()->create(['title' => 'Grid Soup', 'prep_minutes' => 5, 'cook_minutes' => 7])->id, 'date' => $monday->copy()->addDay()->toDateString(), 'slot' => MealSlot::Lunch]);
+
+    planBuilder()
+        ->assertSee('2 of 15 meals planned')
+        ->assertSeeInOrder(['breakfast', 'lunch', 'Grid Soup', 'dinner', 'Grid Pasta', 'Cook time', '30 min', '12 min']);
+});
+
+it('moves the tray to the next empty cell after a pick, row by row and wrapping', function () {
+    $plan = MealPlan::factory()->create();
+    $day = fn (int $offset) => $plan->week_start_date->copy()->addDays($offset)->toDateString();
+    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+    $plan->plannedMeals()->create(['recipe_id' => $recipe->id, 'date' => $day(0), 'slot' => MealSlot::Lunch]);
+
+    $component = planBuilder()->call('openPicker', $day(0), 'breakfast')->call('choose', $recipe->id);
+    expect([$component->get('pickerDate'), $component->get('pickerSlot')])->toBe([$day(1), 'breakfast']);
+
+    // Friday breakfast ends the row; Monday lunch is planned, so Tuesday lunch is next.
+    $component->call('openPicker', $day(4), 'breakfast')->call('choose', $recipe->id);
+    expect([$component->get('pickerDate'), $component->get('pickerSlot')])->toBe([$day(1), 'lunch']);
+
+    // Friday dinner is the last cell; the search wraps to the top.
+    $component->call('openPicker', $day(4), 'dinner')->call('choose', $recipe->id);
+    expect([$component->get('pickerDate'), $component->get('pickerSlot')])->toBe([$day(1), 'breakfast']);
+});
+
+it('closes the tray once every meal of the week is planned', function () {
+    $plan = MealPlan::factory()->create();
+    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+
+    foreach (range(0, 4) as $offset) {
+        foreach (MealSlot::cases() as $slot) {
+            if ($offset !== 4 || $slot !== MealSlot::Dinner) {
+                $plan->plannedMeals()->create(['recipe_id' => $recipe->id, 'date' => $plan->week_start_date->copy()->addDays($offset)->toDateString(), 'slot' => $slot]);
+            }
+        }
+    }
+
+    $component = planBuilder()
+        ->call('openPicker', $plan->week_start_date->copy()->addDays(4)->toDateString(), 'dinner')
+        ->call('choose', $recipe->id);
+
+    expect($component->get('pickerDate'))->toBeNull()
+        ->and($component->get('pickerSlot'))->toBeNull()
+        ->and($plan->plannedMeals()->count())->toBe(15);
+});
+
+it('shows in the tray how often each recipe is already planned this week', function () {
+    $plan = MealPlan::factory()->create();
+    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any, 'title' => 'Twice Soup']);
+    foreach ([MealSlot::Lunch, MealSlot::Dinner] as $slot) {
+        $plan->plannedMeals()->create(['recipe_id' => $recipe->id, 'date' => $plan->week_start_date->toDateString(), 'slot' => $slot]);
+    }
+
+    planBuilder()
+        ->call('openPicker', $plan->week_start_date->copy()->addDay()->toDateString(), 'dinner')
+        ->assertSeeInOrder(['Twice Soup', '×2 this week']);
+});
+
+function weekOf(int $weeksFromNow, bool $locked): MealPlan
+{
+    $factory = $locked ? MealPlan::factory()->locked() : MealPlan::factory();
+
+    return $factory->create(['week_start_date' => now()->startOfWeek(CarbonInterface::MONDAY)->addWeeks($weeksFromNow)->toDateString()]);
+}
+
+function dinnerOnMonday(MealPlan $plan): PlannedMeal
+{
+    return $plan->plannedMeals()->create([
+        'recipe_id' => Recipe::factory()->approved()->create()->id,
+        'date' => $plan->week_start_date->toDateString(),
+        'slot' => MealSlot::Dinner,
+    ]);
+}
+
+it('opens a past meal of a locked week in the tray with its recipe link and log controls', function () {
+    $plan = weekOf(-2, locked: true);
+    $meal = dinnerOnMonday($plan);
+
+    planBuilder()
+        ->call('openMeal', $plan->week_start_date->toDateString(), 'dinner')
+        ->assertSeeHtml('data-test="log-meal-'.$meal->id.'"')
+        ->assertSeeHtml('href="'.route('recipes.show', $meal->recipe).'"')
+        ->assertDontSee('Clear');
+});
+
+it('refuses to open a meal for logging on a draft week, a future day or an empty cell', function (bool $locked, int $weeksFromNow, bool $withMeal, int $status) {
+    $plan = weekOf($weeksFromNow, $locked);
+    if ($withMeal) {
+        dinnerOnMonday($plan);
+    }
+
+    planBuilder()
+        ->call('openMeal', $plan->week_start_date->toDateString(), 'dinner')
+        ->assertStatus($status)
+        ->assertSet('pickerDate', null);
+})->with([
+    'draft week' => [false, -2, true, 403],
+    'future day' => [true, 2, true, 403],
+    'empty cell' => [true, -2, false, 404],
+]);
