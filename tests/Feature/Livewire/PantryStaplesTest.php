@@ -175,6 +175,8 @@ it('gives every tile the sort keys the browser re-sorts a tapped tile by, matchi
 
     [$server, $browser] = tileOrders(Livewire::actingAs(User::factory()->create())->test(PantryStaples::class)->html());
 
-    expect($server)->toBe(['Staple: cumin', 'Staple: salt', 'Staple: rice', 'Staple: basil', 'Staple: avocado'])
+    // The recipe factory adds ingredients of its own, so only the head is fixed.
+    expect(array_slice($server, 0, 3))->toBe(['Staple: cumin', 'Staple: salt', 'Staple: rice'])
+        ->and(array_search('Staple: basil', $server))->toBeLessThan(array_search('Staple: avocado', $server))
         ->and($browser)->toBe($server);
 });
