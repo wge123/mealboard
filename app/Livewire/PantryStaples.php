@@ -71,13 +71,10 @@ class PantryStaples extends Component
             ->when($search !== '', fn ($query) => $query->where('name', 'like', '%'.$search.'%'));
 
         // Every staple is listed; only the other ingredients are capped, the
-        // ones most recipes use first. Until recipe import cleans ingredient
-        // names, names that start with a quantity ("200g tomato") are left out
-        // unless searched for.
+        // ones most recipes use first.
         $staples = $this->filter === PantryFilter::Others ? collect() : $matching()->where('is_pantry_staple', true)->withCount('recipes')->orderBy('name')->get();
         $others = $this->filter === PantryFilter::Staples ? collect() : $matching()
             ->where('is_pantry_staple', false)
-            ->when($search === '', fn ($query) => $query->whereRaw("substr(name, 1, 1) not between '0' and '9'"))
             ->withCount('recipes')
             ->orderByDesc('recipes_count')
             ->orderBy('name')
