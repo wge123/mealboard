@@ -17,6 +17,12 @@ class SetRecipeStatus
             $recipe->approved_by = $actor->id;
         }
 
+        // Back to pending (an undone approval) means nobody has approved it.
+        if ($status === RecipeStatus::Pending) {
+            $recipe->approved_at = null;
+            $recipe->approved_by = null;
+        }
+
         $recipe->save();
 
         return $recipe;

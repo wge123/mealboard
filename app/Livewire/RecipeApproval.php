@@ -15,16 +15,26 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
- * Approval cards page (step 20): one pending recipe at a time, oldest first.
+ * Approval deck: the pending recipes as a stack of cards, oldest on top.
  * Approve stamps attribution via SetRecipeStatus; reject KEEPS the row as
- * status=rejected so discovery can dedupe against it.
+ * status=rejected so discovery can dedupe against it. Skip sends a card to
+ * the back of the deck for this visit only, and undo walks this visit's
+ * decisions and skips back, newest first.
  */
 #[Layout('layouts.app')]
 #[Title('Approve recipes')]
 class RecipeApproval extends Component
 {
-    /** Cards decided this session — drives the "N of M pending" progress line. */
-    public int $reviewed = 0;
+    /** Ids skipped this visit, in the order they went to the back of the deck. */
+    public array $skipped = [];
+
+    /**
+     * This visit's steps, oldest first, for undo: a decision's recipe id and
+     * status, or a skip's recipe id with the skipped list from before it.
+     *
+     * @var list<array{id: int, status: string, skipped?: list<int>}>
+     */
+    public array $history = [];
 
     public function approve(int $recipeId): void
     {
@@ -34,6 +44,42 @@ class RecipeApproval extends Component
     public function reject(int $recipeId): void
     {
         $this->decide($recipeId, RecipeStatus::Rejected);
+    }
+
+    /** Send a pending card to the back of the deck; it stays pending. */
+    public function skip(int $recipeId): void
+    {
+        if (! Recipe::query()->where('status', RecipeStatus::Pending)->whereKey($recipeId)->exists()) {
+            return;
+        }
+
+        $this->history[] = ['id' => $recipeId, 'status' => 'skipped', 'skipped' => $this->skipped];
+        $this->skipped = [...array_values(array_diff($this->skipped, [$recipeId])), $recipeId];
+    }
+
+    /**
+     * Take back the newest step. A decision returns its recipe to pending,
+     * unless the recipe changed elsewhere since; a skip puts the deck back.
+     */
+    public function undo(): void
+    {
+        $step = array_pop($this->history);
+
+        if ($step === null) {
+            return;
+        }
+
+        if ($step['status'] === 'skipped') {
+            $this->skipped = $step['skipped'];
+
+            return;
+        }
+
+        $recipe = Recipe::query()->where('status', $step['status'])->find($step['id']);
+
+        if ($recipe !== null) {
+            app(SetRecipeStatus::class)->handle($recipe, RecipeStatus::Pending, auth()->user());
+        }
     }
 
     /** Add an unknown tool word as a new kitchen tool kind the household owns. */
@@ -85,27 +131,34 @@ class RecipeApproval extends Component
 
         if ($recipe !== null) {
             app(SetRecipeStatus::class)->handle($recipe, $status, auth()->user());
-            $this->reviewed++;
+            $this->history[] = ['id' => $recipeId, 'status' => $status->value];
+            // Decided, it leaves the back of the deck; undone, it comes back on top.
+            $this->skipped = array_values(array_diff($this->skipped, [$recipeId]));
         }
     }
 
     public function render(): View
     {
-        $recipe = Recipe::query()
-            ->with(['ingredients', 'recipeRequest'])
+        // Oldest first, skipped cards behind the rest in the order they were skipped.
+        $back = array_flip($this->skipped);
+        $deck = Recipe::query()
             ->where('status', RecipeStatus::Pending)
             ->orderBy('created_at')
             ->orderBy('id')
-            ->first();
+            ->get()
+            ->sortBy(fn (Recipe $recipe) => $back[$recipe->id] ?? -1)
+            ->values();
 
+        $recipe = $deck->first()?->load(['ingredients', 'recipeRequest']);
         $missing = $recipe === null ? [] : app(MissingKitchenTools::class)->for($recipe);
 
         return view('livewire.recipe-approval', [
             'recipe' => $recipe,
+            'under' => $deck->slice(1, 2)->values(),
             'missing' => $missing,
             // Owned kinds only: naming a word as one of them always clears the flag.
             'kinds' => $missing === [] ? collect() : KitchenToolKind::query()->where('owned', true)->orderBy('name')->get(),
-            'pending' => Recipe::query()->where('status', RecipeStatus::Pending)->count(),
+            'pending' => $deck->count(),
         ]);
     }
 }

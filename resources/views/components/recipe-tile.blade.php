@@ -1,17 +1,15 @@
 {{--
     A recipe as a square cover tile, on the library's shelves and wall. The
-    cover is the recipe's image, or a generated one: its meal colour washed
-    with a hue taken from the title, so tiles tell apart without photos.
+    cover is the recipe's image, or a generated one (RecipeCover).
 --}}
 @props(['recipe', 'rating' => null, 'missing' => []])
 @php
     $minutes = \App\Livewire\RecipeLibrary::minutes($recipe);
-    $hue = crc32($recipe->title) % 360;
-    $initials = collect(preg_split('/\s+/', $recipe->title))->filter(fn ($word) => preg_match('/^\p{L}/u', $word))->take(2)->map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)))->implode('');
+    $initials = \App\Support\RecipeCover::initials($recipe);
     $needs = collect($missing)->map->label()->implode(', ');
 @endphp
 <a href="{{ route('recipes.show', $recipe) }}" {{ $attributes->class('group relative block aspect-square overflow-hidden rounded-2xl') }}
-   style="background: radial-gradient(circle at 25% 20%, oklch(85% 0.09 {{ $hue }} / .9), transparent 60%), linear-gradient(135deg, color-mix(in oklab, var(--meal-{{ $recipe->meal_type->value }}) 55%, var(--color-base-100)), oklch(75% 0.08 {{ ($hue + 40) % 360 }}))">
+   style="{{ \App\Support\RecipeCover::background($recipe) }}">
     @if ($recipe->image_url)
         <img src="{{ $recipe->image_url }}" class="absolute inset-0 size-full object-cover" alt="" loading="lazy">
     @else
