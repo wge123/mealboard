@@ -4,11 +4,12 @@ namespace Database\Factories;
 
 use App\Enums\MealSlot;
 use App\Models\MealPlan;
+use App\Models\PlannedMeal;
 use App\Models\Recipe;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\PlannedMeal>
+ * @extends Factory<PlannedMeal>
  */
 class PlannedMealFactory extends Factory
 {

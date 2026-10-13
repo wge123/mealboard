@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\DiscoveryRun;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\DiscoveryRun>
+ * @extends Factory<DiscoveryRun>
  */
 class DiscoveryRunFactory extends Factory
 {

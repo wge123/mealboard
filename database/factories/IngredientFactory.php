@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Enums\IngredientCategory;
+use App\Models\Ingredient;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\Ingredient>
+ * @extends Factory<Ingredient>
  */
 class IngredientFactory extends Factory
 {
