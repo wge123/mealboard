@@ -29,3 +29,15 @@ it('sets rejected and archived without stamping approval', function (RecipeStatu
         ->and($recipe->approved_at)->toBeNull()
         ->and($recipe->approved_by)->toBeNull();
 })->with([RecipeStatus::Rejected, RecipeStatus::Archived]);
+
+it('clears the approval stamps when a recipe goes back to pending', function () {
+    $recipe = Recipe::factory()->approved()->create();
+
+    app(SetRecipeStatus::class)->handle($recipe, RecipeStatus::Pending, User::factory()->create());
+
+    $recipe->refresh();
+
+    expect($recipe->status)->toBe(RecipeStatus::Pending)
+        ->and($recipe->approved_at)->toBeNull()
+        ->and($recipe->approved_by)->toBeNull();
+});
