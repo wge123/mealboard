@@ -127,30 +127,18 @@ it('refuses a filter it does not know', function () {
         ->set('filter', 'bogus');
 })->throws(ValueError::class);
 
-it('lists the other ingredients most used by recipes first and leaves out recipe lines that start with a quantity', function () {
+it('lists the other ingredients most used by recipes first', function () {
     $rice = Ingredient::factory()->create(['name' => 'rice']);
     $avocado = Ingredient::factory()->create(['name' => 'avocado']);
-    $quantity = Ingredient::factory()->create(['name' => '200g tomato']);
 
     foreach (Recipe::factory()->count(3)->create() as $recipe) {
         $recipe->ingredients()->attach($rice->id, ['qty' => 1, 'unit' => 'cup']);
     }
     Recipe::factory()->create()->ingredients()->attach($avocado->id, ['qty' => 1, 'unit' => 'count']);
-    Recipe::factory()->create()->ingredients()->attach($quantity->id, ['qty' => 1, 'unit' => 'count']);
 
     Livewire::actingAs(User::factory()->create())
         ->test(PantryStaples::class)
-        ->assertSeeInOrder(['rice', 'avocado'])
-        ->assertDontSee('200g tomato');
-});
-
-it('still finds a recipe line that starts with a quantity by search', function () {
-    Ingredient::factory()->create(['name' => '200g tomato']);
-
-    Livewire::actingAs(User::factory()->create())
-        ->test(PantryStaples::class)
-        ->set('search', 'tomato')
-        ->assertSee('200g tomato');
+        ->assertSeeInOrder(['rice', 'avocado']);
 });
 
 it('says how many of the other ingredients it shows when they are capped', function () {

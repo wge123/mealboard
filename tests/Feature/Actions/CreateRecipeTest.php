@@ -28,10 +28,11 @@ it('creates a recipe with ingredient pivot rows', function () {
         ->and($recipe->status)->toBe(RecipeStatus::Pending) // schema default
         ->and($recipe->ingredients)->toHaveCount(2);
 
-    $tomatoes = $recipe->ingredients->firstWhere('name', 'crushed tomatoes');
+    // The prep word leaves the name and joins the note.
+    $tomatoes = $recipe->ingredients->firstWhere('name', 'tomatoes');
     expect((float) $tomatoes->pivot->qty)->toBe(400.0)
         ->and($tomatoes->pivot->unit)->toBe('g')
-        ->and($tomatoes->pivot->note)->toBe('canned');
+        ->and($tomatoes->pivot->note)->toBe('canned, crushed');
 
     expect(Ingredient::where('name', 'eggs')->exists())->toBeTrue();
     expect(Recipe::count())->toBe(1);

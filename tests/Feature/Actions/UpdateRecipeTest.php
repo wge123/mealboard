@@ -28,10 +28,10 @@ it('updates attributes and replaces ingredient rows', function () {
         ->and($updated->ingredients)->toHaveCount(1);
 
     $basil = $updated->ingredients->first();
-    expect($basil->name)->toBe('fresh basil') // find-or-create lowercases
+    expect($basil->name)->toBe('basil') // find-or-create lowercases and strips the prep word
         ->and((float) $basil->pivot->qty)->toBe(0.5)
         ->and($basil->pivot->unit)->toBe('cup')
-        ->and($basil->pivot->note)->toBe('torn');
+        ->and($basil->pivot->note)->toBe('torn, fresh');
 });
 
 it('reuses an existing ingredient regardless of case', function () {

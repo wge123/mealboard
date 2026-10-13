@@ -85,3 +85,31 @@ it('lowercases ingredient names', function () {
 
     expect($rows[0]['name'])->toBe('basmati rice');
 });
+
+it('reads a quantity glued to its unit', function () {
+    $rows = app(ParsePastedIngredients::class)->handle("200g tomato\n2kg shredded meat");
+
+    expect($rows[0])->toBe(['qty' => 200.0, 'unit' => 'g', 'name' => 'tomato', 'note' => null])
+        ->and($rows[1])->toBe(['qty' => 2.0, 'unit' => 'kg', 'name' => 'meat', 'note' => 'shredded']);
+});
+
+it('moves a wordy amount into the note', function () {
+    $rows = app(ParsePastedIngredients::class)->handle("as required vegetable oil\nto taste salt\npinch of salt\nhandful coriander\nto serve pita bread");
+
+    expect(array_column($rows, 'name'))->toBe(['vegetable oil', 'salt', 'salt', 'coriander', 'pita bread'])
+        ->and(array_column($rows, 'note'))->toBe(['as required', 'to taste', 'pinch of', 'handful', 'to serve']);
+});
+
+it('keeps a size and its piece word as the note rather than a quantity', function () {
+    $rows = app(ParsePastedIngredients::class)->handle("2cm piece ginger\n1 inch knob ginger");
+
+    expect($rows[0])->toBe(['qty' => null, 'unit' => null, 'name' => 'ginger', 'note' => '2cm piece'])
+        ->and($rows[1])->toBe(['qty' => null, 'unit' => null, 'name' => 'ginger', 'note' => '1 inch knob']);
+});
+
+it('joins a wordy amount with a comma note', function () {
+    $rows = app(ParsePastedIngredients::class)->handle('pinch of salt, or more');
+
+    expect($rows[0]['name'])->toBe('salt')
+        ->and($rows[0]['note'])->toBe('pinch of, or more');
+});
