@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\DiscoveryRunFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DiscoveryRun extends Model
 {
-    /** @use HasFactory<\Database\Factories\DiscoveryRunFactory> */
+    /** @use HasFactory<DiscoveryRunFactory> */
     use HasFactory;
 
     protected $fillable = [

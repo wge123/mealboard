@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\MealLogFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MealLog extends Model
 {
-    /** @use HasFactory<\Database\Factories\MealLogFactory> */
+    /** @use HasFactory<MealLogFactory> */
     use HasFactory;
 
     protected $fillable = [
