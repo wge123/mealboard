@@ -188,3 +188,38 @@ it('tells the scheduled and request scoring prompts the avoided ingredients and 
         && str_contains($process->command[2], 'cilantro')
         && str_contains($process->command[2], 'serves about 5'));
 })->with([false, true]);
+
+it('classifies a large backlog in batches so no single claude call outgrows the argument limit', function () {
+    DiscoveredVideo::factory()->count(85)->create();
+
+    Process::fake(function ($process) {
+        preg_match_all('/"video_id": "([^"]+)"/', $process->command[2], $matches);
+
+        return Process::result(output: json_encode(array_map(
+            fn (string $videoId) => ['video_id' => $videoId, 'classification' => 'likely_recipe', 'score' => 50],
+            $matches[1],
+        )));
+    });
+
+    expect(app(ClassifyDiscoveredVideos::class)->handle())->toBe(85);
+
+    Process::assertRanTimes(fn ($process) => $process->command[0] === '/fake/bin/claude', 3);
+
+    expect(DiscoveredVideo::query()->whereNull('classification')->count())->toBe(0);
+});
+
+it('cuts long descriptions down before they go into the prompt', function () {
+    DiscoveredVideo::factory()->create([
+        'video_id' => 'vidLong0001',
+        'description' => 'Ingredients up front. '.str_repeat('Sponsor links and timestamps. ', 200),
+    ]);
+
+    Process::fake(['*' => Process::result(output: json_encode([
+        ['video_id' => 'vidLong0001', 'classification' => 'likely_recipe', 'score' => 70],
+    ]))]);
+
+    app(ClassifyDiscoveredVideos::class)->handle();
+
+    Process::assertRan(fn ($process) => str_contains($process->command[2], 'Ingredients up front.')
+        && strlen($process->command[2]) < 5000);
+});
