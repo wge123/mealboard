@@ -13,14 +13,24 @@ use Illuminate\Support\Collection;
 use RuntimeException;
 
 /**
- * Pre-filter: batch-classify every unclassified discovered video in ONE
- * claude CLI call. Only likely_recipe survivors proceed to transcript
- * extraction (step 18).
+ * Pre-filter: classify every unclassified discovered video, BATCH_SIZE
+ * videos per claude CLI call. Only likely_recipe survivors proceed to
+ * transcript extraction (step 18).
  */
 class ClassifyDiscoveredVideos
 {
     /** Most recent verdicts included in the prompt (newest first). */
     private const int HISTORY_CAP = 20;
+
+    /**
+     * Videos per claude call. The prompt travels as one argv entry, and the
+     * first poll of a new channel list can find hundreds of videos: 330 with
+     * full descriptions came to 431 KB, past the cmux claude shim's 120 KB cap.
+     */
+    private const int BATCH_SIZE = 40;
+
+    /** Characters of each description kept; the tail is links and sponsors. */
+    private const int DESCRIPTION_CAP = 600;
 
     public function __construct(
         private ClaudeCli $claude,
@@ -57,9 +67,24 @@ class ClassifyDiscoveredVideos
             return 0;
         }
 
-        $output = $this->claude->run($this->prompt($videos, $request));
+        $classified = 0;
 
-        $rows = $this->parseClassifications($output);
+        foreach ($videos->chunk(self::BATCH_SIZE) as $batch) {
+            $classified += $this->classifyBatch($batch, $request);
+        }
+
+        return $classified;
+    }
+
+    /**
+     * One claude call. A malformed response throws before anything in this
+     * batch is written; batches already classified keep their verdicts.
+     *
+     * @param  Collection<int, DiscoveredVideo>  $videos
+     */
+    private function classifyBatch(Collection $videos, ?RecipeRequest $request): int
+    {
+        $rows = $this->parseClassifications($this->claude->run($this->prompt($videos, $request)));
 
         $classified = 0;
 
@@ -92,7 +117,9 @@ class ClassifyDiscoveredVideos
             $videos->map(fn (DiscoveredVideo $video) => [
                 'video_id' => $video->video_id,
                 'title' => $video->title,
-                'description' => $video->description,
+                'description' => $video->description === null
+                    ? null
+                    : mb_substr($video->description, 0, self::DESCRIPTION_CAP),
             ])->values()->all(),
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
         );
