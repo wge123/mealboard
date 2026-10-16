@@ -257,8 +257,11 @@ it('shows done over total on each aisle group row', function () {
 
     $page = shoppingListPage($plan)->assertSeeInOrder(['Produce', '0/2'])->assertSeeInOrder(['Dairy', '0/1']);
 
-    $page->call('toggleItem', 'kale|count')->assertSeeInOrder(['Produce', '1/2']);
-    $page->call('toggleItem', 'yellow onion|count')->assertSeeInOrder(['Produce', '2/2', 'Done']);
+    $page->call('toggleItem', 'kale|count');
+    expect(preg_replace('/\s+/', ' ', strip_tags($page->html())))->toContain('Produce 1/2');
+
+    $page->call('toggleItem', 'yellow onion|count');
+    expect(preg_replace('/\s+/', ' ', strip_tags($page->html())))->toContain('Produce 2/2 Done');
 });
 
 it('opens an inline paste row on an unmatched line only and saves the match from it', function () {
