@@ -32,22 +32,22 @@
                 </x-ui.empty-state>
             </x-ui.card>
         @else
-            <div class="grid items-start gap-4 lg:grid-cols-2">
+            <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
                 @foreach (['By meal' => [$slotRates, 'Meal'], 'By weekday' => [$weekdayRates, 'Day']] as $title => [$rows, $first])
-                    <x-ui.card :title="$title" flush>
-                        <x-ui.table head-on-phone>
+                    <x-ui.card :title="$title" flush class="min-w-0">
+                        <div class="overflow-x-auto"><x-ui.table head-on-phone>
                             <x-slot:head>
                                 <tr class="bg-base-200">
                                     <x-ui.table.th>{{ $first }}</x-ui.table.th>
                                     <x-ui.table.th numeric>Ate</x-ui.table.th>
                                     <x-ui.table.th numeric>Skipped</x-ui.table.th>
-                                    <x-ui.table.th class="w-2/5">Eaten</x-ui.table.th>
+                                    <x-ui.table.th class="sm:w-2/5">Eaten</x-ui.table.th>
                                 </tr>
                             </x-slot:head>
                             <tbody>
                                 @foreach ($rows as $label => $row)
                                     <x-ui.table.row wire:key="{{ Str::slug($title) }}-{{ $label }}">
-                                        <td class="font-medium">
+                                        <td class="whitespace-nowrap font-medium">
                                             @if ($title === 'By meal')
                                                 <span class="me-2 inline-block size-2 rounded-full" style="background: var(--meal-{{ $label }})" aria-hidden="true"></span>
                                             @endif
@@ -59,15 +59,15 @@
                                     </x-ui.table.row>
                                 @endforeach
                             </tbody>
-                        </x-ui.table>
+                        </x-ui.table></div>
                     </x-ui.card>
                 @endforeach
 
-                <x-ui.card title="Top recipes" flush>
+                <x-ui.card title="Top recipes" flush class="min-w-0">
                     @if ($topRecipes->isEmpty())
                         <x-ui.empty-state title="No rated meals yet." />
                     @else
-                        <x-ui.table head-on-phone>
+                        <div class="overflow-x-auto"><x-ui.table head-on-phone>
                             <x-slot:head>
                                 <tr class="bg-base-200">
                                     <x-ui.table.th class="w-10">#</x-ui.table.th>
@@ -80,21 +80,21 @@
                                 @foreach ($topRecipes as $row)
                                     <x-ui.table.row wire:key="top-{{ $row['id'] }}">
                                         <td class="tabular-nums text-base-content/70">{{ $loop->iteration }}</td>
-                                        <td class="max-w-0 truncate"><a href="{{ route('recipes.show', $row['id']) }}" class="font-medium hover:text-primary">{{ $row['title'] }}</a></td>
+                                        <td><a href="{{ route('recipes.show', $row['id']) }}" class="font-medium hover:text-primary">{{ $row['title'] }}</a></td>
                                         <td class="num whitespace-nowrap">{{ $star() }} {{ number_format($row['avg'], 1) }}</td>
                                         <td class="num text-base-content/70">{{ $row['count'] }}×</td>
                                     </x-ui.table.row>
                                 @endforeach
                             </tbody>
-                        </x-ui.table>
+                        </x-ui.table></div>
                     @endif
                 </x-ui.card>
 
-                <x-ui.card title="Most skipped" flush>
+                <x-ui.card title="Most skipped" flush class="min-w-0">
                     @if ($skippedRecipes->isEmpty())
                         <x-ui.empty-state title="Nothing skipped yet." />
                     @else
-                        <x-ui.table head-on-phone>
+                        <div class="overflow-x-auto"><x-ui.table head-on-phone>
                             <x-slot:head>
                                 <tr class="bg-base-200">
                                     <x-ui.table.th>Recipe</x-ui.table.th>
@@ -105,30 +105,30 @@
                             <tbody>
                                 @foreach ($skippedRecipes as $row)
                                     <x-ui.table.row wire:key="skipped-{{ $row['id'] }}">
-                                        <td class="max-w-0 truncate"><a href="{{ route('recipes.show', $row['id']) }}" class="font-medium hover:text-primary">{{ $row['title'] }}</a></td>
+                                        <td><a href="{{ route('recipes.show', $row['id']) }}" class="font-medium hover:text-primary">{{ $row['title'] }}</a></td>
                                         <td class="num">{{ $row['skipped'] }}</td>
                                         <td class="num text-base-content/70">{{ $row['planned'] }}</td>
                                     </x-ui.table.row>
                                 @endforeach
                             </tbody>
-                        </x-ui.table>
+                        </x-ui.table></div>
                     @endif
                 </x-ui.card>
 
                 <x-ui.card title="Cuisines" flush class="lg:col-span-2">
-                    <x-ui.table head-on-phone>
+                    <div class="overflow-x-auto"><x-ui.table head-on-phone class="max-sm:[&_td]:px-2 max-sm:[&_th]:px-2">
                         <x-slot:head>
                             <tr class="bg-base-200">
                                 <x-ui.table.th>Cuisine</x-ui.table.th>
                                 <x-ui.table.th numeric>Meals</x-ui.table.th>
-                                <x-ui.table.th class="w-1/3">Eaten</x-ui.table.th>
+                                <x-ui.table.th class="sm:w-1/3">Eaten</x-ui.table.th>
                                 <x-ui.table.th numeric>Rating</x-ui.table.th>
                             </tr>
                         </x-slot:head>
                         <tbody>
                             @foreach ($cuisines as $row)
                                 <x-ui.table.row wire:key="cuisine-{{ $row['cuisine'] }}">
-                                    <td class="font-medium">{{ $row['cuisine'] }}</td>
+                                    <td class="font-medium max-sm:pe-1">{{ $row['cuisine'] }}</td>
                                     <td class="num">{{ $row['meals'] }}</td>
                                     <td>@include('livewire.partials.rate-bar', ['rate' => $row['rate'], 'label' => $row['cuisine'].' eaten'])</td>
                                     <td class="num whitespace-nowrap">
@@ -137,7 +137,7 @@
                                 </x-ui.table.row>
                             @endforeach
                         </tbody>
-                    </x-ui.table>
+                    </x-ui.table></div>
                 </x-ui.card>
             </div>
         @endif
