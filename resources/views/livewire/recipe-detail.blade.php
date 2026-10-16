@@ -56,7 +56,7 @@
                 @endif
                 <span class="inline-flex items-center gap-1 tabular-nums"><x-tabler-users class="size-3.5" />Serves {{ $recipe->servings }}</span>
                 @if ($missingCount)
-                    <span class="inline-flex items-center gap-1 text-warning"><x-tabler-tool class="size-3.5" />{{ $missingCount }} {{ \Illuminate\Support\Str::plural('tool', $missingCount) }} missing</span>
+                    <x-ui.badge tone="warning"><x-tabler-tool class="size-3.5" />{{ $missingCount }} {{ \Illuminate\Support\Str::plural('tool', $missingCount) }} missing</x-ui.badge>
                 @endif
             </p>
 
@@ -88,7 +88,7 @@
                         </div>
                         @foreach ($recipe->ingredients as $n => $ingredient)
                             <label class="flex min-h-11 cursor-pointer items-start gap-3 border-b border-base-300 px-3 py-2.5 last:border-b-0 hover:bg-base-200"
-                                   x-bind:class="ready.includes({{ $n }}) && 'text-base-content/50'">
+                                   x-bind:class="ready.includes({{ $n }}) && 'text-base-content/70'">
                                 <input type="checkbox" class="checkbox checkbox-sm checkbox-primary mt-0.5"
                                        x-on:change="$event.target.checked ? ready.push({{ $n }}) : ready.splice(ready.indexOf({{ $n }}), 1);
                                                     if (ready.length === {{ $ingredientCount }}) open.mise = false">
@@ -117,7 +117,7 @@
                                         x-on:click="done.includes({{ $n }}) ? done.splice(done.indexOf({{ $n }}), 1) : done.push({{ $n }})"
                                         x-bind:aria-pressed="done.includes({{ $n }})"
                                         x-bind:aria-current="current === {{ $n }} ? 'step' : false"
-                                        x-bind:class="{ 'bg-primary/5 border-s-primary': current === {{ $n }}, 'border-s-transparent': current !== {{ $n }}, 'text-base-content/50': done.includes({{ $n }}) }">
+                                        x-bind:class="{ 'bg-primary/5 border-s-primary': current === {{ $n }}, 'border-s-transparent': current !== {{ $n }}, 'text-base-content/70': done.includes({{ $n }}) }">
                                     <span class="flex size-7 shrink-0 items-center justify-center rounded-full border border-base-300 text-sm font-medium tabular-nums"
                                           x-bind:class="done.includes({{ $n }}) && 'border-primary bg-primary text-primary-content'">
                                         <span x-show="! done.includes({{ $n }})">{{ $n + 1 }}</span>

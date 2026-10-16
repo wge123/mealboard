@@ -13,20 +13,20 @@
     @if ($recipe->image_url)
         <img src="{{ $recipe->image_url }}" class="absolute inset-0 size-full object-cover" alt="" loading="lazy">
     @else
-        <span aria-hidden="true" class="absolute inset-0 grid place-items-center pb-8 font-display text-5xl font-semibold text-black/15 transition-transform group-hover:scale-110">{{ $initials }}</span>
+        <span aria-hidden="true" class="absolute inset-0 grid place-items-center pb-8 font-display text-2xl font-semibold text-black/15 transition-transform group-hover:scale-110">{{ $initials }}</span>
     @endif
 
     <span class="absolute top-2 left-2 flex gap-1">
         @if ($minutes > 0)
-            <span class="badge badge-sm border-0 bg-base-100/90 text-base-content font-medium">{{ $minutes }} min</span>
+            <x-ui.badge class="bg-base-100/90">{{ $minutes }} min</x-ui.badge>
         @endif
         @if ($rating !== null)
-            <span class="badge badge-sm border-0 bg-base-100/90 text-base-content font-medium" title="Average rating {{ number_format($rating, 1) }}"><x-tabler-star-filled class="size-3.5 text-primary" /> {{ number_format($rating, 1) }}</span>
+            <x-ui.badge class="bg-base-100/90" title="Average rating {{ number_format($rating, 1) }}"><x-tabler-star-filled class="size-3.5 text-primary" /> {{ number_format($rating, 1) }}</x-ui.badge>
         @endif
     </span>
 
     @if ($needs !== '')
-        <span data-missing-badge class="absolute top-2.5 right-2.5 size-3 rounded-full bg-warning ring-2 ring-base-100 shadow-none" title="needs: {{ $needs }}"><span class="sr-only">needs: {{ $needs }}</span></span>
+        <span class="absolute top-2 right-2 rounded-full bg-base-100"><x-ui.badge tone="warning" data-missing-badge="true" title="needs: {{ $needs }}"><x-tabler-tool class="size-3" /><span class="sr-only">needs: {{ $needs }}</span></x-ui.badge></span>
     @endif
 
     <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent p-3 pt-10">

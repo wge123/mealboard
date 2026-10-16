@@ -22,7 +22,7 @@
             @elseif ($log === 'skipped')
                 <span class="text-base-content/70"><x-tabler-x /><span class="sr-only">Skipped</span></span>
             @elseif ($log === 'open')
-                <span class="mt-1.5 size-2 shrink-0 rounded-full bg-warning"></span><span class="sr-only">Not logged yet</span>
+                <x-ui.badge tone="warning" dot class="shrink-0"><span class="sr-only">Not logged yet</span></x-ui.badge>
             @endif
         </span>
         <span class="num text-xs text-base-content/70">{{ $minutes > 0 ? $minutes.' min' : '' }}</span>

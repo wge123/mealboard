@@ -179,7 +179,7 @@
                     <div class="mb-3 flex flex-wrap items-center gap-2">
                         <div class="me-auto" style="--slot-accent: var(--meal-{{ $pickerSlot }})">
                             <div class="slot-label text-xs font-semibold tracking-widest uppercase">{{ $pickerSlot }}</div>
-                            <h3 class="font-display text-lg font-semibold">{{ $trayDay->format('D j M') }}</h3>
+                            <h3 class="text-lg font-semibold">{{ $trayDay->format('D j M') }}</h3>
                         </div>
                         @if ($editable)
                             <input type="search" class="input min-h-11 w-44 sm:w-64" placeholder="Search recipes…"
@@ -213,8 +213,8 @@
                                             wire:click="choose({{ $recipe->id }})"
                                             wire:loading.attr="disabled" wire:target="choose">
                                         <span class="line-clamp-3 text-sm leading-tight font-medium">{{ $recipe->title }}</span>
-                                        {{-- Badges wrap onto two lines inside a narrow tile instead of overflowing. --}}
-                                        <span class="flex flex-wrap gap-1 [&_.badge]:h-auto [&_.badge]:py-0.5 [&_.badge]:text-left [&_.badge]:leading-tight">
+                                        {{-- Badges wrap onto further lines, one whole pill each, inside a narrow tile. --}}
+                                        <span class="flex flex-wrap gap-1">
                                             @include('livewire.partials.missing-tools-badge', ['missing' => $missingTools[$recipe->id]])
                                             @foreach ($avoidedIngredients[$recipe->id] as $word)
                                                 <x-ui.badge tone="error" data-avoided-badge>contains: {{ $word }}</x-ui.badge>

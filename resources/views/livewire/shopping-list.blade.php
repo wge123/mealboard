@@ -68,7 +68,7 @@
                             <x-ui.table.group :label="ucfirst($category)" :done="$aisleDone" :total="count($categoryLines)" :cols="4" />
                             @foreach ($categoryLines as $line)
                                 @php($matched = $line['product_url'] !== null)
-                                <x-ui.table.row :group="ucfirst($category)" :class="$line['checked'] ? 'text-base-content/60' : ''">
+                                <x-ui.table.row :group="ucfirst($category)" :class="$line['checked'] ? 'text-base-content/70' : ''">
                                     <td class="p-0!">
                                         <label class="flex min-h-11 cursor-pointer items-center gap-3 px-4 py-1.5">
                                             <input type="checkbox" class="checkbox checkbox-primary checkbox-sm shrink-0"
