@@ -184,3 +184,21 @@ it('shows the skip and undo buttons on the card', function () {
         ->assertSeeHtml('aria-label="Approve"')
         ->assertSeeHtml('aria-label="Reject"');
 });
+
+it('puts the ingredient lines and the missing tool fixes in the sheet on the card', function () {
+    $recipe = Recipe::factory()->create(['title' => 'Sheet Card']);
+    $recipe->ingredients()->attach(
+        \App\Models\Ingredient::factory()->create(['name' => 'red lentils'])->id,
+        ['qty' => 250, 'unit' => 'g', 'note' => null],
+    );
+    $recipe->recipeTools()->each(fn ($tool) => $tool->delete());
+    $recipe->recipeTools()->create(['position' => 1, 'count' => 1])
+        ->alternatives()->create(['position' => 1, 'word' => 'tagine', 'kitchen_tool_kind_id' => null]);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeApproval::class)
+        ->assertSeeInOrder(['red lentils', '250 g'])
+        ->assertSee('Add as a new kitchen tool')
+        ->assertDontSee('KEEP')
+        ->assertDontSee('NOPE');
+});
