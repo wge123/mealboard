@@ -196,7 +196,7 @@
         </x-ui.card>
 
         <x-ui.card title="Segmented toggle" count="2 states">
-            <div class="flex flex-col gap-4" x-data="{ view: 'group' }">
+            <div class="flex flex-col items-start gap-4" x-data="{ view: 'group' }">
                 <x-ui.segmented label="View">
                     <x-ui.segmented.option x-bind:aria-pressed="view === 'group' ? 'true' : 'false'" x-bind:class="view === 'group' ? 'bg-base-100 text-base-content ring-1 ring-base-300' : 'text-base-content/70'" @click="view = 'group'">Group by</x-ui.segmented.option>
                     <x-ui.segmented.option x-bind:aria-pressed="view === 'shelves' ? 'true' : 'false'" x-bind:class="view === 'shelves' ? 'bg-base-100 text-base-content ring-1 ring-base-300' : 'text-base-content/70'" @click="view = 'shelves'">Shelves</x-ui.segmented.option>
