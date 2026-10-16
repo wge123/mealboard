@@ -1,5 +1,5 @@
 /* ============================================================================
-   Mealboard design rulebook (ADR 0002) — read this before styling any page:
+   Mealboard design rulebook (see docs/adr/0002-quiet-tabler-design-tokens.md) — read this before styling any page:
    - Type: 16px root, body text-sm (14px). Inputs are text-base sm:text-sm so
      iOS never zooms. Page title: font-display text-2xl font-semibold.
      Card/section titles: text-base font-semibold. Labels: text-xs
