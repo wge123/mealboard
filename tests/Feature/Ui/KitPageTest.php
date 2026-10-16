@@ -11,3 +11,9 @@ it('answers 404 for the kit page outside the local environment', function (strin
 
     $this->get('/kit')->assertNotFound();
 })->with(['testing', 'production', 'staging']);
+
+it('shows the second half of the kit on the kit page', function () {
+    $this->app['env'] = 'local';
+
+    $this->get('/kit')->assertOk()->assertSee('Table')->assertSee('Chip')->assertSee('Segmented toggle')->assertSee('Field');
+});
