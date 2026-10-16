@@ -73,7 +73,7 @@ function seedInsightsLog(): void
 
 function insightsHtml(): string
 {
-    return test()->actingAs(User::factory()->create())->get('/insights')->assertOk()->getContent();
+    return preg_replace('/<!--.*?-->/s', '', test()->actingAs(User::factory()->create())->get('/insights')->assertOk()->getContent());
 }
 
 it('renders for an authenticated user', function () {
@@ -167,7 +167,7 @@ it('shows dashes for the figures that need data when nothing is logged', functio
     $html = insightsHtml();
 
     expect(insightsStat($html, 'Meals logged'))->toBe('Meals logged 0')
-        ->and(insightsStat($html, 'Eaten'))->toBe('Eaten —')
-        ->and(insightsStat($html, 'Average rating'))->toBe('Average rating —')
-        ->and(insightsStat($html, 'Discoveries kept'))->toBe('Discoveries kept —');
+        ->and(insightsStat($html, 'Eaten'))->toBe('Eaten — 0 ate · 0 skipped')
+        ->and(insightsStat($html, 'Average rating'))->toBe('Average rating — 0 rated meals')
+        ->and(insightsStat($html, 'Discoveries kept'))->toBe('Discoveries kept — 0 kept · 0 passed');
 });
