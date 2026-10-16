@@ -81,9 +81,9 @@
                                             </span>
                                         </label>
                                     </td>
-                                    <td class="num whitespace-nowrap">{{ $fmtQty($line['qty']) }} <span class="text-base-content/70">{{ $line['unit'] !== 'count' ? $line['unit'] : '' }}</span></td>
+                                    <td class="num whitespace-nowrap px-2! sm:px-4!">{{ $fmtQty($line['qty']) }} <span class="text-base-content/70">{{ $line['unit'] !== 'count' ? $line['unit'] : '' }}</span></td>
                                     <td class="hidden text-base-content/70 md:table-cell">{{ implode('; ', $line['notes']) }}</td>
-                                    <td class="whitespace-nowrap text-end">
+                                    <td class="whitespace-nowrap px-2! text-end sm:px-4!">
                                         <div class="inline-flex items-center gap-1">
                                             <a href="{{ $line['product_url'] ?? $line['search_url'] }}" target="_blank" rel="noopener"
                                                class="inline-flex min-h-11 items-center sm:min-h-9"
