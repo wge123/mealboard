@@ -125,6 +125,106 @@
             </div>
         </x-ui.card>
 
+        @php
+            $kitRows = [
+                'Produce' => [['Basil', 2, 'bunch', true], ['Cherry tomatoes', 400, 'g', false], ['Lemons', 3, '', false]],
+                'Dairy' => [['Feta', 200, 'g', true], ['Greek yoghurt', 500, 'g', true]],
+                'Pantry' => [['Orzo', 300, 'g', false], ['Olive oil', 1, 'bottle', false]],
+            ];
+            $sortBy = request('sort') === 'item' ? 'item' : 'amount';
+            $sortDir = request('dir') === 'asc' ? 'asc' : 'desc';
+            $sortUrl = fn (string $col) => '?sort='.$col.'&dir='.($sortBy === $col && $sortDir === 'asc' ? 'desc' : 'asc');
+            $kitRows = array_map(function ($items) use ($sortBy, $sortDir) {
+                usort($items, fn ($a, $b) => ($sortBy === 'item' ? $a[0] <=> $b[0] : $a[1] <=> $b[1]) * ($sortDir === 'asc' ? 1 : -1));
+
+                return $items;
+            }, $kitRows);
+        @endphp
+
+        <x-ui.card title="Table" count="sortable, numeric, folding groups" flush>
+            <div>
+                <x-ui.table>
+                    <x-slot:head>
+                        <tr>
+                            <x-ui.table.th sortable :sort="$sortBy === 'item' ? $sortDir : null" onclick="location.search = '{{ $sortUrl('item') }}'">Item</x-ui.table.th>
+                            <x-ui.table.th numeric :sort="$sortBy === 'amount' ? $sortDir : null" onclick="location.search = '{{ $sortUrl('amount') }}'">Amount</x-ui.table.th>
+                            <x-ui.table.th class="hidden md:table-cell">Unit</x-ui.table.th>
+                            <x-ui.table.th numeric>Have</x-ui.table.th>
+                        </tr>
+                    </x-slot:head>
+                    @foreach ($kitRows as $aisle => $items)
+                        @php $kitDone = collect($items)->where(3, true)->count(); @endphp
+                        <tbody wire:key="g-{{ $aisle }}-{{ $kitDone }}">
+                            <x-ui.table.group :label="$aisle" :done="$kitDone" :total="count($items)" :cols="4" />
+                            @foreach ($items as [$name, $amount, $unit, $have])
+                                <x-ui.table.row :group="$aisle">
+                                    <td class="p-0!">
+                                        <label class="flex min-h-11 cursor-pointer items-center gap-3 px-4 py-1.5">
+                                            <input type="checkbox" class="checkbox checkbox-primary checkbox-sm" @checked($have)>
+                                            {{ $name }}
+                                        </label>
+                                    </td>
+                                    <td class="num">{{ $amount }}</td>
+                                    <td class="hidden text-base-content/70 md:table-cell">{{ $unit }}</td>
+                                    <td class="num">{{ $have ? 'Yes' : 'No' }}</td>
+                                </x-ui.table.row>
+                            @endforeach
+                        </tbody>
+                    @endforeach
+                </x-ui.table>
+            </div>
+            <x-slot:footer>
+                Tap a group to fold it; Dairy is complete, so it starts folded. Click Item or Amount to sort (the header shows the direction).
+            </x-slot:footer>
+        </x-ui.card>
+
+        <x-ui.card title="Chip" count="2 states">
+            <div class="flex flex-col gap-4" x-data="{ on: ['Dinner'] }">
+                <div class="flex flex-wrap items-center gap-2">
+                    @foreach (['Breakfast', 'Lunch', 'Dinner', 'Snack'] as $meal)
+                        <x-ui.chip x-bind:aria-pressed="on.includes('{{ $meal }}') ? 'true' : 'false'"
+                                   x-bind:class="on.includes('{{ $meal }}') ? 'border-primary bg-primary/10 text-primary' : 'border-base-300 bg-base-100'"
+                                   @click="on = on.includes('{{ $meal }}') ? on.filter(m => m !== '{{ $meal }}') : [...on, '{{ $meal }}']">{{ $meal }}</x-ui.chip>
+                    @endforeach
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <x-ui.chip pressed icon="tabler-check">Pressed</x-ui.chip>
+                    <x-ui.chip>Resting</x-ui.chip>
+                    <x-ui.chip busy="kit" disabled>Busy (disabled)</x-ui.chip>
+                </div>
+            </div>
+        </x-ui.card>
+
+        <x-ui.card title="Segmented toggle" count="2 states">
+            <div class="flex flex-col gap-4" x-data="{ view: 'group' }">
+                <x-ui.segmented label="View">
+                    <x-ui.segmented.option x-bind:aria-pressed="view === 'group' ? 'true' : 'false'" x-bind:class="view === 'group' ? 'bg-base-100 text-base-content ring-1 ring-base-300' : 'text-base-content/70'" @click="view = 'group'">Group by</x-ui.segmented.option>
+                    <x-ui.segmented.option x-bind:aria-pressed="view === 'shelves' ? 'true' : 'false'" x-bind:class="view === 'shelves' ? 'bg-base-100 text-base-content ring-1 ring-base-300' : 'text-base-content/70'" @click="view = 'shelves'">Shelves</x-ui.segmented.option>
+                </x-ui.segmented>
+                <div class="flex flex-wrap items-center gap-4">
+                    <x-ui.segmented label="Outcome (static)">
+                        <x-ui.segmented.option pressed>Ate it</x-ui.segmented.option>
+                        <x-ui.segmented.option>Skipped</x-ui.segmented.option>
+                    </x-ui.segmented>
+                    <x-ui.segmented label="Outcome (busy, disabled)" busy="kit">
+                        <x-ui.segmented.option pressed disabled>Ate it</x-ui.segmented.option>
+                        <x-ui.segmented.option disabled>Skipped</x-ui.segmented.option>
+                    </x-ui.segmented>
+                </div>
+            </div>
+        </x-ui.card>
+
+        @php
+            view()->share('errors', (new \Illuminate\Support\ViewErrorBag)->put('default', new \Illuminate\Support\MessageBag(['kit_error' => ['Enter a quantity between 1 and 20.']])));
+        @endphp
+        <x-ui.card title="Field" count="3 states">
+            <div class="grid gap-4 md:grid-cols-3">
+                <x-ui.field label="Recipe name" name="kit_plain" placeholder="Pad thai" />
+                <x-ui.field label="Servings" name="kit_hint" type="number" hint="How many people you cook for." value="4" />
+                <x-ui.field label="Quantity" name="kit_error" type="number" value="40" hint="Whole numbers only." />
+            </div>
+        </x-ui.card>
+
         <x-ui.card title="Refresh (page convention)">
             <p class="mb-3 text-base-content/70">
                 Lists that update wrap their results in <code>wire:loading.delay.class="opacity-50 pointer-events-none"</code>

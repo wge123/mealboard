@@ -186,6 +186,12 @@
     }
 }
 
+/* Numbers in table cells and headers: right-aligned, equal-width digits. */
+@utility num {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+}
+
 /* A tapped settings tile slides to its new place (tileSelect in app.js). */
 ::view-transition-group(*) {
     animation-duration: 200ms;
