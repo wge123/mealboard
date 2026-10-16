@@ -258,3 +258,45 @@ it('clears every filter at once and goes back to the shelves', function () {
 it('refuses a chip for a facet that does not exist', function () {
     library()->call('toggle', 'groupBy', 'time')->assertStatus(422);
 });
+
+it('links Request a recipe from the page header to the request page', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/recipes')
+        ->assertOk()
+        ->assertSee('Request a recipe')
+        ->assertSee('href="'.route('recipes.request').'"', false);
+});
+
+it('offers one filter menu per facet and says how many values are on', function () {
+    Recipe::factory()->approved()->create(['meal_type' => MealType::Dinner, 'cuisine' => 'thai', 'tags' => ['quick']]);
+    Recipe::factory()->approved()->create(['meal_type' => MealType::Lunch, 'cuisine' => 'italian', 'tags' => ['quick']]);
+
+    library()
+        ->assertSeeHtml('role="toolbar"')
+        ->assertDontSeeHtml('aria-label="Meal, ')
+        ->call('toggle', 'mealTypes', 'dinner')
+        ->call('toggle', 'mealTypes', 'lunch')
+        ->call('toggle', 'cuisines', 'thai')
+        ->assertSeeHtml('aria-label="Meal, 2 on"')
+        ->assertSeeHtml('aria-label="Cuisine, 1 on"')
+        ->set('maxMinutes', 40)
+        ->assertSeeHtml('aria-label="Time, ≤ 40 min"');
+});
+
+it('turns the 4 and up chip on and off', function () {
+    library()
+        ->assertSeeHtml('4 and up')
+        ->set('minRating', 4)
+        ->assertSet('minRating', 4)
+        ->set('minRating', null)
+        ->assertSet('minRating', null);
+});
+
+it('keeps the old chip rows out of the page', function () {
+    Recipe::factory()->approved()->create(['cuisine' => 'thai', 'tags' => ['quick']]);
+    Recipe::factory()->approved()->create(['cuisine' => 'thai', 'tags' => ['quick']]);
+
+    library()
+        ->assertDontSeeHtml('aria-label="Meal and time"')
+        ->assertDontSeeHtml('aria-label="Cuisine and tags"');
+});
