@@ -149,7 +149,7 @@
                                             <div class="mt-2" wire:key="missing-alt-{{ $entry->tool->id }}-{{ $loop->index }}">
                                                 @if ($alt['kind'] === null)
                                                     <p class="text-base-content/70">&ldquo;{{ $alt['word'] }}&rdquo; is not a kitchen tool you have listed.</p>
-                                                    <div class="mt-1.5 flex flex-wrap items-center gap-2" x-data='{ kindId: "", word: @js($alt['word']) }'>
+                                                    <div class="mt-1.5 flex flex-wrap items-center gap-2" x-data="{ kindId: '', word: @js($alt['word']) }">
                                                         <x-ui.button wire:click="addAsNewTool(word)">Add as a new kitchen tool</x-ui.button>
                                                         <select class="select min-h-11 w-auto sm:min-h-9" x-model="kindId"
                                                                 aria-label="Which kitchen tool is {{ $alt['word'] }}?">
@@ -191,7 +191,7 @@
                 <x-ui.button variant="ghost" icon="tabler-chevrons-right" x-on:click="skip()" aria-label="Skip for now" title="Skip for now (S)"><span class="max-sm:sr-only">Skip</span></x-ui.button>
                 <x-ui.button variant="primary" icon="tabler-check" x-on:click="fly('approve')" aria-label="Approve" title="Keep (A)">Keep</x-ui.button>
             </div>
-            <p class="mt-3 text-center text-xs text-base-content/70">Swipe right to keep, left to pass. Skip sends it to the back.<span class="hidden lg:inline"> Keys: <kbd class="kbd kbd-xs">A</kbd> <kbd class="kbd kbd-xs">R</kbd> <kbd class="kbd kbd-xs">S</kbd> <kbd class="kbd kbd-xs">U</kbd></span></p>
+            <p class="mt-3 text-center text-xs text-base-content/70">Swipe right to keep, left to pass. Skip sends it to the back.<span class="hidden whitespace-nowrap lg:inline"> Keys: <kbd class="kbd kbd-xs">A</kbd> <kbd class="kbd kbd-xs">R</kbd> <kbd class="kbd kbd-xs">S</kbd> <kbd class="kbd kbd-xs">U</kbd></span></p>
         </div>
     @endif
 </div>
