@@ -29,6 +29,23 @@ class KitchenToolInventory
     }
 
     /**
+     * How many distinct recipes call for each kind, through any of a tool
+     * entry's alternatives. Keyed by kind id; kinds no recipe uses are absent.
+     *
+     * @return Collection<int, int>
+     */
+    public function recipeCounts(): Collection
+    {
+        return RecipeToolAlternative::query()
+            ->join('recipe_tools', 'recipe_tools.id', '=', 'recipe_tool_alternatives.recipe_tool_id')
+            ->whereNotNull('recipe_tool_alternatives.kitchen_tool_kind_id')
+            ->groupBy('recipe_tool_alternatives.kitchen_tool_kind_id')
+            ->selectRaw('recipe_tool_alternatives.kitchen_tool_kind_id as kind_id, count(distinct recipe_tools.recipe_id) as recipes')
+            ->pluck('recipes', 'kind_id')
+            ->map(fn ($recipes) => (int) $recipes);
+    }
+
+    /**
      * Whether the household owns this kind.
      */
     public function owns(KitchenToolKind $kind): bool

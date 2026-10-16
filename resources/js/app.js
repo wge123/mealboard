@@ -41,9 +41,11 @@ document.addEventListener('alpine:init', () => {
                 tile.parentElement.insertBefore(tile, next ?? null);
                 const group = tile.closest('[data-resort-group]');
                 const count = group?.querySelector('[data-on-count]');
-                if (count) {
-                    count.textContent = [...group.querySelectorAll('li[data-key-on]')].filter((li) => controlOf(li) && isOn(li)).length;
-                }
+                const lines = [...group.querySelectorAll('li[data-key-on]')].filter((li) => controlOf(li));
+                const on = lines.filter(isOn).length;
+                if (count) count.textContent = on;
+                const off = group.querySelector('[data-off-count]');
+                if (off) off.textContent = lines.length - on;
             };
             document.startViewTransition ? document.startViewTransition(move) : move();
         },

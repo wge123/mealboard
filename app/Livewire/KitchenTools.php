@@ -133,7 +133,7 @@ class KitchenTools extends Component
         }
     }
 
-    public function render(): View
+    public function render(KitchenToolInventory $inventory): View
     {
         // Owned kinds first, then the rest, each group alphabetical.
         $kinds = KitchenToolKind::query()
@@ -147,6 +147,6 @@ class KitchenTools extends Component
             ->with(['otherNames' => fn ($q) => $q->orderBy('name')])
             ->find($this->detailId);
 
-        return view('livewire.kitchen-tools', ['kinds' => $kinds, 'detail' => $detail]);
+        return view('livewire.kitchen-tools', ['kinds' => $kinds, 'detail' => $detail, 'recipeCounts' => $inventory->recipeCounts()]);
     }
 }

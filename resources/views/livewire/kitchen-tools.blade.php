@@ -1,56 +1,78 @@
 <div x-data="tileSelect" x-on:keydown.escape.window="selecting && toggleSelecting()">
-    @include('livewire.partials.section-header', [
-        'title' => 'Kitchen tools', 'filters' => \App\Enums\KitchenToolFilter::cases(), 'current' => $filter,
-        'help' => 'Tap a tool to mark it owned or not. The dots button opens its note and other names.',
-    ])
+    <x-ui.card title="Kitchen tools" flush>
+        <x-slot:actions>
+            <x-ui.button x-on:click="toggleSelecting()" x-bind:aria-pressed="selecting" aria-pressed="false" x-bind:class="selecting && 'btn-primary'">
+                <span x-text="selecting ? 'Cancel' : 'Select'">Select</span>
+            </x-ui.button>
+        </x-slot:actions>
 
-    @if ($kinds->isEmpty())
-        <p class="rounded-box bg-base-200 py-8 text-center text-sm text-base-content/70">{{ match ($filter) {
-            \App\Enums\KitchenToolFilter::Owned => 'You have marked no kitchen tool owned yet.',
-            \App\Enums\KitchenToolFilter::NotOwned => 'You have every kitchen tool the app knows.',
-            \App\Enums\KitchenToolFilter::All => 'The app knows no kitchen tools yet.',
-        } }}</p>
-    @else
-        <ul class="grid grid-cols-3 gap-2 sm:grid-cols-5 xl:grid-cols-7">
-            @foreach ($kinds as $kind)
-                <li class="group/tile relative" wire:key="kind-{{ $kind->id }}" style="view-transition-name: tool-{{ $kind->id }}"
-                    data-key-on="{{ $kind->name }}" data-key-off="{{ $kind->name }}">
-                    {{-- The look follows aria-pressed, so a tap can flip it before the server answers. --}}
-                    <button type="button"
-                            class="group flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-box border border-base-300 px-1 py-3 text-center transition aria-pressed:bg-base-100 aria-[pressed=false]:border-dashed aria-[pressed=false]:text-base-content/70"
-                            :class="picked.includes({{ $kind->id }}) && 'ring-2 ring-primary ring-offset-2 ring-offset-base-100'"
-                            x-on:click="tap({{ $kind->id }}, () => $wire.toggleOwned({{ $kind->id }}), $el)"
-                            aria-pressed="{{ $kind->owned ? 'true' : 'false' }}"
-                            aria-label="Owned: {{ $kind->display_name }}">
-                        <span aria-hidden="true" class="absolute top-1.5 left-1.5 hidden size-4 place-items-center rounded-full bg-primary text-xs text-primary-content group-aria-pressed:grid"><x-tabler-check class="size-3" /></span>
-                        <span class="size-7 group-aria-pressed:text-primary group-aria-[pressed=false]:text-base-content/70 [&>svg]:size-full" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($kind->name) }}</span>
-                        <span class="text-xs leading-tight font-medium">{{ $kind->display_name }}</span>
-                        @if ($kind->note)
-                            <span class="line-clamp-1 text-xs text-base-content/70">{{ $kind->note }}</span>
-                        @endif
-                    </button>
-                    {{-- Always shown on phones; on desktop it appears on hover or keyboard focus. --}}
-                    <button type="button" class="btn btn-ghost btn-xs absolute top-0 right-0 min-h-11 min-w-11 text-base text-base-content/70 hover:text-base-content lg:opacity-0 lg:group-hover/tile:opacity-100 lg:focus-visible:opacity-100"
-                            x-show="! selecting"
-                            wire:click="openDetails({{ $kind->id }})"
-                            aria-label="Details for {{ $kind->display_name }}"><x-tabler-dots class="size-5" /></button>
-                </li>
-            @endforeach
-        </ul>
-    @endif
+        <p class="max-w-prose px-4 py-3 text-base-content/70">Tap a tool to mark it owned or not. The dots button opens its note and other names. The number is how many recipes call for the tool.</p>
 
-    @error('markMany') <p class="mt-2 text-sm text-error" role="alert">{{ $message }}</p> @enderror
-    @error('deleteKind') <p class="mt-2 text-sm text-error" role="alert">{{ $message }}</p> @enderror
-
-    <form wire:submit="addKind" class="mt-5" data-test="add-kind-form">
-        <label for="new-kind" class="mb-1 block text-sm font-medium">Add a kitchen tool the app doesn't know</label>
-        <div class="flex gap-2">
-            <input id="new-kind" type="text" wire:model="newKind" placeholder="Tortilla press"
-                   class="input min-h-11 flex-1">
-            <button type="submit" class="btn btn-primary min-h-11">Add</button>
+        <div class="flex flex-wrap items-end gap-x-4 gap-y-3 border-t border-base-300 px-4 py-3">
+            <x-ui.segmented label="Show">
+                @foreach (\App\Enums\KitchenToolFilter::cases() as $case)
+                    <x-ui.segmented.option :pressed="$filter === $case" wire:click="$set('filter', '{{ $case->value }}')">{{ $case->label() }}</x-ui.segmented.option>
+                @endforeach
+            </x-ui.segmented>
         </div>
-        @error('addKind') <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p> @enderror
-    </form>
+        @error('markMany') <p class="px-4 pb-3 font-medium text-error" role="alert">{{ $message }}</p> @enderror
+        @error('deleteKind') <p class="px-4 pb-3 font-medium text-error" role="alert">{{ $message }}</p> @enderror
+
+        <div wire:loading.delay.class="opacity-50 pointer-events-none" wire:loading.attr="aria-busy" wire:target="filter">
+            @if ($kinds->isEmpty())
+                <x-ui.empty-state class="border-t border-base-300" :title="match ($filter) {
+                    \App\Enums\KitchenToolFilter::Owned => 'You have marked no kitchen tool owned yet.',
+                    \App\Enums\KitchenToolFilter::NotOwned => 'You have every kitchen tool the app knows.',
+                    \App\Enums\KitchenToolFilter::All => 'The app knows no kitchen tools yet.',
+                }" />
+            @else
+                {{-- One list in columns under an Owned and a Don't have heading. The headings carry data-state, so a tap re-sorts a tool across them (tileSelect). --}}
+                <ul class="gap-x-6 border-t border-base-300 px-2 pb-1 sm:columns-2 lg:columns-3 [&>li[data-state]]:[column-span:all]" data-resort-group>
+                    @foreach ([true, false] as $isOwned)
+                        @php $group = $kinds->where('owned', $isOwned); @endphp
+                        @continue($group->isEmpty())
+                        <li class="-mx-2 flex min-h-11 items-center gap-2 bg-base-200 px-4 text-xs font-semibold tracking-wide text-base-content/70 uppercase sm:min-h-9 {{ $isOwned ? '' : 'mt-1 border-t border-base-300' }}"
+                            wire:key="group-{{ $isOwned ? 'owned' : 'missing' }}" data-state="{{ $isOwned ? 'on' : 'off' }}" data-key-on="" data-key-off="">
+                            {{ $isOwned ? 'Owned' : "Don't have" }}
+                            <span class="font-normal tracking-normal normal-case tabular-nums" @if ($isOwned) data-on-count @else data-off-count @endif>{{ $group->count() }}</span>
+                        </li>
+                        @foreach ($group as $kind)
+                            @php
+                                $uses = $recipeCounts[$kind->id] ?? 0;
+                                $missing = ! $kind->owned && $uses > 0;
+                                $usedIn = 'used in '.$uses.' '.\Illuminate\Support\Str::plural('recipe', $uses);
+                            @endphp
+                            <li class="group/tile break-inside-avoid rounded-field" wire:key="kind-{{ $kind->id }}" style="view-transition-name: tool-{{ $kind->id }}"
+                                :class="picked.includes({{ $kind->id }}) && 'bg-primary/10'"
+                                data-key-on="{{ $kind->name }}" data-key-off="{{ $kind->name }}">
+                                <x-ui.checklist-line :id="'tool-'.$kind->id" :label="$kind->display_name" :checked="$kind->owned"
+                                                     :hint="$kind->note" :count="$uses" :count-label="$missing ? $usedIn.', and you don\'t have it' : $usedIn" :warn="$missing"
+                                                     aria-label="Owned: {{ $kind->display_name }}"
+                                                     x-on:click="tap({{ $kind->id }}, () => $wire.toggleOwned({{ $kind->id }}), $el, $event)">
+                                    <x-slot:leading>{{ \App\Support\KitchenToolIcon::for($kind->name) }}</x-slot:leading>
+                                    <x-slot:action>
+                                        {{-- Always shown on phones; on desktop it appears on hover or keyboard focus. --}}
+                                        <x-ui.button square variant="ghost" icon="tabler-dots" :label="'Details for '.$kind->display_name"
+                                                     class="sm:size-8 sm:min-h-8 lg:opacity-0 lg:group-hover/tile:opacity-100 lg:focus-visible:opacity-100"
+                                                     x-show="! selecting" wire:click="openDetails({{ $kind->id }})" />
+                                    </x-slot:action>
+                                </x-ui.checklist-line>
+                            </li>
+                        @endforeach
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+
+        <x-slot:footer>
+            <form wire:submit="addKind" class="flex max-w-md items-end gap-2" data-test="add-kind-form">
+                <div class="min-w-0 flex-1">
+                    <x-ui.field label="Add a kitchen tool the app doesn't know" name="newKind" id="new-kind" :error="$errors->first('addKind')" placeholder="Tortilla press" wire:model="newKind" />
+                </div>
+                <x-ui.button type="submit" variant="primary" busy="addKind">Add</x-ui.button>
+            </form>
+        </x-slot:footer>
+    </x-ui.card>
 
     @include('livewire.partials.tile-grid-bar', ['offLabel' => 'Mark not owned', 'onLabel' => 'Mark owned'])
 

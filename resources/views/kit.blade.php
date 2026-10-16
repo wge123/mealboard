@@ -347,6 +347,9 @@
                     <x-slot:action><x-ui.button square variant="ghost" icon="tabler-dots" label="Details for Wok" /></x-slot:action>
                 </x-ui.checklist-line>
                 <x-ui.checklist-line label="Icon instead of a checkbox" icon="tabler-flame" :count="3" count-label="3 recipes" />
+                <x-ui.checklist-line id="kit-line-6" label="Air Fryer" hint="5 L" :count="4" count-label="used in 4 recipes, and you don't have it" warn>
+                    <x-slot:leading><x-tabler-flame /></x-slot:leading>
+                </x-ui.checklist-line>
             </div>
         </x-ui.card>
     </div>

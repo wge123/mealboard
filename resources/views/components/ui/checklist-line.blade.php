@@ -3,8 +3,11 @@
      The checkbox needs an `id`; the whole label is the hit area and the attributes you pass (wire:click, x-on:click, aria-label)
      go on the checkbox. `count` is the muted number, `count-label` its words for assistive tech ("used in 3 recipes").
      The `action` slot sits beside the label, not inside it, so a tap on it never ticks the box: give its button an aria-label.
-     With `icon` there is no checkbox and the line is a plain row. --}}
-@props(['label', 'id' => null, 'checked' => false, 'count' => null, 'countLabel' => null, 'icon' => null, 'action' => null])
+     With `icon` there is no checkbox and the line is a plain row.
+     The `leading` slot puts a glyph (a 16px icon) between the checkbox and the label. `warn` shows the count in the warning
+     colour, for a need that is not met; put the reason in `count-label` so it does not rest on colour.
+     `hint` is a few muted words after the label (a note). --}}
+@props(['label', 'id' => null, 'checked' => false, 'count' => null, 'countLabel' => null, 'icon' => null, 'action' => null, 'leading' => null, 'warn' => false, 'hint' => null])
 
 @php
     if ($icon === null && blank($id)) {
@@ -18,13 +21,14 @@
         <div class="{{ $line }}">
             <x-dynamic-component :component="$icon" class="size-4 shrink-0 text-base-content/70" />
             <span class="flex-1 truncate">{{ $label }}</span>
-            @if ($count !== null)<span class="text-xs tabular-nums text-base-content/70" aria-hidden="true">{{ $count }}</span>@if ($countLabel)<span class="sr-only">{{ $countLabel }}</span>@endif @endif
+            @if ($count !== null)<span @if ($warn) data-warning @endif class="text-xs tabular-nums {{ $warn ? 'font-medium text-warning' : 'text-base-content/70' }}" aria-hidden="true">{{ $count }}</span>@if ($countLabel)<span class="sr-only">{{ $countLabel }}</span>@endif @endif
         </div>
     @else
         <label for="{{ $id }}" class="{{ $line }} cursor-pointer hover:bg-base-200">
             <input id="{{ $id }}" type="checkbox" @checked($checked) {{ $attributes->merge(['class' => 'peer checkbox checkbox-primary checkbox-xs shrink-0']) }}>
-            <span class="flex-1 truncate peer-[:not(:checked)]:text-base-content/70">{{ $label }}</span>
-            @if ($count !== null)<span class="text-xs tabular-nums text-base-content/70" aria-hidden="true">{{ $count }}</span>@if ($countLabel)<span class="sr-only">{{ $countLabel }}</span>@endif @endif
+            @if ($leading)<span class="size-4 shrink-0 text-base-content/70 peer-checked:text-primary [&>svg]:size-full" aria-hidden="true">{{ $leading }}</span>@endif
+            <span class="flex-1 truncate peer-[:not(:checked)]:text-base-content/70">{{ $label }}@if ($hint) <span class="text-xs text-base-content/70">{{ $hint }}</span>@endif</span>
+            @if ($count !== null)<span @if ($warn) data-warning @endif class="text-xs tabular-nums {{ $warn ? 'font-medium text-warning' : 'text-base-content/70' }}" aria-hidden="true">{{ $count }}</span>@if ($countLabel)<span class="sr-only">{{ $countLabel }}</span>@endif @endif
         </label>
     @endif
     @if ($action)
