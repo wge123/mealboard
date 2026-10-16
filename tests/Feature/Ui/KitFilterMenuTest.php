@@ -50,3 +50,8 @@ it('disables a busy filter menu for its wire target', function () {
 it('refuses a filter menu with no label', function () {
     Blade::render('<x-ui.filter-menu><x-ui.filter-menu.option>Dinner</x-ui.filter-menu.option></x-ui.filter-menu>');
 })->throws(ViewException::class);
+
+it('needs a label: it names the button', function () {
+    expect(fn () => Blade::render('<x-ui.filter-menu><x-ui.filter-menu.option>Dinner</x-ui.filter-menu.option></x-ui.filter-menu>'))
+        ->toThrow(Exception::class);
+});

@@ -110,3 +110,13 @@ it('no longer ships the unused root views', function () {
     expect(view()->exists('home'))->toBeFalse()
         ->and(view()->exists('welcome'))->toBeFalse();
 });
+
+it('offers the theme switch as Light, Dark and System in the top bar and the phone drawer', function () {
+    $html = $this->actingAs(User::factory()->create())->get('/plan')->assertOk()->getContent();
+
+    expect(substr_count($html, 'aria-label="Theme"'))->toBe(2);
+    foreach (['Light', 'Dark', 'System'] as $label) {
+        expect(substr_count($html, ">{$label}</button>"))->toBe(2);
+    }
+    expect($html)->not->toContain('>Auto</button>');
+});

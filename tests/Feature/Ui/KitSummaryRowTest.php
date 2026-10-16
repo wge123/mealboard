@@ -25,9 +25,9 @@ it('renders the help line and slot in the panel', function () {
         ->toContain('Prep and cook, in total.')->toContain('Presets here');
 });
 
-it('fills an ink chip when it is pressed and outlines it with a dash when it is not', function () {
-    expect(Blade::render('<x-ui.chip tone="ink" pressed>Cilantro</x-ui.chip>'))->toContain('bg-base-content');
-    expect(Blade::render('<x-ui.chip tone="ink">Cilantro</x-ui.chip>'))->toContain('border-dashed')->not->toContain('bg-base-content');
+it('announces an ink chip as pressed or not', function () {
+    expect(Blade::render('<x-ui.chip tone="ink" pressed>Cilantro</x-ui.chip>'))->toContain('aria-pressed="true"')->toContain('Cilantro');
+    expect(Blade::render('<x-ui.chip tone="ink">Cilantro</x-ui.chip>'))->toContain('aria-pressed="false"');
 });
 
 it('keeps a passed data-test attribute ahead of aria-pressed', function () {

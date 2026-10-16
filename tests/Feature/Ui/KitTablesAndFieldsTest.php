@@ -114,7 +114,7 @@ it('can pin a group row under the top of the screen while its rows scroll', func
 
 it('hides a row under a group through the table fold state', function () {
     expect(Blade::render('<x-ui.table.row group="Produce"><td>Basil</td></x-ui.table.row>'))
-        ->toContain('x-show')->toContain('Produce')->toContain('Basil');
+        ->toContain('data-group="Produce"')->toContain('Basil');
 });
 
 it('binds the field label to the input and shows the hint', function () {
