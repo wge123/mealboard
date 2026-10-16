@@ -17,7 +17,12 @@
         {{-- The table groups its rows the way the shelves are grouped; with a filter on, a phone shows a wall and has nothing to group. --}}
         @if (! $filtering || $view === 'table')
             <div @class(['flex items-center gap-2', 'max-lg:hidden' => $filtering])>
-                <span class="text-base-content/70">{{ $view === 'table' ? 'Group by' : 'Shelves by' }}</span>
+                @if ($view === 'table')
+                    <span class="text-base-content/70 max-lg:hidden">Group by</span>
+                    <span class="text-base-content/70 lg:hidden">Shelves by</span>
+                @else
+                    <span class="text-base-content/70">Shelves by</span>
+                @endif
                 <x-ui.segmented :label="$view === 'table' ? 'Group by' : 'Shelves by'">
                     @foreach (\App\Enums\LibraryShelving::cases() as $case)
                         <x-ui.segmented.option :pressed="$groupBy === $case" wire:click="$set('groupBy', '{{ $case->value }}')">{{ $case->label() }}</x-ui.segmented.option>
