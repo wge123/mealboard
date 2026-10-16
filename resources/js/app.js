@@ -52,7 +52,14 @@ document.addEventListener('alpine:init', () => {
             this.picked = [];
         },
         apply(request) {
-            request(this.picked).then(() => this.toggleSelecting());
+            request(this.picked).then(() => {
+                this.toggleSelecting();
+                // A checkbox that was clicked while picking was put back by preventDefault, and the browser then
+                // ignores the server's new checked attribute; set each box from its attribute.
+                this.$root.querySelectorAll('input[type="checkbox"]').forEach((box) => {
+                    box.checked = box.hasAttribute('checked');
+                });
+            });
         },
     }));
 });
