@@ -1,121 +1,131 @@
+@php
+    $all = collect($lines)->flatten(1);
+    $total = $all->count();
+    $done = $all->where('checked', true)->count();
+    $cartCount = collect($this->shoppingList['buy_list'])->whereNotNull('product_url')->count();
+    $weeksStale = $mealPlan->weeksStale();
+    $fmtQty = fn ($qty) => $qty === null ? '' : rtrim(rtrim(number_format((float) $qty, 2, '.', ''), '0'), '.');
+    $erroredNames = $all->pluck('name')->filter(fn ($name) => $errors->has('foundUrls.'.$name))->values()->all();
+@endphp
 <div>
-    {{-- Header: page title + week subtitle, back link. --}}
-    <div class="mb-4 flex flex-wrap items-start justify-between gap-2">
-        <div>
-            <h1 class="font-display text-2xl font-semibold tracking-tight">Shopping list</h1>
-            <p class="mt-0.5 text-sm text-base-content/70">
-                Week of {{ $mealPlan->week_start_date->format('j M Y') }} · {{ ucfirst($mealPlan->status->value) }}
-            </p>
-        </div>
-        <a href="{{ route('plan.builder') }}" class="btn btn-ghost btn-sm min-h-11 border border-base-300">
-            <x-tabler-arrow-left class="size-4" /> Back to plan
-        </a>
-    </div>
+    <x-ui.page-header
+        title="Shopping list"
+        :pretitle="'Week of '.$mealPlan->week_start_date->format('j M Y')"
+        :subtitle="$lines !== [] ? 'Tick what you already have, then add the rest to your Walmart cart.' : null"
+        :back="route('plan.builder')"
+    >
+        @if ($lines !== [])
+            <x-slot:actions>
+                <div class="hidden items-center gap-2 lg:flex">
+                    @include('livewire.partials.shopping-list-copy-menu')
+                    @if ($cartUrl !== null)
+                        <x-ui.button variant="primary" :href="$cartUrl" icon="tabler-shopping-cart" target="_blank" rel="noopener">Add {{ $cartCount }} to Walmart cart</x-ui.button>
+                    @endif
+                </div>
+            </x-slot:actions>
+        @endif
+    </x-ui.page-header>
 
-    @php($weeksStale = $mealPlan->weeksStale())
     @if ($weeksStale > 0)
         {{-- Stale week: dates already past, nothing newer locked (GLOSSARY). --}}
-        <div role="alert" class="alert alert-warning mb-5">
-            <span>
-                <strong>Stale week.</strong>
-                This week ended {{ $weeksStale }} {{ Str::plural('week', $weeksStale) }} ago and no newer week has been locked — lock the current week before shopping.
-            </span>
-        </div>
+        <x-ui.alert tone="warning" class="mb-5">
+            <strong>Stale week.</strong>
+            This week ended {{ $weeksStale }} {{ Str::plural('week', $weeksStale) }} ago and no newer week has been locked — lock the current week before shopping.
+        </x-ui.alert>
     @endif
 
-    {{-- Pantry staples toggle. --}}
-    <label class="mb-5 flex min-h-11 w-fit cursor-pointer items-center gap-3">
-        <input type="checkbox" class="toggle toggle-primary" wire:model.live="includeStaples">
-        <span class="text-sm font-medium">Include pantry staples</span>
-    </label>
+    <x-ui.card flush title="Items" :count="$total">
+        <x-slot:actions>
+            <label class="flex min-h-11 cursor-pointer items-center gap-2 sm:min-h-9">
+                <input type="checkbox" class="toggle toggle-primary toggle-sm" wire:model.live="includeStaples">
+                <span>Pantry staples</span>
+            </label>
+        </x-slot:actions>
 
-    @forelse ($lines as $category => $categoryLines)
-        <section>
-            {{-- Sticky section header: stays visible while scrolling the category. --}}
-            <h2 class="sticky top-0 z-10 flex items-center gap-2 bg-base-100 py-2 text-xs font-semibold tracking-wide text-base-content/70 uppercase">
-                {{ ucfirst($category) }}
-                <span class="badge badge-ghost badge-sm">{{ count($categoryLines) }}</span>
-            </h2>
+        <div wire:loading.delay.class="opacity-50 pointer-events-none" wire:loading.attr="aria-busy" wire:target="includeStaples">
+            @if ($lines === [])
+                <x-ui.empty-state title="Nothing to buy">The week has no planned meals with ingredients.</x-ui.empty-state>
+            @else
+                <div class="flex items-center gap-3 border-b border-base-300 px-4 py-3">
+                    <progress class="progress progress-primary h-1.5 flex-1" value="{{ $done }}" max="{{ max($total, 1) }}" aria-label="Items ticked"></progress>
+                    <span class="text-base-content/70 tabular-nums">{{ $done }}/{{ $total }}</span>
+                </div>
 
-            <ul class="mb-5 divide-y divide-base-300 rounded-box border border-base-300 bg-base-100">
-                @foreach ($categoryLines as $line)
-                    @php($matched = $line['product_url'] !== null)
-                    <li class="px-3" @unless ($matched) x-data="{ paste: @js($errors->has('foundUrls.'.$line['name'])) }" @endunless>
-                        <div class="flex items-center gap-2">
-                            {{-- Whole label row toggles the checkbox — big in-store tap target. --}}
-                            <label class="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5">
-                                <input type="checkbox" class="checkbox checkbox-primary checkbox-lg shrink-0"
-                                       wire:click="toggleItem(@js($line['key']))" @checked($line['checked'])>
-                                <span class="min-w-0 {{ $line['checked'] ? 'line-through text-base-content/70' : '' }}">
-                                    <span class="font-medium">{{ $line['label'] }}</span>
-                                    @if ($line['notes'] !== [])
-                                        <span class="block text-xs text-base-content/70">{{ implode('; ', $line['notes']) }}</span>
-                                    @endif
-                                </span>
-                            </label>
+                <x-ui.table>
+                    <x-slot:head>
+                        <tr>
+                            <x-ui.table.th>Item</x-ui.table.th>
+                            <x-ui.table.th numeric>Amount</x-ui.table.th>
+                            <x-ui.table.th class="hidden md:table-cell">Notes</x-ui.table.th>
+                            <x-ui.table.th numeric>Walmart</x-ui.table.th>
+                        </tr>
+                    </x-slot:head>
 
-                            {{-- Walmart link chip — deliberately NOT the whole row (row = toggle). --}}
-                            <a href="{{ $line['product_url'] ?? $line['search_url'] }}" target="_blank" rel="noopener"
-                               class="btn btn-ghost btn-sm min-h-11 shrink-0 px-2 font-normal text-primary"
-                               aria-label="Walmart {{ $matched ? 'product' : 'search' }} for {{ $line['name'] }}"><x-tabler-external-link class="size-3.5" /> {{ $matched ? 'product' : 'search' }}</a>
-                        </div>
-
-                        @unless ($matched)
-                            {{-- Found-it flow collapsed behind a small toggle so the checklist stays a checklist. --}}
-                            <div class="pb-1 ps-10">
-                                <button type="button" class="btn btn-ghost btn-sm min-h-11 px-2 font-normal text-base-content/70"
-                                        @click="paste = !paste">
-                                    + save product
-                                </button>
-                                <div x-show="paste" x-cloak class="pb-2">
-                                    <div class="join w-full max-w-sm">
-                                        <input type="url" class="input join-item input-sm min-h-11 w-full" placeholder="Paste product URL"
-                                               aria-label="Walmart product URL for {{ $line['name'] }}"
-                                               wire:model="foundUrls.{{ $line['name'] }}">
-                                        <button type="button" class="btn btn-outline join-item btn-success btn-sm min-h-11"
-                                                wire:click="saveMatch(@js($line['name']))"
-                                                wire:loading.attr="disabled" wire:target="saveMatch">
-                                            <span wire:loading wire:target="saveMatch" class="loading loading-spinner loading-xs"></span>
-                                            Found it
-                                        </button>
-                                    </div>
-                                    @error('foundUrls.'.$line['name'])
-                                        <div class="mt-1 text-sm text-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        @endunless
-                    </li>
-                @endforeach
-            </ul>
-        </section>
-    @empty
-        <div class="rounded-box border border-base-300 bg-base-200 px-6 py-12 text-center">
-            <p class="font-display text-xl font-semibold">Nothing to buy</p>
-            <p class="mt-1 text-sm text-base-content/70">The week has no planned meals with ingredients.</p>
+                    @foreach ($lines as $category => $categoryLines)
+                        @php($aisleDone = collect($categoryLines)->where('checked', true)->count())
+                        {{-- The key carries the ticked count, so a tick re-creates the aisle and the auto-fold rule takes over again. --}}
+                        <tbody wire:key="aisle-{{ $category }}-{{ $aisleDone }}" x-data="{ paste: Object.fromEntries(@js($erroredNames).map(n => [n, true])) }">
+                            <x-ui.table.group :label="ucfirst($category)" :done="$aisleDone" :total="count($categoryLines)" :cols="4" />
+                            @foreach ($categoryLines as $line)
+                                @php($matched = $line['product_url'] !== null)
+                                <x-ui.table.row :group="ucfirst($category)" :class="$line['checked'] ? 'text-base-content/60' : ''">
+                                    <td class="p-0!">
+                                        <label class="flex min-h-11 cursor-pointer items-center gap-3 px-4 py-1.5">
+                                            <input type="checkbox" class="checkbox checkbox-primary checkbox-sm shrink-0"
+                                                   wire:click="toggleItem(@js($line['key']))" @checked($line['checked'])>
+                                            <span class="min-w-0">
+                                                <span class="font-medium {{ $line['checked'] ? 'line-through' : '' }}">{{ $line['name'] }}</span>
+                                                @if ($line['notes'] !== [])
+                                                    <span class="block text-xs text-base-content/70 md:hidden">{{ implode('; ', $line['notes']) }}</span>
+                                                @endif
+                                            </span>
+                                        </label>
+                                    </td>
+                                    <td class="num whitespace-nowrap">{{ $fmtQty($line['qty']) }} <span class="text-base-content/70">{{ $line['unit'] !== 'count' ? $line['unit'] : '' }}</span></td>
+                                    <td class="hidden text-base-content/70 md:table-cell">{{ implode('; ', $line['notes']) }}</td>
+                                    <td class="whitespace-nowrap text-end">
+                                        <div class="inline-flex items-center gap-1">
+                                            <a href="{{ $line['product_url'] ?? $line['search_url'] }}" target="_blank" rel="noopener"
+                                               class="inline-flex min-h-11 items-center sm:min-h-9"
+                                               aria-label="Walmart {{ $matched ? 'product' : 'search' }} for {{ $line['name'] }}">
+                                                <x-ui.badge :tone="$matched ? 'primary' : 'neutral'" :dot="true">{{ $matched ? 'Matched' : 'Search' }}</x-ui.badge>
+                                            </a>
+                                            @unless ($matched)
+                                                <x-ui.button variant="ghost" square icon="tabler-plus"
+                                                             :label="'Save a Walmart product for '.$line['name']"
+                                                             @click="paste[{{ Js::from($line['name']) }}] = ! paste[{{ Js::from($line['name']) }}]" />
+                                            @endunless
+                                        </div>
+                                    </td>
+                                </x-ui.table.row>
+                                @unless ($matched)
+                                    <tr x-show="open(@js(ucfirst($category))) && paste[@js($line['name'])]" x-cloak>
+                                        <td colspan="4" class="px-4 pb-3">
+                                            <div class="flex items-start gap-2">
+                                                <div class="flex-1">
+                                                    <x-ui.field label="Walmart product URL for {{ $line['name'] }}" name="foundUrls.{{ $line['name'] }}" id="found-{{ $loop->parent->index }}-{{ $loop->index }}"
+                                                                type="url" placeholder="Paste Walmart product URL" wire:model="foundUrls.{{ $line['name'] }}" />
+                                                </div>
+                                                <x-ui.button variant="primary" class="mt-6" busy="saveMatch" wire:click="saveMatch({{ Js::from($line['name']) }})">Save</x-ui.button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endunless
+                            @endforeach
+                        </tbody>
+                    @endforeach
+                </x-ui.table>
+            @endif
         </div>
-    @endforelse
+    </x-ui.card>
 
     @if ($lines !== [])
-        {{-- Sticky action bar: sits above the fixed bottom tab bar on phones. --}}
-        <div class="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 mt-6 flex flex-col gap-2 rounded-box border border-base-300 bg-base-100 p-2 lg:bottom-4">
+        {{-- Phone bottom bar: floats above the tab bar. --}}
+        <div class="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 mt-4 flex gap-2 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg lg:hidden">
+            @include('livewire.partials.shopping-list-copy-menu', ['up' => true, 'iconOnly' => true])
             @if ($cartUrl !== null)
-                {{-- Affiliate add-to-cart: the human clicks it, nothing here ever carts. --}}
-                <a href="{{ $cartUrl }}" target="_blank" rel="noopener"
-                   class="btn btn-primary min-h-11 w-full">
-                    Add matched items to Walmart cart
-                </a>
+                <x-ui.button variant="primary" class="flex-1" :href="$cartUrl" icon="tabler-shopping-cart" target="_blank" rel="noopener">Add {{ $cartCount }} to Walmart cart</x-ui.button>
             @endif
-            <div class="flex gap-2">
-                <button type="button" class="btn btn-outline btn-primary min-h-11 flex-1" x-data="{ copied: false }"
-                        x-text="copied ? 'Copied!' : 'Copy as markdown'"
-                        @click="navigator.clipboard.writeText(@js($markdown)); copied = true; setTimeout(() => copied = false, 1500)">
-                </button>
-                <button type="button" class="btn btn-outline btn-primary min-h-11 flex-1" x-data="{ copied: false }"
-                        x-text="copied ? 'Copied!' : 'Copy as plain list'"
-                        @click="navigator.clipboard.writeText(@js($plain)); copied = true; setTimeout(() => copied = false, 1500)">
-                </button>
-            </div>
         </div>
     @endif
 </div>
