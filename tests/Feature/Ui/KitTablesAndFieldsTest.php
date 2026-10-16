@@ -101,6 +101,17 @@ it('lets a group row opt out of folding itself when complete', function () {
     expect($folds)->not->toBe($stays);
 });
 
+it('lets a group row say its own count in words instead of done over total', function () {
+    $html = Blade::render('<x-ui.table.group label="Produce" :cols="1">2 of 5 on hand</x-ui.table.group>');
+
+    expect($html)->toContain('2 of 5 on hand')->not->toContain('0/0');
+});
+
+it('can pin a group row under the top of the screen while its rows scroll', function () {
+    expect(Blade::render('<x-ui.table.group label="Produce" sticky />'))->toContain('sticky');
+    expect(Blade::render('<x-ui.table.group label="Produce" />'))->not->toContain('sticky');
+});
+
 it('hides a row under a group through the table fold state', function () {
     expect(Blade::render('<x-ui.table.row group="Produce"><td>Basil</td></x-ui.table.row>'))
         ->toContain('x-show')->toContain('Produce')->toContain('Basil');

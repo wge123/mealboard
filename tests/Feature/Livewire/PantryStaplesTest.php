@@ -176,3 +176,48 @@ it('gives select mode a way out and action labels that say what they do', functi
         ->assertSee('Remove staples')
         ->assertSee('Make staples');
 });
+
+it('groups the ingredients under their aisle and says how many of each aisle are on hand', function () {
+    Ingredient::factory()->create(['name' => 'basil', 'category' => 'produce']);
+    Ingredient::factory()->pantryStaple()->create(['name' => 'garlic', 'category' => 'produce']);
+    Ingredient::factory()->pantryStaple()->create(['name' => 'rice', 'category' => 'pantry']);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(PantryStaples::class)
+        ->assertSeeTextInOrder(['Pantry', '1 of 1 on hand', 'rice', 'Produce', '1 of 2 on hand', 'garlic', 'basil']);
+});
+
+it('shows how many recipes use each ingredient on its line', function () {
+    $rice = Ingredient::factory()->create(['name' => 'rice']);
+    foreach (Recipe::factory()->count(3)->create() as $recipe) {
+        $recipe->ingredients()->attach($rice->id, ['qty' => 1, 'unit' => 'cup']);
+    }
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(PantryStaples::class)
+        ->assertSeeText('used in 3 recipes');
+});
+
+it('counts an aisle from the ingredients it shows when a filter narrows the list', function () {
+    Ingredient::factory()->create(['name' => 'basil', 'category' => 'produce']);
+    Ingredient::factory()->pantryStaple()->create(['name' => 'garlic', 'category' => 'produce']);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(PantryStaples::class)
+        ->set('filter', 'staples')
+        ->assertSeeText('1 of 1 on hand');
+});
+
+it('lists each ingredient as a checkbox that is ticked when it is a staple', function () {
+    Ingredient::factory()->create(['name' => 'basil']);
+    Ingredient::factory()->pantryStaple()->create(['name' => 'garlic']);
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML('<?xml encoding="utf-8">'.Livewire::actingAs(User::factory()->create())->test(PantryStaples::class)->html());
+    $boxes = [];
+    foreach ((new DOMXPath($dom))->query('//input[@type="checkbox"]') as $box) {
+        $boxes[$box->getAttribute('aria-label')] = $box->hasAttribute('checked');
+    }
+
+    expect($boxes)->toBe(['Staple: garlic' => true, 'Staple: basil' => false]);
+});
