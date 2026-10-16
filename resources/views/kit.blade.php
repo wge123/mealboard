@@ -195,6 +195,28 @@
             </div>
         </x-ui.card>
 
+        <x-ui.card title="Filter menu" count="3 states">
+            <div class="flex flex-wrap items-center gap-2" x-data="{ meals: ['Dinner'] }">
+                <x-ui.filter-menu label="Meal">
+                    @foreach (['Breakfast', 'Lunch', 'Dinner', 'Snack'] as $meal)
+                        <x-ui.filter-menu.option x-bind:aria-pressed="meals.includes('{{ $meal }}') ? 'true' : 'false'"
+                                                 @click="meals = meals.includes('{{ $meal }}') ? meals.filter(m => m !== '{{ $meal }}') : [...meals, '{{ $meal }}']">{{ $meal }}</x-ui.filter-menu.option>
+                    @endforeach
+                </x-ui.filter-menu>
+                <x-ui.filter-menu label="Cuisine" :count="2">
+                    <x-ui.filter-menu.option pressed>Thai</x-ui.filter-menu.option>
+                    <x-ui.filter-menu.option pressed>Italian</x-ui.filter-menu.option>
+                    <x-ui.filter-menu.option>French</x-ui.filter-menu.option>
+                </x-ui.filter-menu>
+                <x-ui.filter-menu label="Time" single value="≤ 20 min">
+                    <x-ui.filter-menu.option>Any time</x-ui.filter-menu.option>
+                    <x-ui.filter-menu.option pressed>≤ 20 min</x-ui.filter-menu.option>
+                    <x-ui.filter-menu.option>≤ 40 min</x-ui.filter-menu.option>
+                </x-ui.filter-menu>
+            </div>
+            <p class="mt-3 text-base-content/70">A button that opens a list of options. Multi-pick menus show how many are on; a one-of-N menu (<code>single</code>) shows its choice and closes after a pick. Active menus are tinted and announced in the button's name.</p>
+        </x-ui.card>
+
         <x-ui.card title="Segmented toggle" count="2 states">
             <div class="flex flex-col items-start gap-4" x-data="{ view: 'group' }">
                 <x-ui.segmented label="View">

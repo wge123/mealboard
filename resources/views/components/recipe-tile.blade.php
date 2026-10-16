@@ -8,7 +8,7 @@
     $initials = \App\Support\RecipeCover::initials($recipe);
     $needs = collect($missing)->map->label()->implode(', ');
 @endphp
-<a href="{{ route('recipes.show', $recipe) }}" {{ $attributes->class('group relative block aspect-square overflow-hidden rounded-box') }}
+<a href="{{ route('recipes.show', $recipe) }}" {{ $attributes->class('group relative block aspect-square overflow-hidden rounded-box border border-base-300') }}
    style="{{ \App\Support\RecipeCover::background($recipe) }}">
     @if ($recipe->image_url)
         <img src="{{ $recipe->image_url }}" class="absolute inset-0 size-full object-cover" alt="" loading="lazy">
@@ -18,15 +18,15 @@
 
     <span class="absolute top-2 left-2 flex gap-1">
         @if ($minutes > 0)
-            <span class="badge badge-sm border-0 bg-base-100/85">{{ $minutes }} min</span>
+            <span class="badge badge-sm border-0 bg-base-100/90 text-base-content font-medium">{{ $minutes }} min</span>
         @endif
         @if ($rating !== null)
-            <span class="badge badge-sm border-0 bg-base-100/85" title="Average rating {{ number_format($rating, 1) }}"><x-tabler-star-filled class="size-3.5 text-primary" /> {{ number_format($rating, 1) }}</span>
+            <span class="badge badge-sm border-0 bg-base-100/90 text-base-content font-medium" title="Average rating {{ number_format($rating, 1) }}"><x-tabler-star-filled class="size-3.5 text-primary" /> {{ number_format($rating, 1) }}</span>
         @endif
     </span>
 
     @if ($needs !== '')
-        <span data-missing-badge class="absolute top-2.5 right-2.5 size-3 rounded-full bg-warning ring-2 ring-base-100" title="needs: {{ $needs }}"><span class="sr-only">needs: {{ $needs }}</span></span>
+        <span data-missing-badge class="absolute top-2.5 right-2.5 size-3 rounded-full bg-warning ring-2 ring-base-100 shadow-none" title="needs: {{ $needs }}"><span class="sr-only">needs: {{ $needs }}</span></span>
     @endif
 
     <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent p-3 pt-10">

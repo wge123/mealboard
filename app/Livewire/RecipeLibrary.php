@@ -21,7 +21,7 @@ use Livewire\Component;
  * of the matching tiles. The household's library is small, so every approved
  * recipe is loaded once and filtered and grouped in memory.
  */
-#[Layout('layouts.app')]
+#[Layout('layouts.app', ['width' => 'wide'])]
 #[Title('Recipes')]
 class RecipeLibrary extends Component
 {
