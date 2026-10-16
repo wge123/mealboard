@@ -287,16 +287,106 @@ it('marks a recipe containing an avoided ingredient in the picker and still allo
         ->and(PlannedMeal::where('recipe_id', $plain->id)->exists())->toBeFalse();
 });
 
-it('lays the week out as meals by days with a planned count and a cook time per day', function () {
+it('lays the week out as a day ledger with the meals of each day on one row and its cook time', function () {
     $plan = MealPlan::factory()->create();
     $monday = $plan->week_start_date;
+    $tuesday = $monday->copy()->addDay();
 
     $plan->plannedMeals()->create(['recipe_id' => Recipe::factory()->approved()->create(['title' => 'Grid Pasta', 'prep_minutes' => 10, 'cook_minutes' => 20])->id, 'date' => $monday->toDateString(), 'slot' => MealSlot::Dinner]);
-    $plan->plannedMeals()->create(['recipe_id' => Recipe::factory()->approved()->create(['title' => 'Grid Soup', 'prep_minutes' => 5, 'cook_minutes' => 7])->id, 'date' => $monday->copy()->addDay()->toDateString(), 'slot' => MealSlot::Lunch]);
+    $plan->plannedMeals()->create(['recipe_id' => Recipe::factory()->approved()->create(['title' => 'Grid Soup', 'prep_minutes' => 5, 'cook_minutes' => 7])->id, 'date' => $tuesday->toDateString(), 'slot' => MealSlot::Lunch]);
 
     planBuilder()
-        ->assertSee('2 of 15 meals planned')
-        ->assertSeeInOrder(['breakfast', 'lunch', 'Grid Soup', 'dinner', 'Grid Pasta', 'Cook time', '30 min', '12 min']);
+        ->assertSee('2 of 15 meals')
+        ->assertSeeInOrder(['breakfast', 'lunch', 'dinner', 'Cook', $monday->format('D j M'), 'Grid Pasta', '30 min', $tuesday->format('D j M'), 'Grid Soup', '12 min'])
+        ->assertDontSee('Cook time');
+});
+
+it('badges a filled draft Suggested and tells what to do next', function () {
+    $plan = MealPlan::factory()->create();
+    $plan->plannedMeals()->create(['recipe_id' => Recipe::factory()->approved()->create()->id, 'date' => $plan->week_start_date->toDateString(), 'slot' => MealSlot::Dinner]);
+
+    planBuilder()
+        ->assertSee('Suggested')
+        ->assertSee('Mealboard filled this week for you')
+        ->assertSee('Lock week')
+        ->assertSee('Fill the gaps')
+        ->assertDontSee('Fill the week');
+});
+
+it('offers no gap fill once every meal of a suggested week is planned', function () {
+    $plan = MealPlan::factory()->create();
+    $recipe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
+    foreach (range(0, 4) as $offset) {
+        foreach (MealSlot::cases() as $slot) {
+            $plan->plannedMeals()->create(['recipe_id' => $recipe->id, 'date' => $plan->week_start_date->copy()->addDays($offset)->toDateString(), 'slot' => $slot]);
+        }
+    }
+
+    planBuilder()->assertSee('Suggested')->assertSee('Lock week')->assertDontSee('Fill the gaps');
+});
+
+it('offers to fill the week on an empty draft instead of calling it suggested', function () {
+    Recipe::factory()->approved()->count(15)->create(['meal_type' => MealType::Any]);
+    $plan = MealPlan::factory()->create();
+
+    planBuilder()
+        ->assertSee('Fill the week')
+        ->assertDontSee('Suggested')
+        ->assertDontSee('Lock week')
+        ->call('autoFill');
+
+    expect($plan->plannedMeals()->count())->toBe(15);
+});
+
+it('fills the gaps of a suggested week without touching the meals already there', function () {
+    Recipe::factory()->approved()->count(15)->create(['meal_type' => MealType::Any]);
+    $plan = MealPlan::factory()->create();
+    $kept = $plan->plannedMeals()->create(['recipe_id' => Recipe::factory()->approved()->create(['meal_type' => MealType::Any])->id, 'date' => $plan->week_start_date->toDateString(), 'slot' => MealSlot::Dinner]);
+
+    planBuilder()->call('autoFill');
+
+    expect($plan->plannedMeals()->count())->toBe(15)
+        ->and($kept->fresh()->recipe_id)->toBe($kept->recipe_id);
+});
+
+it('shows a locked week with its shopping list and no suggestion', function () {
+    $plan = weekOf(2, locked: true);
+    dinnerOnMonday($plan);
+
+    planBuilder()
+        ->assertSee('Locked')
+        ->assertSee('Shopping list')
+        ->assertSeeHtml('href="'.route('plan.shopping-list', $plan).'"')
+        ->assertDontSee('Suggested')
+        ->assertDontSee('Fill the');
+});
+
+it('marks each past meal of a locked week as eaten, skipped or not logged yet', function () {
+    $plan = weekOf(-2, locked: true);
+    $monday = $plan->week_start_date->toDateString();
+    $tuesday = $plan->week_start_date->copy()->addDay()->toDateString();
+    $meal = fn (string $date, MealSlot $slot, string $title) => $plan->plannedMeals()->create([
+        'recipe_id' => Recipe::factory()->approved()->create(['title' => $title])->id,
+        'date' => $date,
+        'slot' => $slot,
+    ]);
+
+    MealLog::factory()->create(['planned_meal_id' => $meal($monday, MealSlot::Breakfast, 'Eaten Oats')->id, 'ate_it' => true, 'rating' => null]);
+    MealLog::factory()->create(['planned_meal_id' => $meal($monday, MealSlot::Lunch, 'Skipped Soup')->id, 'ate_it' => false, 'rating' => null]);
+    $meal($tuesday, MealSlot::Dinner, 'Forgotten Pasta');
+
+    planBuilder()
+        ->assertSeeInOrder(['Eaten Oats', 'Eaten', 'Skipped Soup', 'Skipped', 'Forgotten Pasta', 'Not logged yet'])
+        ->assertSee('This week is over')
+        ->assertSee('Mark done')
+        ->assertSee('Shopping list');
+});
+
+it('does not ask for a log on meals that have not happened yet', function () {
+    $plan = weekOf(2, locked: true);
+    dinnerOnMonday($plan);
+
+    planBuilder()->assertDontSee('Not logged yet')->assertDontSee('Mark done');
 });
 
 it('moves the tray to the next empty cell after a pick, row by row and wrapping', function () {
