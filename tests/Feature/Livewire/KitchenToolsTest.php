@@ -207,3 +207,77 @@ it('gives select mode a way out and action labels that say what they do', functi
         ->assertSee('Mark not owned')
         ->assertSee('Mark owned');
 });
+
+/** @param  list<string>  $names  kind names one recipe's single tool entry offers */
+function recipeNeedingKinds(array $names): void
+{
+    $recipe = Recipe::factory()->create();
+    $recipe->recipeTools()->delete();
+    $tool = $recipe->recipeTools()->create(['position' => 1, 'count' => 1]);
+
+    foreach ($names as $i => $name) {
+        $tool->alternatives()->create(['position' => $i + 1, 'word' => $name, 'kitchen_tool_kind_id' => KitchenToolKind::where('name', $name)->value('id')]);
+    }
+}
+
+it('splits the tools into Owned and Don\'t have groups with their counts', function () {
+    KitchenToolKind::query()->update(['owned' => false]);
+    KitchenToolKind::query()->whereIn('name', ['wok', 'oven'])->update(['owned' => true]);
+    $total = KitchenToolKind::count();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->assertSeeInOrder(['Owned', '2', 'Oven', 'Wok', "Don't have", (string) ($total - 2), 'Air Fryer'])
+        ->assertSeeHtml('data-state="on"')
+        ->assertSeeHtml('data-state="off"');
+});
+
+it('moves a tool to the other group when it is toggled', function () {
+    $wok = KitchenToolKind::where('name', 'wok')->firstOrFail();
+
+    $component = Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->assertSeeInOrder(["Don't have", 'Wok'])
+        ->call('toggleOwned', $wok->id);
+
+    $component->assertSeeInOrder(['Owned', 'Wok', "Don't have"]);
+    expect($wok->fresh()->owned)->toBeTrue();
+});
+
+it('shows how many recipes call for each tool', function () {
+    recipeNeedingKinds(['wok']);
+    recipeNeedingKinds(['wok', 'skillet']);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->assertSee('used in 2 recipes')
+        ->assertSee('used in 1 recipe');
+});
+
+it('flags a tool the household does not have that recipes call for', function () {
+    recipeNeedingKinds(['wok']);
+    recipeNeedingKinds(['oven']);
+
+    $html = Livewire::actingAs(User::factory()->create())->test(KitchenTools::class)->html();
+
+    // The wok is not owned and a recipe needs it; the oven is owned, so it is not flagged.
+    expect($html)->toContain("used in 1 recipe, and you don't have it")
+        ->and(substr_count($html, "you don't have it"))->toBe(1);
+});
+
+it('does not flag a not-owned tool no recipe calls for', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->assertDontSee("you don't have it");
+});
+
+it('gives every tool line a details button that opens the sheet', function () {
+    $wok = KitchenToolKind::where('name', 'wok')->firstOrFail();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(KitchenTools::class)
+        ->assertSeeHtml('aria-label="Details for Wok"')
+        ->call('openDetails', $wok->id)
+        ->assertSeeHtml('aria-label="Wok details"')
+        ->assertSeeHtml('aria-label="Note for Wok"');
+});

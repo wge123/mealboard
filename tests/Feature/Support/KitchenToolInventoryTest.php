@@ -132,3 +132,50 @@ it('marks nothing when one of the kinds does not exist', function () {
 
     expect($inventory->owns($wok))->toBeFalse();
 });
+
+/** A recipe whose tool entries are the given lists of kind names (each list is one either-or entry). */
+function recipeUsingKinds(array $entries): App\Models\Recipe
+{
+    $recipe = App\Models\Recipe::factory()->create();
+    $recipe->recipeTools()->delete();
+
+    foreach ($entries as $position => $names) {
+        $tool = $recipe->recipeTools()->create(['position' => $position + 1, 'count' => 1]);
+
+        foreach ($names as $i => $name) {
+            $tool->alternatives()->create(['position' => $i + 1, 'word' => $name, 'kitchen_tool_kind_id' => KitchenToolKind::where('name', $name)->value('id')]);
+        }
+    }
+
+    return $recipe;
+}
+
+it('counts the recipes that call for each kind, through any alternative', function () {
+    recipeUsingKinds([['wok', 'skillet']]);
+    recipeUsingKinds([['wok']]);
+    recipeUsingKinds([['oven']]);
+
+    $counts = (new KitchenToolInventory)->recipeCounts();
+
+    expect($counts[KitchenToolKind::where('name', 'wok')->value('id')])->toBe(2)
+        ->and($counts[KitchenToolKind::where('name', 'skillet')->value('id')])->toBe(1)
+        ->and($counts[KitchenToolKind::where('name', 'oven')->value('id')])->toBe(1);
+});
+
+it('counts a recipe once per kind however many times it names the kind', function () {
+    recipeUsingKinds([['wok'], ['wok', 'skillet']]);
+
+    $counts = (new KitchenToolInventory)->recipeCounts();
+
+    expect($counts[KitchenToolKind::where('name', 'wok')->value('id')])->toBe(1);
+});
+
+it('leaves out kinds no recipe calls for and words that match no kind', function () {
+    $recipe = recipeUsingKinds([['wok']]);
+    $recipe->recipeTools()->first()->alternatives()->create(['position' => 2, 'word' => 'flux capacitor', 'kitchen_tool_kind_id' => null]);
+
+    $counts = (new KitchenToolInventory)->recipeCounts();
+
+    expect($counts->has(KitchenToolKind::where('name', 'air fryer')->value('id')))->toBeFalse()
+        ->and($counts)->toHaveCount(1);
+});
