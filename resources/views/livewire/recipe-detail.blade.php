@@ -169,31 +169,14 @@
             </div>
         </div>
     @else
-        <a class="btn btn-ghost btn-sm mb-4 min-h-11 border border-base-300" href="{{ route('recipes.index') }}">
-            <x-tabler-arrow-left class="size-4" /> Recipes
-        </a>
+        <x-ui.page-header title="Edit recipe" :back="route('recipes.index')" />
 
-        <h1 class="font-display text-2xl font-semibold tracking-tight">Edit recipe</h1>
-
-        <form wire:submit="save" class="mt-4">
+        <form wire:submit="save">
             @include('livewire.partials.recipe-form-fields')
 
-            <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Kitchen tools</h2>
-            @include('livewire.partials.recipe-tool-rows')
-
-            <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Ingredients</h2>
-            @include('livewire.partials.ingredient-rows')
-
-            <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Cooking steps</h2>
-            @include('livewire.partials.cooking-step-rows')
-
             <div class="mt-6 flex gap-2">
-                <button type="submit" class="btn btn-primary min-h-11"
-                        wire:loading.attr="disabled" wire:target="save">
-                    <span wire:loading wire:target="save" class="loading loading-spinner loading-xs"></span>
-                    Save
-                </button>
-                <button type="button" class="btn btn-ghost min-h-11 border border-base-300" wire:click="cancelEditing">Cancel</button>
+                <x-ui.button variant="primary" type="submit" busy="save">Save</x-ui.button>
+                <x-ui.button wire:click="cancelEditing">Cancel</x-ui.button>
             </div>
         </form>
     @endif

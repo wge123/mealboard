@@ -1,62 +1,33 @@
 <div>
-    <a class="btn btn-ghost btn-sm mb-4 min-h-11 border border-base-300" href="{{ route('recipes.index') }}">
-        <x-tabler-arrow-left class="size-4" /> Recipes
-    </a>
-
-    <h1 class="mb-4 font-display text-2xl font-semibold tracking-tight">Add recipe</h1>
+    <x-ui.page-header title="Add recipe" :back="route('recipes.index')" />
 
     <form wire:submit="save">
-        @include('livewire.partials.recipe-form-fields')
-
         {{-- Paste-to-parse: the fastest way in; heuristic and AI parsers side by side. --}}
-        <section class="mt-6 rounded-box border border-base-300 bg-base-200 p-4">
-            <h2 class="font-display text-xl font-semibold">Paste a recipe</h2>
-            <p class="mt-1 text-sm text-base-content/70">
-                One ingredient per line, e.g. <code class="rounded bg-base-300 px-1">2 cups diced onion</code> —
+        <x-ui.card title="Paste a recipe" class="mb-4">
+            <p class="text-base-content/70">
+                One ingredient per line, e.g. <code class="rounded bg-base-200 px-1">2 cups diced onion</code>,
                 or paste anything and let AI parse it. Parsed rows land below and stay editable.
             </p>
-            <textarea rows="6" class="textarea textarea-lg mt-3 w-full" wire:model="paste" aria-label="Paste a recipe"></textarea>
-            <div class="mt-2 flex flex-wrap items-center gap-2">
-                <button type="button" class="btn btn-outline btn-sm min-h-11" wire:click="parsePaste"
-                        wire:loading.attr="disabled" wire:target="parsePaste">
-                    <span wire:loading wire:target="parsePaste" class="loading loading-spinner loading-xs"></span>
-                    Parse ingredients
-                </button>
-                <button type="button" class="btn btn-primary btn-sm min-h-11" wire:click="aiParse"
-                        wire:loading.attr="disabled" wire:target="aiParse">
-                    <span wire:loading.remove wire:target="aiParse">AI parse</span>
-                    <span wire:loading.flex wire:target="aiParse" class="items-center gap-2">
-                        <span class="loading loading-spinner loading-xs"></span>
-                        Parsing&hellip;
-                    </span>
-                </button>
+            <textarea rows="6" class="textarea mt-3 w-full" wire:model="paste" aria-label="Paste a recipe"></textarea>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+                <x-ui.button wire:click="parsePaste" busy="parsePaste">Parse ingredients</x-ui.button>
+                <x-ui.button variant="primary" wire:click="aiParse" busy="aiParse" busy-label="Parsing&hellip;">AI parse</x-ui.button>
                 @if ($parsedWith === 'ai')
-                    <span class="badge badge-soft badge-success">AI parsed</span>
+                    <x-ui.badge tone="primary">AI parsed</x-ui.badge>
                 @elseif ($parsedWith === 'heuristic')
-                    <span class="badge badge-soft badge-neutral">Heuristic parsed</span>
+                    <x-ui.badge tone="neutral">Heuristic parsed</x-ui.badge>
                 @endif
             </div>
             @if ($parseError !== '')
-                <div class="alert alert-error mt-3 py-2 text-sm" role="alert">{{ $parseError }}</div>
+                <x-ui.alert tone="error" class="mt-3">{{ $parseError }}</x-ui.alert>
             @endif
-        </section>
+        </x-ui.card>
 
-        <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Kitchen tools</h2>
-        @include('livewire.partials.recipe-tool-rows')
-
-        <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Ingredients</h2>
-        @include('livewire.partials.ingredient-rows')
-
-        <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Cooking steps</h2>
-        @include('livewire.partials.cooking-step-rows')
+        @include('livewire.partials.recipe-form-fields')
 
         <div class="mt-6 flex gap-2">
-            <button type="submit" class="btn btn-primary min-h-11"
-                    wire:loading.attr="disabled" wire:target="save">
-                <span wire:loading wire:target="save" class="loading loading-spinner loading-xs"></span>
-                Save recipe
-            </button>
-            <a class="btn btn-ghost min-h-11 border border-base-300" href="{{ route('recipes.index') }}">Cancel</a>
+            <x-ui.button variant="primary" type="submit" busy="save">Save recipe</x-ui.button>
+            <x-ui.button :href="route('recipes.index')">Cancel</x-ui.button>
         </div>
     </form>
 </div>
