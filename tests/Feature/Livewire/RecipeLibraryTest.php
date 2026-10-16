@@ -317,14 +317,11 @@ it('opens on the shelves unless the address asks for the table', function () {
         ->assertSee('Overnight Oats');
 });
 
-it('writes the view and the sort to the address', function () {
+it('keeps the view and the sort in the address so a reload lands on the same table', function () {
     Recipe::factory()->approved()->create();
 
-    $component = library()->set('view', 'table');
-    expect($component->effects['url'] ?? [])->toHaveKey('view');
-
-    $component->call('sortBy', 'time');
-    expect($component->effects['url'])->toMatchArray(['sort' => 'time', 'dir' => 'asc']);
+    // Livewire tells the browser which properties to mirror into the query string.
+    expect(library()->effects['url'])->toHaveKeys(['view', 'sort', 'dir']);
 });
 
 it('keeps the phone on the shelves while the table is chosen', function () {
@@ -362,7 +359,8 @@ it('sorts every table column both ways', function (string $column, array $expect
     $quick->ingredients()->attach(Ingredient::factory()->create()->id, ['qty' => 1, 'unit' => 'count', 'note' => null]);
     KitchenToolKind::where('name', 'skillet')->update(['owned' => false]);
 
-    $component = library()->set('view', 'table');
+    // Start sorted by another column, so the first click on any column sorts it ascending.
+    $component = library()->set('view', 'table')->set('sort', 'meal');
     $order = fn () => collect(['Quick Soup', 'Slow Roast', 'Plain Rice'])
         ->sortBy(fn (string $title) => strpos((string) str($component->html())->after('data-test="library-table"'), $title))
         ->values()->all();

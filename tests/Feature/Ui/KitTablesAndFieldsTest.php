@@ -143,6 +143,12 @@ it('renders a slotted control in a field under the same label', function () {
     expect($html)->toContain('for="meal"')->toContain('<select')->not->toContain('<input');
 });
 
+it('renders a group row without done as a plain count that never folds itself', function () {
+    $html = Blade::render('<x-ui.table.group label="Dinner" :total="4" />');
+
+    expect($html)->toContain('Dinner')->toContain('>4<')->not->toContain('0/4')->not->toContain('Done')->toContain("auto['Dinner'] = false");
+});
+
 it('refuses a field with no name', function () {
     Blade::render('<x-ui.field label="Email" />');
 })->throws(ViewException::class);
