@@ -12,20 +12,20 @@
     <div class="grid grid-cols-4 gap-2 sm:grid-cols-7">
         @foreach ($presets as $preset)
             <button type="button" data-test="{{ $key }}-{{ $preset }}" aria-pressed="{{ (int) $value === $preset ? 'true' : 'false' }}"
-                    class="flex min-h-14 flex-col items-center justify-center rounded-xl border {{ (int) $value === $preset ? 'border-primary bg-primary/10 font-medium' : 'border-base-300 bg-base-100' }}"
+                    class="flex min-h-14 flex-col items-center justify-center rounded-box border {{ (int) $value === $preset ? 'border-primary bg-primary/10 font-medium' : 'border-base-300 bg-base-100' }}"
                     wire:click="{{ $pick }}({{ $preset }})" x-on:click="other = false">
                 <span class="text-lg leading-none font-semibold tabular-nums">{{ $preset }}</span>
-                @if ($suffix) <span class="text-[11px] opacity-70">{{ $suffix }}</span> @endif
+                @if ($suffix) <span class="text-xs text-base-content/70">{{ $suffix }}</span> @endif
             </button>
         @endforeach
         <button type="button" data-test="{{ $key }}-other" aria-pressed="{{ $isPreset ? 'false' : 'true' }}"
-                class="col-span-2 flex min-h-14 flex-col items-center justify-center rounded-xl border sm:col-span-1 {{ $isPreset ? 'border-dashed border-base-300' : 'border-primary bg-primary/10 font-medium' }}"
+                class="col-span-2 flex min-h-14 flex-col items-center justify-center rounded-box border sm:col-span-1 {{ $isPreset ? 'border-dashed border-base-300' : 'border-primary bg-primary/10 font-medium' }}"
                 x-on:click="other = ! other">
             @if ($isPreset)
                 <span class="text-sm font-medium">Other</span>
             @else
                 <span class="text-lg leading-none font-semibold tabular-nums">{{ $value }}</span>
-                <span class="text-[11px] opacity-70">Other</span>
+                <span class="text-xs text-base-content/70">Other</span>
             @endif
         </button>
     </div>

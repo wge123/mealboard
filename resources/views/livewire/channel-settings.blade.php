@@ -25,18 +25,18 @@
     </form>
 
     @if ($channels->isEmpty())
-        <div class="rounded-2xl border border-base-300 bg-base-200 px-6 py-12 text-center">
-            <p class="font-[family-name:var(--font-display)] text-xl font-semibold">No channels yet</p>
+        <div class="rounded-box border border-base-300 bg-base-200 px-6 py-12 text-center">
+            <p class="font-display text-xl font-semibold">No channels yet</p>
             <p class="mt-1 text-sm text-base-content/70">Add a YouTube channel above to start discovering recipes.</p>
         </div>
     @else
         <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ($channels as $channel)
-                <li class="flex items-center gap-3 rounded-2xl border border-base-300 bg-base-100 p-3 {{ $channel->active ? '' : 'opacity-60' }}" wire:key="channel-{{ $channel->id }}">
+                <li class="flex items-center gap-3 rounded-box border border-base-300 bg-base-100 p-3 {{ $channel->active ? '' : 'text-base-content/70' }}" wire:key="channel-{{ $channel->id }}">
                     <span aria-hidden="true" class="grid size-10 shrink-0 place-items-center rounded-full bg-secondary font-semibold text-secondary-content">{{ mb_strtoupper(mb_substr($channel->name, 0, 1)) }}</span>
                     <div class="min-w-0 flex-1">
                         <span class="block truncate font-medium">{{ $channel->name }}</span>
-                        <span class="block truncate text-xs text-base-content/60">{{ $channel->active ? 'Polled daily' : 'Inactive' }} · {{ $channel->channel_id }}</span>
+                        <span class="block truncate text-xs text-base-content/70">{{ $channel->active ? 'Polled daily' : 'Inactive' }} · {{ $channel->channel_id }}</span>
                     </div>
 
                     {{-- min-h-11 label pads the toggle's hit area to tap-target size. --}}
@@ -51,7 +51,7 @@
                             wire:click="remove({{ $channel->id }})"
                             wire:confirm="Remove {{ $channel->name }}?"
                             wire:loading.attr="disabled" wire:target="remove"
-                            aria-label="Remove {{ $channel->name }}">&times;</button>
+                            aria-label="Remove {{ $channel->name }}"><x-tabler-x class="size-4" /></button>
                 </li>
             @endforeach
         </ul>

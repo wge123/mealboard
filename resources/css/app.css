@@ -1,22 +1,32 @@
 /* ============================================================================
-   Mealboard tactile rules — read this before styling any page (steps 4+):
-   - Cards: rounded-2xl (var(--radius-box)), subtle 1px borders over shadows.
-     Shadows only for true elevation (modals, popovers), never for resting cards.
-   - Tap targets: >= 44px on anything interactive (checkboxes, slot cards,
-     nav items, buttons). This is a phone-first kitchen/store app.
-   - Whitespace is generous: sections breathe, lists get padding, never cram.
-   - Meal-type accents come from --meal-breakfast/lunch/dinner/any — use them
-     for slot markers, chips, and left-edge card bars; do not invent new hues.
-   - Type: Inter Variable for UI/body, Fraunces (--font-display) for page
-     titles and recipe names only — display face used with restraint.
+   Mealboard design rulebook (ADR 0002) — read this before styling any page:
+   - Type: 16px root, body text-sm (14px). Inputs are text-base sm:text-sm so
+     iOS never zooms. Page title: font-display text-2xl font-semibold.
+     Card/section titles: text-base font-semibold. Labels: text-xs
+     font-semibold uppercase tracking-wide. Nothing above text-2xl.
+     Fraunces (font-display) is for page titles and recipe names only.
+   - Muted text: one rule, text-base-content/70. No opacity-* on text.
+   - Radius: rounded-box (8px) cards/panels/modals/deck card; rounded-field
+     (6px) inputs and buttons; rounded-selector (4px) checkboxes;
+     rounded-full only for pills, badges, dots, avatars. rounded-lg/xl/2xl/3xl
+     are banned.
+   - Shadow: shadow-lg only on things that float (dropdown, modal, drawer,
+     toast, floating bar, top swipe card). Resting things get a 1px
+     border-base-300 instead; in dark mode floating things get it too.
+   - Colour: herb green is the only UI colour (success/secondary/accent point
+     at it). info/warning/error are for badges and alerts only. Meal-type
+     hues (--meal-*) are data colours: markers only (3px bar, dot, tint of
+     12% or less).
+   - Tap targets: >= 44px hit area, not visuals. A dense row is a <label>
+     around a checkbox-sm with min-h-11. Buttons/nav: min-h-11, sm:min-h-9.
+   - Spacing: card p-4, table cells px-4 py-2.5, sections gap-6, page gutter
+     px-4 sm:px-6.
    ========================================================================== */
 
 @import 'tailwindcss';
 
 @import '@fontsource-variable/inter';
-@import '@fontsource/fraunces/400.css';
 @import '@fontsource/fraunces/600.css';
-@import '@fontsource/fraunces/700.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -25,96 +35,95 @@
     themes: mealboard --default, mealboard-dark --prefersdark;
 }
 
-/* Light — warm stone/cream base, herb-green primary */
+/* Light — cool white and slate, herb-green primary */
 @plugin "daisyui/theme" {
     name: 'mealboard';
     default: true;
     prefersdark: false;
     color-scheme: light;
 
-    --color-base-100: oklch(98.2% 0.008 85);
-    --color-base-200: oklch(95.5% 0.011 83);
-    --color-base-300: oklch(90.5% 0.015 80);
-    --color-base-content: oklch(27% 0.022 55);
+    --color-base-100: #ffffff;
+    --color-base-200: #f6f8fb;
+    --color-base-300: #e6e7e9;
+    --color-base-content: #1d273b;
 
     --color-primary: oklch(52% 0.115 150);
-    --color-primary-content: oklch(97.5% 0.012 150);
-    --color-secondary: oklch(62% 0.115 42);
-    --color-secondary-content: oklch(98% 0.01 42);
-    --color-accent: oklch(76% 0.125 82);
-    --color-accent-content: oklch(30% 0.06 82);
-    --color-neutral: oklch(36% 0.02 58);
-    --color-neutral-content: oklch(96% 0.01 85);
+    --color-primary-content: #ffffff;
+    --color-secondary: oklch(52% 0.115 150);
+    --color-secondary-content: #ffffff;
+    --color-accent: oklch(52% 0.115 150);
+    --color-accent-content: #ffffff;
+    --color-neutral: #1d273b;
+    --color-neutral-content: #ffffff;
 
-    --color-info: oklch(60% 0.11 232);
-    --color-info-content: oklch(97% 0.012 232);
-    --color-success: oklch(58% 0.125 152);
-    --color-success-content: oklch(97% 0.012 152);
-    --color-warning: oklch(76% 0.15 78);
-    --color-warning-content: oklch(30% 0.07 78);
-    --color-error: oklch(56% 0.185 27);
-    --color-error-content: oklch(97% 0.012 27);
+    --color-info: #4299e1;
+    --color-info-content: #ffffff;
+    --color-success: oklch(52% 0.115 150);
+    --color-success-content: #ffffff;
+    --color-warning: #f76707;
+    --color-warning-content: #ffffff;
+    --color-error: #d63939;
+    --color-error-content: #ffffff;
 
-    /* rounded-2xl feel */
-    --radius-box: 1rem;
-    --radius-field: 0.75rem;
-    --radius-selector: 1rem;
-    --size-field: 0.28125rem;
+    --radius-box: 0.5rem;
+    --radius-field: 0.375rem;
+    --radius-selector: 0.25rem;
+    --size-field: 0.25rem;
     --size-selector: 0.25rem;
     --border: 1px;
     --depth: 0;
     --noise: 0;
 
-    /* Meal-type accents */
-    --meal-breakfast: oklch(78% 0.14 75);
-    --meal-lunch: oklch(70% 0.115 230);
-    --meal-dinner: oklch(58% 0.14 295);
-    --meal-any: oklch(60% 0.02 60);
+    /* Meal-type markers (data colours, one step less saturated) */
+    --meal-breakfast: oklch(78% 0.1 75);
+    --meal-lunch: oklch(70% 0.09 230);
+    --meal-dinner: oklch(58% 0.11 295);
+    --meal-any: oklch(60% 0.015 255);
 }
 
-/* Dark — warm charcoal, same herb-green family lightened */
+/* Dark — cool mirror of light, same herb green lightened */
 @plugin "daisyui/theme" {
     name: 'mealboard-dark';
     default: false;
     prefersdark: true;
     color-scheme: dark;
 
-    --color-base-100: oklch(23% 0.013 58);
-    --color-base-200: oklch(20% 0.012 58);
-    --color-base-300: oklch(17% 0.011 58);
-    --color-base-content: oklch(92% 0.013 82);
+    --color-base-100: oklch(23% 0.02 255);
+    --color-base-200: oklch(19% 0.02 255);
+    --color-base-300: oklch(31% 0.02 255);
+    --color-base-content: oklch(93% 0.01 255);
 
     --color-primary: oklch(70% 0.105 150);
     --color-primary-content: oklch(20% 0.04 150);
-    --color-secondary: oklch(71% 0.1 42);
-    --color-secondary-content: oklch(22% 0.05 42);
-    --color-accent: oklch(80% 0.11 85);
-    --color-accent-content: oklch(26% 0.06 85);
-    --color-neutral: oklch(29% 0.013 58);
-    --color-neutral-content: oklch(92% 0.013 82);
+    --color-secondary: oklch(70% 0.105 150);
+    --color-secondary-content: oklch(20% 0.04 150);
+    --color-accent: oklch(70% 0.105 150);
+    --color-accent-content: oklch(20% 0.04 150);
+    --color-neutral: oklch(31% 0.02 255);
+    --color-neutral-content: oklch(93% 0.01 255);
 
     --color-info: oklch(72% 0.1 232);
     --color-info-content: oklch(20% 0.05 232);
-    --color-success: oklch(70% 0.115 152);
-    --color-success-content: oklch(20% 0.05 152);
+    --color-success: oklch(70% 0.105 150);
+    --color-success-content: oklch(20% 0.04 150);
     --color-warning: oklch(80% 0.13 80);
     --color-warning-content: oklch(26% 0.06 80);
     --color-error: oklch(68% 0.15 25);
     --color-error-content: oklch(20% 0.05 25);
 
-    --radius-box: 1rem;
-    --radius-field: 0.75rem;
-    --radius-selector: 1rem;
-    --size-field: 0.28125rem;
+    --radius-box: 0.5rem;
+    --radius-field: 0.375rem;
+    --radius-selector: 0.25rem;
+    --size-field: 0.25rem;
     --size-selector: 0.25rem;
     --border: 1px;
     --depth: 0;
     --noise: 0;
 
-    --meal-breakfast: oklch(82% 0.12 75);
-    --meal-lunch: oklch(76% 0.1 230);
-    --meal-dinner: oklch(70% 0.11 295);
-    --meal-any: oklch(70% 0.015 60);
+    --meal-breakfast: oklch(80% 0.09 75);
+    --meal-lunch: oklch(74% 0.08 230);
+    --meal-dinner: oklch(68% 0.09 295);
+    --meal-any: oklch(68% 0.012 255);
 }
 
 @theme {
@@ -126,6 +135,18 @@
 @layer base {
     body {
         font-family: var(--font-sans);
+        font-size: var(--text-sm);
+        line-height: var(--text-sm--line-height);
+    }
+
+    /* Inputs are 16px on phones so iOS never zooms, 14px from sm up. */
+    input:not([type='checkbox'], [type='radio'], [type='range']),
+    select,
+    textarea {
+        font-size: var(--text-base);
+        @media (min-width: 40rem) {
+            font-size: var(--text-sm);
+        }
     }
 
     /* Alpine: hide x-cloak'd elements until Alpine initializes them. */
@@ -152,7 +173,7 @@
        --meal-* theme vars; these consume it. The label mixes toward
        base-content so light accents (breakfast amber) stay readable. */
     .slot-row {
-        border-left: 4px solid var(--slot-accent);
+        border-left: 3px solid var(--slot-accent);
     }
 
     .slot-label {
@@ -161,7 +182,7 @@
 
     /* A planned meal on the plan grid, tinted by its slot. */
     .slot-tile {
-        background: color-mix(in oklab, var(--slot-accent) 22%, var(--color-base-100));
+        background: color-mix(in oklab, var(--slot-accent) 12%, var(--color-base-100));
     }
 }
 

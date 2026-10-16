@@ -10,7 +10,7 @@
             </div>
             <div class="col-span-3 md:col-span-1">
                 <button type="button" class="btn btn-ghost min-h-11 w-full text-error" aria-label="Remove step"
-                        wire:click="removeStep({{ $index }})">&times;</button>
+                        wire:click="removeStep({{ $index }})"><x-tabler-x class="size-4" /></button>
             </div>
         </div>
     @endforeach

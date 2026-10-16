@@ -1,14 +1,12 @@
 <div>
     {{-- Header: title, search, and Add recipe (header button on lg+, FAB on phones). --}}
     <div class="mb-3 flex flex-wrap items-center gap-3">
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Recipes</h1>
+        <h1 class="font-display text-2xl font-semibold tracking-tight">Recipes</h1>
         @if ($filtering)
             <span class="text-sm text-base-content/70">{{ $recipes->count() }} {{ Str::plural('match', $recipes->count()) }}</span>
         @endif
         <label class="input ms-auto min-h-11 w-full sm:w-72">
-            <svg class="size-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-            </svg>
+            <x-tabler-search class="size-4 text-base-content/70" />
             <input type="search" placeholder="Search titles, descriptions, tags…"
                    wire:model.live.debounce.300ms="search" aria-label="Search recipes">
         </label>
@@ -28,7 +26,7 @@
                         aria-label="{{ ucfirst($type) }}, {{ $count }} {{ Str::plural('recipe', $count) }}"
                         wire:click="toggle('mealTypes', '{{ $type }}')">
                     <span class="size-2 rounded-full bg-[var(--slot-accent)]" aria-hidden="true"></span>
-                    {{ ucfirst($type) }} <span class="font-normal text-base-content/60">{{ $count }}</span>
+                    {{ ucfirst($type) }} <span class="font-normal text-base-content/70">{{ $count }}</span>
                 </button>
             @endforeach
             <span class="mx-1 w-px shrink-0 bg-base-300" aria-hidden="true"></span>
@@ -37,7 +35,7 @@
                         wire:click="$set('maxMinutes', {{ $maxMinutes === $limit ? 'null' : $limit }})">≤ {{ $limit }} min</button>
             @endforeach
             <button type="button" class="{{ $chip }}" aria-pressed="{{ $minRating === 4 ? 'true' : 'false' }}"
-                    wire:click="$set('minRating', {{ $minRating === 4 ? 'null' : 4 }})"><span class="text-warning" aria-hidden="true">★</span> 4 and up</button>
+                    wire:click="$set('minRating', {{ $minRating === 4 ? 'null' : 4 }})"><x-tabler-star-filled class="size-4 text-primary" /> 4 and up</button>
         </div>
         <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Cuisine and tags">
             @foreach ($cuisineOptions as $option)
@@ -58,8 +56,8 @@
     </div>
 
     @if ($recipes->isEmpty())
-        <div class="rounded-2xl border border-base-300 bg-base-200 px-6 py-12 text-center">
-            <p class="font-[family-name:var(--font-display)] text-xl font-semibold">No recipes match</p>
+        <div class="rounded-box border border-base-300 bg-base-200 px-6 py-12 text-center">
+            <p class="font-display text-xl font-semibold">No recipes match</p>
             <p class="mt-1 text-sm text-base-content/70">Try clearing a filter or searching for something else.</p>
         </div>
     @elseif ($filtering)
@@ -86,7 +84,7 @@
             @foreach ($shelves as $shelf)
                 <section data-test="shelf-{{ $shelf['key'] }}" wire:key="shelf-{{ $groupBy->value }}-{{ $shelf['key'] }}" aria-labelledby="shelf-{{ $shelf['key'] }}">
                     <h2 id="shelf-{{ $shelf['key'] }}" class="mb-2 flex items-baseline gap-2 text-lg font-semibold">
-                        {{ $shelf['title'] }} <span class="text-sm font-normal text-base-content/60">{{ $shelf['recipes']->count() }}</span>
+                        {{ $shelf['title'] }} <span class="text-sm font-normal text-base-content/70">{{ $shelf['recipes']->count() }}</span>
                     </h2>
                     {{-- A shelf swipes sideways, snapping to whole tiles. --}}
                     <ul class="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2">
@@ -105,8 +103,6 @@
     <a href="{{ route('recipes.create') }}"
        class="btn btn-circle btn-primary fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 size-14 shadow-lg lg:hidden"
        aria-label="Add recipe">
-        <svg class="size-7" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
+        <x-tabler-plus class="size-7" />
     </a>
 </div>

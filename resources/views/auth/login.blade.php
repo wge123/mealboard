@@ -4,12 +4,12 @@
 
 @section('content')
     <div class="w-full max-w-sm">
-        <h1 class="mb-6 text-center font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-primary">
+        <h1 class="mb-6 text-center font-display text-2xl font-semibold tracking-tight text-primary">
             Mealboard
         </h1>
 
-        <div class="rounded-2xl border border-base-300 bg-base-100 p-6">
-            <h2 class="mb-4 font-[family-name:var(--font-display)] text-xl font-semibold">Log in</h2>
+        <div class="rounded-box border border-base-300 bg-base-100 p-6">
+            <h2 class="mb-4 font-display text-xl font-semibold">Log in</h2>
 
             <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-4">
                 @csrf

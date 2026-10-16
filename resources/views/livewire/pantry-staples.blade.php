@@ -5,15 +5,15 @@
     ])
 
     <label class="input mb-3 min-h-11 w-full sm:max-w-sm">
-        <svg class="h-4 w-4 opacity-50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
+        <x-tabler-search class="size-4 text-base-content/70" />
         <input type="search" class="grow" placeholder="Search ingredients…"
                wire:model.live.debounce.300ms="search" aria-label="Search ingredients">
     </label>
     @error('markMany') <p class="mb-2 text-sm text-error" role="alert">{{ $message }}</p> @enderror
 
     @if ($ingredients->isEmpty())
-        <div class="rounded-2xl border border-base-300 bg-base-200 px-6 py-12 text-center">
-            <p class="font-[family-name:var(--font-display)] text-xl font-semibold">No ingredients match</p>
+        <div class="rounded-box border border-base-300 bg-base-200 px-6 py-12 text-center">
+            <p class="font-display text-xl font-semibold">No ingredients match</p>
             <p class="mt-1 text-sm text-base-content/70">Add a staple by name below, or search for another word.</p>
         </div>
     @else

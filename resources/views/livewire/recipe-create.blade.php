@@ -1,17 +1,17 @@
 <div>
     <a class="btn btn-ghost btn-sm mb-4 min-h-11 border border-base-300" href="{{ route('recipes.index') }}">
-        &larr; Recipes
+        <x-tabler-arrow-left class="size-4" /> Recipes
     </a>
 
-    <h1 class="mb-4 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Add recipe</h1>
+    <h1 class="mb-4 font-display text-2xl font-semibold tracking-tight">Add recipe</h1>
 
     <form wire:submit="save">
         @include('livewire.partials.recipe-form-fields')
 
         {{-- Paste-to-parse: the fastest way in; heuristic and AI parsers side by side. --}}
-        <section class="mt-6 rounded-2xl border border-base-300 bg-base-200 p-4">
-            <h2 class="font-[family-name:var(--font-display)] text-xl font-semibold">Paste a recipe</h2>
-            <p class="mt-1 text-sm opacity-60">
+        <section class="mt-6 rounded-box border border-base-300 bg-base-200 p-4">
+            <h2 class="font-display text-xl font-semibold">Paste a recipe</h2>
+            <p class="mt-1 text-sm text-base-content/70">
                 One ingredient per line, e.g. <code class="rounded bg-base-300 px-1">2 cups diced onion</code> —
                 or paste anything and let AI parse it. Parsed rows land below and stay editable.
             </p>
@@ -41,13 +41,13 @@
             @endif
         </section>
 
-        <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Kitchen tools</h2>
+        <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Kitchen tools</h2>
         @include('livewire.partials.recipe-tool-rows')
 
-        <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Ingredients</h2>
+        <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Ingredients</h2>
         @include('livewire.partials.ingredient-rows')
 
-        <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Cooking steps</h2>
+        <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Cooking steps</h2>
         @include('livewire.partials.cooking-step-rows')
 
         <div class="mt-6 flex gap-2">

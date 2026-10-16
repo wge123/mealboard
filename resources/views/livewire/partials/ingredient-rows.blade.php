@@ -29,7 +29,7 @@
             </div>
             <div class="col-span-3 md:col-span-1">
                 <button type="button" class="btn btn-ghost min-h-11 w-full text-error" aria-label="Remove ingredient"
-                        wire:click="removeRow({{ $index }})">&times;</button>
+                        wire:click="removeRow({{ $index }})"><x-tabler-x class="size-4" /></button>
             </div>
         </div>
     @endforeach

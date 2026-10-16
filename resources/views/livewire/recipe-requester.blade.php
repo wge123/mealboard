@@ -1,6 +1,6 @@
 <div class="mx-auto w-full max-w-2xl">
-    <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Request a recipe</h1>
-    <p class="mt-1 mb-5 text-sm opacity-60">
+    <h1 class="font-display text-2xl font-semibold tracking-tight">Request a recipe</h1>
+    <p class="mt-1 mb-5 text-sm text-base-content/70">
         Ask for a specific dish and Mealboard searches YouTube and asks Claude for it. Requests ignore the
         weekday limits that shape the daily suggestions.
     </p>
@@ -18,14 +18,14 @@
         @error('query')
             <p class="mt-1 text-sm text-error">{{ $message }}</p>
         @enderror
-        <p class="mt-2 text-xs opacity-50" wire:loading wire:target="submit">
+        <p class="mt-2 text-xs text-base-content/70" wire:loading wire:target="submit">
             Searching YouTube and asking Claude. This takes a minute or two.
         </p>
     </form>
 
     @if ($lastRequest !== null)
-        <div class="mb-6 rounded-2xl border border-base-300 bg-base-100 px-5 py-4">
-            <p class="text-sm opacity-60">Requested</p>
+        <div class="mb-6 rounded-box border border-base-300 bg-base-100 px-5 py-4">
+            <p class="text-sm text-base-content/70">Requested</p>
             <p class="font-medium">{{ $lastRequest->query }}</p>
 
             @if ($lastRequest->status === \App\Enums\RequestStatus::Failed)
@@ -48,13 +48,13 @@
     @endif
 
     @if ($recent->isNotEmpty())
-        <h2 class="mb-2 text-sm font-medium opacity-60">Earlier requests</h2>
-        <ul class="divide-y divide-base-300 rounded-2xl border border-base-300 bg-base-100">
+        <h2 class="mb-2 text-sm font-medium text-base-content/70">Earlier requests</h2>
+        <ul class="divide-y divide-base-300 rounded-box border border-base-300 bg-base-100">
             @foreach ($recent as $request)
                 <li class="flex items-center gap-3 px-4 py-3" wire:key="request-{{ $request->id }}">
                     <div class="min-w-0 flex-1">
                         <span class="block truncate font-medium">{{ $request->query }}</span>
-                        <span class="block truncate text-xs opacity-50">
+                        <span class="block truncate text-xs text-base-content/70">
                             {{ $request->completed_at?->diffForHumans() ?? 'in progress' }}
                         </span>
                     </div>

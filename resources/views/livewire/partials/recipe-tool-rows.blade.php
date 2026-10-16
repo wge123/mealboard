@@ -15,7 +15,7 @@
             </div>
             <div class="col-span-4 md:col-span-1">
                 <button type="button" class="btn btn-ghost min-h-11 w-full text-error" aria-label="Remove kitchen tool"
-                        wire:click="removeTool({{ $index }})">&times;</button>
+                        wire:click="removeTool({{ $index }})"><x-tabler-x class="size-4" /></button>
             </div>
         </div>
     @endforeach

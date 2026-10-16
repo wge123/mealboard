@@ -1,6 +1,6 @@
 <div>
     <a class="btn btn-ghost btn-sm mb-4 min-h-11 border border-base-300" href="{{ route('recipes.index') }}">
-        &larr; Recipes
+        <x-tabler-arrow-left class="size-4" /> Recipes
     </a>
 
     @if (! $editing)
@@ -8,7 +8,7 @@
 
         {{-- Hero header: display title, status, chip row. --}}
         <div class="flex flex-wrap items-start justify-between gap-2">
-            <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">{{ $recipe->title }}</h1>
+            <h1 class="font-display text-2xl font-semibold tracking-tight">{{ $recipe->title }}</h1>
             <button type="button" class="btn btn-outline btn-primary btn-sm min-h-11" wire:click="startEditing">Edit</button>
         </div>
 
@@ -31,11 +31,11 @@
             @endforeach
         </div>
 
-        <p class="mt-2 text-sm opacity-60">
+        <p class="mt-2 text-sm text-base-content/70">
             Inspired from <a class="link" href="{{ $recipe->source_url }}" target="_blank" rel="noopener">{{ parse_url($recipe->source_url, PHP_URL_HOST) ?: $recipe->source_url }}</a> · {{ ucfirst($recipe->source->value) }}
         </p>
         @if ($recipe->approved_at)
-            <p class="text-sm opacity-60">
+            <p class="text-sm text-base-content/70">
                 Approved {{ $recipe->approved_at->format('Y-m-d') }}@if ($recipe->approvedBy) by {{ $recipe->approvedBy->name }}@endif
             </p>
         @endif
@@ -71,12 +71,12 @@
 
         {{-- The recipe shape: Tools, then Mise en place, then Cooking. --}}
         <div class="mt-6 space-y-4">
-            <section class="rounded-2xl border border-base-300 bg-base-100 p-4" data-section="tools">
-                <h2 class="font-[family-name:var(--font-display)] text-xl font-semibold">Tools</h2>
+            <section class="rounded-box border border-base-300 bg-base-100 p-4" data-section="tools">
+                <h2 class="font-display text-xl font-semibold">Tools</h2>
                 <ul class="mt-2 space-y-1">
                     @foreach ($recipe->recipeTools as $tool)
                         <li>
-                            @if ($tool->count > 1)<span class="tabular-nums opacity-70">{{ $tool->count }} &times;</span>@endif
+                            @if ($tool->count > 1)<span class="tabular-nums text-base-content/70">{{ $tool->count }} &times;</span>@endif
                             {{ $tool->alternatives->pluck('word')->implode(' or ') }}
                             @if ($missingToolIds->has($tool->id))
                                 <span class="badge badge-warning badge-sm ml-1" data-missing-tool>missing</span>
@@ -86,25 +86,25 @@
                 </ul>
             </section>
 
-            <section class="rounded-2xl border border-base-300 bg-base-100" data-section="mise-en-place">
-                <h2 class="px-4 pt-4 font-[family-name:var(--font-display)] text-xl font-semibold">Mise en place</h2>
+            <section class="rounded-box border border-base-300 bg-base-100" data-section="mise-en-place">
+                <h2 class="px-4 pt-4 font-display text-xl font-semibold">Mise en place</h2>
                 <ul class="divide-y divide-base-300 p-2">
                     @foreach ($recipe->ingredients as $ingredient)
                         <li class="flex items-baseline gap-3 px-2 py-2.5">
-                            <span class="w-16 shrink-0 text-right text-sm tabular-nums opacity-70">
+                            <span class="w-16 shrink-0 text-right text-sm tabular-nums text-base-content/70">
                                 {{ $ingredient->pivot->qty !== null ? (string) (float) $ingredient->pivot->qty : '' }}
                                 {{ $ingredient->pivot->unit !== 'count' ? $ingredient->pivot->unit : '' }}
                             </span>
                             <span class="min-w-0">
-                                <span class="font-medium">{{ $ingredient->name }}</span>@if ($ingredient->is_pantry_staple)<span class="badge badge-ghost badge-xs ms-1 align-middle">staple</span>@endif@if ($ingredient->pivot->note)<span class="opacity-60">, {{ $ingredient->pivot->note }}</span>@endif
+                                <span class="font-medium">{{ $ingredient->name }}</span>@if ($ingredient->is_pantry_staple)<span class="badge badge-ghost badge-xs ms-1 align-middle">staple</span>@endif@if ($ingredient->pivot->note)<span class="text-base-content/70">, {{ $ingredient->pivot->note }}</span>@endif
                             </span>
                         </li>
                     @endforeach
                 </ul>
             </section>
 
-            <section class="rounded-2xl border border-base-300 bg-base-100 p-4 lg:p-5" data-section="cooking">
-                <h2 class="font-[family-name:var(--font-display)] text-xl font-semibold">Cooking</h2>
+            <section class="rounded-box border border-base-300 bg-base-100 p-4 lg:p-5" data-section="cooking">
+                <h2 class="font-display text-xl font-semibold">Cooking</h2>
                 <ol class="mt-3 list-decimal space-y-2 ps-5">
                     @foreach ($recipe->cookingSteps as $step)
                         <li>{{ $step->text }}</li>
@@ -113,18 +113,18 @@
             </section>
         </div>
     @else
-        <h1 class="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">Edit recipe</h1>
+        <h1 class="font-display text-2xl font-semibold tracking-tight">Edit recipe</h1>
 
         <form wire:submit="save" class="mt-4">
             @include('livewire.partials.recipe-form-fields')
 
-            <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Kitchen tools</h2>
+            <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Kitchen tools</h2>
             @include('livewire.partials.recipe-tool-rows')
 
-            <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Ingredients</h2>
+            <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Ingredients</h2>
             @include('livewire.partials.ingredient-rows')
 
-            <h2 class="mt-6 mb-2 font-[family-name:var(--font-display)] text-xl font-semibold">Cooking steps</h2>
+            <h2 class="mt-6 mb-2 font-display text-xl font-semibold">Cooking steps</h2>
             @include('livewire.partials.cooking-step-rows')
 
             <div class="mt-6 flex gap-2">

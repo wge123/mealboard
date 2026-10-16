@@ -8,12 +8,12 @@
     $initials = \App\Support\RecipeCover::initials($recipe);
     $needs = collect($missing)->map->label()->implode(', ');
 @endphp
-<a href="{{ route('recipes.show', $recipe) }}" {{ $attributes->class('group relative block aspect-square overflow-hidden rounded-2xl') }}
+<a href="{{ route('recipes.show', $recipe) }}" {{ $attributes->class('group relative block aspect-square overflow-hidden rounded-box') }}
    style="{{ \App\Support\RecipeCover::background($recipe) }}">
     @if ($recipe->image_url)
         <img src="{{ $recipe->image_url }}" class="absolute inset-0 size-full object-cover" alt="" loading="lazy">
     @else
-        <span aria-hidden="true" class="absolute inset-0 grid place-items-center pb-8 font-[family-name:var(--font-display)] text-5xl font-semibold text-black/15 transition-transform group-hover:scale-110">{{ $initials }}</span>
+        <span aria-hidden="true" class="absolute inset-0 grid place-items-center pb-8 font-display text-5xl font-semibold text-black/15 transition-transform group-hover:scale-110">{{ $initials }}</span>
     @endif
 
     <span class="absolute top-2 left-2 flex gap-1">
@@ -21,7 +21,7 @@
             <span class="badge badge-sm border-0 bg-base-100/85">{{ $minutes }} min</span>
         @endif
         @if ($rating !== null)
-            <span class="badge badge-sm border-0 bg-base-100/85" title="Average rating {{ number_format($rating, 1) }}"><span class="text-warning" aria-hidden="true">★</span> {{ number_format($rating, 1) }}</span>
+            <span class="badge badge-sm border-0 bg-base-100/85" title="Average rating {{ number_format($rating, 1) }}"><x-tabler-star-filled class="size-3.5 text-primary" /> {{ number_format($rating, 1) }}</span>
         @endif
     </span>
 
@@ -31,6 +31,6 @@
 
     <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent p-3 pt-10">
         <span class="line-clamp-2 text-sm leading-tight font-semibold text-white">{{ $recipe->title }}</span>
-        <span class="block truncate text-[11px] text-white/80">{{ collect([ucfirst($recipe->meal_type->value), $recipe->cuisine ? \Illuminate\Support\Str::ucfirst($recipe->cuisine) : null])->filter()->implode(' · ') }}</span>
+        <span class="block truncate text-xs text-white/80">{{ collect([ucfirst($recipe->meal_type->value), $recipe->cuisine ? \Illuminate\Support\Str::ucfirst($recipe->cuisine) : null])->filter()->implode(' · ') }}</span>
     </span>
 </a>

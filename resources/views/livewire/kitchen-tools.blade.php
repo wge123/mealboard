@@ -1,11 +1,11 @@
 <div x-data="tileSelect" x-on:keydown.escape.window="selecting && toggleSelecting()">
     @include('livewire.partials.section-header', [
         'title' => 'Kitchen tools', 'filters' => \App\Enums\KitchenToolFilter::cases(), 'current' => $filter,
-        'help' => 'Tap a tool to mark it owned or not. ⋯ opens its note and other names.',
+        'help' => 'Tap a tool to mark it owned or not. The dots button opens its note and other names.',
     ])
 
     @if ($kinds->isEmpty())
-        <p class="rounded-2xl bg-base-200 py-8 text-center text-sm text-base-content/70">{{ match ($filter) {
+        <p class="rounded-box bg-base-200 py-8 text-center text-sm text-base-content/70">{{ match ($filter) {
             \App\Enums\KitchenToolFilter::Owned => 'You have marked no kitchen tool owned yet.',
             \App\Enums\KitchenToolFilter::NotOwned => 'You have every kitchen tool the app knows.',
             \App\Enums\KitchenToolFilter::All => 'The app knows no kitchen tools yet.',
@@ -17,23 +17,23 @@
                     data-key-on="{{ $kind->name }}" data-key-off="{{ $kind->name }}">
                     {{-- The look follows aria-pressed, so a tap can flip it before the server answers. --}}
                     <button type="button"
-                            class="group flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-xl border border-base-300 px-1 py-3 text-center transition aria-pressed:bg-base-100 aria-[pressed=false]:border-dashed aria-[pressed=false]:text-base-content/70"
+                            class="group flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-box border border-base-300 px-1 py-3 text-center transition aria-pressed:bg-base-100 aria-[pressed=false]:border-dashed aria-[pressed=false]:text-base-content/70"
                             :class="picked.includes({{ $kind->id }}) && 'ring-2 ring-primary ring-offset-2 ring-offset-base-100'"
                             x-on:click="tap({{ $kind->id }}, () => $wire.toggleOwned({{ $kind->id }}), $el)"
                             aria-pressed="{{ $kind->owned ? 'true' : 'false' }}"
                             aria-label="Owned: {{ $kind->display_name }}">
-                        <span aria-hidden="true" class="absolute top-1.5 left-1.5 hidden size-4 place-items-center rounded-full bg-primary text-[10px] text-primary-content group-aria-pressed:grid">✓</span>
-                        <span class="size-7 group-aria-pressed:text-primary group-aria-[pressed=false]:opacity-50 [&>svg]:size-full" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($kind->name) }}</span>
+                        <span aria-hidden="true" class="absolute top-1.5 left-1.5 hidden size-4 place-items-center rounded-full bg-primary text-xs text-primary-content group-aria-pressed:grid"><x-tabler-check class="size-3" /></span>
+                        <span class="size-7 group-aria-pressed:text-primary group-aria-[pressed=false]:text-base-content/70 [&>svg]:size-full" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($kind->name) }}</span>
                         <span class="text-xs leading-tight font-medium">{{ $kind->display_name }}</span>
                         @if ($kind->note)
-                            <span class="line-clamp-1 text-[11px] text-base-content/70">{{ $kind->note }}</span>
+                            <span class="line-clamp-1 text-xs text-base-content/70">{{ $kind->note }}</span>
                         @endif
                     </button>
                     {{-- Always shown on phones; on desktop it appears on hover or keyboard focus. --}}
-                    <button type="button" class="btn btn-ghost btn-xs absolute top-0 right-0 min-h-11 min-w-11 text-base text-base-content/60 hover:text-base-content lg:opacity-0 lg:group-hover/tile:opacity-100 lg:focus-visible:opacity-100"
+                    <button type="button" class="btn btn-ghost btn-xs absolute top-0 right-0 min-h-11 min-w-11 text-base text-base-content/70 hover:text-base-content lg:opacity-0 lg:group-hover/tile:opacity-100 lg:focus-visible:opacity-100"
                             x-show="! selecting"
                             wire:click="openDetails({{ $kind->id }})"
-                            aria-label="Details for {{ $kind->display_name }}">⋯</button>
+                            aria-label="Details for {{ $kind->display_name }}"><x-tabler-dots class="size-5" /></button>
                 </li>
             @endforeach
         </ul>
@@ -62,7 +62,7 @@
                 <div class="flex items-center gap-3">
                     <span class="size-9 text-primary [&>svg]:size-full" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($detail->name) }}</span>
                     <h3 class="flex-1 text-lg font-semibold">{{ $detail->display_name }}</h3>
-                    <button type="button" class="btn btn-circle btn-ghost min-h-11 min-w-11" wire:click="closeDetails" aria-label="Close">&times;</button>
+                    <button type="button" class="btn btn-circle btn-ghost min-h-11 min-w-11" wire:click="closeDetails" aria-label="Close"><x-tabler-x class="size-5" /></button>
                 </div>
 
                 <label class="mt-4 flex min-h-11 cursor-pointer items-center justify-between gap-3">
@@ -97,7 +97,7 @@
                                     <button type="button" class="btn btn-ghost btn-xs min-h-11 min-w-11"
                                             data-test="remove-other-name-{{ $otherName->id }}"
                                             wire:click="removeOtherName({{ $otherName->id }})"
-                                            aria-label="Remove other name {{ $otherName->name }}">&times;</button>
+                                            aria-label="Remove other name {{ $otherName->name }}"><x-tabler-x class="size-4" /></button>
                                 @endif
                             </li>
                         @endforeach
