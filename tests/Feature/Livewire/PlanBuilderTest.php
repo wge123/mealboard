@@ -482,3 +482,70 @@ it('refuses to open a meal for logging on a draft week, a future day or an empty
     'future day' => [true, 2, true, 403],
     'empty cell' => [true, -2, false, 404],
 ]);
+
+function suggestedWeek(): MealPlan
+{
+    $plan = MealPlan::factory()->create();
+    dinnerOnMonday($plan);
+
+    return $plan;
+}
+
+it('saves a Looks good tick on a day and removes it when unticked', function () {
+    $plan = suggestedWeek();
+    $monday = $plan->week_start_date->toDateString();
+
+    $component = planBuilder()->assertSee('Looks good')->call('toggleReviewed', $monday);
+    expect($plan->fresh()->reviewed_dates)->toBe([$monday]);
+
+    $component->call('toggleReviewed', $monday);
+    expect($plan->fresh()->reviewed_dates)->toBe([]);
+});
+
+it('shows a tick made by one user to another user', function () {
+    $plan = suggestedWeek();
+    $monday = $plan->week_start_date->toDateString();
+    $tuesday = $plan->week_start_date->copy()->addDay()->toDateString();
+    $wednesday = $plan->week_start_date->copy()->addDays(2)->toDateString();
+
+    planBuilder()->call('toggleReviewed', $monday)->call('toggleReviewed', $tuesday);
+
+    planBuilder()
+        ->assertSee('Lock week · 2 of 5 days checked')
+        ->assertSeeHtml('data-test="looks-good-'.$monday.'" checked')
+        ->assertDontSeeHtml('data-test="looks-good-'.$wednesday.'" checked');
+});
+
+it('counts the ticked days in the Lock label', function () {
+    $plan = suggestedWeek();
+
+    planBuilder()->assertSee('Lock week · 0 of 5 days checked');
+
+    $plan->update(['reviewed_dates' => collect(range(0, 4))->map(fn ($n) => $plan->week_start_date->copy()->addDays($n)->toDateString())->all()]);
+
+    planBuilder()->assertSee('Lock week')->assertDontSee('days checked');
+});
+
+it('locks a suggested week with no days ticked', function () {
+    $plan = suggestedWeek();
+
+    planBuilder()->call('lock')->assertOk();
+
+    expect($plan->fresh()->status)->toBe(MealPlanStatus::Locked);
+});
+
+it('shows no Looks good ticks on a locked week and refuses new ones', function () {
+    $plan = suggestedWeek();
+    $monday = $plan->week_start_date->toDateString();
+    $plan->update(['reviewed_dates' => [$monday]]);
+
+    planBuilder()->call('lock')->assertDontSee('Looks good')->assertDontSee('days checked');
+
+    planBuilder()->call('toggleReviewed', $monday)->assertStatus(403);
+});
+
+it('refuses a tick for a date outside the week', function () {
+    suggestedWeek();
+
+    planBuilder()->call('toggleReviewed', '2001-01-01')->assertStatus(422);
+});
