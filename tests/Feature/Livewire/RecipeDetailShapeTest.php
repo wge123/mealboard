@@ -5,7 +5,7 @@ use App\Models\KitchenToolKind;
 use App\Models\Recipe;
 use App\Models\User;
 
-it('shows Tools, Mise en place and Cooking in order for a shaped recipe', function () {
+it('shows the tools to get out, the ingredients and the steps in order for a shaped recipe', function () {
     $recipe = Recipe::factory()->unshaped()->approved()->create();
     $tool = $recipe->recipeTools()->create(['position' => 1, 'count' => 2]);
     $tool->alternatives()->create(['position' => 1, 'word' => 'flat-top griddle']);
@@ -24,8 +24,8 @@ it('shows Tools, Mise en place and Cooking in order for a shaped recipe', functi
         ->get("/recipes/{$recipe->id}")
         ->assertOk()
         ->assertSeeInOrder([
-            'Tools', '2 ×', 'flat-top griddle or large skillet', 'tongs',
-            'Mise en place', 'scallion', 'whites and greens apart', 'salt',
+            'Mise en place', 'Get out', '2 ×', 'flat-top griddle or large skillet', 'tongs',
+            'scallion', 'whites and greens apart', 'salt',
             'Cooking', 'Heat the griddle.', 'Sear everything.',
         ]);
 });
@@ -37,7 +37,7 @@ it('builds a shaped recipe from the factory state', function () {
         ->and($recipe->recipeTools()->first()->alternatives->first()->kind->name)->toBe('skillet');
 });
 
-it('marks a missing tool in the Tools list and leaves owned ones unmarked', function () {
+it('marks a missing tool in the Get out list and leaves owned ones unmarked', function () {
     KitchenToolKind::where('name', 'wok')->update(['owned' => false]);
     KitchenToolKind::where('name', 'skillet')->update(['owned' => true]);
     $recipe = Recipe::factory()->approved()->create();
