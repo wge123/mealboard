@@ -1,165 +1,146 @@
 <div>
-    {{-- Header: week title + status, week picker, actions. --}}
-    <div class="mb-1 flex flex-wrap items-center gap-x-3 gap-y-2">
-        <h1 class="font-display text-2xl font-semibold tracking-tight">
-            {{ $plan ? 'Week of '.$plan->week_start_date->format('j M') : 'Plan' }}
-        </h1>
+    @php
+        $ordered = $plans->sortBy('week_start_date')->values();
+        $at = $plan ? $ordered->search(fn ($p) => $p->id === $plan->id) : false;
+        $prevPlan = $at !== false ? $ordered->get($at - 1) : null;
+        $nextPlan = $at !== false ? $ordered->get($at + 1) : null;
 
-        @if ($plan)
-            <span class="badge badge-soft {{ ['draft' => 'badge-warning', 'locked' => 'badge-success', 'completed' => 'badge-neutral'][$plan->status->value] }}">
-                {{ ucfirst($plan->status->value) }}
-            </span>
-        @endif
+        $cellKey = fn ($day, $slot) => $day->toDateString().'|'.$slot->value;
+        $openCell = $pickerDate && $pickerSlot ? $pickerDate.'|'.$pickerSlot : null;
+        $minutesOf = fn ($recipe) => (int) $recipe->prep_minutes + (int) $recipe->cook_minutes;
+        $dayMinutes = fn ($day) => collect($slots)->sum(fn ($slot) => $meals->has($cellKey($day, $slot)) ? $minutesOf($meals->get($cellKey($day, $slot))->recipe) : 0);
+        $hm = fn (int $min) => $min >= 60 ? intdiv($min, 60).'h'.($min % 60 ? ' '.($min % 60).'m' : '') : $min.' min';
+        $total = $days->count() * count($slots);
+        $weekMinutes = $days->sum(fn ($day) => $dayMinutes($day));
 
-        @if ($plans->isNotEmpty())
-            <select class="select select-sm ms-auto min-h-11 w-auto" wire:model.live="planId" aria-label="Week">
-                @foreach ($plans as $option)
-                    <option value="{{ $option->id }}">
-                        Week of {{ $option->week_start_date->format('j M Y') }} ({{ $option->status->value }})
-                    </option>
-                @endforeach
-            </select>
-        @endif
-    </div>
+        // The week's state, in the words the screen uses. A draft with meals in it is a suggestion to confirm.
+        $state = match (true) {
+            ! $plan => 'none',
+            $plan->status === \App\Enums\MealPlanStatus::Draft && $meals->isEmpty() => 'empty',
+            $plan->status === \App\Enums\MealPlanStatus::Draft => 'suggested',
+            $plan->status === \App\Enums\MealPlanStatus::Locked => 'locked',
+            default => 'completed',
+        };
+        $badge = [
+            'empty' => ['Draft', 'neutral'],
+            'suggested' => ['Suggested', 'primary'],
+            'locked' => ['Locked', 'neutral'],
+            'completed' => ['Done', 'neutral'],
+        ][$state] ?? null;
 
-    @if ($plan)
-        <p class="mb-4 text-sm text-base-content/70">
-            Mon {{ $plan->week_start_date->format('j M') }} – Fri {{ $plan->week_start_date->copy()->addDays(4)->format('j M Y') }}
-        </p>
-    @endif
+        // A past meal of a locked or completed week is eaten, skipped, or not logged yet; anything else has no mark.
+        $logState = function ($meal, $day) use ($loggable) {
+            if (! $loggable || $day->isFuture()) {
+                return null;
+            }
 
-    <div class="mb-6 flex flex-wrap items-center gap-2">
-        @if ($plan && $editable)
-            <button type="button" class="btn btn-outline btn-primary btn-sm min-h-11" wire:click="autoFill"
-                    wire:loading.attr="disabled" wire:target="autoFill">
-                <span wire:loading wire:target="autoFill" class="loading loading-spinner loading-xs"></span>
-                Auto-fill empty slots
-            </button>
-            <button type="button" class="btn btn-primary btn-sm min-h-11" wire:click="lock"
-                    wire:confirm="Lock this week? It becomes read-only for both of you."
-                    wire:loading.attr="disabled" wire:target="lock">
-                <span wire:loading wire:target="lock" class="loading loading-spinner loading-xs"></span>
-                Lock week
-            </button>
-        @endif
+            return $meal->logs->isEmpty() ? 'open' : ($meal->logs->contains('ate_it', true) ? 'ate' : 'skipped');
+        };
+    @endphp
 
-        @if ($plan && $completable)
-            <button type="button" class="btn btn-success btn-sm min-h-11" wire:click="markCompleted"
-                    wire:confirm="Mark this week as completed?"
-                    wire:loading.attr="disabled" wire:target="markCompleted">
-                <span wire:loading wire:target="markCompleted" class="loading loading-spinner loading-xs"></span>
-                Mark completed
-            </button>
-        @endif
-
-        @if ($plan && ! $editable)
-            <a class="btn btn-primary btn-sm min-h-11" href="{{ route('plan.shopping-list', $plan) }}">
-                Shopping list
-            </a>
-        @endif
-
-        <button type="button" class="btn btn-ghost btn-sm min-h-11 border border-base-300" wire:click="createNextWeek"
-                wire:loading.attr="disabled" wire:target="createNextWeek">
-            <span wire:loading wire:target="createNextWeek" class="loading loading-spinner loading-xs"></span>
-            Create next week
-        </button>
-    </div>
+    <x-ui.page-header
+        :title="$plan ? 'Week of '.$plan->week_start_date->format('j M') : 'Plan'"
+        :subtitle="$plan ? 'Mon '.$plan->week_start_date->format('j M').' – Fri '.$plan->week_start_date->copy()->addDays(4)->format('j M Y').' · '.$meals->count().' of '.$total.' meals'.($weekMinutes ? ' · '.$hm($weekMinutes).' of cooking' : '') : null"
+    >
+        <x-slot:actions>
+            @if ($badge)
+                <x-ui.badge :tone="$badge[1]">{{ $badge[0] }}</x-ui.badge>
+            @endif
+            @if ($plans->isNotEmpty())
+                <div class="flex items-center gap-1">
+                    @if ($prevPlan)
+                        <x-ui.button square label="Previous week" icon="tabler-chevron-left" wire:click="$set('planId', {{ $prevPlan->id }})" />
+                    @else
+                        <x-ui.button square label="Previous week" icon="tabler-chevron-left" disabled />
+                    @endif
+                    <select class="select min-h-11 w-auto sm:min-h-9" wire:model.live="planId" aria-label="Week">
+                        @foreach ($plans as $option)
+                            <option value="{{ $option->id }}">
+                                Week of {{ $option->week_start_date->format('j M Y') }} ({{ $option->status->value }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @if ($nextPlan)
+                        <x-ui.button square label="Next week" icon="tabler-chevron-right" wire:click="$set('planId', {{ $nextPlan->id }})" />
+                    @else
+                        <x-ui.button square label="Next week" icon="tabler-chevron-right" disabled />
+                    @endif
+                </div>
+            @endif
+            <x-ui.button icon="tabler-plus" wire:click="createNextWeek" busy="createNextWeek">Plan next week</x-ui.button>
+        </x-slot:actions>
+    </x-ui.page-header>
 
     @if ($publishWarning)
-        <div class="alert alert-warning mb-4" role="alert">{{ $publishWarning }}</div>
+        <x-ui.alert tone="warning" class="mb-4">{{ $publishWarning }}</x-ui.alert>
     @endif
 
     @if (! $plan)
-        <div class="rounded-box border border-base-300 bg-base-200 px-6 py-12 text-center">
-            <p class="font-display text-xl font-semibold">Nothing planned yet</p>
-            <p class="mt-1 text-sm text-base-content/70">No meal plans yet. Create next week's draft to get started.</p>
-        </div>
+        <x-ui.card>
+            <x-ui.empty-state title="Nothing planned yet" icon="tabler-calendar">
+                No meal plans yet. Create next week's draft to get started.
+            </x-ui.empty-state>
+        </x-ui.card>
     @else
         @if ($breakfastsOftenSkipped)
-            <div class="alert alert-info alert-soft mb-4 py-2 text-sm" role="status">
-                Breakfasts often skipped — picking faster ones.
-            </div>
+            <x-ui.alert class="mb-4">Breakfasts often skipped — picking faster ones.</x-ui.alert>
         @endif
 
-        @php
-            $cellKey = fn ($day, $slot) => $day->toDateString().'|'.$slot->value;
-            $openCell = $pickerDate && $pickerSlot ? $pickerDate.'|'.$pickerSlot : null;
-            $minutesOf = fn ($recipe) => (int) $recipe->prep_minutes + (int) $recipe->cook_minutes;
-            // The pinned meal column: its shadows paint over the gutter and the gap beside it, so scrolled days never peek out.
-            $pin = 'sticky left-0 z-10 bg-base-100 shadow-[-1.5rem_0_0_var(--color-base-100),0.5rem_0_0_var(--color-base-100)]';
-        @endphp
+        @include('livewire.partials.week-notice')
 
-        <p class="mb-2 text-sm text-base-content/70">{{ $meals->count() }} of {{ $days->count() * count($slots) }} meals planned</p>
-
-        {{-- Meals by days. On phones the meal column stays put and the days
-             scroll sideways, snapping to whole days. The scroll padding is
-             the gutter, the meal column and two cell gaps, so a snapped day
-             starts just right of the meal column. --}}
-        <div class="-mx-4 snap-x snap-mandatory scroll-ps-[6.25rem] overflow-x-auto px-4 pb-2 lg:mx-0 lg:overflow-visible lg:px-0">
-            <table class="w-full min-w-[calc(4.5rem+5*9.5rem)] table-fixed border-separate border-spacing-1.5">
-                <colgroup><col class="w-18"></colgroup>
-                <thead>
+        {{-- Desktop: the ledger, a row per day. --}}
+        <x-ui.card flush class="hidden lg:block">
+            <x-ui.table class="table-fixed" aria-label="Meals by day">
+                <x-slot:head>
                     <tr>
-                        <th class="{{ $pin }}"><span class="sr-only">Meal</span></th>
-                        @foreach ($days as $day)
-                            <th scope="col" class="snap-start text-left text-sm font-semibold {{ $day->isToday() ? 'text-primary' : '' }}">
-                                {{ $day->format('D') }} <span class="font-normal text-base-content/70">{{ $day->format('j M') }}</span>
-                            </th>
+                        <x-ui.table.th class="w-36">Day</x-ui.table.th>
+                        @foreach ($slots as $slot)
+                            <x-ui.table.th class="border-s border-base-300">
+                                <span class="flex items-center gap-2"><span class="size-2 shrink-0 rounded-full" style="background: var(--meal-{{ $slot->value }})" aria-hidden="true"></span>{{ $slot->value }}</span>
+                            </x-ui.table.th>
                         @endforeach
+                        <x-ui.table.th numeric class="w-28 border-s border-base-300">Cook</x-ui.table.th>
+                        {{-- Ticket 10: the "Looks good" tick column goes here, on a suggested draft only. --}}
                     </tr>
-                </thead>
+                </x-slot:head>
                 <tbody>
-                    @foreach ($slots as $slot)
-                        <tr style="--slot-accent: var(--meal-{{ $slot->value }})">
-                            <th scope="row" class="slot-label {{ $pin }} pe-1 text-left text-xs font-semibold tracking-widest uppercase">{{ $slot->value }}</th>
-                            @foreach ($days as $day)
-                                @php
-                                    $meal = $meals->get($cellKey($day, $slot));
-                                    $label = $slot->value.' '.$day->format('l');
-                                    $open = $openCell === $cellKey($day, $slot);
-                                    $tile = 'flex h-24 w-full flex-col justify-between gap-1 rounded-box p-2 text-left transition '.($open ? 'ring-2 ring-primary ring-offset-2 ring-offset-base-100 ' : '');
-                                @endphp
-                                <td class="align-top">
-                                    @if ($meal)
-                                        @php
-                                            $minutes = $minutesOf($meal->recipe);
-                                            $facts = collect([$minutes > 0 ? $minutes.' min' : null, $meal->recipe->cuisine ? \Illuminate\Support\Str::ucfirst($meal->recipe->cuisine) : null])->filter()->implode(' · ');
-                                        @endphp
-                                        @if ($editable || ($loggable && $day->lte(today())))
-                                            <button type="button" class="slot-tile {{ $tile }}" aria-label="{{ $label }}: {{ $meal->recipe->title }}"
-                                                    wire:click="{{ $editable ? 'openPicker' : 'openMeal' }}('{{ $day->toDateString() }}', '{{ $slot->value }}')">
-                                                <span class="line-clamp-3 text-sm leading-tight font-semibold">{{ $meal->recipe->title }}</span>
-                                                <span class="truncate text-xs text-base-content/70">{{ $facts }}</span>
-                                            </button>
-                                        @else
-                                            <a href="{{ route('recipes.show', $meal->recipe) }}" class="slot-tile {{ $tile }} hover:brightness-95">
-                                                <span class="line-clamp-3 text-sm leading-tight font-semibold">{{ $meal->recipe->title }}</span>
-                                                <span class="truncate text-xs text-base-content/70">{{ $facts }}</span>
-                                            </a>
-                                        @endif
-                                    @elseif ($editable)
-                                        <button type="button" class="{{ $tile }} items-center justify-center border border-dashed border-base-300 text-xl text-base-content/70 hover:border-base-content/70"
-                                                wire:click="openPicker('{{ $day->toDateString() }}', '{{ $slot->value }}')"
-                                                aria-label="Add {{ $label }}"><x-tabler-plus class="size-4" /></button>
-                                    @else
-                                        <div class="grid h-24 place-items-center rounded-box border border-dashed border-base-300 text-base-content/70">—</div>
-                                    @endif
+                    @foreach ($days as $day)
+                        <x-ui.table.row wire:key="day-{{ $day->toDateString() }}" class="{{ $day->isToday() ? 'bg-primary/5' : '' }}">
+                            <th scope="row" class="px-4 py-2.5 text-start align-top font-medium {{ $day->isToday() ? 'text-primary' : '' }}">
+                                {{ $day->format('D j M') }}
+                                @if ($day->isToday())<span class="block text-xs font-normal">Today</span>@endif
+                            </th>
+                            @foreach ($slots as $slot)
+                                <td class="h-14 border-s border-base-300 p-0! align-top">
+                                    @include('livewire.partials.week-cell', ['class' => 'flex size-full min-h-14 flex-col justify-between gap-0.5 px-4 py-2.5 text-start hover:bg-base-200'])
                                 </td>
                             @endforeach
-                        </tr>
+                            <td class="num border-s border-base-300 align-top text-base-content/70">{{ $dayMinutes($day) ? $hm($dayMinutes($day)) : '—' }}</td>
+                        </x-ui.table.row>
                     @endforeach
-                    <tr>
-                        <th scope="row" class="{{ $pin }} pe-1 text-left text-xs font-semibold tracking-widest text-base-content/70 uppercase">Cook time</th>
-                        @foreach ($days as $day)
-                            @php
-                                $dayMinutes = collect($slots)->sum(fn ($slot) => $meals->has($cellKey($day, $slot)) ? $minutesOf($meals->get($cellKey($day, $slot))->recipe) : 0);
-                            @endphp
-                            <td class="px-2 text-xs text-base-content/70">{{ $dayMinutes > 0 ? $dayMinutes.' min' : '—' }}</td>
-                        @endforeach
-                    </tr>
                 </tbody>
-            </table>
-        </div>
+            </x-ui.table>
+        </x-ui.card>
+
+        {{-- Phone: the same ledger as a grouped list, a day per group. --}}
+        <x-ui.card flush class="overflow-hidden lg:hidden">
+            @foreach ($days as $day)
+                <div wire:key="day-list-{{ $day->toDateString() }}" class="border-b border-base-300 last:border-b-0">
+                    <div class="flex min-h-11 items-center gap-2 bg-base-200 px-4 font-medium">
+                        <span class="{{ $day->isToday() ? 'text-primary' : '' }}">{{ $day->format('D j M') }}</span>
+                        @if ($day->isToday())<x-ui.badge>Today</x-ui.badge>@endif
+                        <span class="num ms-auto text-base-content/70">{{ $dayMinutes($day) ? $hm($dayMinutes($day)) : '' }}</span>
+                        {{-- Ticket 10: the day's "Looks good" tick goes here, on a suggested draft only. --}}
+                    </div>
+                    @foreach ($slots as $slot)
+                        <div class="flex min-h-11 items-stretch border-t border-base-300">
+                            <span class="flex w-10 shrink-0 items-center justify-center"><span class="size-2 shrink-0 rounded-full" style="background: var(--meal-{{ $slot->value }})"></span><span class="sr-only">{{ ucfirst($slot->value) }}</span></span>
+                            @include('livewire.partials.week-cell', ['class' => 'flex min-h-11 flex-1 items-center justify-between gap-3 py-2 pe-4 text-start [&>span:last-child]:shrink-0'])
+                        </div>
+                    @endforeach
+                </div>
+            @endforeach
+        </x-ui.card>
 
         {{-- The tray: recipes to pick on a draft week, the meal to log on a locked one.
              It sits above the phone tab bar. --}}

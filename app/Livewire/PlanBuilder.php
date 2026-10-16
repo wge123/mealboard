@@ -22,7 +22,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.app', ['width' => 'wide'])]
 #[Title('Plan')]
 class PlanBuilder extends Component
 {
@@ -167,7 +167,7 @@ class PlanBuilder extends Component
 
     public function render(): View
     {
-        $plan = $this->plan()?->load('plannedMeals.recipe');
+        $plan = $this->plan()?->load('plannedMeals.recipe', 'plannedMeals.logs');
 
         $meals = $plan
             ? $plan->plannedMeals->keyBy(fn (PlannedMeal $meal) => $meal->date->toDateString().'|'.$meal->slot->value)
