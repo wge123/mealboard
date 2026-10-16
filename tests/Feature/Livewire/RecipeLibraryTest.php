@@ -3,6 +3,7 @@
 use App\Enums\MealType;
 use App\Enums\RecipeStatus;
 use App\Livewire\RecipeLibrary;
+use App\Models\Ingredient;
 use App\Models\KitchenToolKind;
 use App\Models\MealLog;
 use App\Models\PlannedMeal;
@@ -299,4 +300,110 @@ it('keeps the old chip rows out of the page', function () {
     library()
         ->assertDontSeeHtml('aria-label="Meal and time"')
         ->assertDontSeeHtml('aria-label="Cuisine and tags"');
+});
+
+// --- Table view (desktop) ---------------------------------------------------
+
+it('opens on the shelves unless the address asks for the table', function () {
+    Recipe::factory()->approved()->create(['title' => 'Overnight Oats']);
+
+    library()->assertSet('view', 'shelves')->assertDontSeeHtml('data-test="library-table"');
+
+    Livewire::withQueryParams(['view' => 'table'])
+        ->actingAs(User::factory()->create())
+        ->test(RecipeLibrary::class)
+        ->assertSet('view', 'table')
+        ->assertSeeHtml('data-test="library-table"')
+        ->assertSee('Overnight Oats');
+});
+
+it('writes the view and the sort to the address', function () {
+    Recipe::factory()->approved()->create();
+
+    $component = library()->set('view', 'table');
+    expect($component->effects['url'] ?? [])->toHaveKey('view');
+
+    $component->call('sortBy', 'time');
+    expect($component->effects['url'])->toMatchArray(['sort' => 'time', 'dir' => 'asc']);
+});
+
+it('keeps the phone on the shelves while the table is chosen', function () {
+    Recipe::factory()->approved()->create(['title' => 'Overnight Oats', 'meal_type' => MealType::Breakfast]);
+
+    library()->set('view', 'table')
+        ->assertSeeHtml('data-test="library-table"')
+        ->assertSeeHtml('data-test="shelf-breakfast"');
+});
+
+it('lists the filtered recipes in the table, grouped by the current group-by', function () {
+    Recipe::factory()->approved()->create(['title' => 'Overnight Oats', 'meal_type' => MealType::Breakfast, 'cuisine' => 'scottish']);
+    Recipe::factory()->approved()->create(['title' => 'Steak Frites', 'meal_type' => MealType::Dinner, 'cuisine' => 'french']);
+    Recipe::factory()->approved()->create(['title' => 'Moules Frites', 'meal_type' => MealType::Dinner, 'cuisine' => 'french']);
+
+    $component = library()->set('view', 'table');
+    $table = fn () => (string) str($component->html())->after('data-test="library-table"')->before('</table>');
+
+    expect($table())->toContain('Breakfast', 'Overnight Oats', 'Dinner', 'Steak Frites', 'Moules Frites');
+
+    $component->set('groupBy', 'cuisine');
+    expect($table())->toContain('French', 'Scottish');
+
+    $component->set('cuisines', ['french']);
+    expect($table())->toContain('Steak Frites')->not->toContain('Overnight Oats')->not->toContain('Scottish');
+});
+
+it('sorts every table column both ways', function (string $column, array $expectedAscending) {
+    $quick = Recipe::factory()->approved()->create(['title' => 'Quick Soup', 'meal_type' => MealType::Dinner, 'cuisine' => 'british', 'prep_minutes' => 5, 'cook_minutes' => 5]);
+    $slow = Recipe::factory()->approved()->create(['title' => 'Slow Roast', 'meal_type' => MealType::Dinner, 'cuisine' => 'french', 'prep_minutes' => 20, 'cook_minutes' => 90]);
+    Recipe::factory()->unshaped()->approved()->create(['title' => 'Plain Rice', 'meal_type' => MealType::Dinner, 'cuisine' => 'asian', 'prep_minutes' => 5, 'cook_minutes' => 20]);
+    rateRecipe($slow, 5);
+    rateRecipe($quick, 2);
+    $slow->ingredients()->attach(Ingredient::factory()->count(3)->create()->pluck('id'), ['qty' => 1, 'unit' => 'count', 'note' => null]);
+    $quick->ingredients()->attach(Ingredient::factory()->create()->id, ['qty' => 1, 'unit' => 'count', 'note' => null]);
+    KitchenToolKind::where('name', 'skillet')->update(['owned' => false]);
+
+    $component = library()->set('view', 'table');
+    $order = fn () => collect(['Quick Soup', 'Slow Roast', 'Plain Rice'])
+        ->sortBy(fn (string $title) => strpos((string) str($component->html())->after('data-test="library-table"'), $title))
+        ->values()->all();
+
+    $component->call('sortBy', $column);
+    expect($order())->toBe($expectedAscending);
+
+    $component->call('sortBy', $column);
+    expect($order())->toBe(array_reverse($expectedAscending));
+})->with([
+    'recipe' => ['title', ['Plain Rice', 'Quick Soup', 'Slow Roast']],
+    'cuisine' => ['cuisine', ['Plain Rice', 'Quick Soup', 'Slow Roast']],
+    'time' => ['time', ['Quick Soup', 'Plain Rice', 'Slow Roast']],
+    'rating' => ['rating', ['Plain Rice', 'Quick Soup', 'Slow Roast']],
+    'ingredients' => ['ingredients', ['Plain Rice', 'Quick Soup', 'Slow Roast']],
+    'kitchen tools' => ['tools', ['Plain Rice', 'Quick Soup', 'Slow Roast']],
+]);
+
+it('sorts the meal column in the order of the day', function () {
+    Recipe::factory()->approved()->create(['title' => 'Steak Frites', 'meal_type' => MealType::Dinner]);
+    Recipe::factory()->approved()->create(['title' => 'Overnight Oats', 'meal_type' => MealType::Breakfast]);
+    Recipe::factory()->approved()->create(['title' => 'Club Sandwich', 'meal_type' => MealType::Lunch]);
+
+    library()->set('view', 'table')->set('groupBy', 'rating')
+        ->call('sortBy', 'meal')
+        ->assertSeeInOrder(['Overnight Oats', 'Club Sandwich', 'Steak Frites'])
+        ->call('sortBy', 'meal')
+        ->assertSeeInOrder(['Steak Frites', 'Club Sandwich', 'Overnight Oats']);
+});
+
+it('marks the sorted column and its direction for assistive tech', function () {
+    Recipe::factory()->approved()->create();
+
+    library()->set('view', 'table')
+        ->assertSeeHtml('aria-sort="ascending"')
+        ->call('sortBy', 'time')
+        ->assertSeeHtml('aria-sort="ascending"')
+        ->call('sortBy', 'time')
+        ->assertSeeHtml('aria-sort="descending"');
+});
+
+it('refuses to sort by a column the table does not have', function () {
+    library()->call('sortBy', 'password')->assertStatus(422);
 });
