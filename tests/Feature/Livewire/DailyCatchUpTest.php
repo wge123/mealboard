@@ -79,3 +79,23 @@ it('shows the empty state when everything is logged', function () {
         ->assertSee('All caught up')
         ->assertSee('Nothing left to log from yesterday.');
 });
+
+it('shows yesterday\'s meals as one card of rows, each with the log switch', function () {
+    $plan = MealPlan::factory()->locked()->create([
+        'week_start_date' => now()->startOfWeek(CarbonInterface::MONDAY)->subWeeks(2)->toDateString(),
+    ]);
+    $yesterday = today()->subDay()->toDateString();
+
+    catchUpMeal($plan, $yesterday, 'breakfast', 'Row Porridge');
+    catchUpMeal($plan, $yesterday, 'dinner', 'Row Curry');
+
+    $html = Livewire::actingAs(User::factory()->create())
+        ->test(DailyCatchUp::class)
+        ->assertSee('Catch up on yesterday')
+        ->assertSee('2 meals to log')
+        ->assertSeeInOrder(['Row Porridge', 'Row Curry'])
+        ->html();
+
+    expect(substr_count($html, 'data-log-row'))->toBe(2)
+        ->and(substr_count($html, 'aria-label="Ate it?"'))->toBe(2);
+});

@@ -170,3 +170,30 @@ it('hides quick-log controls for future weeks and draft plans', function (MealPl
         'slot' => MealSlot::Dinner,
     ])),
 ]);
+
+it('offers an Ate it / Skipped switch whose pressed state follows the answer', function () {
+    $meal = lockedMeal();
+
+    logControls($meal)
+        ->assertSeeHtml('aria-label="Ate it?"')
+        ->assertSee('Ate it')
+        ->assertSee('Skipped')
+        ->assertDontSeeHtml('aria-label="Rating"')
+        ->assertDontSeeHtml('aria-label="Log note"')
+        ->call('setAte', false)
+        ->assertSeeHtmlInOrder(['aria-pressed="false"', 'Ate it', 'aria-pressed="true"', 'Skipped'])
+        ->assertSeeHtml('aria-label="Rating"')
+        ->assertSeeHtml('aria-label="Log note"')
+        ->call('setAte', true)
+        ->assertSeeHtmlInOrder(['aria-pressed="true"', 'Ate it', 'aria-pressed="false"', 'Skipped']);
+});
+
+it('fills the stars up to the rating', function () {
+    $meal = lockedMeal();
+
+    $html = logControls($meal)->call('setAte', true)->call('setRating', 3)->html();
+
+    expect(substr_count($html, 'aria-label="Rate '))->toBe(5)
+        ->and(substr_count($html, 'data-rating-star="on"'))->toBe(3)
+        ->and(substr_count($html, 'data-rating-star="off"'))->toBe(2);
+});
