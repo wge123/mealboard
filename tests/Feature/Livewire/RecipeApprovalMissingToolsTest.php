@@ -72,6 +72,7 @@ it('offers to mark a known kind owned and clears the flag', function () {
         ->test(RecipeApproval::class)
         ->assertSee('needs: wok')
         ->assertSee('Mark Wok as owned')
+        ->assertSeeHtml('wire:click="markToolOwned('.$wok->id.')"')
         ->call('markToolOwned', $wok->id)
         ->assertDontSee('needs:');
 
