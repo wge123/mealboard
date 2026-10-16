@@ -10,7 +10,8 @@
         "chrome-php/chrome": "^1.16",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
-        "livewire/livewire": "^3.0"
+        "livewire/livewire": "^3.0",
+        "secondnetwork/blade-tabler-icons": "^3.49"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
