@@ -279,5 +279,29 @@
                 </div>
             </div>
         </x-ui.card>
+        <x-ui.card title="Summary row" count="closed, open" flush>
+            <x-ui.summary-row id="kit-time" label="Weekday time limit" value="30" suffix="min" help="Prep and cook, in total.">
+                <div class="flex flex-wrap gap-2">
+                    @foreach ([15, 20, 30, 45, 60] as $minutes)
+                        <x-ui.chip :pressed="$minutes === 30" class="tabular-nums">{{ $minutes }}</x-ui.chip>
+                    @endforeach
+                    <x-ui.chip class="border-dashed">Other</x-ui.chip>
+                </div>
+            </x-ui.summary-row>
+            <x-ui.summary-row id="kit-size" label="Household size" value="2" suffix="people" help="How many people you cook for." open>
+                <div class="flex flex-wrap gap-2">
+                    @foreach ([1, 2, 3, 4] as $size)
+                        <x-ui.chip :pressed="$size === 2" class="tabular-nums">{{ $size }}</x-ui.chip>
+                    @endforeach
+                </div>
+            </x-ui.summary-row>
+            <x-slot:footer>
+                Tap a row to open it in place. Below: the ink tone of the chip, used for avoided ingredients.
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <x-ui.chip tone="ink" pressed icon="tabler-x">Cilantro</x-ui.chip>
+                    <x-ui.chip tone="ink" icon="tabler-plus">Olive</x-ui.chip>
+                </div>
+            </x-slot:footer>
+        </x-ui.card>
     </div>
 @endsection
