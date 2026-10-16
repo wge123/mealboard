@@ -1,9 +1,10 @@
-{{-- Kit: one option of a segmented toggle. Reads `busy` from the group. --}}
+{{-- Kit: one option of a segmented toggle. Reads `busy` from the group. `tone="primary"` paints the pressed option herb green. --}}
 @aware(['busy' => null])
-@props(['pressed' => false])
+@props(['pressed' => false, 'tone' => null])
 
 @php
-    $state = $pressed ? 'bg-base-100 text-base-content ring-1 ring-base-300' : 'text-base-content/70 hover:text-base-content';
+    $pressedState = $tone === 'primary' ? 'bg-primary text-primary-content' : 'bg-base-100 text-base-content ring-1 ring-base-300';
+    $state = $pressed ? $pressedState : 'text-base-content/70 hover:text-base-content';
     $busyAttributes = $busy ? ['wire:loading.attr' => 'disabled', 'wire:target' => $busy] : [];
 @endphp
 

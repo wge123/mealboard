@@ -1,27 +1,23 @@
 {{-- Single column, capped width: comfortable one-thumb logging on a phone. --}}
 <div class="mx-auto w-full max-w-md">
-    <h1 class="font-display text-2xl font-semibold tracking-tight">Catch up on yesterday</h1>
-    <p class="mt-1 mb-4 text-sm text-base-content/70">{{ $yesterday->format('l j M') }} — meals you haven't logged yet.</p>
+    <x-ui.page-header title="Catch up on yesterday"
+                      :subtitle="$yesterday->format('l j M').($meals->isEmpty() ? '' : ' · '.$meals->count().' '.\Illuminate\Support\Str::plural('meal', $meals->count()).' to log')" />
 
     @if ($meals->isEmpty())
-        <div class="rounded-box border border-base-300 bg-base-200 px-6 py-14 text-center">
-            <x-tabler-confetti class="mx-auto size-12 text-primary" />
-            <p class="mt-4 font-display text-2xl font-semibold">All caught up</p>
-            <p class="mt-1 text-sm text-base-content/70">Nothing left to log from yesterday.</p>
-        </div>
+        <x-ui.card>
+            <x-ui.empty-state title="All caught up" icon="tabler-circle-check">Nothing left to log from yesterday.</x-ui.empty-state>
+        </x-ui.card>
     @else
-        <div class="flex flex-col gap-3">
+        <x-ui.card flush class="divide-y divide-base-300 overflow-hidden">
             @foreach ($meals as $meal)
-                <div class="slot-row rounded-box border-y border-r border-base-300 bg-base-100 p-4"
-                     style="--slot-accent: var(--meal-{{ $meal->slot->value }})">
-                    <div class="slot-label text-xs font-semibold tracking-widest uppercase">{{ $meal->slot->value }}</div>
-                    <a href="{{ route('recipes.show', $meal->recipe) }}"
-                       class="mt-0.5 block font-display text-lg leading-snug font-semibold hover:text-primary">
-                        {{ $meal->recipe->title }}
-                    </a>
+                <div class="px-4 py-3" data-log-row>
+                    <div class="flex items-center gap-1.5 text-xs font-medium tracking-wide text-base-content/70 uppercase">
+                        <span class="size-2 rounded-full" style="background: var(--meal-{{ $meal->slot->value }})"></span>{{ $meal->slot->value }}
+                    </div>
+                    <a href="{{ route('recipes.show', $meal->recipe) }}" class="mt-0.5 block font-semibold hover:text-primary">{{ $meal->recipe->title }}</a>
                     <livewire:meal-log-controls :planned-meal="$meal" :key="'catchup-'.$meal->id" />
                 </div>
             @endforeach
-        </div>
+        </x-ui.card>
     @endif
 </div>

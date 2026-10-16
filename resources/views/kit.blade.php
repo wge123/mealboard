@@ -303,5 +303,12 @@
                 </div>
             </x-slot:footer>
         </x-ui.card>
+
+        <x-ui.card title="Segmented toggle, green" count="tone=primary">
+            <x-ui.segmented label="Outcome (green)">
+                <x-ui.segmented.option tone="primary" pressed><x-tabler-check class="size-3.5" /> Ate it</x-ui.segmented.option>
+                <x-ui.segmented.option tone="primary"><x-tabler-x class="size-3.5" /> Skipped</x-ui.segmented.option>
+            </x-ui.segmented>
+        </x-ui.card>
     </div>
 @endsection
