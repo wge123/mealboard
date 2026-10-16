@@ -48,3 +48,23 @@ it('shows an icon instead of a checkbox when it has one', function () {
 it('needs an id to bind a checkbox to its label', function () {
     Blade::render('<x-ui.checklist-line label="Salt" />');
 })->throws(ViewException::class);
+
+it('puts a leading glyph between the checkbox and the name, inside the label that ticks the box', function () {
+    $html = Blade::render(<<<'BLADE'
+        <x-ui.checklist-line id="a" label="Wok">
+            <x-slot:leading><svg data-test="glyph"></svg></x-slot:leading>
+        </x-ui.checklist-line>
+    BLADE);
+
+    expect(strpos($html, 'type="checkbox"'))->toBeLessThan(strpos($html, 'data-test="glyph"'))
+        ->and(strpos($html, 'data-test="glyph"'))->toBeLessThan(strpos($html, 'Wok'))
+        ->and(strpos($html, 'data-test="glyph"'))->toBeLessThan(strpos($html, '</label>'));
+});
+
+it('flags a warning count so the screen can mark a need that is not met', function () {
+    $warn = Blade::render('<x-ui.checklist-line id="a" label="Wok" :count="3" count-label="used in 3 recipes" warn />');
+    $calm = Blade::render('<x-ui.checklist-line id="a" label="Wok" :count="3" count-label="used in 3 recipes" />');
+
+    expect($warn)->toContain('data-warning')
+        ->and($calm)->not->toContain('data-warning');
+});
