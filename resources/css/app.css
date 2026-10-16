@@ -139,16 +139,6 @@
         line-height: var(--text-sm--line-height);
     }
 
-    /* Inputs are 16px on phones so iOS never zooms, 14px from sm up. */
-    input:not([type='checkbox'], [type='radio'], [type='range']),
-    select,
-    textarea {
-        font-size: var(--text-base);
-        @media (min-width: 40rem) {
-            font-size: var(--text-sm);
-        }
-    }
-
     /* Alpine: hide x-cloak'd elements until Alpine initializes them. */
     [x-cloak] {
         display: none !important;
@@ -164,6 +154,17 @@
             animation-iteration-count: 1 !important;
             transition-duration: 0.01ms !important;
             scroll-behavior: auto !important;
+        }
+    }
+}
+
+/* Inputs are 16px on phones so iOS never zooms, 14px from sm up. This sits in the utilities layer: daisyUI's .input
+   (components layer) sets its own font-size and beats anything in base. */
+@layer utilities {
+    :where(input:not([type='checkbox'], [type='radio'], [type='range']), select, textarea) {
+        font-size: var(--text-base);
+        @media (min-width: 40rem) {
+            font-size: var(--text-sm);
         }
     }
 }
