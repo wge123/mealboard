@@ -79,6 +79,20 @@ class PlanBuilder extends Component
         $this->publishWarning = $lockWeek->publishWarning;
     }
 
+    /** Tick or untick "Looks good" on a day of a suggested week; saved on the week for the whole household. */
+    public function toggleReviewed(string $date): void
+    {
+        $plan = $this->editablePlan();
+
+        abort_unless($this->weekDates($plan)->contains($date), 422);
+
+        $reviewed = collect($plan->reviewed_dates ?? []);
+
+        $plan->update(['reviewed_dates' => $reviewed->contains($date)
+            ? $reviewed->reject(fn (string $d) => $d === $date)->values()->all()
+            : $reviewed->push($date)->values()->all()]);
+    }
+
     public function markCompleted(): void
     {
         $plan = $this->plan();

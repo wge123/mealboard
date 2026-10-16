@@ -22,6 +22,7 @@ class MealPlan extends Model
         'locked_by',
         'checked_items',
         'purchased_at',
+        'reviewed_dates',
     ];
 
     /**
@@ -35,6 +36,7 @@ class MealPlan extends Model
             'locked_at' => 'datetime',
             'checked_items' => 'array',
             'purchased_at' => 'datetime',
+            'reviewed_dates' => 'array',
         ];
     }
 

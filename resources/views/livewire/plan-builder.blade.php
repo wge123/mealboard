@@ -11,6 +11,9 @@
         $dayMinutes = fn ($day) => collect($slots)->sum(fn ($slot) => $meals->has($cellKey($day, $slot)) ? $minutesOf($meals->get($cellKey($day, $slot))->recipe) : 0);
         $hm = fn (int $min) => $min >= 60 ? intdiv($min, 60).'h'.($min % 60 ? ' '.($min % 60).'m' : '') : $min.' min';
         $total = $days->count() * count($slots);
+        // Ticked days of a suggested week; only days still in the week count.
+        $reviewed = collect($plan?->reviewed_dates ?? [])->intersect($days->map->toDateString());
+        $allReviewed = $days->isNotEmpty() && $reviewed->count() === $days->count();
         $weekMinutes = $days->sum(fn ($day) => $dayMinutes($day));
 
         // The week's state, in the words the screen uses. A draft with meals in it is a suggestion to confirm.
@@ -100,7 +103,9 @@
                             </x-ui.table.th>
                         @endforeach
                         <x-ui.table.th numeric class="w-28 border-s border-base-300">Cook</x-ui.table.th>
-                        {{-- Ticket 10: the "Looks good" tick column goes here, on a suggested draft only. --}}
+                        @if ($state === 'suggested')
+                            <x-ui.table.th class="w-40 border-s border-base-300">Review</x-ui.table.th>
+                        @endif
                     </tr>
                 </x-slot:head>
                 <tbody>
@@ -116,6 +121,16 @@
                                 </td>
                             @endforeach
                             <td class="num border-s border-base-300 align-top text-base-content/70">{{ $dayMinutes($day) ? $hm($dayMinutes($day)) : '—' }}</td>
+                            @if ($state === 'suggested')
+                                <td class="border-s border-base-300 px-4 py-2 align-top">
+                                    <label class="flex min-h-9 cursor-pointer items-center gap-2">
+                                        <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                                               data-test="looks-good-{{ $day->toDateString() }}" @checked($reviewed->contains($day->toDateString()))
+                                               wire:click="toggleReviewed('{{ $day->toDateString() }}')">
+                                        <span class="{{ $reviewed->contains($day->toDateString()) ? '' : 'text-base-content/70' }}">Looks good</span>
+                                    </label>
+                                </td>
+                            @endif
                         </x-ui.table.row>
                     @endforeach
                 </tbody>
@@ -130,7 +145,15 @@
                         <span class="{{ $day->isToday() ? 'text-primary' : '' }}">{{ $day->format('D j M') }}</span>
                         @if ($day->isToday())<x-ui.badge>Today</x-ui.badge>@endif
                         <span class="num ms-auto text-base-content/70">{{ $dayMinutes($day) ? $hm($dayMinutes($day)) : '' }}</span>
-                        {{-- Ticket 10: the day's "Looks good" tick goes here, on a suggested draft only. --}}
+                        @if ($state === 'suggested')
+                            <label class="flex min-h-11 cursor-pointer items-center gap-1.5 ps-2 font-normal">
+                                <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                                       aria-label="{{ $day->format('l') }} looks good"
+                                       data-test="looks-good-phone-{{ $day->toDateString() }}" @checked($reviewed->contains($day->toDateString()))
+                                       wire:click="toggleReviewed('{{ $day->toDateString() }}')">
+                                <span class="text-base-content/70">OK</span>
+                            </label>
+                        @endif
                     </div>
                     @foreach ($slots as $slot)
                         <div class="flex min-h-11 items-stretch border-t border-base-300">
