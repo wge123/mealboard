@@ -1,116 +1,145 @@
+{{-- Insights: a report. Four headline stats in one divided card, then every list as a flush table in a card. No charts;
+     a rate gets a thin inline bar in its cell. Two tables per row on the computer, one column on the phone. --}}
+@php
+    $star = fn () => svg('tabler-star-filled', 'inline size-3.5 -translate-y-px text-primary');
+@endphp
 <div>
-    <h1 class="mb-5 font-display text-2xl font-semibold tracking-tight">Insights</h1>
+    <x-ui.page-header
+        title="Insights"
+        :subtitle="$coverage
+            ? 'From '.$totals['logs'].' logged '.str('meal')->plural($totals['logs']).' in '.$coverage['weeks'].' planned '.str('week')->plural($coverage['weeks']).' between '.$coverage['from']->format('j M').' and '.$coverage['to']->format('j M').'.'
+            : 'Nothing logged yet. Log meals from the plan and this page fills in.'"
+    />
 
-    {{-- Top-line stat cards. --}}
-    <div class="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <div class="rounded-box border border-base-300 bg-base-100 p-4">
-            <div class="text-xs font-medium tracking-wide uppercase text-base-content/70">Meals logged</div>
-            <div class="mt-1 font-display text-2xl font-semibold">{{ $totals['logs'] }}</div>
-        </div>
-        <div class="rounded-box border border-base-300 bg-base-100 p-4">
-            <div class="text-xs font-medium tracking-wide uppercase text-base-content/70">Ate rate</div>
-            <div class="mt-1 font-display text-2xl font-semibold">
-                {{ $totals['ateRate'] !== null ? $totals['ateRate'].'%' : '—' }}
+    <div class="flex flex-col gap-4">
+        <x-ui.card flush>
+            <dl class="grid grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-base-300 max-lg:[&>*]:border-base-300 max-lg:[&>*:nth-child(odd)]:border-e max-lg:[&>*:nth-child(-n+2)]:border-b">
+                <x-ui.stat label="Meals logged" :value="$totals['logs']"
+                           :hint="$coverage ? $coverage['weeks'].' '.str('week')->plural($coverage['weeks']) : null" />
+                <x-ui.stat label="Eaten" :value="$totals['ateRate']" suffix="%"
+                           :hint="$totals['ate'].' ate · '.$totals['skipped'].' skipped'" />
+                <x-ui.stat label="Average rating" :value="$totals['avgRating'] !== null ? number_format($totals['avgRating'], 1) : null" suffix=" / 5"
+                           :hint="$totals['rated'].' rated '.str('meal')->plural($totals['rated'])" />
+                <x-ui.stat label="Discoveries kept" :value="$discovered['keptRate']" suffix="%"
+                           :hint="$discovered['approved'].' kept · '.$discovered['rejected'].' passed'" />
+            </dl>
+        </x-ui.card>
+
+        @if ($coverage === null)
+            <x-ui.card>
+                <x-ui.empty-state title="No meals logged yet" icon="tabler-chart-bar-off">
+                    Once you mark planned meals as eaten or skipped, the tables show up here.
+                </x-ui.empty-state>
+            </x-ui.card>
+        @else
+            <div class="grid items-start gap-4 lg:grid-cols-2">
+                @foreach (['By meal' => [$slotRates, 'Meal'], 'By weekday' => [$weekdayRates, 'Day']] as $title => [$rows, $first])
+                    <x-ui.card :title="$title" flush>
+                        <x-ui.table head-on-phone>
+                            <x-slot:head>
+                                <tr class="bg-base-200">
+                                    <x-ui.table.th>{{ $first }}</x-ui.table.th>
+                                    <x-ui.table.th numeric>Ate</x-ui.table.th>
+                                    <x-ui.table.th numeric>Skipped</x-ui.table.th>
+                                    <x-ui.table.th class="w-2/5">Eaten</x-ui.table.th>
+                                </tr>
+                            </x-slot:head>
+                            <tbody>
+                                @foreach ($rows as $label => $row)
+                                    <x-ui.table.row wire:key="{{ Str::slug($title) }}-{{ $label }}">
+                                        <td class="font-medium">
+                                            @if ($title === 'By meal')
+                                                <span class="me-2 inline-block size-2 rounded-full" style="background: var(--meal-{{ $label }})" aria-hidden="true"></span>
+                                            @endif
+                                            {{ ucfirst($label) }}
+                                        </td>
+                                        <td class="num">{{ $row['ate'] }}</td>
+                                        <td class="num">{{ $row['skipped'] }}</td>
+                                        <td>@include('livewire.partials.rate-bar', ['rate' => $row['rate'], 'label' => $label.' eaten'])</td>
+                                    </x-ui.table.row>
+                                @endforeach
+                            </tbody>
+                        </x-ui.table>
+                    </x-ui.card>
+                @endforeach
+
+                <x-ui.card title="Top recipes" flush>
+                    @if ($topRecipes->isEmpty())
+                        <x-ui.empty-state title="No rated meals yet." />
+                    @else
+                        <x-ui.table head-on-phone>
+                            <x-slot:head>
+                                <tr class="bg-base-200">
+                                    <x-ui.table.th class="w-10">#</x-ui.table.th>
+                                    <x-ui.table.th>Recipe</x-ui.table.th>
+                                    <x-ui.table.th numeric>Rating</x-ui.table.th>
+                                    <x-ui.table.th numeric>Rated</x-ui.table.th>
+                                </tr>
+                            </x-slot:head>
+                            <tbody>
+                                @foreach ($topRecipes as $row)
+                                    <x-ui.table.row wire:key="top-{{ $row['id'] }}">
+                                        <td class="tabular-nums text-base-content/70">{{ $loop->iteration }}</td>
+                                        <td class="max-w-0 truncate"><a href="{{ route('recipes.show', $row['id']) }}" class="font-medium hover:text-primary">{{ $row['title'] }}</a></td>
+                                        <td class="num whitespace-nowrap">{{ $star() }} {{ number_format($row['avg'], 1) }}</td>
+                                        <td class="num text-base-content/70">{{ $row['count'] }}×</td>
+                                    </x-ui.table.row>
+                                @endforeach
+                            </tbody>
+                        </x-ui.table>
+                    @endif
+                </x-ui.card>
+
+                <x-ui.card title="Most skipped" flush>
+                    @if ($skippedRecipes->isEmpty())
+                        <x-ui.empty-state title="Nothing skipped yet." />
+                    @else
+                        <x-ui.table head-on-phone>
+                            <x-slot:head>
+                                <tr class="bg-base-200">
+                                    <x-ui.table.th>Recipe</x-ui.table.th>
+                                    <x-ui.table.th numeric>Skipped</x-ui.table.th>
+                                    <x-ui.table.th numeric>Planned</x-ui.table.th>
+                                </tr>
+                            </x-slot:head>
+                            <tbody>
+                                @foreach ($skippedRecipes as $row)
+                                    <x-ui.table.row wire:key="skipped-{{ $row['id'] }}">
+                                        <td class="max-w-0 truncate"><a href="{{ route('recipes.show', $row['id']) }}" class="font-medium hover:text-primary">{{ $row['title'] }}</a></td>
+                                        <td class="num">{{ $row['skipped'] }}</td>
+                                        <td class="num text-base-content/70">{{ $row['planned'] }}</td>
+                                    </x-ui.table.row>
+                                @endforeach
+                            </tbody>
+                        </x-ui.table>
+                    @endif
+                </x-ui.card>
+
+                <x-ui.card title="Cuisines" flush class="lg:col-span-2">
+                    <x-ui.table head-on-phone>
+                        <x-slot:head>
+                            <tr class="bg-base-200">
+                                <x-ui.table.th>Cuisine</x-ui.table.th>
+                                <x-ui.table.th numeric>Meals</x-ui.table.th>
+                                <x-ui.table.th class="w-1/3">Eaten</x-ui.table.th>
+                                <x-ui.table.th numeric>Rating</x-ui.table.th>
+                            </tr>
+                        </x-slot:head>
+                        <tbody>
+                            @foreach ($cuisines as $row)
+                                <x-ui.table.row wire:key="cuisine-{{ $row['cuisine'] }}">
+                                    <td class="font-medium">{{ $row['cuisine'] }}</td>
+                                    <td class="num">{{ $row['meals'] }}</td>
+                                    <td>@include('livewire.partials.rate-bar', ['rate' => $row['rate'], 'label' => $row['cuisine'].' eaten'])</td>
+                                    <td class="num whitespace-nowrap">
+                                        @if ($row['avg'] !== null){{ $star() }} {{ number_format($row['avg'], 1) }}@else<span class="text-base-content/70">—</span>@endif
+                                    </td>
+                                </x-ui.table.row>
+                            @endforeach
+                        </tbody>
+                    </x-ui.table>
+                </x-ui.card>
             </div>
-        </div>
-        <div class="rounded-box border border-base-300 bg-base-100 p-4">
-            <div class="text-xs font-medium tracking-wide uppercase text-base-content/70">Avg rating</div>
-            <div class="mt-1 font-display text-2xl font-semibold">
-                @if ($totals['avgRating'] !== null)
-                    {{ $totals['avgRating'] }} <x-tabler-star-filled class="inline size-5 text-primary" />
-                @else
-                    —
-                @endif
-            </div>
-        </div>
-        <div class="rounded-box border border-base-300 bg-base-100 p-4">
-            <div class="text-xs font-medium tracking-wide uppercase text-base-content/70">Rejection rate</div>
-            <div class="mt-1 font-display text-2xl font-semibold">
-                {{ $discovered['rate'] !== null ? $discovered['rate'].'%' : '—' }}
-            </div>
-            <div class="text-xs text-base-content/70">discovered recipes</div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
-        {{-- Ate vs skipped by slot: meal-accent progress bars. --}}
-        <section class="rounded-box border border-base-300 bg-base-100 p-4 lg:p-5">
-            <h2 class="font-display text-xl font-semibold">Ate vs skipped by slot</h2>
-            @forelse ($slotRates as $label => $row)
-                <div class="mt-3">
-                    <div class="flex items-baseline justify-between gap-2 text-sm">
-                        <span class="slot-label font-medium" style="--slot-accent: var(--meal-{{ $label }})">{{ ucfirst($label) }}</span>
-                        <span class="text-base-content/70">{{ $row['ate'] }} ate · {{ $row['skipped'] }} skipped · {{ $row['rate'] }}%</span>
-                    </div>
-                    {{-- daisyUI progress fills with currentColor; mix the meal accent toward base-content for contrast. --}}
-                    <progress class="progress mt-1 w-full"
-                              style="color: color-mix(in oklab, var(--meal-{{ $label }}) 70%, var(--color-base-content))"
-                              value="{{ $row['rate'] }}" max="100" aria-label="{{ ucfirst($label) }} ate rate"></progress>
-                </div>
-            @empty
-                <p class="mt-3 text-sm text-base-content/70">No meal logs yet.</p>
-            @endforelse
-        </section>
-
-        {{-- Ate vs skipped by weekday: neutral progress bars. --}}
-        <section class="rounded-box border border-base-300 bg-base-100 p-4 lg:p-5">
-            <h2 class="font-display text-xl font-semibold">Ate vs skipped by weekday</h2>
-            @forelse ($weekdayRates as $label => $row)
-                <div class="mt-3">
-                    <div class="flex items-baseline justify-between gap-2 text-sm">
-                        <span class="font-medium">{{ $label }}</span>
-                        <span class="text-base-content/70">{{ $row['ate'] }} ate · {{ $row['skipped'] }} skipped · {{ $row['rate'] }}%</span>
-                    </div>
-                    <progress class="progress mt-1 w-full" value="{{ $row['rate'] }}" max="100"
-                              aria-label="{{ $label }} ate rate"></progress>
-                </div>
-            @empty
-                <p class="mt-3 text-sm text-base-content/70">No meal logs yet.</p>
-            @endforelse
-        </section>
-
-        {{-- Top recipes by average rating. --}}
-        <section class="rounded-box border border-base-300 bg-base-100 p-4 lg:p-5">
-            <h2 class="font-display text-xl font-semibold">Top recipes by average rating</h2>
-            @if ($topRecipes->isEmpty())
-                <p class="mt-3 text-sm text-base-content/70">No rated meals yet.</p>
-            @else
-                <ol class="mt-2 divide-y divide-base-300">
-                    @foreach ($topRecipes as $row)
-                        <li class="flex min-h-11 items-center gap-3 py-2">
-                            <span class="w-7 shrink-0 text-center font-display text-lg font-semibold text-base-content/70">
-                                {{ $loop->iteration }}
-                            </span>
-                            <a href="{{ route('recipes.show', $row['id']) }}" class="min-w-0 flex-1 truncate font-medium hover:text-primary">
-                                {{ $row['title'] }}
-                            </a>
-                            <span class="flex shrink-0 text-primary">@foreach (range(1, 5) as $star)@if ($star <= (int) round($row['avg']))<x-tabler-star-filled class="size-4" />@else<x-tabler-star class="size-4 text-base-content/70" />@endif @endforeach</span>
-                            <span class="shrink-0 text-sm tabular-nums text-base-content/70">{{ $row['avg'] }}</span>
-                            <span class="badge badge-ghost badge-sm shrink-0">{{ $row['count'] }} log{{ $row['count'] === 1 ? '' : 's' }}</span>
-                        </li>
-                    @endforeach
-                </ol>
-            @endif
-        </section>
-
-        {{-- Discovered-recipe rejection rate: radial progress. --}}
-        <section class="rounded-box border border-base-300 bg-base-100 p-4 lg:p-5">
-            <h2 class="font-display text-xl font-semibold">Discovered-recipe rejection rate</h2>
-            @if ($discovered['rate'] === null)
-                <p class="mt-3 text-sm text-base-content/70">No discovery verdicts yet.</p>
-            @else
-                <div class="mt-4 flex items-center gap-5">
-                    <div class="radial-progress shrink-0 text-error"
-                         style="--value: {{ $discovered['rate'] }}; --size: 6rem; --thickness: 0.5rem;"
-                         role="progressbar" aria-valuenow="{{ $discovered['rate'] }}" aria-valuemin="0" aria-valuemax="100">
-                        <span class="font-display text-xl font-semibold">{{ $discovered['rate'] }}%</span>
-                    </div>
-                    <p class="text-sm leading-relaxed text-base-content/70">
-                        {{ $discovered['rejected'] }} rejected vs {{ $discovered['approved'] }} approved —
-                        <strong>{{ $discovered['rate'] }}% rejected</strong>
-                    </p>
-                </div>
-            @endif
-        </section>
+        @endif
     </div>
 </div>

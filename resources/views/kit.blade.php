@@ -310,5 +310,15 @@
                 <x-ui.segmented.option tone="primary"><x-tabler-x class="size-3.5" /> Skipped</x-ui.segmented.option>
             </x-ui.segmented>
         </x-ui.card>
+
+        <x-ui.card title="Stat" count="4 in one card, plus the empty value" flush>
+            <dl class="grid grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-base-300 max-lg:[&>*]:border-base-300 max-lg:[&>*:nth-child(odd)]:border-e max-lg:[&>*:nth-child(-n+2)]:border-b">
+                <x-ui.stat label="Meals logged" value="42" hint="6 weeks" />
+                <x-ui.stat label="Eaten" value="75" suffix="%" hint="31 ate · 11 skipped" />
+                <x-ui.stat label="Average rating" value="3.7" suffix=" / 5" hint="18 rated meals" />
+                <x-ui.stat label="Discoveries kept" :value="null" suffix="%" hint="0 kept · 0 passed" />
+            </dl>
+            <x-slot:footer>Label over a figure in tabular digits, an optional suffix and a one-line hint. A stat with no value shows a dash. No trend arrows.</x-slot:footer>
+        </x-ui.card>
     </div>
 @endsection
