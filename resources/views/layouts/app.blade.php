@@ -144,7 +144,7 @@
                     <x-tabler-circle-check class="size-6" />
                     <span class="text-xs font-medium">Approve</span>
                     @if ($pendingRecipeCount > 0)
-                        <x-ui.badge tone="primary" class="absolute start-1/2 top-1 ms-1.5 px-1.5">{{ $pendingRecipeCount }}</x-ui.badge>
+                        <x-ui.badge tone="primary" class="absolute start-1/2 top-1 ms-2 px-1.5">{{ $pendingRecipeCount }}</x-ui.badge>
                     @endif
                 </a>
 
