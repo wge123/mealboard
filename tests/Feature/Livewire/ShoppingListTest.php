@@ -229,7 +229,65 @@ it('renders the cart link without a checked line', function () {
     shoppingListPage($plan)
         ->call('toggleItem', 'chicken thighs|mass')
         ->assertSeeHtml('href="https://affil.walmart.com/cart/addToCart?items=44390949"')
-        ->assertSee('Add matched items to Walmart cart');
+        ->assertSee('Add 1 to Walmart cart');
+});
+
+it('counts only the matched buy-list lines on the cart button and drops the count with every check', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create(['ingredient_id' => $onion->id, 'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949']);
+    $chicken = Ingredient::factory()->create(['name' => 'chicken thighs', 'category' => IngredientCategory::Meat]);
+    WalmartMatch::factory()->create(['ingredient_id' => $chicken->id, 'product_url' => 'https://www.walmart.com/ip/chicken-thighs/10315356']);
+    $kale = Ingredient::factory()->create(['name' => 'kale', 'category' => IngredientCategory::Produce]);
+    $plan = lockedPlanWith([[$onion, 2, 'count'], [$chicken, 500, 'g'], [$kale, 1, 'count']]);
+
+    shoppingListPage($plan)
+        ->assertSee('Add 2 to Walmart cart')
+        ->call('toggleItem', 'chicken thighs|mass')
+        ->assertSee('Add 1 to Walmart cart')
+        ->assertDontSee('Add 2 to Walmart cart')
+        ->call('toggleItem', 'yellow onion|count')
+        ->assertDontSee('to Walmart cart');
+});
+
+it('shows done over total on each aisle group row', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    $kale = Ingredient::factory()->create(['name' => 'kale', 'category' => IngredientCategory::Produce]);
+    $milk = Ingredient::factory()->create(['name' => 'milk', 'category' => IngredientCategory::Dairy]);
+    $plan = lockedPlanWith([[$onion, 2, 'count'], [$kale, 1, 'count'], [$milk, 250, 'ml']]);
+
+    $page = shoppingListPage($plan)->assertSeeInOrder(['Produce', '0/2'])->assertSeeInOrder(['Dairy', '0/1']);
+
+    $page->call('toggleItem', 'kale|count')->assertSeeInOrder(['Produce', '1/2']);
+    $page->call('toggleItem', 'yellow onion|count')->assertSeeInOrder(['Produce', '2/2', 'Done']);
+});
+
+it('opens an inline paste row on an unmatched line only and saves the match from it', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create(['ingredient_id' => $onion->id, 'product_url' => 'https://www.walmart.com/ip/yellow-onion/44390949']);
+    $kale = Ingredient::factory()->create(['name' => 'kale', 'category' => IngredientCategory::Produce]);
+    $plan = lockedPlanWith([[$onion, 2, 'count'], [$kale, 1, 'count']]);
+
+    shoppingListPage($plan)
+        ->assertSee('Matched')
+        ->assertSee('Search')
+        ->assertSeeHtml('aria-label="Save a Walmart product for kale"')
+        ->assertDontSeeHtml('aria-label="Save a Walmart product for yellow onion"')
+        ->set('foundUrls.kale', 'https://www.walmart.com/ip/kale/1')
+        ->call('saveMatch', 'kale')
+        ->assertDontSeeHtml('aria-label="Save a Walmart product for kale"');
+
+    expect(WalmartMatch::count())->toBe(2);
+});
+
+it('shows the tick-then-cart subtitle and no prototype switcher', function () {
+    $flour = Ingredient::factory()->create(['name' => 'flour', 'category' => IngredientCategory::Pantry]);
+    $plan = lockedPlanWith([[$flour, 500, 'g']]);
+
+    $this->actingAs(User::factory()->create())
+        ->get("/plan/{$plan->id}/shopping-list?variant=A")
+        ->assertOk()
+        ->assertSee('Tick what you already have, then add the rest to your Walmart cart.')
+        ->assertDontSee('Aisle table');
 });
 
 it('warns when the week it shows is stale', function () {
