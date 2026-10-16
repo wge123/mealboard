@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\View\ViewException;
 
 it('renders a button with an href as an anchor and without one as a plain button', function () {
     $link = Blade::render('<x-ui.button href="/plan">Plan</x-ui.button>');
@@ -24,7 +25,7 @@ it('passes extra attributes through to the button', function () {
 
 it('refuses a square button that has no label', function () {
     Blade::render('<x-ui.button square icon="tabler-plus" />');
-})->throws(InvalidArgumentException::class);
+})->throws(ViewException::class);
 
 it('uses the label as the accessible name of a square button', function () {
     expect(Blade::render('<x-ui.button square icon="tabler-plus" label="Add recipe" />'))
@@ -64,7 +65,7 @@ it('gives an error or warning alert the alert role and an info alert the status 
 
 it('rejects an alert tone the kit does not have', function () {
     Blade::render('<x-ui.alert tone="success">Nope</x-ui.alert>');
-})->throws(InvalidArgumentException::class);
+})->throws(ViewException::class);
 
 it('renders the page header title as an h1 with pretitle, subtitle, back link and actions', function () {
     $html = Blade::render(<<<'BLADE'
@@ -120,4 +121,4 @@ it('renders a badge with its text and marks the dot decorative', function () {
 
 it('rejects a badge tone the kit does not have', function () {
     Blade::render('<x-ui.badge tone="purple">x</x-ui.badge>');
-})->throws(InvalidArgumentException::class);
+})->throws(ViewException::class);
