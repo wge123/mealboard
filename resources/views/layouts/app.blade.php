@@ -40,7 +40,6 @@
         $item = 'inline-flex min-h-11 items-center gap-2 rounded-field px-3 font-medium sm:min-h-9';
         $onShop = request()->routeIs('shop', 'plan.shopping-list');
         $onRecipes = request()->routeIs('recipes.index', 'recipes.show', 'recipes.create', 'recipes.request');
-        $themeButtons = ['light' => 'Light', 'dark' => 'Dark', 'system' => 'Auto'];
     @endphp
 
     {{-- Desktop: a slim sticky top bar (lg+ only; phones get the bottom tabs and no top bar). --}}
@@ -91,11 +90,7 @@
                             <div class="divider my-1"></div>
                             <div class="px-2 pb-1">
                                 <div class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/70">Theme</div>
-                                <div class="join w-full">
-                                    @foreach ($themeButtons as $key => $label)
-                                        <button type="button" class="btn join-item btn-sm min-h-11 flex-1 sm:min-h-9" :class="theme === '{{ $key }}' && 'btn-primary'" :aria-pressed="theme === '{{ $key }}'" @click="setTheme('{{ $key }}')">{{ $label }}</button>
-                                    @endforeach
-                                </div>
+                                <x-theme-switch />
                             </div>
                             <div class="divider my-1"></div>
                             <form method="POST" action="{{ route('logout') }}" class="px-2 pb-1">
@@ -180,11 +175,7 @@
                         <div class="divider my-1"></div>
                         <div class="px-2 pb-1">
                             <div class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/70">Theme</div>
-                            <div class="join w-full">
-                                @foreach ($themeButtons as $key => $label)
-                                    <button type="button" class="btn join-item btn-sm min-h-11 flex-1" :class="theme === '{{ $key }}' && 'btn-primary'" :aria-pressed="theme === '{{ $key }}'" @click="setTheme('{{ $key }}')">{{ $label }}</button>
-                                @endforeach
-                            </div>
+                            <x-theme-switch />
                         </div>
                         <div class="divider my-1"></div>
                         <form method="POST" action="{{ route('logout') }}" class="px-2 pb-1">

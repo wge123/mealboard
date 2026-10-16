@@ -1,7 +1,7 @@
 <div x-data="tileSelect" x-on:keydown.escape.window="selecting && toggleSelecting()">
     <x-ui.card title="Kitchen tools" flush>
         <x-slot:actions>
-            <x-ui.button x-on:click="toggleSelecting()" x-bind:aria-pressed="selecting" aria-pressed="false" x-bind:class="selecting && 'btn-primary'">
+            <x-ui.button x-on:click="toggleSelecting()" x-bind:aria-pressed="selecting" aria-pressed="false">
                 <span x-text="selecting ? 'Cancel' : 'Select'">Select</span>
             </x-ui.button>
         </x-slot:actions>

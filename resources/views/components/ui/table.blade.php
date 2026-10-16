@@ -9,7 +9,7 @@
     {{ $attributes->merge(['class' => 'w-full text-start [&_td]:px-4 [&_td]:py-2.5 [&_tbody_tr]:border-b [&_tbody_tr]:border-base-300 [&_tbody:last-of-type_tr:last-child]:border-b-0']) }}
 >
     @if ($head)
-        <thead @class(['hidden sm:table-header-group' => ! $headOnPhone, '[&_tr]:border-b [&_tr]:border-base-300'])>{{ $head }}</thead>
+        <thead @if ($headOnPhone) data-head-on-phone @endif @class(['hidden sm:table-header-group' => ! $headOnPhone, '[&_tr]:border-b [&_tr]:border-base-300'])>{{ $head }}</thead>
     @endif
     {{ $slot }}
 </table>

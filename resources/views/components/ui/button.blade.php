@@ -14,7 +14,7 @@
 @php
     $variants = [
         'primary' => 'btn-primary',
-        'secondary' => 'border-base-300 bg-base-100 hover:bg-base-200',
+        'secondary' => 'border-base-300 bg-base-100 hover:bg-base-200 aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-content',
         'ghost' => 'btn-ghost',
         'danger' => 'btn-ghost text-error hover:bg-error hover:text-error-content',
     ];
@@ -29,13 +29,12 @@
     $classes = 'btn min-h-11 sm:min-h-9 h-auto rounded-field px-3 font-medium shadow-none '.$variants[$variant].($square ? ' btn-square px-0' : '');
     $tag = $href ? 'a' : 'button';
     $spinner = '<span class="loading loading-spinner loading-xs hidden" data-spinner aria-hidden="true" wire:loading.class.remove="hidden" wire:target="'.e($busy).'"></span>';
-    $busyAttributes = $busy ? ['wire:loading.attr' => 'disabled', 'wire:target' => $busy] : [];
 @endphp
 
 <{{ $tag }}
     @if ($href) href="{{ $href }}" @endif
     @if ($square) aria-label="{{ $label }}" @endif
-    {{ $attributes->merge($href ? [] : ['type' => 'button'])->merge($busyAttributes)->merge(['class' => $classes]) }}
+    {{ $attributes->merge($href ? [] : ['type' => 'button'])->merge(\App\Support\Kit::busy($busy))->merge(['class' => $classes]) }}
 >
     @if ($busy && ! $icon){!! $spinner !!}@endif
     @if ($icon)

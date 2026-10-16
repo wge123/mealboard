@@ -157,9 +157,6 @@
     </div>
 
     {{-- FAB: phones only, floats above the bottom tab bar. --}}
-    <a href="{{ route('recipes.create') }}"
-       class="btn btn-circle btn-primary fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 size-14 shadow-lg lg:hidden"
-       aria-label="Add recipe">
-        <x-tabler-plus class="size-7" />
-    </a>
+    <x-ui.button variant="primary" square label="Add recipe" :href="route('recipes.create')" icon="tabler-plus"
+                 class="btn-circle fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 size-14 shadow-lg! lg:hidden" />
 </div>

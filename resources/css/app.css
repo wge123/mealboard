@@ -193,6 +193,17 @@
     font-variant-numeric: tabular-nums;
 }
 
+/* A 32px control whose hit area reaches 44px: an invisible band above and below it (chip, segmented option, filter menu). */
+@utility hit-area {
+    position: relative;
+    &::before {
+        content: '';
+        position: absolute;
+        inset-inline: 0;
+        inset-block: -0.375rem;
+    }
+}
+
 /* A tapped settings tile slides to its new place (tileSelect in app.js). */
 ::view-transition-group(*) {
     animation-duration: 200ms;
