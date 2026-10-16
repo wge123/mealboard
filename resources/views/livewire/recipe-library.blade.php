@@ -4,7 +4,7 @@
         <x-slot:actions>
             <label class="input min-h-11 w-full sm:min-h-9 sm:w-64">
                 <x-tabler-search class="size-4 text-base-content/70" />
-                <input type="search" placeholder="Search titles, descriptions, tags…"
+                <input type="search" placeholder="Search recipes…"
                        wire:model.live.debounce.300ms="search" aria-label="Search recipes">
             </label>
             <x-ui.button :href="route('recipes.request')" icon="tabler-message">Request a recipe</x-ui.button>
@@ -21,7 +21,7 @@
                     <x-ui.segmented.option :pressed="$groupBy === $case" wire:click="$set('groupBy', '{{ $case->value }}')">{{ $case->label() }}</x-ui.segmented.option>
                 @endforeach
             </x-ui.segmented>
-            <span class="mx-1 h-6 w-px bg-base-300" aria-hidden="true"></span>
+            <span class="mx-1 hidden h-6 w-px bg-base-300 sm:block" aria-hidden="true"></span>
         @endunless
 
         <x-ui.filter-menu label="Meal" :count="count($mealTypes)">

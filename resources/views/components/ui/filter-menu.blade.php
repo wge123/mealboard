@@ -29,6 +29,6 @@
         x-cloak x-show="open" x-transition.opacity.duration.100ms
         role="group" aria-label="{{ $label }}"
         @if ($single) @click="open = false" @endif
-        class="absolute start-0 z-30 mt-1 flex max-h-72 min-w-48 flex-col overflow-y-auto rounded-box border border-base-300 bg-base-100 p-1 shadow-lg"
+        class="absolute start-0 z-30 mt-1 flex max-sm:fixed max-sm:inset-x-4 max-h-72 min-w-48 flex-col overflow-y-auto rounded-box border border-base-300 bg-base-100 p-1 shadow-lg"
     >{{ $slot }}</div>
 </div>
