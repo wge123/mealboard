@@ -29,7 +29,7 @@ it('reads as one page: fact line, Mise en place with the tools to get out, Cooki
         ->assertOk()
         ->assertSeeInOrder([
             'Garlic Noodles', '25 min', 'Serves 4',
-            'Mise en place', 'Get out', 'wok', '2 ×', 'tongs', 'noodles', '200 g', 'garlic', 'minced',
+            'Mise en place', 'Get out', 'wok', '2 ×', 'tongs', '200 g', 'noodles', 'garlic', 'minced',
             'Cooking', 'Boil the noodles.', 'Toss with garlic.',
             'Details', 'Cuisine', 'Thai',
         ]);
@@ -55,8 +55,10 @@ it('links Add to a week to the plan page', function () {
 
 it('flags a missing tool with a warning badge and counts it on the fact line', function () {
     KitchenToolKind::where('name', 'wok')->update(['owned' => false]);
+    KitchenToolKind::where('name', 'tongs')->update(['owned' => true]);
     $recipe = cookModeRecipe();
-    $recipe->recipeTools()->first()->alternatives()->first()->update(['kitchen_tool_kind_id' => KitchenToolKind::where('name', 'wok')->value('id')]);
+    $recipe->recipeTools()->orderBy('position')->first()->alternatives()->first()->update(['kitchen_tool_kind_id' => KitchenToolKind::where('name', 'wok')->value('id')]);
+    $recipe->recipeTools()->orderBy('position')->get()[1]->alternatives()->first()->update(['kitchen_tool_kind_id' => KitchenToolKind::where('name', 'tongs')->value('id')]);
 
     $this->actingAs(User::factory()->create())->get("/recipes/{$recipe->id}")
         ->assertOk()
@@ -65,6 +67,7 @@ it('flags a missing tool with a warning badge and counts it on the fact line', f
 });
 
 it('shows no missing-tool flag when every tool is owned', function () {
+    KitchenToolKind::where('name', 'skillet')->update(['owned' => true]);
     $recipe = Recipe::factory()->approved()->create();
 
     $this->actingAs(User::factory()->create())->get("/recipes/{$recipe->id}")
