@@ -154,7 +154,6 @@ class RecipeApproval extends Component
 
         return view('livewire.recipe-approval', [
             'recipe' => $recipe,
-            'under' => $deck->slice(1, 2)->values(),
             'missing' => $missing,
             // Owned kinds only: naming a word as one of them always clears the flag.
             'kinds' => $missing === [] ? collect() : KitchenToolKind::query()->where('owned', true)->orderBy('name')->get(),
