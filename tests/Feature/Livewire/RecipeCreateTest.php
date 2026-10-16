@@ -219,6 +219,24 @@ it('uses the glossary word kitchen tool on the tool rows', function () {
         ->assertDontSee('Add tool');
 });
 
+it('puts the paste card before the titled section cards and shows the slow AI parse as busy', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->assertSeeInOrder(['Paste a recipe', 'Details', 'Kitchen tools', 'Ingredients', 'Cooking steps'])
+        ->assertSee('Parsing', false)
+        ->assertSee('wire:target="aiParse"', false);
+});
+
+it('shows a row error right under the field it belongs to', function () {
+    $html = Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('rows', [['name' => 'flour', 'qty' => '1', 'unit' => 'handful', 'prep_note' => '']])
+        ->call('save')
+        ->html();
+
+    expect($html)->toMatch('/aria-label="Unit".*?<\/select>(\s|<!--.*?-->)*<p[^>]*text-error[^>]*>[^<]*unit/s');
+});
+
 it('shows the empty ingredients error on the form', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeCreate::class)
