@@ -1,31 +1,49 @@
-// Select mode for the settings tile grids: off, a tap runs the tile's own
-// action; on, a tap picks the tile, and the action bar applies to the picks.
+// Select mode for the settings lists (tile grids and checklists): off, a tap
+// runs the item's own action; on, a tap picks the item, and the action bar
+// applies to the picks.
+//
+// The re-sort hook. Every item is an <li data-key-on data-key-off> whose control
+// is a [aria-pressed] button or a checkbox. Ticked items come first, each
+// ordered by its data-key-on or data-key-off; a tap moves the item there before
+// the server answers. A group heading that sits in the same list as an item is
+// an <li data-state="on|off"> with the same keys and no control, so items sort
+// around it. A wrapper marked data-resort-group holds one group's items: after a
+// move it rewrites the [data-on-count] inside it with the number ticked.
 document.addEventListener('alpine:init', () => {
     window.Alpine.data('tileSelect', () => ({
         selecting: false,
         picked: [],
-        tap(id, action, button) {
+        tap(id, action, control, event) {
             if (this.selecting) {
+                // A checkbox must not tick while it is only being picked.
+                event?.preventDefault();
                 this.picked = this.picked.includes(id) ? this.picked.filter((p) => p !== id) : [...this.picked, id];
                 return;
             }
-            this.resort(button);
+            this.resort(control);
             return action();
         },
-        // Flip the tapped tile and slide it to where the server will put it,
-        // before the server answers; the server's render then confirms it, or
-        // puts it back. Pressed tiles come first, each ordered by the
-        // data-key-on or data-key-off its <li> carries.
-        resort(button) {
-            const key = (li) => {
-                const on = li.querySelector('[aria-pressed]').getAttribute('aria-pressed') === 'true';
-                return (on ? '0 ' : '1 ') + li.dataset[on ? 'keyOn' : 'keyOff'];
+        resort(control) {
+            const controlOf = (li) => li.querySelector('[aria-pressed], input[type="checkbox"]');
+            const isOn = (li) => {
+                const c = controlOf(li);
+                if (!c) return li.dataset.state === 'on';
+                return c.matches('input') ? c.checked : c.getAttribute('aria-pressed') === 'true';
             };
+            const key = (li) => (isOn(li) ? '0 ' : '1 ') + li.dataset[isOn(li) ? 'keyOn' : 'keyOff'];
             const move = () => {
-                button.setAttribute('aria-pressed', button.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
-                const tile = button.closest('li');
+                // A checkbox has already flipped itself; a button has not.
+                if (!control.matches('input')) {
+                    control.setAttribute('aria-pressed', control.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+                }
+                const tile = control.closest('li');
                 const next = [...tile.parentElement.children].find((li) => li !== tile && key(li) > key(tile));
                 tile.parentElement.insertBefore(tile, next ?? null);
+                const group = tile.closest('[data-resort-group]');
+                const count = group?.querySelector('[data-on-count]');
+                if (count) {
+                    count.textContent = [...group.querySelectorAll('li[data-key-on]')].filter((li) => controlOf(li) && isOn(li)).length;
+                }
             };
             document.startViewTransition ? document.startViewTransition(move) : move();
         },

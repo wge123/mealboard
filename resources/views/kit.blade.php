@@ -320,5 +320,34 @@
             </dl>
             <x-slot:footer>Label over a figure in tabular digits, an optional suffix and a one-line hint. A stat with no value shows a dash. No trend arrows.</x-slot:footer>
         </x-ui.card>
+        <x-ui.card title="Checklist line" count="checkbox, icon, action" flush>
+            <p class="px-4 py-3 text-base-content/70">
+                A 44px line (32px on desktop): checkbox, name, muted count and an optional trailing action. Under a sticky, folding
+                <code>table.group</code> row they flow in columns. Tap the name to tick the box.
+            </p>
+            <x-ui.table class="border-t border-base-300">
+                <tbody>
+                    <x-ui.table.group label="Produce" :cols="1" sticky="top-0">
+                        <span>2</span> of 4 on hand
+                    </x-ui.table.group>
+                    <x-ui.table.row group="Produce" class="hover:bg-transparent!">
+                        <td class="p-0!">
+                            <ul class="gap-x-6 px-2 py-1 sm:columns-2">
+                                <li class="break-inside-avoid"><x-ui.checklist-line id="kit-line-1" label="Basil" :count="9" count-label="used in 9 recipes" checked /></li>
+                                <li class="break-inside-avoid"><x-ui.checklist-line id="kit-line-2" label="Garlic" :count="14" count-label="used in 14 recipes" checked /></li>
+                                <li class="break-inside-avoid"><x-ui.checklist-line id="kit-line-3" label="Lemon" :count="4" count-label="used in 4 recipes" /></li>
+                                <li class="break-inside-avoid"><x-ui.checklist-line id="kit-line-4" label="Shallot" :count="1" count-label="used in 1 recipe" /></li>
+                            </ul>
+                        </td>
+                    </x-ui.table.row>
+                </tbody>
+            </x-ui.table>
+            <div class="grid gap-x-6 border-t border-base-300 px-2 py-1 sm:grid-cols-2">
+                <x-ui.checklist-line id="kit-line-5" label="Wok" checked>
+                    <x-slot:action><x-ui.button square variant="ghost" icon="tabler-dots" label="Details for Wok" /></x-slot:action>
+                </x-ui.checklist-line>
+                <x-ui.checklist-line label="Icon instead of a checkbox" icon="tabler-flame" :count="3" count-label="3 recipes" />
+            </div>
+        </x-ui.card>
     </div>
 @endsection

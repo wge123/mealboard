@@ -7,8 +7,8 @@ use App\Models\User;
 use Livewire\Livewire;
 
 it('renders the pantry staples section with staples first for a signed-in household', function () {
-    Ingredient::factory()->create(['name' => 'avocado']);
-    Ingredient::factory()->pantryStaple()->create(['name' => 'soy sauce']);
+    Ingredient::factory()->create(['name' => 'avocado', 'category' => 'bakery']);
+    Ingredient::factory()->pantryStaple()->create(['name' => 'soy sauce', 'category' => 'bakery']);
 
     $this->actingAs(User::factory()->create())
         ->get('/settings')
@@ -128,8 +128,8 @@ it('refuses a filter it does not know', function () {
 })->throws(ValueError::class);
 
 it('lists the other ingredients most used by recipes first', function () {
-    $rice = Ingredient::factory()->create(['name' => 'rice']);
-    $avocado = Ingredient::factory()->create(['name' => 'avocado']);
+    $rice = Ingredient::factory()->create(['name' => 'rice', 'category' => 'bakery']);
+    $avocado = Ingredient::factory()->create(['name' => 'avocado', 'category' => 'bakery']);
 
     foreach (Recipe::factory()->count(3)->create() as $recipe) {
         $recipe->ingredients()->attach($rice->id, ['qty' => 1, 'unit' => 'cup']);
@@ -150,11 +150,11 @@ it('says how many of the other ingredients it shows when they are capped', funct
 });
 
 it('gives every tile the sort keys the browser re-sorts a tapped tile by, matching the server order', function () {
-    $rice = Ingredient::factory()->create(['name' => 'rice']);
-    $basil = Ingredient::factory()->create(['name' => 'basil']);
-    Ingredient::factory()->create(['name' => 'avocado']);
-    $salt = Ingredient::factory()->pantryStaple()->create(['name' => 'salt']);
-    Ingredient::factory()->pantryStaple()->create(['name' => 'cumin']);
+    $rice = Ingredient::factory()->create(['name' => 'rice', 'category' => 'bakery']);
+    $basil = Ingredient::factory()->create(['name' => 'basil', 'category' => 'bakery']);
+    Ingredient::factory()->create(['name' => 'avocado', 'category' => 'bakery']);
+    $salt = Ingredient::factory()->pantryStaple()->create(['name' => 'salt', 'category' => 'bakery']);
+    Ingredient::factory()->pantryStaple()->create(['name' => 'cumin', 'category' => 'bakery']);
 
     foreach (Recipe::factory()->count(3)->create() as $recipe) {
         $recipe->ingredients()->attach([$rice->id => ['qty' => 1, 'unit' => 'cup'], $salt->id => ['qty' => 1, 'unit' => 'tsp']]);
@@ -209,8 +209,8 @@ it('counts an aisle from the ingredients it shows when a filter narrows the list
 });
 
 it('lists each ingredient as a checkbox that is ticked when it is a staple', function () {
-    Ingredient::factory()->create(['name' => 'basil']);
-    Ingredient::factory()->pantryStaple()->create(['name' => 'garlic']);
+    Ingredient::factory()->create(['name' => 'basil', 'category' => 'bakery']);
+    Ingredient::factory()->pantryStaple()->create(['name' => 'garlic', 'category' => 'bakery']);
 
     $dom = new DOMDocument;
     @$dom->loadHTML('<?xml encoding="utf-8">'.Livewire::actingAs(User::factory()->create())->test(PantryStaples::class)->html());

@@ -45,10 +45,11 @@ expect()->extend('toBeOne', function () {
 */
 
 /**
- * The tiles of a settings grid as [server order, browser order]: the browser
- * re-sorts a tapped tile the way resources/js/app.js does, pressed tiles
- * first, each ordered by its data-key-on or data-key-off. Each tile is named
- * by its button's aria-label.
+ * The items of a settings list as [server order, browser order]: the browser
+ * re-sorts a tapped item the way resources/js/app.js does, ticked items first,
+ * each ordered by its data-key-on or data-key-off. An item is named by its
+ * control's aria-label. The control is a pressed button or a checkbox; a
+ * heading <li data-state="on|off"> has none and is named by its text.
  *
  * @return array{0: list<string>, 1: list<string>}
  */
@@ -56,19 +57,31 @@ function tileOrders(string $html): array
 {
     $dom = new DOMDocument;
     @$dom->loadHTML('<?xml encoding="utf-8">'.$html);
+    $xpath = new DOMXPath($dom);
 
     $tiles = [];
-    foreach ((new DOMXPath($dom))->query('//li[@data-key-on]') as $li) {
-        $button = (new DOMXPath($dom))->query('.//button[@aria-pressed]', $li)->item(0);
-        $pressed = $button->getAttribute('aria-pressed') === 'true';
+    foreach ($xpath->query('//li[@data-key-on]') as $li) {
+        $control = $xpath->query('.//*[@aria-pressed] | .//input[@type="checkbox"]', $li)->item(0);
+        $on = match (true) {
+            $control === null => $li->getAttribute('data-state') === 'on',
+            $control->nodeName === 'input' => $control->hasAttribute('checked'),
+            default => $control->getAttribute('aria-pressed') === 'true',
+        };
         $tiles[] = [
-            'name' => $button->getAttribute('aria-label'),
-            'sort' => [$pressed ? 0 : 1, $li->getAttribute($pressed ? 'data-key-on' : 'data-key-off')],
+            'list' => $li->parentNode->getNodePath(),
+            'name' => $control?->getAttribute('aria-label') ?? trim($li->textContent),
+            'sort' => [$on ? 0 : 1, $li->getAttribute($on ? 'data-key-on' : 'data-key-off')],
         ];
     }
 
     $server = array_column($tiles, 'name');
-    usort($tiles, fn ($a, $b) => strcmp($a['sort'][0].' '.$a['sort'][1], $b['sort'][0].' '.$b['sort'][1]));
+    // The browser moves an item only within its own list: an aisle, or the whole grid.
+    $browser = [];
+    foreach (array_unique(array_column($tiles, 'list')) as $list) {
+        $inList = array_filter($tiles, fn ($tile) => $tile['list'] === $list);
+        usort($inList, fn ($a, $b) => strcmp($a['sort'][0].' '.$a['sort'][1], $b['sort'][0].' '.$b['sort'][1]));
+        array_push($browser, ...array_column($inList, 'name'));
+    }
 
-    return [$server, array_column($tiles, 'name')];
+    return [$server, $browser];
 }
