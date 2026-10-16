@@ -113,7 +113,7 @@
                                                 @if ($recipe->image_url)
                                                     <img src="{{ $recipe->image_url }}" class="absolute inset-0 size-full object-cover" alt="" loading="lazy">
                                                 @else
-                                                    <span class="absolute inset-0 grid place-items-center text-[10px] font-semibold text-black/40">{{ \App\Support\RecipeCover::initials($recipe) }}</span>
+                                                    <span class="absolute inset-0 grid place-items-center text-xs font-semibold text-black/70">{{ \App\Support\RecipeCover::initials($recipe) }}</span>
                                                 @endif
                                             </span>
                                             <span class="line-clamp-1">{{ $recipe->title }}</span>

@@ -185,12 +185,11 @@
                             <input type="search" class="input min-h-11 w-44 sm:w-64" placeholder="Search recipes…"
                                    wire:model.live.debounce.300ms="pickerSearch" aria-label="Search recipes">
                             @if ($trayMeal)
-                                <button type="button" class="btn btn-ghost min-h-11 text-error"
-                                        wire:click="clearSlot('{{ $pickerDate }}', '{{ $pickerSlot }}')"
-                                        wire:loading.attr="disabled" wire:target="clearSlot">Clear</button>
+                                <x-ui.button variant="danger" wire:click="clearSlot('{{ $pickerDate }}', '{{ $pickerSlot }}')"
+                                        busy="clearSlot">Clear</x-ui.button>
                             @endif
                         @endif
-                        <button type="button" class="btn btn-circle btn-ghost min-h-11 min-w-11" wire:click="closePicker" aria-label="Close"><x-tabler-x class="size-5" /></button>
+                        <x-ui.button square variant="ghost" icon="tabler-x" label="Close" wire:click="closePicker" />
                     </div>
 
                     @if (! $editable && $trayMeal)
@@ -218,7 +217,7 @@
                                         <span class="flex flex-wrap gap-1 [&_.badge]:h-auto [&_.badge]:py-0.5 [&_.badge]:text-left [&_.badge]:leading-tight">
                                             @include('livewire.partials.missing-tools-badge', ['missing' => $missingTools[$recipe->id]])
                                             @foreach ($avoidedIngredients[$recipe->id] as $word)
-                                                <span class="badge badge-error badge-soft badge-sm" data-avoided-badge>contains: {{ $word }}</span>
+                                                <x-ui.badge tone="error" data-avoided-badge>contains: {{ $word }}</x-ui.badge>
                                             @endforeach
                                         </span>
                                         <span class="flex justify-between gap-1 text-xs text-base-content/70">

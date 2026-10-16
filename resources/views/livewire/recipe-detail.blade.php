@@ -70,7 +70,7 @@
 
             <div class="space-y-3 lg:grid lg:grid-cols-[22rem_1fr] lg:items-start lg:gap-4 lg:space-y-0">
                 {{-- Mise en place: the tools to get out, then the ingredient Lines to tick. overflow-clip (not hidden) keeps the group row sticky. --}}
-                <section class="overflow-clip rounded-box border border-base-300 bg-base-100 lg:sticky lg:top-20" data-section="mise-en-place">
+                <x-ui.card flush class="overflow-clip lg:sticky lg:top-20" data-section="mise-en-place">
                     <button type="button" class="{{ $groupRow }}" x-on:click="open.mise = ! open.mise" x-bind:aria-expanded="open.mise">
                         <x-tabler-chevron-down class="size-5 lg:hidden" x-bind:class="open.mise ? '' : '-rotate-90'" />
                         <h2 class="contents">Mise en place</h2>
@@ -94,16 +94,16 @@
                                                     if (ready.length === {{ $ingredientCount }}) open.mise = false">
                                 <span class="w-16 shrink-0 text-right font-medium tabular-nums">{{ $amount($ingredient) }}</span>
                                 <span class="min-w-0">
-                                    <span x-bind:class="ready.includes({{ $n }}) && 'line-through'">{{ $ingredient->name }}</span>@if ($ingredient->is_pantry_staple)<span class="badge badge-ghost badge-xs ms-1">staple</span>@endif
+                                    <span x-bind:class="ready.includes({{ $n }}) && 'line-through'">{{ $ingredient->name }}</span>@if ($ingredient->is_pantry_staple)<x-ui.badge class="ms-1">staple</x-ui.badge>@endif
                                     @if ($ingredient->pivot->note)<span class="block text-base-content/70">{{ $ingredient->pivot->note }}</span>@endif
                                 </span>
                             </label>
                         @endforeach
                     </div>
-                </section>
+                </x-ui.card>
 
                 {{-- Cooking: tap a step to mark it done; the first open step is the current one. --}}
-                <section class="overflow-clip rounded-box border border-base-300 bg-base-100" data-section="cooking"
+                <x-ui.card flush class="overflow-clip" data-section="cooking"
                          x-data="{ get current() { for (let n = 0; n < {{ $stepCount }}; n++) if (! done.includes(n)) return n; return -1 } }">
                     <button type="button" class="{{ $groupRow }} lg:px-4" x-on:click="open.cook = ! open.cook" x-bind:aria-expanded="open.cook">
                         <x-tabler-chevron-down class="size-5 lg:hidden" x-bind:class="open.cook ? '' : '-rotate-90'" />
@@ -128,10 +128,10 @@
                             </li>
                         @endforeach
                     </ol>
-                </section>
+                </x-ui.card>
 
                 {{-- Phone: Details, folded by default; the facts and the actions. Desktop shows the strip and the header actions instead. --}}
-                <section class="overflow-clip rounded-box border border-base-300 bg-base-100 lg:hidden" data-section="details">
+                <x-ui.card flush class="overflow-clip lg:hidden" data-section="details">
                     <button type="button" class="{{ $groupRow }}" x-on:click="open.details = ! open.details" x-bind:aria-expanded="open.details">
                         <x-tabler-chevron-down class="size-5 lg:hidden" x-bind:class="open.details ? '' : '-rotate-90'" />
                         <h2 class="contents">Details</h2>
@@ -160,7 +160,7 @@
                             @endforeach
                         </div>
                     </div>
-                </section>
+                </x-ui.card>
             </div>
 
             {{-- Phone bottom bar: one primary action. --}}

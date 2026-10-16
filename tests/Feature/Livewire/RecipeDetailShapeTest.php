@@ -60,7 +60,9 @@ it('badges a pantry staple in the mise en place and leaves other ingredients bar
 
     $html = $this->actingAs(User::factory()->create())->get("/recipes/{$recipe->id}")->assertOk()->getContent();
 
-    expect(substr_count($html, '>staple<'))->toBe(1)
-        ->and(strpos($html, 'soy sauce'))->toBeLessThan(strpos($html, '>staple<'))
-        ->and(strpos($html, '>staple<'))->toBeLessThan(strpos($html, 'salmon'));
+    $badge = preg_match_all('/>\s*staple\s*</', $html, $found, PREG_OFFSET_CAPTURE);
+
+    expect($badge)->toBe(1)
+        ->and(strpos($html, 'soy sauce'))->toBeLessThan($found[0][0][1])
+        ->and($found[0][0][1])->toBeLessThan(strpos($html, 'salmon'));
 });

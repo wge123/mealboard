@@ -23,7 +23,7 @@
                 <span class="lg:hidden">{{ $short }}</span>
                 <span class="hidden lg:inline">{{ $label }}</span>
                 @if ($count)
-                    <span class="badge badge-sm" aria-label="{{ $count }} {{ $counts }}">{{ $count }}</span>
+                    <x-ui.badge aria-label="{{ $count }} {{ $counts }}">{{ $count }}</x-ui.badge>
                 @endif
             </a>
         @endforeach

@@ -100,9 +100,7 @@
                             <div class="divider my-1"></div>
                             <form method="POST" action="{{ route('logout') }}" class="px-2 pb-1">
                                 @csrf
-                                <button type="submit" class="btn btn-ghost btn-sm min-h-11 w-full justify-start gap-3 px-2 font-normal sm:min-h-9">
-                                    <x-tabler-logout /> Log out
-                                </button>
+                                <x-ui.button type="submit" variant="ghost" icon="tabler-logout" class="w-full justify-start">Log out</x-ui.button>
                             </form>
                         </div>
                     </div>
@@ -191,10 +189,7 @@
                         <div class="divider my-1"></div>
                         <form method="POST" action="{{ route('logout') }}" class="px-2 pb-1">
                             @csrf
-                            <button type="submit" class="btn btn-ghost btn-sm min-h-11 w-full justify-start gap-3 px-2 font-normal">
-                                <x-tabler-logout class="size-5" />
-                                Log out
-                            </button>
+                            <x-ui.button type="submit" variant="ghost" icon="tabler-logout" class="w-full justify-start">Log out</x-ui.button>
                         </form>
                     </div>
                 </div>

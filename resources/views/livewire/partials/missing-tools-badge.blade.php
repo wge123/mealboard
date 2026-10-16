@@ -1,3 +1,3 @@
 @foreach ($missing as $entry)
-    <span class="badge badge-warning badge-sm" data-missing-badge>needs: {{ $entry->label() }}</span>
+    <x-ui.badge tone="warning" data-missing-badge>needs: {{ $entry->label() }}</x-ui.badge>
 @endforeach

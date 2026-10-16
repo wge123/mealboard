@@ -84,7 +84,7 @@
                 <div class="flex items-center gap-3">
                     <span class="size-9 text-primary [&>svg]:size-full" aria-hidden="true">{{ \App\Support\KitchenToolIcon::for($detail->name) }}</span>
                     <h3 class="flex-1 text-lg font-semibold">{{ $detail->display_name }}</h3>
-                    <button type="button" class="btn btn-circle btn-ghost min-h-11 min-w-11" wire:click="closeDetails" aria-label="Close"><x-tabler-x class="size-5" /></button>
+                    <x-ui.button square variant="ghost" icon="tabler-x" label="Close" wire:click="closeDetails" />
                 </div>
 
                 <label class="mt-4 flex min-h-11 cursor-pointer items-center justify-between gap-3">
@@ -102,7 +102,7 @@
                                placeholder="e.g. 12-inch, cast iron"
                                aria-label="Note for {{ $detail->display_name }}"
                                wire:model="notes.{{ $detail->id }}">
-                        <button type="submit" class="btn min-h-11">Save</button>
+                        <x-ui.button type="submit" busy="saveNote">Save</x-ui.button>
                     </div>
                     <p class="mt-1 text-xs text-base-content/70">For you only; never used to match recipes.</p>
                 </form>
@@ -113,13 +113,12 @@
                 @else
                     <ul class="flex flex-wrap gap-2" aria-label="Other names for {{ $detail->display_name }}">
                         @foreach ($detail->otherNames as $otherName)
-                            <li class="badge badge-outline h-auto gap-1 py-1" wire:key="other-name-{{ $otherName->id }}">
+                            <li class="inline-flex items-center gap-1 rounded-full border border-base-300 py-1 ps-3 text-xs font-medium" wire:key="other-name-{{ $otherName->id }}">
                                 <span>{{ $otherName->name }}</span>
                                 @if ($otherName->origin === \App\Enums\KitchenToolOrigin::Household)
-                                    <button type="button" class="btn btn-ghost btn-xs min-h-11 min-w-11"
+                                    <x-ui.button square variant="ghost" icon="tabler-x" :label="'Remove other name '.$otherName->name"
                                             data-test="remove-other-name-{{ $otherName->id }}"
-                                            wire:click="removeOtherName({{ $otherName->id }})"
-                                            aria-label="Remove other name {{ $otherName->name }}"><x-tabler-x class="size-4" /></button>
+                                            wire:click="removeOtherName({{ $otherName->id }})" />
                                 @endif
                             </li>
                         @endforeach
@@ -132,16 +131,15 @@
                            placeholder="Another name for it"
                            aria-label="Add an other name for {{ $detail->display_name }}"
                            wire:model="newOtherName">
-                    <button type="submit" class="btn min-h-11">Add</button>
+                    <x-ui.button type="submit" busy="addOtherName">Add</x-ui.button>
                 </form>
                 @error('addOtherName') <p class="mt-1 text-sm text-error" role="alert">{{ $message }}</p> @enderror
 
                 @if ($detail->origin === \App\Enums\KitchenToolOrigin::Household)
                     <div class="mt-6 border-t border-base-300 pt-4">
-                        <button type="button" class="btn btn-ghost min-h-11 text-error"
-                                data-test="delete-kind-{{ $detail->id }}"
+                        <x-ui.button variant="danger" data-test="delete-kind-{{ $detail->id }}"
                                 wire:click="deleteKind({{ $detail->id }})"
-                                wire:confirm="Delete {{ $detail->display_name }}?">Delete this tool</button>
+                                wire:confirm="Delete {{ $detail->display_name }}?">Delete this tool</x-ui.button>
                     </div>
                 @endif
             </div>

@@ -208,7 +208,7 @@ class RecipeLibrary extends Component
             ],
         };
 
-        $titles = ['quick' => 'Quick (20 min or less)', 'weeknight' => 'Weeknight (21–40 min)', 'takes a while' => 'Takes a while (over 40 min)', 'loved' => 'Loved (4★ and up)', 'any' => 'Any meal'];
+        $titles = ['quick' => 'Quick (20 min or less)', 'weeknight' => 'Weeknight (21–40 min)', 'takes a while' => 'Takes a while (over 40 min)', 'loved' => 'Loved (4 stars and up)', 'any' => 'Any meal'];
         $grouped = $recipes->groupBy($shelfOf);
 
         return collect($order)
