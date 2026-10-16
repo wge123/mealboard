@@ -4,43 +4,24 @@
 
 @section('content')
     <div class="w-full max-w-sm">
-        <h1 class="mb-6 text-center font-display text-2xl font-semibold tracking-tight text-primary">
-            Mealboard
-        </h1>
+        <p class="mb-6 text-center font-display text-2xl font-semibold text-primary">Mealboard</p>
 
-        <div class="rounded-box border border-base-300 bg-base-100 p-6">
-            <h2 class="mb-4 font-display text-xl font-semibold">Log in</h2>
-
+        <x-ui.card title="Log in">
             <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-4">
                 @csrf
 
-                <div>
-                    <label for="email" class="mb-1 block text-sm font-medium">Email</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}"
-                           class="input min-h-11 w-full {{ $errors->has('email') ? 'input-error' : '' }}"
-                           required autofocus autocomplete="email">
-                    @error('email')
-                        <p class="mt-1 text-sm text-error">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-ui.field label="Email" name="email" type="email" :value="old('email')"
+                            required autofocus autocomplete="email" />
+                <x-ui.field label="Password" name="password" type="password"
+                            required autocomplete="current-password" />
 
-                <div>
-                    <label for="password" class="mb-1 block text-sm font-medium">Password</label>
-                    <input id="password" type="password" name="password"
-                           class="input min-h-11 w-full {{ $errors->has('password') ? 'input-error' : '' }}"
-                           required autocomplete="current-password">
-                    @error('password')
-                        <p class="mt-1 text-sm text-error">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <label class="flex min-h-11 cursor-pointer items-center gap-3">
+                <label class="flex min-h-11 cursor-pointer items-center gap-3 sm:min-h-9">
                     <input id="remember" type="checkbox" name="remember" value="1" class="checkbox checkbox-primary">
-                    <span class="text-sm">Remember me</span>
+                    <span>Remember me</span>
                 </label>
 
-                <button type="submit" class="btn btn-primary min-h-11 w-full">Log in</button>
+                <x-ui.button type="submit" variant="primary" class="w-full">Log in</x-ui.button>
             </form>
-        </div>
+        </x-ui.card>
     </div>
 @endsection
