@@ -217,6 +217,16 @@
             <p class="mt-3 text-base-content/70">A button that opens a list of options. Multi-pick menus show how many are on; a one-of-N menu (<code>single</code>) shows its choice and closes after a pick. Active menus are tinted and announced in the button's name.</p>
         </x-ui.card>
 
+        <x-ui.card title="Datagrid" count="label over value">
+            <x-ui.datagrid>
+                <x-ui.datagrid.item label="Cuisine">Thai</x-ui.datagrid.item>
+                <x-ui.datagrid.item label="Time">25 min</x-ui.datagrid.item>
+                <x-ui.datagrid.item label="Serves">4</x-ui.datagrid.item>
+                <x-ui.datagrid.item label="Source"><a class="link link-hover" href="#">example.com</a></x-ui.datagrid.item>
+                <x-ui.datagrid.item label="Approved" />
+            </x-ui.datagrid>
+        </x-ui.card>
+
         <x-ui.card title="Segmented toggle" count="2 states">
             <div class="flex flex-col items-start gap-4" x-data="{ view: 'group' }">
                 <x-ui.segmented label="View">

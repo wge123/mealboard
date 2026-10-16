@@ -13,7 +13,7 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.app', ['width' => 'wide'])]
 class RecipeDetail extends Component
 {
     use InteractsWithRecipeForm;
