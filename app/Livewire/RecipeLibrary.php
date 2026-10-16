@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 /**
@@ -27,6 +28,9 @@ class RecipeLibrary extends Component
 {
     /** The chip facets: a recipe matches a facet when it has any of the chosen values. */
     private const array FACETS = ['mealTypes', 'cuisines', 'tags'];
+
+    /** The table's sortable columns. */
+    private const array SORTS = ['title', 'meal', 'cuisine', 'time', 'rating', 'ingredients', 'tools'];
 
     public string $search = '';
 
@@ -44,6 +48,27 @@ class RecipeLibrary extends Component
     public ?int $minRating = null;
 
     public LibraryShelving $groupBy = LibraryShelving::Meal;
+
+    /** 'shelves' or 'table'; the table shows on wide screens only, phones stay on the shelves. Kept in the address. */
+    #[Url(except: 'shelves')]
+    public string $view = 'shelves';
+
+    #[Url(except: 'title')]
+    public string $sort = 'title';
+
+    #[Url(except: 'asc')]
+    public string $dir = 'asc';
+
+    /**
+     * Sort the table by a column; the same column again flips the direction.
+     */
+    public function sortBy(string $column): void
+    {
+        abort_unless(in_array($column, self::SORTS, true), 422);
+
+        $this->dir = $this->sort === $column && $this->dir === 'asc' ? 'desc' : 'asc';
+        $this->sort = $column;
+    }
 
     /**
      * Turn a chip on or off.
@@ -64,7 +89,7 @@ class RecipeLibrary extends Component
 
     public function render(): View
     {
-        $all = Recipe::query()->where('status', RecipeStatus::Approved)->orderBy('title')->get();
+        $all = Recipe::query()->where('status', RecipeStatus::Approved)->withCount('ingredients')->orderBy('title')->get();
 
         // Average rating per recipe id, from meal_logs through planned_meals.
         $ratings = MealLog::query()
@@ -79,12 +104,16 @@ class RecipeLibrary extends Component
         $filtering = $this->search !== '' || $this->mealTypes !== [] || $this->cuisines !== [] || $this->tags !== []
             || $this->maxMinutes !== null || $this->minRating !== null;
 
+        $missingTools = app(MissingKitchenTools::class)->forMany($recipes);
+
         return view('livewire.recipe-library', [
             'recipes' => $recipes,
             'filtering' => $filtering,
             'shelves' => $filtering ? collect() : $this->shelves($recipes, $ratings),
+            // The table groups the sorted recipes the way the shelves are grouped.
+            'groups' => $this->view === 'table' ? $this->shelves($this->sorted($recipes, $ratings, $missingTools), $ratings) : collect(),
             'ratings' => $ratings,
-            'missingTools' => app(MissingKitchenTools::class)->forMany($recipes),
+            'missingTools' => $missingTools,
             // Each meal chip counts what the other filters leave, so it says what tapping it would show.
             'mealTypeCounts' => collect(MealType::cases())->mapWithKeys(fn (MealType $type) => [
                 $type->value => $all->filter(fn (Recipe $recipe) => $recipe->meal_type === $type && $this->matches($recipe, $ratings, except: 'mealTypes'))->count(),
@@ -93,6 +122,32 @@ class RecipeLibrary extends Component
             // Tags on one recipe only would crowd the chip row; a search still finds them.
             'tagOptions' => $all->pluck('tags')->flatten()->filter()->countBy()->filter(fn (int $count) => $count > 1)->sortKeys()->sortDesc()->keys(),
         ]);
+    }
+
+    /**
+     * The recipes ordered by the table's sort column. Ties keep title order, in the same direction.
+     *
+     * @param  Collection<int, Recipe>  $recipes
+     * @param  Collection<int, float>  $ratings
+     * @param  array<int, list<mixed>>  $missingTools
+     * @return Collection<int, Recipe>
+     */
+    private function sorted(Collection $recipes, Collection $ratings, array $missingTools): Collection
+    {
+        $descending = $this->dir === 'desc';
+
+        return $recipes
+            ->sortBy(fn (Recipe $recipe) => mb_strtolower($recipe->title), SORT_REGULAR, $descending)
+            ->sortBy(fn (Recipe $recipe) => match ($this->sort) {
+                'meal' => array_search($recipe->meal_type, MealType::cases(), true),
+                'cuisine' => $recipe->cuisine ?? '~',
+                'time' => self::minutes($recipe) ?: PHP_INT_MAX,
+                'rating' => $ratings->get($recipe->id, -1),
+                'ingredients' => $recipe->ingredients_count,
+                'tools' => count($missingTools[$recipe->id] ?? []),
+                default => mb_strtolower($recipe->title),
+            }, SORT_REGULAR, $descending)
+            ->values();
     }
 
     /**
