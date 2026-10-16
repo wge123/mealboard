@@ -69,7 +69,7 @@ function tileOrders(string $html): array
         };
         $tiles[] = [
             'list' => $li->parentNode->getNodePath(),
-            'name' => $control?->getAttribute('aria-label') ?? trim($li->textContent),
+            'name' => $control?->getAttribute('aria-label') ?? trim(preg_replace('/\s+/', ' ', $li->textContent)),
             'sort' => [$on ? 0 : 1, $li->getAttribute($on ? 'data-key-on' : 'data-key-off')],
         ];
     }

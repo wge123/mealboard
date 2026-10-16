@@ -68,3 +68,7 @@ it('flags a warning count so the screen can mark a need that is not met', functi
     expect($warn)->toContain('data-warning')
         ->and($calm)->not->toContain('data-warning');
 });
+
+it('shows a hint after the name', function () {
+    expect(Blade::render('<x-ui.checklist-line id="a" label="Skillet" hint="12-inch, cast iron" />'))->toContain('12-inch, cast iron');
+});

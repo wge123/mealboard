@@ -196,7 +196,8 @@ it('gives every tile the sort keys the browser re-sorts a tapped tile by, matchi
 
     [$server, $browser] = tileOrders(Livewire::actingAs(User::factory()->create())->test(KitchenTools::class)->html());
 
-    expect(array_slice($server, 0, 2))->toBe(['Owned: Oven', 'Owned: Wok'])
+    // The Owned heading sorts first, then the owned tools by name.
+    expect(array_slice($server, 0, 3))->toBe(['Owned 2', 'Owned: Oven', 'Owned: Wok'])
         ->and($browser)->toBe($server);
 });
 
@@ -261,8 +262,10 @@ it('flags a tool the household does not have that recipes call for', function ()
     $html = Livewire::actingAs(User::factory()->create())->test(KitchenTools::class)->html();
 
     // The wok is not owned and a recipe needs it; the oven is owned, so it is not flagged.
-    expect($html)->toContain("used in 1 recipe, and you don't have it")
-        ->and(substr_count($html, "you don't have it"))->toBe(1);
+    $text = html_entity_decode($html, ENT_QUOTES);
+
+    expect($text)->toContain("used in 1 recipe, and you don't have it")
+        ->and(substr_count($text, "you don't have it"))->toBe(1);
 });
 
 it('does not flag a not-owned tool no recipe calls for', function () {
