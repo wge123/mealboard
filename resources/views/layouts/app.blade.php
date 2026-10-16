@@ -17,7 +17,7 @@
     @livewireStyles
 </head>
 <body
-    class="min-h-screen bg-base-100 text-base-content"
+    class="min-h-screen bg-base-200 text-base-content"
     x-data="{
         theme: localStorage.getItem('mealboard-theme') || 'system',
         setTheme(t) {
@@ -32,117 +32,136 @@
         },
     }"
 >
-    {{-- Desktop top navbar (lg+ only; phones get the bottom tab bar). --}}
-    <header class="hidden border-b border-base-300 bg-base-100 lg:block">
-        <nav class="mx-auto flex w-full max-w-6xl items-center gap-1 px-6 py-3">
-            <a href="{{ url('/') }}" class="mr-6 font-display text-2xl font-semibold text-primary">Mealboard</a>
+    @php
+        // Screens pick the content width: standard (today's cap) or wide (the full window with a gutter).
+        // A Livewire screen passes #[Layout('layouts.app', ['width' => 'wide'])]; a plain view uses @section('width', 'wide').
+        $wide = ($width ?? trim($__env->yieldContent('width'))) === 'wide';
+
+        $item = 'inline-flex min-h-11 items-center gap-2 rounded-field px-3 font-medium sm:min-h-9';
+        $onShop = request()->routeIs('shop', 'plan.shopping-list');
+        $onRecipes = request()->routeIs('recipes.index', 'recipes.show', 'recipes.create', 'recipes.request');
+        $themeButtons = ['light' => 'Light', 'dark' => 'Dark', 'system' => 'Auto'];
+    @endphp
+
+    {{-- Desktop: a slim sticky top bar (lg+ only; phones get the bottom tabs and no top bar). --}}
+    <header class="sticky top-0 z-30 hidden border-b border-base-300 bg-base-100 lg:block">
+        <nav aria-label="Main" class="mx-auto flex h-14 w-full items-center gap-1 px-6 {{ $wide ? 'lg:px-8' : 'max-w-6xl' }}">
+            <a href="{{ url('/') }}" class="me-4 text-base font-semibold text-primary">Mealboard</a>
             @auth
                 <div class="flex items-center gap-1">
-                    <a href="{{ route('plan.builder') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('plan.builder') ? 'text-primary' : '' }}">Plan</a>
-                    <a href="{{ route('recipes.index') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('recipes.index', 'recipes.show', 'recipes.create') ? 'text-primary' : '' }}">Recipes</a>
-                    <a href="{{ route('recipes.request') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('recipes.request') ? 'text-primary' : '' }}">Request</a>
-                    <a href="{{ route('recipes.approve') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('recipes.approve') ? 'text-primary' : '' }}">
-                        Approve
+                    <a href="{{ route('plan.builder') }}" class="{{ $item }} {{ request()->routeIs('plan.builder') ? 'bg-base-200 text-primary' : 'text-base-content/70 hover:text-base-content' }}" @if (request()->routeIs('plan.builder')) aria-current="page" @endif>
+                        <x-tabler-calendar-week /> Plan
+                    </a>
+                    <a href="{{ route('shop') }}" class="{{ $item }} {{ $onShop ? 'bg-base-200 text-primary' : 'text-base-content/70 hover:text-base-content' }}" @if ($onShop) aria-current="page" @endif>
+                        <x-tabler-shopping-cart /> Shop
+                    </a>
+                    <a href="{{ route('recipes.index') }}" class="{{ $item }} {{ $onRecipes ? 'bg-base-200 text-primary' : 'text-base-content/70 hover:text-base-content' }}" @if ($onRecipes) aria-current="page" @endif>
+                        <x-tabler-book-2 /> Recipes
+                    </a>
+                    <a href="{{ route('recipes.approve') }}" class="{{ $item }} {{ request()->routeIs('recipes.approve') ? 'bg-base-200 text-primary' : 'text-base-content/70 hover:text-base-content' }}" @if (request()->routeIs('recipes.approve')) aria-current="page" @endif>
+                        <x-tabler-circle-check /> Approve
                         @if ($pendingRecipeCount > 0)
-                            <span class="badge badge-primary badge-sm">{{ $pendingRecipeCount }}</span>
+                            <x-ui.badge tone="primary">{{ $pendingRecipeCount }}</x-ui.badge>
                         @endif
                     </a>
-                    <a href="{{ route('log.catch-up') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('log.*') ? 'text-primary' : '' }}">Log</a>
-                    <a href="{{ route('insights') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('insights') ? 'text-primary' : '' }}">Insights</a>
-                    <a href="{{ route('settings') }}" class="btn btn-ghost btn-sm min-h-11 {{ request()->routeIs('settings') ? 'text-primary' : '' }}">Settings</a>
+                    <a href="{{ route('log.catch-up') }}" class="{{ $item }} {{ request()->routeIs('log.*') ? 'bg-base-200 text-primary' : 'text-base-content/70 hover:text-base-content' }}" @if (request()->routeIs('log.*')) aria-current="page" @endif>
+                        <x-tabler-edit /> Log
+                    </a>
+                    <a href="{{ route('insights') }}" class="{{ $item }} {{ request()->routeIs('insights') ? 'bg-base-200 text-primary' : 'text-base-content/70 hover:text-base-content' }}" @if (request()->routeIs('insights')) aria-current="page" @endif>
+                        <x-tabler-chart-bar /> Insights
+                    </a>
                 </div>
             @endauth
-            <div class="ms-auto flex items-center gap-2">
-                <div class="dropdown dropdown-end">
-                    <button type="button" tabindex="0" class="btn btn-ghost btn-sm min-h-11" aria-label="Theme">
-                        <span x-show="theme === 'light'">Light</span>
-                        <span x-show="theme === 'dark'">Dark</span>
-                        <span x-show="theme === 'system'">Auto</span>
-                    </button>
-                    <ul tabindex="0" class="dropdown-content menu z-30 mt-1 w-32 rounded-box border border-base-300 bg-base-100 p-1 shadow-lg">
-                        <li><button type="button" @click="setTheme('light'); $el.closest('.dropdown').querySelector('button').blur()" :class="theme === 'light' && 'menu-active'">Light</button></li>
-                        <li><button type="button" @click="setTheme('dark'); $el.closest('.dropdown').querySelector('button').blur()" :class="theme === 'dark' && 'menu-active'">Dark</button></li>
-                        <li><button type="button" @click="setTheme('system'); $el.closest('.dropdown').querySelector('button').blur()" :class="theme === 'system' && 'menu-active'">System</button></li>
-                    </ul>
-                </div>
+            <div class="ms-auto flex items-center">
                 @auth
-                    <span class="text-sm text-base-content/70">{{ auth()->user()->name }}</span>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-outline btn-sm min-h-11">Log out</button>
-                    </form>
+                    <div class="dropdown dropdown-end">
+                        <button type="button" tabindex="0" class="{{ $item }} text-base-content/70 hover:text-base-content" aria-haspopup="menu">
+                            <x-tabler-user-circle />
+                            {{ auth()->user()->name }}
+                            <x-tabler-chevron-down class="size-4" />
+                        </button>
+                        <div tabindex="0" class="dropdown-content z-40 mt-1 w-60 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
+                            <ul class="menu w-full p-0">
+                                <li>
+                                    <a href="{{ route('settings') }}" class="min-h-11 sm:min-h-9 {{ request()->routeIs('settings') ? 'text-primary' : '' }}">
+                                        <x-tabler-settings /> Settings
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="divider my-1"></div>
+                            <div class="px-2 pb-1">
+                                <div class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/70">Theme</div>
+                                <div class="join w-full">
+                                    @foreach ($themeButtons as $key => $label)
+                                        <button type="button" class="btn join-item btn-sm min-h-11 flex-1 sm:min-h-9" :class="theme === '{{ $key }}' && 'btn-primary'" :aria-pressed="theme === '{{ $key }}'" @click="setTheme('{{ $key }}')">{{ $label }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div class="divider my-1"></div>
+                            <form method="POST" action="{{ route('logout') }}" class="px-2 pb-1">
+                                @csrf
+                                <button type="submit" class="btn btn-ghost btn-sm min-h-11 w-full justify-start gap-3 px-2 font-normal sm:min-h-9">
+                                    <x-tabler-logout /> Log out
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 @else
-                    <a class="btn btn-outline btn-primary btn-sm min-h-11" href="{{ route('login') }}">Log in</a>
+                    <x-ui.button variant="primary" href="{{ route('login') }}">Log in</x-ui.button>
                 @endauth
             </div>
         </nav>
     </header>
 
-    <main class="mx-auto w-full max-w-6xl px-4 py-6 pb-24 lg:px-6 lg:pb-12">
+    <main class="mx-auto w-full px-4 py-6 pb-24 sm:px-6 lg:pb-12 {{ $wide ? 'lg:px-8' : 'max-w-6xl' }}">
         {{ $slot ?? '' }}
         @yield('content')
     </main>
 
-    {{-- Mobile bottom tab bar (thumb-reach nav; hidden on lg+). --}}
+    {{-- Phone: five bottom tabs (thumb-reach nav; hidden on lg+). --}}
     @auth
+        @php
+            $tab = 'relative flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 pt-1.5 pb-1';
+            $onMore = request()->routeIs('recipes.index', 'recipes.show', 'recipes.create', 'recipes.request', 'insights', 'settings');
+        @endphp
         <nav
             class="fixed inset-x-0 bottom-0 z-40 border-t border-base-300 bg-base-100 lg:hidden"
             style="padding-bottom: env(safe-area-inset-bottom)"
             aria-label="Primary"
         >
             <div class="mx-auto flex w-full max-w-md items-stretch">
-                <a
-                    href="{{ route('plan.builder') }}"
-                    class="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 pt-1.5 pb-1 {{ request()->routeIs('plan.builder') ? 'text-primary' : 'text-base-content/70' }}"
-                >
+                <a href="{{ route('plan.builder') }}" class="{{ $tab }} {{ request()->routeIs('plan.builder') ? 'text-primary' : 'text-base-content/70' }}" @if (request()->routeIs('plan.builder')) aria-current="page" @endif>
                     <x-tabler-calendar-week class="size-6" />
                     <span class="text-xs font-medium">Plan</span>
                 </a>
 
-                @if ($latestLockedPlanId !== null)
-                    <a
-                        href="{{ route('plan.shopping-list', $latestLockedPlanId) }}"
-                        class="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 pt-1.5 pb-1 {{ request()->routeIs('plan.shopping-list') ? 'text-primary' : 'text-base-content/70' }}"
-                    >
-                        <x-tabler-shopping-cart class="size-6" />
-                        <span class="text-xs font-medium">Shop</span>
-                    </a>
-                @endif
-
-                <a
-                    href="{{ route('recipes.approve') }}"
-                    class="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 pt-1.5 pb-1 {{ request()->routeIs('recipes.approve') ? 'text-primary' : 'text-base-content/70' }}"
-                >
-                    <span class="{{ $pendingRecipeCount > 0 ? 'indicator' : '' }}">
-                        @if ($pendingRecipeCount > 0)
-                            <span class="indicator-item badge badge-primary badge-xs px-1.5 font-semibold">{{ $pendingRecipeCount }}</span>
-                        @endif
-                        <x-tabler-circle-check class="size-6" />
-                    </span>
-                    <span class="text-xs font-medium">Approve</span>
+                <a href="{{ route('shop') }}" class="{{ $tab }} {{ $onShop ? 'text-primary' : 'text-base-content/70' }}" @if ($onShop) aria-current="page" @endif>
+                    <x-tabler-shopping-cart class="size-6" />
+                    <span class="text-xs font-medium">Shop</span>
                 </a>
 
-                <a
-                    href="{{ route('log.catch-up') }}"
-                    class="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 pt-1.5 pb-1 {{ request()->routeIs('log.*') ? 'text-primary' : 'text-base-content/70' }}"
-                >
+                <a href="{{ route('recipes.approve') }}" class="{{ $tab }} {{ request()->routeIs('recipes.approve') ? 'text-primary' : 'text-base-content/70' }}" @if (request()->routeIs('recipes.approve')) aria-current="page" @endif>
+                    <x-tabler-circle-check class="size-6" />
+                    <span class="text-xs font-medium">Approve</span>
+                    @if ($pendingRecipeCount > 0)
+                        <x-ui.badge tone="primary" class="absolute start-1/2 top-1 ms-1.5 px-1.5">{{ $pendingRecipeCount }}</x-ui.badge>
+                    @endif
+                </a>
+
+                <a href="{{ route('log.catch-up') }}" class="{{ $tab }} {{ request()->routeIs('log.*') ? 'text-primary' : 'text-base-content/70' }}" @if (request()->routeIs('log.*')) aria-current="page" @endif>
                     <x-tabler-edit class="size-6" />
                     <span class="text-xs font-medium">Log</span>
                 </a>
 
                 <div class="dropdown dropdown-top dropdown-end flex-1">
-                    <button
-                        type="button"
-                        tabindex="0"
-                        class="flex min-h-14 w-full flex-col items-center justify-center gap-0.5 pt-1.5 pb-1 {{ request()->routeIs('recipes.index', 'recipes.show', 'recipes.create', 'insights', 'settings') ? 'text-primary' : 'text-base-content/70' }}"
-                    >
+                    <button type="button" tabindex="0" aria-haspopup="menu" class="{{ $tab }} w-full {{ $onMore ? 'text-primary' : 'text-base-content/70' }}">
                         <x-tabler-dots class="size-6" />
                         <span class="text-xs font-medium">More</span>
                     </button>
                     <div tabindex="0" class="dropdown-content z-50 mb-2 me-2 w-60 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
                         <ul class="menu w-full p-0">
                             <li>
-                                <a href="{{ route('recipes.index') }}" class="min-h-11 {{ request()->routeIs('recipes.index', 'recipes.show', 'recipes.create') ? 'text-primary' : '' }}">
+                                <a href="{{ route('recipes.index') }}" class="min-h-11 {{ request()->routeIs('recipes.index', 'recipes.show', 'recipes.create', 'recipes.request') ? 'text-primary' : '' }}">
                                     <x-tabler-book-2 class="size-5" />
                                     Recipes
                                 </a>
@@ -162,11 +181,11 @@
                         </ul>
                         <div class="divider my-1"></div>
                         <div class="px-2 pb-1">
-                            <div class="mb-1.5 text-xs font-medium text-base-content/70">Theme</div>
+                            <div class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-base-content/70">Theme</div>
                             <div class="join w-full">
-                                <button type="button" class="btn join-item btn-sm min-h-11 flex-1" :class="theme === 'light' && 'btn-primary'" @click="setTheme('light')">Light</button>
-                                <button type="button" class="btn join-item btn-sm min-h-11 flex-1" :class="theme === 'dark' && 'btn-primary'" @click="setTheme('dark')">Dark</button>
-                                <button type="button" class="btn join-item btn-sm min-h-11 flex-1" :class="theme === 'system' && 'btn-primary'" @click="setTheme('system')">Auto</button>
+                                @foreach ($themeButtons as $key => $label)
+                                    <button type="button" class="btn join-item btn-sm min-h-11 flex-1" :class="theme === '{{ $key }}' && 'btn-primary'" :aria-pressed="theme === '{{ $key }}'" @click="setTheme('{{ $key }}')">{{ $label }}</button>
+                                @endforeach
                             </div>
                         </div>
                         <div class="divider my-1"></div>

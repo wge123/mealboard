@@ -20,7 +20,7 @@ it('leaves no emoji or glyph standing in for an icon in any view', function () {
 
     $offenders = [];
     foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(resource_path('views'))) as $file) {
-        if (! str_ends_with($file->getFilename(), '.blade.php') || $file->getFilename() === 'welcome.blade.php') {
+        if (! str_ends_with($file->getFilename(), '.blade.php')) {
             continue;
         }
         foreach ($glyphs as $glyph) {

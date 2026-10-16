@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Enums\RecipeStatus;
-use App\Models\MealPlan;
 use App\Models\Recipe;
 use App\Walmart\ChromeListBrowser;
 use App\Walmart\ListBrowser;
@@ -30,16 +29,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Nav shell data: two cheap per-request counts for the tab bar /
-        // navbar (pending-approval badge, Shop tab target).
+        // Nav shell data: the pending-approval count for the tab bar / top bar.
         View::composer('layouts.app', function (\Illuminate\View\View $view) {
             $view->with([
                 'pendingRecipeCount' => auth()->check()
                     ? Recipe::query()->where('status', RecipeStatus::Pending)->count()
                     : 0,
-                'latestLockedPlanId' => auth()->check()
-                    ? MealPlan::latestLocked()?->id
-                    : null,
             ]);
         });
     }

@@ -11,6 +11,7 @@ use App\Livewire\RecipeLibrary;
 use App\Livewire\RecipeRequester;
 use App\Livewire\Settings;
 use App\Livewire\ShoppingList;
+use App\Models\MealPlan;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/plan')->name('home');
@@ -24,6 +25,14 @@ Route::get('/kit', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/plan', PlanBuilder::class)->name('plan.builder');
+    // Shop is always in the nav: it goes to the latest locked week, or says to lock one.
+    Route::get('/shop', function () {
+        $plan = MealPlan::latestLocked();
+
+        return $plan
+            ? redirect()->route('plan.shopping-list', $plan->id)
+            : view('shop-empty');
+    })->name('shop');
     Route::get('/plan/{mealPlan}/shopping-list', ShoppingList::class)->name('plan.shopping-list');
     Route::get('/log', DailyCatchUp::class)->name('log.catch-up');
     Route::get('/recipes', RecipeLibrary::class)->name('recipes.index');
