@@ -16,7 +16,7 @@
     </x-ui.card>
 
     @if ($lastRequest !== null)
-        <x-ui.card title="Requested" class="mb-6" wire:loading.class="opacity-60" wire:target="submit">
+        <x-ui.card title="Requested" class="mb-6" wire:loading.delay.class="opacity-50 pointer-events-none" wire:loading.attr="aria-busy" wire:target="submit">
             <p class="font-medium">{{ $lastRequest->query }}</p>
 
             @if ($lastRequest->status === \App\Enums\RequestStatus::Failed)

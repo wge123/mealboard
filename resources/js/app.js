@@ -39,8 +39,10 @@ document.addEventListener('alpine:init', () => {
                 const tile = control.closest('li');
                 const next = [...tile.parentElement.children].find((li) => li !== tile && key(li) > key(tile));
                 tile.parentElement.insertBefore(tile, next ?? null);
+                // Counts live in a group wrapper; a list without one has nothing more to update.
                 const group = tile.closest('[data-resort-group]');
-                const count = group?.querySelector('[data-on-count]');
+                if (!group) return;
+                const count = group.querySelector('[data-on-count]');
                 const lines = [...group.querySelectorAll('li[data-key-on]')].filter((li) => controlOf(li));
                 const on = lines.filter(isOn).length;
                 if (count) count.textContent = on;
