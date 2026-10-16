@@ -15,6 +15,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/plan')->name('home');
 
+// The component kit's showcase page: a development aid, so it 404s outside local.
+Route::get('/kit', function () {
+    abort_unless(app()->environment('local'), 404);
+
+    return view('kit');
+})->name('kit');
+
 Route::middleware('auth')->group(function () {
     Route::get('/plan', PlanBuilder::class)->name('plan.builder');
     Route::get('/plan/{mealPlan}/shopping-list', ShoppingList::class)->name('plan.shopping-list');
