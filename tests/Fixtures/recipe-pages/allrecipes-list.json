@@ -1,0 +1,336 @@
+[
+{
+"@context": "http://schema.org",
+"@type": ["Recipe"]
+,"headline": "Balsamic Roasted Brussels Sprouts with Bacon"
+,"datePublished": "2019-07-12T14:26:56-04:00"
+,"dateModified": "2026-10-20T14:20:49-04:00"
+,"author": [
+{"@type": "Person"
+,"name": "Kisspookies"
+}
+]
+,"description": "Bring on the bacon! Brussels sprouts with bacon become a crowd favorite when smothered in balsamic and topped with homemade bacon bits."
+,"image": {
+"@type": "ImageObject",
+"url": "https://www.allrecipes.com/thmb/qghZo7b4K7WghQJDiq0L2YAf6Zw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/8876402-e98b6d3daa154d54a011c8d9d617c5ec.jpg",
+"height": 1500,
+"width": 1500
+}
+,"publisher": {
+"@type": "Organization",
+"name": "Allrecipes",
+"url": "https://www.allrecipes.com",
+"logo": {
+"@type": "ImageObject",
+"url": "https://www.allrecipes.com/thmb/Z9lwz1y0B5aX-cemPiTgpn5YB0k=/112x112/filters:no_upscale():max_bytes(150000):strip_icc()/allrecipes_logo_schema-867c69d2999b439a9eba923a445ccfe3.png",
+"width": 112,
+"height": 112
+},
+"brand": "Allrecipes"
+, "publishingPrinciples": "https://www.allrecipes.com/about-us-6648102#toc-editorial-guidelines"
+, "sameAs" : [
+"https://www.facebook.com/allrecipes",
+"https://www.instagram.com/allrecipes/",
+"https://www.pinterest.com/allrecipes/",
+"https://www.tiktok.com/@allrecipes",
+"https://www.youtube.com/allrecipes",
+"https://profile.google.com/@allrecipes",
+"https://flipboard.com/@Allrecipes",
+"https://en.wikipedia.org/wiki/Allrecipes.com",
+"http://linkedin.com/company/allrecipes.com",
+"https://www.threads.com/@allrecipes",
+"https://x.com/allrecipes"
+]
+}
+,"name": "Balsamic Roasted Brussels Sprouts with Bacon"
+,"aggregateRating": {
+"@type": "AggregateRating",
+"ratingValue": "4.6",
+"ratingCount": "14"
+}
+,"cookTime": "PT15M"
+,"nutrition": {
+"@type": "NutritionInformation"
+,"calories": "93 kcal"
+,"carbohydrateContent": "12 g"
+,"cholesterolContent": "2 mg"
+,"fiberContent": "5 g"
+,"proteinContent": "4 g"
+,"saturatedFatContent": "1 g"
+,"sodiumContent": "212 mg"
+,"sugarContent": "4 g"
+,"fatContent": "5 g"
+,"unsaturatedFatContent": "0 g"
+}
+,"prepTime": "PT15M"
+, "recipeCategory": ["Dinner","Side Dish"]
+,"recipeCuisine": ["American"]
+,"recipeIngredient": [
+"1 pound Brussels sprouts, trimmed and halved or quartered",
+"2 tablespoons balsamic vinegar, divided",
+"1 tablespoon olive oil",
+"0.25 teaspoon salt",
+"0.25 teaspoon ground black pepper",
+"2 slices bacon",
+"2 teaspoons lemon zest" ]
+,"recipeInstructions": [
+{
+"@type": "HowToStep"
+,"text": "Preheat the oven to 400 degrees F (200 degrees C). Line a 15x10-inch baking pan with foil."
+} ,{
+"@type": "HowToStep"
+,"text": "Place Brussels sprouts into the prepared pan. Drizzle 1 tablespoon balsamic vinegar and olive oil on top. Season with salt and pepper; toss to coat."
+} ,{
+"@type": "HowToStep"
+,"text": "Roast in the preheated oven, stirring every 5 minutes, until Brussels sprouts are crisp-tender and brown, 15 to 20 minutes."
+} ,{
+"@type": "HowToStep"
+,"text": "While Brussels sprouts roast, place bacon in a large skillet and cook over medium-high heat, turning occasionally, until evenly browned and crisp, 10 to 12 minutes. Drain bacon slices on paper towels. Crumble when cool enough to handle."
+} ,{
+"@type": "HowToStep"
+,"text": "Drizzle roasted Brussels sprouts with remaining 1 tablespoon balsamic vinegar and sprinkle with crumbled bacon and lemon zest."
+} ]
+,"recipeYield": "4"
+,"totalTime": "PT30M"
+,"review": [
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "4"
+},
+"author": {
+"@type": "Person",
+"name": "Joe Schepis"
+}
+,
+"reviewBody": "This was an excellent recipe, very tasty. Time in the oven was more like 28-30 minutes. I could do without the lemon zest but my wife loves lemons and enjoyed it very much. I doubled the recipe but rather than adding another 1-2 tablespoons of balsamic vinegar after the oven, I used drizzles of balsamic reduction. That was awesome because it left the sprouts with a hearty coating. I pan fried the bacon and as it was a little to supple, I decided to throw it in with the sprouts for the last 5 minutes to cook and crisp up a little more. I think the extra bacon grease that rendered out added even a little more bacon flavor to the recipe. A winner!"
+},
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "SunnyCorn9682"
+},
+"reviewBody": "Well it's been 🥓 baconized a whole lb for 2 lbs of yummy Brussel Sprouts !! I of course remodeled your recipe just a tad adding 3 tbl spoons balsamic vinegar ( brand name Gran Deposito) of Modena Giuseppe Giusti founded in 1605 !!! An Italian vintage Balsamic Vinegar the Best of the BEST !!! And I added a couple secret ingredients ? Thank so much for laying the groundwork of this amazing 🤩 recipe !!",
+"datePublished": "2025-02-28T02:18:58.636Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "SpeedyBass4962"
+},
+"reviewBody": "These were so good. I did put the bacon on before the oven and skipped the lemon. I probably used a bit more balsamic too. Very good!",
+"datePublished": "2025-01-02T16:29:18.289Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Kim"
+},
+"reviewBody": "This made for some absolutely wonderful Brussels sprouts!! So delicious when roasted like this! I used some thinly sliced pepper bacon, and left out the lemon zest. It was fantastic, and so easy to make! I will definitely be making these again! Thank you for the recipe!",
+"datePublished": "2020-12-23T17:11:51.310Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "MareBare"
+},
+"reviewBody": "Great way to add delicious veggies to your meal! Used only bacon grease no olive oil it wasn’t needed. Used more bacon it was fantastic!!",
+"datePublished": "2026-01-23T23:48:18.098Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Happyschmoopies"
+},
+"reviewBody": "I am not a big fan of Brussels sprouts, but, these are delicious! I quartered the sprouts so there were be more surface for becoming carmelized.",
+"datePublished": "2020-12-08T02:51:14.280Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "ProBrie1183"
+},
+"reviewBody": "Tasty, I added mushrooms to mine as well. But came out very good. Recommend it to anyone looking for a healthy meal.",
+"datePublished": "2023-06-19T00:41:39.219Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "3"
+},
+"author": {
+"@type": "Person",
+"name": "Cindy W"
+},
+"reviewBody": "We love brussel sprouts and this recipe is not typically how we make them. I think next time I will omit the lemon zest and add a cheese like feta or blue cheese.",
+"datePublished": "2020-12-30T16:15:03.387Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Liz Dalton 'Lizzie'"
+},
+"reviewBody": "Good recipe! I had never tried them with Balsamic Vinegar and it is fantastic! And the lemon zest adds lots of flavor! I did not cut them because they were small but will next time. I will make again!",
+"datePublished": "2020-12-23T00:44:17.100Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "4"
+},
+"author": {
+"@type": "Person",
+"name": "JARRIE"
+},
+"reviewBody": "I used more sprouts than this and just sort of eyeballed the balsamic vinegar These were very good! Sorry the bacon didn't wind up picture-worthy, that was my fault and not the recipe's fault so I didn't include it in the photo!",
+"datePublished": "2020-12-22T17:33:57.020Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Judy in Delaware"
+},
+"reviewBody": "We both really enjoyed this recipe, and I'm not a sprouts fan. The balsamic was a great addition and the crispy bacon just took it over the top. I also really liked the little bits that had a bit of a char. Very good and a keeper.",
+"datePublished": "2020-12-21T23:54:23.217Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "4"
+},
+"author": {
+"@type": "Person",
+"name": "Deb C"
+},
+"reviewBody": "This was a nice variation to Brussels sprouts. I think roasting Brussels sprouts always bring our their best flavor.",
+"datePublished": "2020-12-08T13:28:43.797Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Allrecipes Member"
+},
+"reviewBody": "This recipe was delicious just as written. I loved the combination of flavors. Do not omit the fresh lemon zest garnish!",
+"datePublished": "2020-07-27T01:24:15.803Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "JollyCow4665"
+},
+"reviewBody": "This recipe was delicious just as written. I loved the combination of flavors. Do not omit the fresh lemon zest garnish!",
+"datePublished": "2020-07-27T01:21:34.813Z"
+}
+]
+,"mainEntityOfPage": {
+"@type": ["WebPage"]
+,"@id": "https://www.allrecipes.com/recipe/274676/balsamic-roasted-brussels-sprouts-with-bacon/"
+,"name": "Balsamic Roasted Brussels Sprouts with Bacon"
+,"breadcrumb": {
+"@type": "BreadcrumbList",
+"itemListElement": [
+{
+"@type": "ListItem",
+"position": 1,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/1116/fruits-and-vegetables/",
+"name": "Fruits and Vegetables"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 2,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/1059/fruits-and-vegetables/vegetables/",
+"name": "Vegetables"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 3,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/1081/fruits-and-vegetables/vegetables/brussels-sprouts/",
+"name": "Brussels Sprouts"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 4,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/17813/fruits-and-vegetables/vegetables/brussels-sprouts/roasted/",
+"name": "Roasted"
+}
+}
+]
+}} }
+]

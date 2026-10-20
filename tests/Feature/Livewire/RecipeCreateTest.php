@@ -7,6 +7,7 @@ use App\Models\Recipe;
 use App\Models\User;
 use App\Support\HouseholdPreferences;
 use App\Support\MissingKitchenTools;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 use Livewire\Livewire;
@@ -342,4 +343,38 @@ it('says a page with no recipe data has none and fills nothing', function () {
         ->call('importLink')
         ->assertSet('title', '')
         ->assertSee('no recipe data');
+});
+
+it('says could not fetch for a 403, a challenge page and a timeout, and offers paste-the-text with the address filled', function (Closure $fake) {
+    Http::fake(['*' => $fake]);
+    $address = 'https://www.foodnetwork.com/recipes/some-recipe';
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', $address)
+        ->call('importLink')
+        ->assertSet('title', '')
+        ->assertSee('could not be fetched')
+        ->assertDontSee('no recipe data')
+        ->assertSee('paste the recipe text')
+        ->assertSet('sourceUrl', $address);
+})->with([
+    'a 403' => [fn () => Http::response('Access Denied', 403)],
+    'a challenge page' => [fn () => Http::response('<html><title>Just a moment...</title></html>', 403, ['cf-mitigated' => 'challenge'])],
+    'a challenge page served as 200' => [fn () => Http::response('<html><head><title>Just a moment...</title></head><body>Checking your browser</body></html>', 200, ['cf-mitigated' => 'challenge'])],
+    'a timeout' => [fn () => throw new ConnectionException('cURL error 28: Operation timed out')],
+]);
+
+it('says no recipe data and offers paste-the-text with the address filled', function () {
+    Http::fake(['*' => Http::response('<html><body>An article</body></html>')]);
+    $address = 'https://example.com/article';
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', $address)
+        ->call('importLink')
+        ->assertSee('no recipe data')
+        ->assertDontSee('could not be fetched')
+        ->assertSee('paste the recipe text')
+        ->assertSet('sourceUrl', $address);
 });
