@@ -96,6 +96,27 @@ it('puts the shared output format and the kinds list in the extraction prompt', 
     });
 });
 
+it('puts the copy-only rule in the extraction prompt: unstated amounts and times are null or zero, never estimated', function () {
+    $video = DiscoveredVideo::factory()->likelyRecipe()->create();
+
+    Process::fake([
+        '*python3*' => Process::result(output: 'a transcript'),
+        '*claude*' => Process::result(output: json_encode(validVideoRecipeObject())),
+    ]);
+
+    app(ExtractRecipeFromVideo::class)->handle($video);
+
+    Process::assertRan(function ($process) {
+        $prompt = $process->input ?? '';
+
+        return ($process->command[0] ?? '') === '/fake/bin/claude'
+            && str_contains($prompt, 'Copy every amount')
+            && str_contains($prompt, 'null')
+            && str_contains($prompt, 'never estimate')
+            && str_contains($prompt, 'never scale');
+    });
+});
+
 it('retries once with its own output and the errors, then stores the corrected recipe', function () {
     $video = DiscoveredVideo::factory()->likelyRecipe()->create();
 
