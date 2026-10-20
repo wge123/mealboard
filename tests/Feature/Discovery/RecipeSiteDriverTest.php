@@ -55,6 +55,8 @@ function timesFetched(string $url): int
 
 beforeEach(function () {
     config()->set('mealboard.drivers', [RecipeSiteDriver::class]);
+    Http::preventStrayRequests();
+    RecipeSite::query()->delete(); // the migration lists the two real sites; these tests use their own
     RecipeSite::factory()->create(['feed_url' => SITE_FEED, 'name' => 'Cook']);
 });
 

@@ -5,6 +5,10 @@ use App\Models\RecipeSite;
 use App\Models\User;
 use Livewire\Livewire;
 
+beforeEach(function () {
+    RecipeSite::query()->delete(); // the migration lists the first two sites; these tests start from none
+});
+
 it('renders the recipe site list on the settings page', function () {
     RecipeSite::factory()->create(['name' => 'Love and Lemons']);
 

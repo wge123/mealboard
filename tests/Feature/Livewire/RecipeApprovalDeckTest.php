@@ -2,6 +2,7 @@
 
 use App\Enums\RecipeStatus;
 use App\Livewire\RecipeApproval;
+use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Models\User;
 use Livewire\Livewire;
@@ -188,7 +189,7 @@ it('shows the skip and undo buttons on the card', function () {
 it('puts the ingredient lines and the missing tool fixes in the sheet on the card', function () {
     $recipe = Recipe::factory()->create(['title' => 'Sheet Card']);
     $recipe->ingredients()->attach(
-        \App\Models\Ingredient::factory()->create(['name' => 'red lentils'])->id,
+        Ingredient::factory()->create(['name' => 'red lentils'])->id,
         ['qty' => 250, 'unit' => 'g', 'note' => null],
     );
     $recipe->recipeTools()->each(fn ($tool) => $tool->delete());
