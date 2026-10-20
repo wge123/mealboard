@@ -1,0 +1,19 @@
+HTTP/2 200 
+content-type: text/plain
+content-length: 2216
+accept-ranges: bytes
+date: Wed, 14 Oct 2026 12:08:12 GMT
+server: AmazonS3
+last-modified: Tue, 29 Sep 2026 15:20:42 GMT
+etag: "dac2e70cf2e10d74423d6da94c50637d"
+x-amz-server-side-encryption: AES256
+vary: Accept-Encoding
+x-cache: Hit from cloudfront
+via: 1.1 62323086586f1338e01b4e30280b745a.cloudfront.net (CloudFront)
+x-amz-cf-pop: TPA52-P4
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: 6lIW3bORSnNYQ-C2cg8bMXicF7w8wgSj8eE0rYsFOKSeaUo1yqP-sA==
+age: 541166
+cache-control: max-age=604800
+vary: Origin
+

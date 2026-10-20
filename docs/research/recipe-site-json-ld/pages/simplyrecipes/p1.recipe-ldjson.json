@@ -1,0 +1,135 @@
+[
+{
+"@context": "http://schema.org",
+"@type": ["Recipe","NewsArticle"]
+,"headline": "This 20-Minute Creamed Spinach Tortellini Turns a Classic Side Into Dinner"
+,"datePublished": "2026-10-20T07:32:00-04:00"
+,"dateModified": "2026-10-20T07:32:00-04:00"
+,"author": [
+{"@type": "Person"
+,"name": "Ben Weiner"
+,"url": "https://www.simplyrecipes.com/ben-weiner-11943347"
+}
+]
+,"description": "In this quick creamed spinach tortellini recipe, a creamy, spinach-rich sauce envelops tender tortellini for a decadent one-pan main dish."
+,"image": {
+"@type": "ImageObject",
+"url": "https://www.simplyrecipes.com/thmb/t-PAQnTza-ZxUdSnHhz7hETmNDY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Simply-Recipes-Creamed-Spinach-Tortellini-LEAD-1-c6d6c13bff5c4904a12cedc8356c9bdc.jpg",
+"height": 1000,
+"width": 1500
+}
+,"publisher": {
+"@type": "Organization",
+"name": "Simply Recipes",
+"url": "https://www.simplyrecipes.com",
+"logo": {
+"@type": "ImageObject",
+"url": "https://www.simplyrecipes.com/thmb/w-6VMkS2Ix524xJLwO0bvbMDCO0=/320x1125/filters:no_upscale():max_bytes(150000):strip_icc()/SimplyRecipesLogoTransparent-07a297c54b2142ae9c079abb2f0fa639.png",
+"width": 320,
+"height": 1125
+},
+"brand": "Simply Recipes"
+, "publishingPrinciples": "https://www.simplyrecipes.com/about-us-5096129#toc-editorial-guidelines"
+, "sameAs" : [
+"https://www.instagram.com/simplyrecipes",
+"https://www.facebook.com/simplyrecipes",
+"https://www.pinterest.com/simplyrecipes",
+"https://www.youtube.com/c/simplyrecipes"
+]
+}
+,"name": "This 20-Minute Creamed Spinach Tortellini Turns a Classic Side Into Dinner"
+,"cookTime": "PT15M"
+,"keywords": "Creamed Spinach Tortellini"
+,"nutrition": {
+"@type": "NutritionInformation"
+,"calories": "632 kcal"
+,"carbohydrateContent": "47 g"
+,"cholesterolContent": "180 mg"
+,"fiberContent": "6 g"
+,"proteinContent": "29 g"
+,"saturatedFatContent": "16 g"
+,"sodiumContent": "990 mg"
+,"sugarContent": "6 g"
+,"fatContent": "38 g"
+,"transFatContent": "0 g"
+,"unsaturatedFatContent": "19 g"
+}
+,"prepTime": "PT5M"
+, "recipeCategory": ["Dinner"]
+,"recipeCuisine": ["American"]
+,"recipeIngredient": [
+"3 tablespoons olive oil",
+"1 small shallot, thinly sliced",
+"2 cloves garlic, minced",
+"1 3/4 cups chicken stock or vegetable stock",
+"Kosher salt & freshly ground black pepper",
+"Freshly ground black pepper to taste",
+"1 (9 to 12-ounce) package tortellini, refrigerated or frozen",
+"1/2 cup mascarpone or cream cheese, room temperature",
+"1 pound frozen spinach, thawed and drained",
+"1 egg yolk",
+"1 cup (about 2.5 ounces) freshly grated parmesan cheese",
+"1/2 cup (2 ounces) shredded Gruyère cheese",
+"1/4 teaspoon ground nutmeg",
+"1/2 teaspoon red pepper flakes" ]
+,"recipeInstructions": [
+{
+"@type": "HowToStep"
+,"name": "Cook the aromatics:"
+,"text": "In a large skillet, heat olive oil over medium-low heat. Add the shallot and garlic, and cook until both start to soften, 2 minutes. Add the chicken stock and salt and pepper to taste, increase the heat to medium-high, and bring to a simmer."
+} ,{
+"@type": "HowToStep"
+,"name": "Cook the pasta and start the sauce:"
+,"text": "Once the stock has come to a simmer, add the tortellini and cook until warmed through, about 4 minutes. Add the mascarpone or cream cheese and stir constantly until fully incorporated, about 2 more minutes. Add the thawed spinach and cook until warmed through, about 2 more minutes."
+} ,{
+"@type": "HowToStep"
+,"name": "Finish the pasta:"
+,"text": "In a small bowl combine the egg yolk and parmesan, mixing until no wet streaks of yolk remain. Reduce the heat to low, add the Gruyère, the parmesan-yolk mixture, nutmeg, and pepper flakes. Turn the heat off and stir everything together until the cheese has melted. The residual heat from the skillet will cook the egg and allow the cheese to fully incorporate, about 3 minutes. Store leftovers in an airtight container in the refrigerator for up to 3 days."
+} ]
+,"recipeYield": "4"
+,"totalTime": "PT20M"
+,"mainEntityOfPage": {
+"@type": ["WebPage"]
+,"@id": "https://www.simplyrecipes.com/creamed-spinach-tortellini-recipe-12175246"
+,"name": "This 20-Minute Creamed Spinach Tortellini Turns a Classic Side Into Dinner"
+,"breadcrumb": {
+"@type": "BreadcrumbList",
+"itemListElement": [
+{
+"@type": "ListItem",
+"position": 1,
+"item": {
+"@id": "https://www.simplyrecipes.com/recipes-by-ingredients-5091192",
+"name": "Recipes By Ingredients"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 2,
+"item": {
+"@id": "https://www.simplyrecipes.com/pasta-recipes-5090999",
+"name": "Pastas"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 3,
+"item": {
+"@id": "https://www.simplyrecipes.com/pasta-recipes-by-type-5090993",
+"name": "Pastas By Type"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 4,
+"item": {
+"@id": "https://www.simplyrecipes.com/tortellini-recipes-5090983",
+"name": "Tortellinis"
+}
+}
+]
+}} }
+]

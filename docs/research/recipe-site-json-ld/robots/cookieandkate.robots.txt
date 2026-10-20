@@ -1,0 +1,30 @@
+User-agent: 008
+Disallow: /
+
+User-agent: Opebot-v (https://www.1plusx.com (https://www.1plusx.com/)) 
+Allow: /
+
+User-agent: anthropic-ai
+Disallow: /
+User-agent: Claude-Web
+Disallow: /
+User-agent: CCbot
+Disallow: /
+User-agent: FacebookBot
+Disallow: /
+User-agent: Google-Extended
+Disallow: /
+User-agent: GPTBot
+Disallow: /
+User-agent: PiplBot
+Disallow: /
+
+User-agent: *
+Disallow: /cdn-cgi/
+Disallow: /wp-admin/
+Disallow: /?s=
+Disallow: /search/
+
+Allow: /wp-admin/admin-ajax.php
+
+Sitemap: https://cookieandkate.com/sitemap_index.xml

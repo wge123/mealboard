@@ -1,0 +1,23 @@
+Disallow: /r/
+Disallow: /ecourse/
+Disallow: /university/
+Disallow: /18190176/
+Disallow: /minimalist-baker-detox-guide/
+Disallow: /m/*
+Disallow: /m/Minimalist-Baker-Detox-Guide.pdf
+Sitemap: http://minimalistbaker.com/sitemap_index.xml
+
+User-agent: anthropic-ai
+Disallow: /
+User-agent: Claude-Web
+Disallow: /
+User-agent: CCbot
+Disallow: /
+User-agent: FacebookBot
+Disallow: /
+User-agent: Google-Extended
+Disallow: /
+User-agent: GPTBot
+Disallow: /
+User-agent: PiplBot
+Disallow: /

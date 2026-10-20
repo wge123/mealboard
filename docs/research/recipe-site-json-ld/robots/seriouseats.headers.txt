@@ -1,0 +1,27 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:27:32 GMT
+content-type: text/plain;charset=utf-8
+cf-ray: a4da13c04b76a4eb-MIA
+cf-cache-status: DYNAMIC
+cache-control: max-age=3600, private
+set-cookie: TMog=nc2219bfc71d14f879f311417d4f8d53418; Path=/; Domain=.seriouseats.com; Expires=Sun, 7 Nov 2094 21:41:39 GMT; Max-Age=2147483647; Secure
+set-cookie: globalTI_SID=0a62deac-b262-4bda-884b-36cc76472d70; Path=/; Domain=.seriouseats.com; Expires=Thu, 19 Oct 2028 18:27:32 GMT; Max-Age=63072000; Secure
+set-cookie: Mint=nc2219bfc71d14f879f311417d4f8d53418; Path=/; Domain=.seriouseats.com; Expires=Tue, 20 Oct 2026 18:57:32 GMT; Max-Age=1800; Secure
+set-cookie: pc=1; Path=/; Domain=.seriouseats.com; Expires=Tue, 20 Oct 2026 18:57:32 GMT; Max-Age=1800; Secure
+set-cookie: __cf_bm=O9cf5GAufP.u_GwWJ_awtcZkgqUc6ZdVN0EjSfOMgz4-1792520852.524132-1.0.1.1-dFQNNCyFqnbUbtvp_IZFRfflxTjLMDfB4fTOrtdlnR3TqshO.JpK3x_7kP899mTpWyr4v3pzoLEgcGibH1SP8B1Vgz84t2MCyfPys.0GVS_fetKd4xP104kyOm1UM2vD; HttpOnly; SameSite=None; Secure; Path=/; Domain=seriouseats.com; Expires=Tue, 20 Oct 2026 18:57:32 GMT
+expires: Thu, 01 Jan 1970 00:00:00 GMT
+link: <//www.seriouseats.com/static/fonts/space-grotesk-semi-bold.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.seriouseats.com/static/fonts/inter-regular-subset.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.seriouseats.com/static/fonts/inter-semi-bold-subset.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.googletagmanager.com/gtm.js?id=GTM-5P3SZGS>; rel=preload; as=script; nopush, <//www.googletagmanager.com/gtag/js?id=G-48FDR9J6FP&l=dataLayer&cx=c>; rel=preload; as=script; nopush, <//securepubads.g.doubleclick.net/tag/js/gpt.js>; rel=preload; as=script; nopush
+server: cloudflare
+x-content-type-options: nosniff
+strict-transport-security: max-age=15552000
+vary: Accept-Encoding, Origin, Access-Control-Request-Method, Access-Control-Request-Headers
+content-security-policy: frame-ancestors 'self' https://*.seo.aws.about.com https://*.dotdash.com *.seriouseats.com; upgrade-insecure-requests;
+cross-origin-opener-policy: same-origin-allow-popups
+nel: {"report_to":"network-errors","max_age":2592000,"success_fraction":0,"failure_fraction":1.0,"include_subdomains":true}
+referrer-policy: no-referrer-when-downgrade
+report-to: {"group":"network-errors","max_age":2592000,"endpoints":[{"url":"https://rjs.3gl.net/hawklogserver/5463/re.p"}]}
+x-abt-application-version: 2.229.0
+x-connection-protocol: HTTP/2
+x-content-security-policy: frame-ancestors 'self' https://*.seo.aws.about.com https://*.dotdash.com *.seriouseats.com; upgrade-insecure-requests;
+alt-svc: h3=":443"; ma=86400
+

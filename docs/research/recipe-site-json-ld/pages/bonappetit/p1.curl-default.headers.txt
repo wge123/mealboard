@@ -1,0 +1,29 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:35:47 GMT
+content-type: text/html; charset=utf-8
+server: cloudflare
+payment: free
+content-security-policy: frame-ancestors 'self' https://copilot-app.condenast.io https://stg-copilot-app.condenast.io
+modified-at: 1792170714
+cache-control: stale-while-revalidate=60, stale-if-error=86400, s-maxage=14400
+x-content-type-options: nosniff
+x-xss-protection: 0
+back-lae-origin-response-start: 1792519390304
+x-organization-slug: bon-appetit
+x-ua-device: desktop
+vary: accept-encoding
+via: 1.1 7aea57f307e043300c172e8eaaa89c9c.cloudfront.net (CloudFront)
+alt-svc: h3=":443"; ma=86400
+age: 1957
+set-cookie: xid1=1; Expires=Tue, 20 Oct 2026 18:36:02 GMT; Domain=.bonappetit.com; path=/; Secure;
+set-cookie: CN_segments=co.w2643; Expires=Sun, 18 Apr 2027 18:35:47 GMT; Domain=.bonappetit.com; path=/; Secure;
+set-cookie: CN_xid_refresh=7e098050-8219-403e-a39f-03bc8db0e4e2; Expires=Wed, 20 Oct 2027 18:35:47 GMT; Domain=.bonappetit.com; path=/; Secure; httponly; SameSite=None;
+set-cookie: CN_xid=7e098050-8219-403e-a39f-03bc8db0e4e2; Expires=Sun, 18 Apr 2027 18:35:47 GMT; Domain=.bonappetit.com; path=/; Secure; SameSite=None;
+set-cookie: CN_geo_country_code=US; Expires=Sun, 18 Apr 2027 18:35:47 GMT; path=/; Domain=.bonappetit.com;  Secure; SameSite=None;
+x-cache: Hit from cloudfront
+x-amz-cf-pop: MIA3-P4
+x-amz-cf-id: tZXWtMXpX2FSFtqzQ651pcqzsy2r2oVSCAYXUS5CTavCB9IsHAD_zg==
+cf-cache-status: DYNAMIC
+content-encoding: gzip
+cf-ray: a4da1fd4ba5a23b3-MIA
+

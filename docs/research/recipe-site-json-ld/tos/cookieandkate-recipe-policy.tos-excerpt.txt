@@ -1,0 +1,8 @@
+SOURCE: https://cookieandkate.com/cookie-and-kates-photo-and-recipe-policy/
+FETCHED: 2026-10-20 (curl)
+NOTE: sentences matching automated-access / copying keywords, extracted mechanically from the page text; not the whole document.
+
+- Please keep in mind that my content is copyrighted material and I’ve worked very hard to produce it.
+- Please do not share more than one image from a post without my explicit permission (email me).
+- Again, my recipes are copyrighted material and may not be published elsewhere.
+- You do not need to contact me to confirm the permissions presented on this page.

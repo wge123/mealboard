@@ -1,0 +1,278 @@
+[
+{
+"@context": "http://schema.org",
+"@type": ["Recipe"]
+,"headline": "Instant Pot Ham and Bean Soup"
+,"datePublished": "2018-08-08T22:15:57-04:00"
+,"dateModified": "2026-10-20T14:24:19-04:00"
+,"author": [
+{"@type": "Person"
+,"name": "Angela Giannetti Snyder"
+}
+]
+,"description": "Ham and bean soup doesn’t get easier than this Instant Pot recipe that’s chock-full of great Northern beans and perfect for chilly evenings."
+,"image": {
+"@type": "ImageObject",
+"url": "https://www.allrecipes.com/thmb/j26WcJqKwIdS2_lHjRIv3NptrwY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/267262instant-pot-ham-and-bean-soupsouplovingnicole_4x3-307cdd039d0347d5a30bbbbc933ac7ed.jpg",
+"height": 1125,
+"width": 1500
+}
+,"publisher": {
+"@type": "Organization",
+"name": "Allrecipes",
+"url": "https://www.allrecipes.com",
+"logo": {
+"@type": "ImageObject",
+"url": "https://www.allrecipes.com/thmb/Z9lwz1y0B5aX-cemPiTgpn5YB0k=/112x112/filters:no_upscale():max_bytes(150000):strip_icc()/allrecipes_logo_schema-867c69d2999b439a9eba923a445ccfe3.png",
+"width": 112,
+"height": 112
+},
+"brand": "Allrecipes"
+, "publishingPrinciples": "https://www.allrecipes.com/about-us-6648102#toc-editorial-guidelines"
+, "sameAs" : [
+"https://www.facebook.com/allrecipes",
+"https://www.instagram.com/allrecipes/",
+"https://www.pinterest.com/allrecipes/",
+"https://www.tiktok.com/@allrecipes",
+"https://www.youtube.com/allrecipes",
+"https://profile.google.com/@allrecipes",
+"https://flipboard.com/@Allrecipes",
+"https://en.wikipedia.org/wiki/Allrecipes.com",
+"http://linkedin.com/company/allrecipes.com",
+"https://www.threads.com/@allrecipes",
+"https://x.com/allrecipes"
+]
+}
+,"name": "Instant Pot Ham and Bean Soup"
+,"aggregateRating": {
+"@type": "AggregateRating",
+"ratingValue": "4.8",
+"ratingCount": "10"
+}
+,"cookTime": "PT35M"
+,"nutrition": {
+"@type": "NutritionInformation"
+,"calories": "384 kcal"
+,"carbohydrateContent": "50 g"
+,"cholesterolContent": "30 mg"
+,"fiberContent": "12 g"
+,"proteinContent": "24 g"
+,"saturatedFatContent": "4 g"
+,"sodiumContent": "1076 mg"
+,"sugarContent": "2 g"
+,"fatContent": "10 g"
+,"unsaturatedFatContent": "0 g"
+}
+,"prepTime": "PT15M"
+, "recipeCategory": ["Dinner"]
+,"recipeCuisine": ["American"]
+,"recipeIngredient": [
+"2 tablespoons butter",
+"2 medium carrots, sliced",
+"2 celery ribs, chopped",
+"0.5 cup chopped onion",
+"4 (15.5 ounce) cans great northern beans, rinsed and drained",
+"4 cups chicken broth",
+"2 cups cubed fully cooked ham",
+"1 teaspoon chili powder",
+"0.5 teaspoon minced garlic",
+"0.25 teaspoon ground black pepper",
+"1 bay leaf" ]
+,"recipeInstructions": [
+{
+"@type": "HowToStep"
+,"text": "Turn on a multi-functional pressure cooker (such as Instant Pot) and select Saute function. Melt butter in the pot; add carrots, celery, and onion. Saute until vegetables are tender, 5 to 7 minutes."
+} ,{
+"@type": "HowToStep"
+,"text": "Add beans, broth, ham, chili powder, garlic, pepper, and bay leaf to the pot. Close and lock the lid. Select Soup setting according to manufacturers’ instructions. Cook until flavors meld, about 30 minutes."
+} ,{
+"@type": "HowToStep"
+,"text": "Release pressure using the natural-release method according to manufacturer’s instructions, 10 to 40 minutes."
+} ]
+,"recipeYield": ["8", "8 servings"]
+,"totalTime": "PT60M"
+,"review": [
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "4"
+},
+"author": {
+"@type": "Person",
+"name": "Kim's Cooking Now"
+}
+,
+"reviewBody": "I did change the method of this recipe slightly, as I used dry beans, rather than the canned. After sauteing the vegetables, I removed them to a bowl, added the dried beans (16 oz) to the pot, and covered with water by 1\". Cooked on high pressure for 15 minutes, NPR 25 minutes, then opened the pressure cooker and added the vegetables back in and proceeded with the recipe. I did not use the chili powder (that just sounded strange to me for bean and ham soup), but instead added some fresh thyme and parsley. Overall, a tasty soup, and one that I would make again."
+},
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Denise"
+},
+"reviewBody": "Used dry beans rather than canned, it's what I had on hand. I added oregano, cumin, basil, cajun spice, liquid smoke, and paprika along with the recommendations in the original recipe. Because I used dry beans, I used 7-8 cups broth/water. It made LOTS of soup and I was able to put some in the freezer for a \"rainy day\".",
+"datePublished": "2022-10-14T15:00:06.776Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Soup Loving Nicole"
+},
+"reviewBody": "Made exactly as written except my IP doesn't have a soup setting so I used the \"manual\" setting. Simple and delicious! I thought it would need salt but it didn't. The chili powder was different than any others I have used in a ham and bean soup and it worked. We liked it. This is a keeper!",
+"datePublished": "2024-11-25T02:10:26.137Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Laura Hanson"
+},
+"reviewBody": "I have to update my rating to a 5+\nBursting with flavor. I added 1 cup of macaroni and that was it.",
+"datePublished": "2020-12-30T19:09:30.320Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "john"
+},
+"reviewBody": "I amped up the chili powder, minced garlic and black pepper. Also substituted one can of Great Northern beans with Busch's 'cumin and chili' Chili Beans. Fantastic.",
+"datePublished": "2025-12-28T18:47:30.405Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Bully Momma"
+},
+"reviewBody": "I made this twice with a couple of changes. I cooked dry beans in the instant pot. I sauteed the veggies but add diced jalapenos and garlic cloves. I didn't use chili powder, but I used smoked paprika. I also add chopped cilantro. I add a bit of flour for thickness. I made some crispy oven fried cornbread in a cast iron skillet to crumble into the soup. Yummy Yummy! I'm so happy to have come across this recipe.",
+"datePublished": "2025-12-26T05:50:28.744Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Bev Ritch"
+},
+"reviewBody": "I had to reduce the recipe, due to cooking for one, but it was delicious!",
+"datePublished": "2025-01-15T20:31:32.144Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Allrecipes Member"
+},
+"reviewBody": "Very good soup! I am new to the instant pot. I made navy beans before hand in the instant pot then added 6 cups cooked beans to the recipe. I followed the recipe exactly and it had a nice balance of broth to beans. The chili pepper gave it a nice color and added a little more flavor. Easy to make and I will make it again. Thanks for the recipe",
+"datePublished": "2020-02-20T00:24:15.263Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "GlitzyBrie9469"
+},
+"reviewBody": "Very good soup! I am new to the instant pot. I made navy beans before hand in the instant pot then added 6 cups cooked beans to the recipe. I followed the recipe exactly and it had a nice balance of broth to beans. The chili pepper gave it a nice color and added a little more flavor. Easy to make and I will make it again. Thanks for the recipe",
+"datePublished": "2020-02-20T00:24:15.263Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "4"
+},
+"author": {
+"@type": "Person",
+"name": "Mik82"
+},
+"reviewBody": "The only ingredient I didn't use was celery. My family don't like it. It was very good and my husband wants it added to the menu.",
+"datePublished": "2019-02-23T01:52:36.730Z"
+}
+]
+,"mainEntityOfPage": {
+"@type": ["WebPage"]
+,"@id": "https://www.allrecipes.com/recipe/267262/instant-pot-ham-and-bean-soup/"
+,"name": "Instant Pot Ham and Bean Soup"
+,"breadcrumb": {
+"@type": "BreadcrumbList",
+"itemListElement": [
+{
+"@type": "ListItem",
+"position": 1,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/94/soups-stews-and-chili/",
+"name": "Soups, Stews and Chili Recipes"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 2,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/16369/soups-stews-and-chili/soup/",
+"name": "Soup Recipes"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 3,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/675/soups-stews-and-chili/soup/pork-soup/",
+"name": "Pork Soup Recipes"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 4,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/17512/soups-stews-and-chili/soup/pork-soup/ham-soup/",
+"name": "Ham Soup"
+}
+}
+]
+}} }
+]

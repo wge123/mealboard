@@ -1,0 +1,15 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:36:45 GMT
+content-type: text/html; charset=UTF-8
+x-content-type-options: nosniff
+vary: X-Forwarded-Proto,Accept-Encoding
+last-modified: Tue, 20 Oct 2026 17:00:44 GMT
+pragma: public
+cache-control: max-age=3600, public
+cf-cache-status: HIT
+server: cloudflare
+age: 1677
+content-encoding: gzip
+cf-ray: a4da21402b185d0c-MIA
+alt-svc: h3=":443"; ma=86400
+

@@ -1,0 +1,23 @@
+HTTP/2 200 
+content-type: application/rss+xml; charset=UTF-8
+date: Sat, 10 Oct 2026 00:37:18 GMT
+link: <https://pinchofyum.com/wp-json/>; rel="https://api.w.org/"
+link: <https://pinchofyum.com/>; rel="canonical"
+x-batcache: MISS
+server: nginx
+strict-transport-security: max-age=86400
+last-modified: Fri, 09 Oct 2026 17:21:06 GMT
+etag: "bd0ed13f9e228d3eced9d27b67f65ec0"
+cache-control: s-maxage=2419200, max-age=300, must-revalidate
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+content-security-policy: frame-ancestors 'self';
+x-xss-protection: 1; mode=block
+vary: Cookie,Origin
+x-cache: Hit from cloudfront
+via: 1.1 f86a3ae2e4c19bd1ed0975236813d90c.cloudfront.net (CloudFront)
+x-amz-cf-pop: MIA3-P1
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: bgEtrF-6f4CXV02ChKoD_IwRpP6618sA_JEXlsn4nskeKwn3K-hPnQ==
+age: 928266
+

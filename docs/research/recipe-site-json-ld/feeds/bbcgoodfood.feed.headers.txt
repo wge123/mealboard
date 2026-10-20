@@ -1,0 +1,45 @@
+HTTP/2 200 
+content-type: application/rss+xml; charset=utf-8
+backend: https://content-resolution-service-production.headless.imdserve.com
+x-proxied-request: true
+cache-control: public, max-age=0, s-maxage=900, stale-while-revalidate=86400, stale-if-error=86400
+etag: 703a15a4fb2a5bb43e0495d1b5c309a0a6977c87
+link: <https://www.bbcgoodfood.com/stitcher-assets/bbcgoodfood/ad-manager.js>; rel="preload"; as="script"
+link: <https://www.bbcgoodfood.com/unified/wrapperMessagingWithoutDetection.js>; rel="preload"; as="script"
+link: <https://cp.bbcgoodfood.com/now.js>; rel="preload"; as="script"
+link: <https://api.permutive.app>; rel="preconnect"
+link: <https://api.edkt.io>; rel="dns-prefetch"
+link: <https://adservice.google.co.uk>; rel="dns-prefetch"
+link: <https://cdn.doubleverify.com>; rel="dns-prefetch"
+link: <https://region1.google-analytics.com>; rel="dns-prefetch"
+link: <https://use.typekit.net>; rel="preconnect"
+link: <https://cdn.speedcurve.com>; rel="dns-prefetch"
+link: <https://www.google-analytics.com>; rel="dns-prefetch"
+link: <https://www.googletagmanager.com>; rel="dns-prefetch"
+link: <https://ib.adnxs.com>; rel="dns-prefetch"
+link: <https://tlx.3lift.com>; rel="dns-prefetch"
+link: <https://htlb.casalemedia.com>; rel="dns-prefetch"
+link: <https://g2.gumgum.com>; rel="dns-prefetch"
+link: <https://a.teads.tv>; rel="dns-prefetch"
+link: <https://grid.bidswitch.net>; rel="dns-prefetch"
+referrer-policy: strict-origin-when-cross-origin
+x-frame-options: SAMEORIGIN
+x-search-version: 6
+x-service-name: search
+x-service-type: frontend
+x-xss-protection: 1; mode=block
+via: 1.1 varnish, 1.1 varnish
+accept-ranges: bytes
+age: 728
+date: Tue, 20 Oct 2026 18:28:39 GMT
+x-served-by: cache-dub4327-DUB, cache-mia-kmia1760052-MIA
+x-cache: HIT, MISS
+x-cache-hits: 54, 0
+x-timer: S1792520919.956321,VS0,VE118
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+fastly-geoip-countrycode: US
+access-control-allow-origin: *
+vary: Accept-Encoding, X-Routing-Control-Resolve-Only, routing_service_test
+content-length: 195194
+

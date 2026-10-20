@@ -1,0 +1,24 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:38:51 GMT
+content-type: text/html; charset=UTF-8
+permissions-policy: private-state-token-redemption=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com"), private-state-token-issuance=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com")
+last-modified: Tue, 20 Oct 2026 12:43:17 GMT
+x-hosted-by: BigScoots
+server: cloudflare
+content-security-policy: upgrade-insecure-requests
+strict-transport-security: max-age=31536000; includeSubdomains;
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+referrer-policy: strict-origin-when-cross-origin
+vary: Accept, Accept-Encoding
+cf-cache-status: HIT
+set-cookie: _cfuvid=G1dXzfCK5l7LGATQg6rH_i8cvGTsK2wf22o_Mk6p73Q-1792521531.0104225-1.0.1.1-yXu9qN_SCP6._Ye.UT_N9P71OCGitqIRFhWUkDMSOjs; HttpOnly; SameSite=None; Secure; Path=/; Domain=cookieandkate.com
+link: <https://cookieandkate.com/wp-json/>; rel="https://api.w.org/"
+link: <https://cookieandkate.com/wp-json/wp/v2/posts/49586>; rel="alternate"; title="JSON"; type="application/json"
+link: <https://cookieandkate.com/?p=49586>; rel=shortlink
+x-np-cfe: dns1
+content-encoding: gzip
+cf-ray: a4da2450cefbd965-MIA
+alt-svc: h3=":443"; ma=86400
+

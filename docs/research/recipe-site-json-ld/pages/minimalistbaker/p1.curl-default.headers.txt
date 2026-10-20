@@ -1,0 +1,43 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:37:04 GMT
+content-type: text/html; charset=UTF-8
+server: cloudflare
+cf-edge-cache: cache,platform=wordpress
+permissions-policy: private-state-token-redemption=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com"), private-state-token-issuance=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com")
+link: <https://minimalistbaker.com/wp-json/>; rel="https://api.w.org/"
+link: <https://minimalistbaker.com/wp-json/wp/v2/posts/136020>; rel="alternate"; title="JSON"; type="application/json"
+link: <https://minimalistbaker.com/?p=136020>; rel=shortlink
+link: </wp-content/plugins/instagram-feed/css/sbi-styles.min.css?ver=6.10.1>; rel=preload; as=style
+link: </wp-content/plugins/wp-recipe-maker/dist/public-modern.css?ver=10.5.0>; rel=preload; as=style
+link: </wp-content/plugins/wp-recipe-maker-premium/dist/public-pro.css?ver=10.5.0>; rel=preload; as=style
+link: </wp-includes/css/dist/components/style.min.css?ver=6.9.10>; rel=preload; as=style
+link: </wp-includes/css/dist/preferences/style.min.css?ver=6.9.10>; rel=preload; as=style
+link: </wp-includes/css/dist/block-editor/style.min.css?ver=6.9.10>; rel=preload; as=style
+link: </wp-content/plugins/popup-maker/dist/packages/block-library-style.css?ver=dbea705cfafe089d65f1>; rel=preload; as=style
+link: </wp-content/plugins/jquery-pin-it-button-for-images/css/client.css?ver=3.0.6>; rel=preload; as=style
+link: </wp-content/plugins/simple-banner/simple-banner.css?ver=3.2.1>; rel=preload; as=style
+link: </wp-content/plugins/subscribe-to-comments-reloaded/includes/css/font-awesome.min.css?ver=6.9.10>; rel=preload; as=style
+link: </wp-content/plugins/subscribe-to-comments-reloaded/includes/css/stcr-style.css?ver=6.9.10>; rel=preload; as=style
+link: </wp-content/plugins/wpr-extend-comment-form/assets/css/wpr-custom.css?ver=6.9.10>; rel=preload; as=style
+link: </wp-content/themes/mb-2020/assets/css/main.css?ver=1791584718>; rel=preload; as=style
+link: </wp-content/plugins/popup-maker/dist/assets/site.css?ver=1.21.5>; rel=preload; as=style
+link: </wp-includes/js/jquery/jquery.min.js?ver=3.7.1>; rel=preload; as=script
+link: </wp-content/plugins/simple-banner/simple-banner.js?ver=3.2.1>; rel=preload; as=script
+link: </wp-content/plugins/woocommerce/assets/client/blocks/wc-blocks.css?ver=wc-10.6.1>; rel=preload; as=style
+link: </wp-content/plugins/wpforms/assets/css/frontend/classic/wpforms-full.min.css?ver=1.10.0.2>; rel=preload; as=style
+link: </wp-content/plugins/jquery-pin-it-button-for-images/js/jpibfi.client.js?ver=3.0.6>; rel=preload; as=script
+link: </wp-content/plugins/wpr-extend-comment-form/assets/js/wpr-custom-comments.js?ver=1.0.0>; rel=preload; as=script
+link: </wp-content/themes/mb-2020/assets/js/global.js?ver=1791584717>; rel=preload; as=script
+link: </wp-includes/js/comment-reply.min.js?ver=6.9.10>; rel=preload; as=script
+link: </wp-includes/js/jquery/ui/core.min.js?ver=1.13.3>; rel=preload; as=script
+vary: Accept-Encoding
+x-content-type-options: nosniff
+access-control-allow-origin: *
+age: 12694
+last-modified: Tue, 20 Oct 2026 15:21:54 GMT
+cache-control: max-age=86400
+cf-cache-status: HIT
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+content-encoding: gzip
+cf-ray: a4da21b858c1204d-MIA
+

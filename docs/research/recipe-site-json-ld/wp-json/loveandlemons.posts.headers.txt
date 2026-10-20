@@ -1,0 +1,19 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:42:42 GMT
+content-type: application/json; charset=UTF-8
+content-length: 290
+x-robots-tag: noindex
+x-content-type-options: nosniff
+access-control-expose-headers: X-WP-Total, X-WP-TotalPages, Link
+access-control-allow-headers: Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type
+x-wp-total: 1850
+x-wp-totalpages: 617
+link: <https://www.loveandlemons.com/wp-json/wp/v2/posts?_fields=id%2Cdate%2Cmodified%2Clink%2Ctitle&per_page=3&page=2>; rel="next"
+allow: GET
+vary: Origin,X-Forwarded-Proto,Accept-Encoding
+content-encoding: gzip
+server: cloudflare
+cf-cache-status: DYNAMIC
+cf-ray: a4da29f798c6a575-MIA
+alt-svc: h3=":443"; ma=86400
+

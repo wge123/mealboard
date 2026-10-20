@@ -1,0 +1,130 @@
+[
+{
+"@context": "http://schema.org",
+"@type": ["Recipe","NewsArticle"]
+,"headline": "Maple Bacon Brussels Sprouts Will Turn the Biggest Skeptic Into a Fan"
+,"datePublished": "2026-10-20T06:32:00-04:00"
+,"dateModified": "2026-10-20T06:32:00-04:00"
+,"author": [
+{"@type": "Person"
+,"name": "Theodora Kaloudis"
+,"url": "https://www.simplyrecipes.com/theodora-kaloudis-8701339"
+}
+]
+,"description": "This maple bacon Brussels sprouts recipe combines crispy roasted sprouts, smoky bacon, sweet maple syrup, and tangy mustard for an irresistible side dish."
+,"image": {
+"@type": "ImageObject",
+"url": "https://www.simplyrecipes.com/thmb/WHiz96I8vGdZrYYZe1IvPS8aCvo=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/simply-recipes-maple-roasted-sprouts-lead-1-b3a56e31243c48fc90712ce8d34d6503.jpg",
+"height": 1000,
+"width": 1500
+}
+,"publisher": {
+"@type": "Organization",
+"name": "Simply Recipes",
+"url": "https://www.simplyrecipes.com",
+"logo": {
+"@type": "ImageObject",
+"url": "https://www.simplyrecipes.com/thmb/w-6VMkS2Ix524xJLwO0bvbMDCO0=/320x1125/filters:no_upscale():max_bytes(150000):strip_icc()/SimplyRecipesLogoTransparent-07a297c54b2142ae9c079abb2f0fa639.png",
+"width": 320,
+"height": 1125
+},
+"brand": "Simply Recipes"
+, "publishingPrinciples": "https://www.simplyrecipes.com/about-us-5096129#toc-editorial-guidelines"
+, "sameAs" : [
+"https://www.instagram.com/simplyrecipes",
+"https://www.facebook.com/simplyrecipes",
+"https://www.pinterest.com/simplyrecipes",
+"https://www.youtube.com/c/simplyrecipes"
+]
+}
+,"name": "Maple Bacon Brussels Sprouts Will Turn the Biggest Skeptic Into a Fan"
+,"cookTime": "PT30M"
+,"keywords": "Maple Bacon Brussels Sprouts"
+,"nutrition": {
+"@type": "NutritionInformation"
+,"calories": "359 kcal"
+,"carbohydrateContent": "23 g"
+,"cholesterolContent": "35 mg"
+,"fiberContent": "5 g"
+,"proteinContent": "17 g"
+,"saturatedFatContent": "6 g"
+,"sodiumContent": "1129 mg"
+,"sugarContent": "12 g"
+,"fatContent": "24 g"
+,"transFatContent": "0 g"
+,"unsaturatedFatContent": "17 g"
+}
+,"prepTime": "PT20M"
+, "recipeCategory": ["Side Dish","Dinner"]
+,"recipeCuisine": ["American"]
+,"recipeIngredient": [
+"1 1/2 pounds fresh brussels sprouts, trimmed and halved (or quartered if large)",
+"3 tablespoons olive oil",
+"3 tablespoons maple syrup",
+"1 tablespoon stone-ground or Dijon mustard",
+"1 1/4 teaspoons kosher salt",
+"1/2 teaspoon smoked paprika",
+"1/2 teaspoon freshly ground black pepper",
+"5 slices (about 5 ounces) bacon, cut crosswise into 1/2-inch-thick pieces",
+"1 tablespoon fresh thyme leaves, optional" ]
+,"recipeInstructions": [
+{
+"@type": "HowToStep"
+,"name": "Preheat the oven to 400°F."
+,"text": "Line a large rimmed baking sheet with aluminum foil."
+} ,{
+"@type": "HowToStep"
+,"name": "Combine the ingredients:"
+,"text": "On the prepared baking sheet, stir together the brussels sprouts, oil, maple syrup, mustard, salt, paprika, and pepper until well combined. Spread into a single layer. Sprinkle the bacon evenly around the brussels sprouts mixture, separating any pieces that stick together."
+} ,{
+"@type": "HowToStep"
+,"name": "Roast:"
+,"text": "Bake until the bacon is rendered and the brussels sprouts are browned and tender, 30 to 35 minutes, stirring every 10 minutes. Stir in the thyme leaves, if using, and serve immediately. Refrigerate leftovers in an airtight container for up to 4 days."
+} ]
+,"recipeYield": "4"
+,"totalTime": "PT50M"
+,"mainEntityOfPage": {
+"@type": ["WebPage"]
+,"@id": "https://www.simplyrecipes.com/maple-bacon-brussels-sprouts-recipe-12166987"
+,"name": "Maple Bacon Brussels Sprouts Will Turn the Biggest Skeptic Into a Fan"
+,"breadcrumb": {
+"@type": "BreadcrumbList",
+"itemListElement": [
+{
+"@type": "ListItem",
+"position": 1,
+"item": {
+"@id": "https://www.simplyrecipes.com/recipes-5090746",
+"name": "Recipes"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 2,
+"item": {
+"@id": "https://www.simplyrecipes.com/recipes-by-ingredients-5091192",
+"name": "Recipes By Ingredients"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 3,
+"item": {
+"@id": "https://www.simplyrecipes.com/vegetable-recipes-5090922",
+"name": "Vegetables"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 4,
+"item": {
+"@id": "https://www.simplyrecipes.com/brussels-sprouts-recipes-5090906",
+"name": "Brussels Sprouts"
+}
+}
+]
+}} }
+]

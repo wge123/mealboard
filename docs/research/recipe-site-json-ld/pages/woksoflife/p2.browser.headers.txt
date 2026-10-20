@@ -1,0 +1,28 @@
+HTTP/2 103 
+link: <https://thewoksoflife.com/wp-content/uploads/2025/01/logo.svg>; as=image; fetchpriority=high; rel=preload, <https://thewoksoflife.com/wp-content/uploads/2020/10/sarah-60x60.jpg>; as=image; fetchpriority=high; rel=preload, <https://thewoksoflife.com/wp-content/uploads/2026/05/thai-red-curry-sheet-pan-chicken-6.jpg>; as=image; fetchpriority=high; rel=preload, <https://thewoksoflife.com/wp-content/themes/creator-wol/assets/fonts/crimson-text-v10-latin-regular.woff2>; as=font; crossorigin=anonymous; rel=preload; type=font/woff2, <https://thewoksoflife.com/wp-content/themes/creator-wol/assets/fonts/barlow-v4-latin-500.woff2>; as=font; crossorigin=anonymous; rel=preload; type=font/woff2, <https://thewoksoflife.com/wp-content/themes/creator-wol/assets/fonts/crimson-text-v10-latin-700italic.woff2>; as=font; crossorigin=anonymous; rel=preload; type=font/woff2, <https://thewoksoflife.com/wp-content/themes/creator-wol/assets/fonts/crimson-text-v10-latin-italic.woff2>; as=font; crossorigin=anonymous; rel=preload; type=font/woff2, <https://thewoksoflife.com/wp-content/themes/creator-wol/assets/fonts/mark_simonson_-_proxima_nova_s_extrabold-webfont.woff2>; as=font; crossorigin=anonymous; rel=preload; type=font/woff2, <https://thewoksoflife.com/wp-content/themes/creator-wol/assets/fonts/crimson-text-v10-latin-700.woff2>; as=font; crossorigin=anonymous; rel=preload; type=font/woff2, <https://thewoksoflife.com/wp-content/plugins/wpdiscuz/assets/third-party/font-awesome-5.13.0/webfonts/fa-solid-900.woff2>; as=font; crossorigin=anonymous; rel=preload; type=font/woff2
+
+HTTP/2 403 
+date: Tue, 20 Oct 2026 18:35:03 GMT
+content-type: text/html; charset=UTF-8
+accept-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cf-mitigated: challenge
+x-frame-options: SAMEORIGIN
+server: cloudflare
+critical-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cross-origin-embedder-policy: require-corp
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+permissions-policy: accelerometer=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),xr-spatial-tracking=*
+referrer-policy: same-origin
+server-timing: chlray;desc="a4da1ec3f8d1b88d"
+x-content-type-options: nosniff
+strict-transport-security: max-age=15552000; preload
+vary: accept-encoding
+set-cookie: __cf_bm=KwPRjMEiO90FykhqGIF.jwd7tbmFcxOfBJbBrj3ggXc-1792521303.676856-1.0.1.1-6gQbAL_fazqX.28FXtjNLVN.gpdHsyFkGHRKXXGs1NKPQoxw1KMNo3IaGSl_ey3DqI3b1d8ALfcvo8XI8Msv8PTiEarExYnKgkFN8tBEz80zaEAv2_gVSm8lvXDLIhSN; HttpOnly; SameSite=None; Secure; Path=/; Domain=thewoksoflife.com; Expires=Tue, 20 Oct 2026 19:05:03 GMT
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=pI2bNGOaU7dTWL1UnB4%2BALqpYXOwnBKAUZh6%2FhZO5lja7XolGlRpkMUQOcscXD1NDJCKuaFjoJRzZBkIkPes3yAgySDhZfed%2FI1sPqS2UdM72yWQNT2%2FRYXqukvjUi2Sed5s"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.01,"max_age":604800}
+content-encoding: gzip
+cf-ray: a4da1ec3f8d1b88d-MIA
+alt-svc: h3=":443"; ma=86400
+

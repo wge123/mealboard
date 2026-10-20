@@ -1,0 +1,86 @@
+{
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "Recipe",
+            "keywords": "Sweet rolls;;Chocolate;;Breakfast \u0026 brunch",
+            "name": "Soft Chocolate Buns",
+            "description": "Whether you’re a fan of cinnamon buns or babka, these chocolate buns are sure to please you. The sweet chocolate filling perfectly complements the soft, tender dough. White icing completes the ensemble for a wonderfully decadent morning treat, especially when paired with a hot cup of coffee or tea.",
+            "recipeYield": [
+                "8",
+                "8 buns"
+            ],
+            "prepTime": "PT30M",
+            "datePublished": "July 22, 2018 at 8:00pm",
+            "cookTime": "PT25M",
+            "totalTime": "PT3H35M",
+            "recipeInstructions": [
+                "To make the dough: Weigh your flour; or measure it by gently spooning it into a cup, then sweeping off any excess. Combine all the ingredients, and mix and knead — by hand, mixer, or bread machine — to make a soft, smooth dough.",
+                "Place the dough in a lightly greased bowl and allow it to rise, covered, for 1 to 1 1/2 hours, until doubled.",
+                "To make the filling: Mix together all the ingredients, stirring until smooth. Set aside.",
+                "Turn the dough out onto a lightly floured or greased work surface and stretch or roll it into an 8\u0022 x 14\u0022 rectangle.",
+                "Spread the filling (microwaving it briefly if necessary to achieve a spreadable consistency) onto the surface of the dough, leaving 1\u0022 uncovered on one short side. (A small offset spatula is a helpful tool here.) ",
+                "Starting with the filling-covered short side, roll the dough into a log. Use a sharp serrated knife or dental floss (really, it works!) to slice the log into eight buns.",
+                "Place the chocolate buns into a lightly greased 9\u0022 round pan, spacing them evenly.",
+                "Cover the buns and allow them to rise for 45 to 60 minutes, until puffy. Toward the end of the rising time, preheat the oven to 350°F.",
+                "Bake the buns for 20 to 25 minutes, until they\u0027re golden brown.",
+                "Remove the buns from oven and allow them to cool in the pan for 5 to 10 minutes before icing.",
+                "To make the icing: In a small bowl, combine all the ingredients, stirring until smooth.",
+                "Pour or spread the icing evenly onto the warm buns. Serve buns warm or at room temperature.",
+                "Storage information: Wrap leftover chocolate buns and store at room temperature for 1 to 2 days. Un-iced buns can be stored in the freezer for up to 1 month. "
+            ],
+            "recipeIngredient": [
+                "1/2 cup (113g) water, lukewarm",
+                "1 large egg",
+                "2 tablespoons (28g) unsalted butter, softened",
+                "1 teaspoon King Arthur Pure Vanilla Extract",
+                "2 1/4 cups (270g) King Arthur Unbleached All-Purpose Flour",
+                "2 tablespoons (14g) King Arthur Baker\u0027s Special Dry Milk or nonfat dry milk",
+                "2 tablespoons (25g) granulated sugar",
+                "3/4 teaspoon table salt",
+                "1 1/2 teaspoons instant yeast",
+                "5 tablespoons (60g) granulated sugar",
+                "3 tablespoons (15g) Dutch-process cocoa",
+                "1 tablespoon King Arthur Unbleached All-Purpose Flour",
+                "1/16 teaspoon (pinch) table salt",
+                "2 tablespoons (28g) unsalted butter, melted",
+                "1 tablespoon (14g) water",
+                "1/2 cup (57g) confectioners\u0027 sugar",
+                "1 tablespoon (14g) milk"
+            ],
+            "author": {
+                "@type": "Person",
+                "name": "Charlotte Rutledge",
+                "url": "https://www.kingarthurbaking.com/author/charlotte-rutledge"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "King Arthur Baking",
+                "url": "https://www.kingarthurbaking.com/"
+            },
+            "nutrition": {
+                "@type": "NutritionInformation",
+                "servingSize": "1 bun (93g)",
+                "calories": "280 calories",
+                "carbohydrateContent": "48g",
+                "cholesterolContent": "40mg",
+                "fiberContent": "2g",
+                "proteinContent": "7g",
+                "sodiumContent": "280mg",
+                "sugarContent": "20g",
+                "fatContent": "8g",
+                "saturatedFatContent": "4.5g",
+                "transFatContent": "0g"
+            },
+            "image": {
+                "@type": "ImageObject",
+                "url": "https://www.kingarthurbaking.com/sites/default/files/2023-06/chocolate-swirl-buns_0523.jpg"
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.90",
+                "ratingCount": "9"
+            }
+        }
+    ]
+}

@@ -1,0 +1,81 @@
+{
+    "@context": "https:\/\/schema.org",
+    "@type": "Recipe",
+    "@id": "https:\/\/www.tasteofhome.com\/recipes\/pinto-beans-and-rice\/",
+    "name": "Pinto Beans and Rice",
+    "datePublished": "2018-01-01",
+    "dateModified": "2024-05-31",
+    "prepTime": "PT15M",
+    "cookTime": "PT30M",
+    "totalTime": "PT45M",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https:\/\/www.tasteofhome.com\/wp-content\/uploads\/2024\/09\/EXPS_TOHD24_18194_EricKleinberg_8.jpg",
+        "height": 1200,
+        "width": 1200
+    },
+    "recipeCategory": [
+        "Side Dishes"
+    ],
+    "description": "I love to try different foods, and I especially like to see the reaction of my family when I put new dishes on the dinner table. This was a success. I've since served it at many potlucks and have been asked for the recipe every time.&mdash;Linda Romano, Mt. Airy, North Carolina",
+    "recipeIngredient": [
+        "1 large onion, chopped",
+        "2 tablespoons vegetable oil",
+        "3\/4 cup ketchup",
+        "2 to 4 tablespoons brown sugar",
+        "1 teaspoon prepared mustard",
+        "1 teaspoon Liquid Smoke, optional",
+        "1 teaspoon salt",
+        "1\/4 teaspoon pepper",
+        "3 cups cooked long grain rice",
+        "2 cans (15 ounces each) pinto beans, rinsed and drained"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "name": "Preheat the oven.",
+            "text": "Your oven should be preheated to 350\u00b0F. Step 2: Chop and saut\u00e9 the onion. Chop a large onion into small pieces. Do not mince them, but cut them into 1\/2-inch pieces. Then in a large skillet add 1 tablespoon of vegetable oil and the chopped onions. Saut\u00e9 until the onion is tender, remove the skillet from the heat and set aside."
+        },
+        {
+            "@type": "HowToStep",
+            "name": "Add the other ingredients.",
+            "text": "Stir the ketchup, brown sugar, mustard, salt and pepper into the skillet. Mix well and only add liquid smoke if desired. It is an optional ingredient."
+        },
+        {
+            "@type": "HowToStep",
+            "name": "Rinse and drain beans and combine",
+            "text": "Use cold water to rinse the beans lightly. Add the uncooked rice and beans to other ingredients already in the skillet. Editor\u2019s Tip: Use a stainless-steel colander to drain the beans. The openings are only slightly smaller than the beans and nearly all the water drains out easily."
+        },
+        {
+            "@type": "HowToStep",
+            "name": "Transfer to a baking dish and bake",
+            "text": "Move the mixed ingredients to a greased 1-1\/2 quart baking dish. Bake the beans and rice uncovered for 30 to 35 minutes or until the pinto beans and rice are heated through. Editor\u2019s Tip: If you can, use a glass baking dish. Metal, when removed from the oven, cools down faster than glass and if you plan to serve this dish right away you'll want to keep it warm, of course!"
+        }
+    ],
+    "recipeYield": "6 servings",
+    "author": [
+        {
+            "@type": "Person",
+            "name": "Taste of Home Editorial Team"
+        }
+    ],
+    "nutrition": {
+        "@type": "NutritionInformation",
+        "calories": " 263 calories",
+        "fatContent": "5g fat (1g saturated fat)",
+        "cholesterolContent": "0 cholesterol",
+        "sodiumContent": "856mg sodium",
+        "carbohydrateContent": "48g carbohydrate (11g sugars",
+        "fiberContent": "4g fiber)",
+        "proteinContent": "6g protein. "
+    },
+    "aggregateRating": {
+        "@context": "http:\/\/schema.org\/",
+        "@type": "AggregateRating",
+        "worstRating": 1,
+        "bestRating": 5,
+        "ratingValue": 4.5,
+        "reviewCount": 8
+    },
+    "recipeCuisine": "North America, Mexican"
+}

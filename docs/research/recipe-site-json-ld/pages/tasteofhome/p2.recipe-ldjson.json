@@ -1,0 +1,93 @@
+{
+    "@context": "https:\/\/schema.org",
+    "@type": "Recipe",
+    "@id": "https:\/\/www.tasteofhome.com\/recipes\/slow-cooked-sirloin\/",
+    "name": "Slow-Cooker Sirloin Steak",
+    "datePublished": "2018-01-01",
+    "dateModified": "2024-05-31",
+    "prepTime": "PT20M",
+    "cookTime": "PT03H30M",
+    "totalTime": "PT03H50M",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https:\/\/www.tasteofhome.com\/wp-content\/uploads\/2018\/01\/Slow-Cooked-Sirloin_EXPS_FT24_26566_EC_051024_1.jpg",
+        "height": 1200,
+        "width": 1200
+    },
+    "recipeCategory": [
+        "Dinner"
+    ],
+    "description": "Making sirloin steak in a Crockpot is a simple, fool-proof method that gives you\u00a0tender, fall-apart meat with plenty of gravy and none of the messy grease splatter.",
+    "recipeIngredient": [
+        "1 beef top sirloin steak (1-1\/2 pounds)",
+        "1 medium onion, cut into 1-inch chunks",
+        "1 medium green pepper, cut into 1-inch chunks",
+        "1 can (14-1\/2 ounces) reduced-sodium beef broth",
+        "1\/4 cup Worcestershire sauce",
+        "1\/4 teaspoon dill weed",
+        "1\/4 teaspoon dried thyme",
+        "1\/4 teaspoon pepper",
+        "Dash crushed red pepper flakes",
+        "2 tablespoons cornstarch",
+        "2 tablespoons cold water"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "name": "Brown the beef",
+            "text": "In a large nonstick skillet, brown the beef on both sides. Editor's Tip: Cooking over medium-high heat ensures good browning. Too high, and the meat will char too much; too low, and it will not sear well. Keep in mind that you're only adding color in this step, not cooking the steak through."
+        },
+        {
+            "@type": "HowToStep",
+            "name": "Load the slow cooker",
+            "text": "Place the onion and green pepper in a 3-quart slow cooker. Add the beef on top. In a bowl or liquid measuring cup, combine the broth, Worcestershire sauce, dill, thyme, pepper and pepper flakes. Slowly pour the mixture over the beef and vegetables."
+        },
+        {
+            "@type": "HowToStep",
+            "name": "Cook the beef",
+            "text": "Cover the slow cooker and cook the beef on high until it reaches your desired doneness and until the vegetables are crisp-tender, about three to four hours."
+        },
+        {
+            "@type": "HowToStep",
+            "name": "Make a quick gravy and serve",
+            "text": "Remove the beef and keep it warm. In a small bowl, whisk the cornstarch and water together until they form a smooth slurry. Gradually stir the slurry into the cooking juices. Cover the slow cooker and cook on high until the sauce is slightly thickened, about 30 minutes. Return the beef to the slow cooker and heat it through.",
+            "image": "https:\/\/www.tasteofhome.com\/wp-content\/uploads\/2024\/04\/Slow-Cooker-Sirloin-Steak_FT24_26566_EC_051024_3.jpg?fit=700,1024"
+        }
+    ],
+    "recipeYield": "6 servings",
+    "author": [
+        {
+            "@type": "Person",
+            "name": "Kelsey Dimberg"
+        }
+    ],
+    "nutrition": {
+        "@type": "NutritionInformation",
+        "calories": " 199 calories",
+        "fatContent": "6g fat (2g saturated fat)",
+        "cholesterolContent": "68mg cholesterol",
+        "sodiumContent": "305mg sodium",
+        "carbohydrateContent": "8g carbohydrate (2g sugars",
+        "fiberContent": "1g fiber)",
+        "proteinContent": "26g protein.  <B><b>Diabetic Exchanges<\/b>: <\/B>3 lean meat"
+    },
+    "aggregateRating": {
+        "@context": "http:\/\/schema.org\/",
+        "@type": "AggregateRating",
+        "worstRating": 1,
+        "bestRating": 5,
+        "ratingValue": 4.23,
+        "reviewCount": 26
+    },
+    "video": {
+        "@type": "VideoObject",
+        "name": "Slow-Cooked Sirloin",
+        "description": "Check out this video for how to make Slow-Cooked Sirloin!",
+        "thumbnailUrl": [
+            "http:\/\/content.jwplatform.com\/v2\/media\/9No497cv\/poster.jpg?width=720"
+        ],
+        "uploadDate": "",
+        "duration": "P0DT0H0M1S",
+        "contentUrl": "http:\/\/content.jwplatform.com\/videos\/9No497cv-OOHHzDJg.mp4"
+    }
+}

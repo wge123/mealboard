@@ -1,0 +1,27 @@
+HTTP/2 200 
+content-type: text/html; charset=utf-8
+server: CloudFront
+date: Tue, 20 Oct 2026 18:10:32 GMT
+payment: free
+content-security-policy: frame-ancestors 'self' https://copilot-app.condenast.io https://stg-copilot-app.condenast.io
+modified-at: 1792519351
+cache-control: stale-while-revalidate=60, stale-if-error=86400, s-maxage=14400
+x-content-type-options: nosniff
+x-xss-protection: 0
+back-lae-origin-response-start: 1792519832324
+x-organization-slug: epicurious
+x-ua-device: desktop
+content-encoding: gzip
+vary: accept-encoding
+via: 1.1 fc829835df73fbe6f6b25897680c2474.cloudfront.net (CloudFront)
+alt-svc: h3=":443"; ma=86400
+age: 2040
+set-cookie: xid1=1; Expires=Tue, 20 Oct 2026 18:44:47 GMT; Domain=.epicurious.com; path=/; Secure;
+set-cookie: CN_segments=co.w2643; Expires=Sun, 18 Apr 2027 18:44:32 GMT; Domain=.epicurious.com; path=/; Secure;
+set-cookie: CN_xid_refresh=aa39e069-6de4-499e-802a-08a39d6af7ea; Expires=Wed, 20 Oct 2027 18:44:32 GMT; Domain=.epicurious.com; path=/; Secure; httponly; SameSite=None;
+set-cookie: CN_xid=aa39e069-6de4-499e-802a-08a39d6af7ea; Expires=Sun, 18 Apr 2027 18:44:32 GMT; Domain=.epicurious.com; path=/; Secure; SameSite=None;
+set-cookie: CN_geo_country_code=US; Expires=Sun, 18 Apr 2027 18:44:32 GMT; path=/; Domain=.epicurious.com;  Secure; SameSite=None;
+x-cache: Hit from cloudfront
+x-amz-cf-pop: TPA52-P4
+x-amz-cf-id: yZPGms5oxkTyo3QbvjOG-5P62czgD1qScbSHd4owavwwka5BQ9tLmA==
+

@@ -1,0 +1,37 @@
+HTTP/2 302 
+server: nginx
+date: Tue, 20 Oct 2026 18:28:22 GMT
+content-type: text/html; charset=utf-8
+location: http://feeds.feedburner.com/smittenkitchen
+strict-transport-security: max-age=31536000
+host-header: wpcloud
+vary: Cookie
+x-ac: 36.mia _atomic_dca MISS
+x-remembering: Eric Binnion <https://friendsofericbinnion.wordpress.com/>
+alt-svc: clear
+server-timing: a8c-cdn, dc;desc=mia, cache;desc=MISS;dur=131.0
+
+HTTP/1.1 200 OK
+Content-Type: text/xml; charset=utf-8
+feedburnerv2: 
+Last-Modified: Sat, 17 Oct 2026 17:51:46 GMT
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: Mon, 01 Jan 1990 00:00:00 GMT
+Date: Tue, 20 Oct 2026 18:28:23 GMT
+Accept-CH: Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Model, Sec-CH-UA-WoW64, Sec-CH-UA-Form-Factors, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
+Cross-Origin-Resource-Policy: same-site
+Permissions-Policy: ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*, ch-ua-model=*, ch-ua-wow64=*, ch-ua-form-factors=*, ch-ua-platform=*, ch-ua-platform-version=*
+Content-Security-Policy: require-trusted-types-for 'script';report-uri /_/RaichuFeedServer/cspreport
+Content-Security-Policy: script-src 'report-sample' 'nonce-wXeb_2ikJpx4_rKYiJYEng' 'unsafe-inline';object-src 'none';base-uri 'self';report-uri /_/RaichuFeedServer/cspreport;worker-src 'self'
+Content-Security-Policy: script-src 'unsafe-inline' 'unsafe-eval' blob: data: 'self' https://apis.google.com https://ssl.gstatic.com https://www.google.com https://www.googletagmanager.com https://www.gstatic.com https://www.google-analytics.com;report-uri /_/RaichuFeedServer/cspreport/allowlist
+Cross-Origin-Opener-Policy: same-origin
+reporting-endpoints: default="/_/RaichuFeedServer/web-reports?context=eJzj4tDikmJw0pBiEOLmOP703jU2gY7TfYpKlkn5hfGJpSmZ-boFpUk5mcUZqUXFukBB3aLEzOSMUt201NSU4tSistSieCMDIzNDA0NLPQPj-AIDAEEQGvI"
+Server: ESF
+X-XSS-Protection: 0
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Accept-Ranges: none
+Vary: Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site,Accept-Encoding
+Transfer-Encoding: chunked
+

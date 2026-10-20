@@ -1,0 +1,99 @@
+{
+    "@context": "https:\/\/schema.org",
+    "@type": "Recipe",
+    "@id": "https:\/\/www.tasteofhome.com\/recipes\/cinnamon-swirl-quick-bread\/",
+    "name": "Cinnamon Quick Bread",
+    "datePublished": "2018-01-01",
+    "dateModified": "2024-05-31",
+    "prepTime": "PT15M",
+    "cookTime": "PT45M",
+    "totalTime": "PT60M",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https:\/\/www.tasteofhome.com\/wp-content\/uploads\/2018\/01\/Cinnamon-Swirl-Quick-Bread_EXPS_FBBZ24_4876_DR_05_10_04b.jpg",
+        "height": 1200,
+        "width": 1200
+    },
+    "recipeCategory": [
+        "Breakfast",
+        "Brunch"
+    ],
+    "description": "Cinnamon quick bread can be eaten as an indulgent breakfast, a cozy midday treat or a warming dessert. This recipe is as easy as it is warm and delicious.",
+    "recipeIngredient": [
+        "2 cups all-purpose flour",
+        "1-1\/2 cups sugar, divided",
+        "1 teaspoon baking soda",
+        "1\/2 teaspoon salt",
+        "1 cup buttermilk",
+        "1 large egg, room temperature",
+        "1\/4 cup canola oil",
+        "3 teaspoons ground cinnamon",
+        "GLAZE:",
+        "1\/4 cup confectioners' sugar",
+        "1-1\/2 to 2 teaspoons 2% milk"
+    ],
+    "recipeInstructions": [
+        {
+            "@type": "HowToStep",
+            "name": "Create the batter",
+            "text": "Preheat the oven to 350\u00b0F. In a large bowl, whisk together the flour, 1 cup sugar, the baking soda and salt. In a separate bowl, whisk together the buttermilk, egg and oil until very well combined. Using a rubber spatula, stir the wet ingredients into the dry ingredients just until moistened. Editor\u2019s Tip: Be careful not to overmix the batter once the wet and dry ingredients are combined. Overmixing will cause an over-development of gluten, resulting in a tough, dense bread."
+        },
+        {
+            "@type": "HowToStep",
+            "name": "Mix the cinnamon sugar",
+            "text": "In a small bowl, whisk together the cinnamon and remaining 1\/2 cup sugar until everything is evenly distributed."
+        },
+        {
+            "@type": "HowToStep",
+            "name": "Assemble the loaf",
+            "text": "Grease only the bottom of a 9x5-inch loaf pan. Pour half the batter into the pan and gently spread it out evenly to all four corners. Sprinkle the top with half the cinnamon sugar. Pour the remaining batter on top and carefully spread it out. Sprinkle the top with the remaining cinnamon sugar. Using a butter knife, cut through the batter a few times to create a swirl."
+        },
+        {
+            "@type": "HowToStep",
+            "name": "Bake the loaf",
+            "text": "Bake the loaf until a toothpick inserted in the center comes out clean, 45 to 50 minutes. Cool the loaf for 10 minutes at room temperature. Remove the loaf from the pan and onto a wire rack to cool completely to room temperature."
+        },
+        {
+            "@type": "HowToStep",
+            "name": "Drizzle on the glaze",
+            "text": "In a small bowl, whisk together the confectioners' sugar and just enough milk to reach the desired consistency. Drizzle the glaze over the loaf.",
+            "image": "https:\/\/www.tasteofhome.com\/wp-content\/uploads\/2024\/02\/Cinnamon-Swirl-Quick-Bread_FBBZ24_4876_DR_05_10_05b.jpg?fit=700,1024"
+        }
+    ],
+    "recipeYield": "16 servings",
+    "author": [
+        {
+            "@type": "Person",
+            "name": "Val Goodrich"
+        }
+    ],
+    "nutrition": {
+        "@type": "NutritionInformation",
+        "calories": " 179 calories",
+        "fatContent": "4g fat (1g saturated fat)",
+        "cholesterolContent": "14mg cholesterol",
+        "sodiumContent": "173mg sodium",
+        "carbohydrateContent": "34g carbohydrate (21g sugars",
+        "fiberContent": "1g fiber)",
+        "proteinContent": "3g protein."
+    },
+    "aggregateRating": {
+        "@context": "http:\/\/schema.org\/",
+        "@type": "AggregateRating",
+        "worstRating": 1,
+        "bestRating": 5,
+        "ratingValue": 4.39,
+        "reviewCount": 90
+    },
+    "video": {
+        "@type": "VideoObject",
+        "name": "Cinnamon Swirl Quick Bread",
+        "description": "Check out this video for how to make Cinnamon Swirl Quick Bread",
+        "thumbnailUrl": [
+            "http:\/\/content.jwplatform.com\/v2\/media\/TugNVMk9\/poster.jpg?width=720"
+        ],
+        "uploadDate": "",
+        "duration": "P0DT0H0M1S",
+        "contentUrl": "http:\/\/content.jwplatform.com\/videos\/TugNVMk9-IFfy1PC6.mp4"
+    }
+}

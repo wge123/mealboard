@@ -1,0 +1,23 @@
+HTTP/2 200 
+content-type: text/plain
+backend: https://content-resolution-service-production.headless.imdserve.com
+x-proxied-request: true
+access-control-allow-credentials: true
+x-amz-apigw-id: FjbpWGRzjoEEtcQ=
+x-amzn-requestid: 91e88817-79cf-4b40-bb25-4c182cb341ff
+x-amzn-trace-id: Root=1-6ad7a63b-3befd8347c3dcb9b1622bcc4;Parent=5efa2370b91d3037;Sampled=0;Lineage=1:8efcd1e2:0
+via: 1.1 varnish, 1.1 varnish
+accept-ranges: bytes
+age: 0
+date: Tue, 20 Oct 2026 18:27:36 GMT
+x-served-by: static-files, cache-dub4396-DUB, cache-mia-kmia1760048-MIA
+x-cache: HIT, MISS
+x-cache-hits: 9, 0
+x-timer: S1792520856.294438,VS0,VE112
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+fastly-geoip-countrycode: US
+access-control-allow-origin: *
+vary: X-Routing-Control-Resolve-Only, Accept-Encoding, routing_service_test
+content-length: 1828
+

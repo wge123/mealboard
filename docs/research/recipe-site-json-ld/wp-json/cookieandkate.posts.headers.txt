@@ -1,0 +1,28 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:42:37 GMT
+content-type: application/json; charset=UTF-8
+x-robots-tag: noindex
+x-content-type-options: nosniff
+access-control-expose-headers: X-WP-Total, X-WP-TotalPages, Link
+access-control-allow-headers: Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type
+x-wp-total: 930
+x-wp-totalpages: 310
+allow: GET
+vary: Origin
+vary: Accept, Accept-Encoding
+x-hosted-by: BigScoots
+server: cloudflare
+content-security-policy: block-all-mixed-content;
+strict-transport-security: max-age=31536000; includeSubdomains;
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+referrer-policy: strict-origin-when-cross-origin
+last-modified: Tue, 20 Oct 2026 18:42:37 GMT
+cf-cache-status: MISS
+set-cookie: _cfuvid=ObyunfXC1FUvn6PXYRjP8t1SYBuFIwXVwP9zoYtzivU-1792521756.8501675-1.0.1.1-Qu1UJG21GigxdXH9g5UJ5hi67CyEisZ308twiQ1WIUc; HttpOnly; SameSite=None; Secure; Path=/; Domain=cookieandkate.com
+link: <https://cookieandkate.com/wp-json/wp/v2/posts?per_page=3&_fields=id%2Cdate%2Cmodified%2Clink%2Ctitle&page=2>; rel="next"
+x-np-cfe: dns1
+content-encoding: gzip
+cf-ray: a4da29d44fb986b3-MIA
+alt-svc: h3=":443"; ma=86400
+

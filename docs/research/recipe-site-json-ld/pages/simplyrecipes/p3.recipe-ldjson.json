@@ -1,0 +1,117 @@
+[
+{
+"@context": "http://schema.org",
+"@type": ["Recipe","NewsArticle"]
+,"headline": "My Auntie Deb’s 3-Ingredient Carrot-Apple Salad Is My Favorite Fall Side Dish"
+,"datePublished": "2026-10-19T07:32:00-04:00"
+,"dateModified": "2026-10-19T07:32:00-04:00"
+,"author": [
+{"@type": "Person"
+,"name": "Sarah Crowder"
+,"url": "https://www.simplyrecipes.com/sarah-crowder-7501079"
+}
+]
+,"description": "This easy 3-ingredient carrot and apple salad recipe combines sweet apples, crunchy carrots, and lemon juice for a fresh, flavorful fall side dish."
+,"image": {
+"@type": "ImageObject",
+"url": "https://www.simplyrecipes.com/thmb/Xiny3zkzVhCzAtZpaw9FJO05KmQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Simply-Recipes-Carrot-Apple-Salad-LEAD-1-resized-c46a1ccd944b45f2b8f29e899e3f1a4a.jpg",
+"height": 1000,
+"width": 1500
+}
+,"publisher": {
+"@type": "Organization",
+"name": "Simply Recipes",
+"url": "https://www.simplyrecipes.com",
+"logo": {
+"@type": "ImageObject",
+"url": "https://www.simplyrecipes.com/thmb/w-6VMkS2Ix524xJLwO0bvbMDCO0=/320x1125/filters:no_upscale():max_bytes(150000):strip_icc()/SimplyRecipesLogoTransparent-07a297c54b2142ae9c079abb2f0fa639.png",
+"width": 320,
+"height": 1125
+},
+"brand": "Simply Recipes"
+, "publishingPrinciples": "https://www.simplyrecipes.com/about-us-5096129#toc-editorial-guidelines"
+, "sameAs" : [
+"https://www.instagram.com/simplyrecipes",
+"https://www.facebook.com/simplyrecipes",
+"https://www.pinterest.com/simplyrecipes",
+"https://www.youtube.com/c/simplyrecipes"
+]
+}
+,"name": "My Auntie Deb’s 3-Ingredient Carrot-Apple Salad Is My Favorite Fall Side Dish"
+,"keywords": "Auntie Deb’s 3-Ingredient Carrot-Apple Salad"
+,"nutrition": {
+"@type": "NutritionInformation"
+,"calories": "73 kcal"
+,"carbohydrateContent": "18 g"
+,"cholesterolContent": "0 mg"
+,"fiberContent": "4 g"
+,"proteinContent": "1 g"
+,"saturatedFatContent": "0 g"
+,"sodiumContent": "91 mg"
+,"sugarContent": "12 g"
+,"fatContent": "0 g"
+,"transFatContent": "0 g"
+,"unsaturatedFatContent": "0 g"
+}
+,"prepTime": "PT10M"
+, "recipeCategory": ["Side Dish","Salad"]
+,"recipeCuisine": ["American"]
+,"recipeIngredient": [
+"4 carrots, peeled and grated (about 2 1/2 cups)",
+"2 large sweet apples (such as Fuji, Gala, or Honeycrisp), scrubbed and grated",
+"2 tablespoons fresh lemon juice",
+"1/4 teaspoon kosher salt, plus more to taste",
+"Chopped toasted walnuts, optional" ]
+,"recipeInstructions": [
+{
+"@type": "HowToStep"
+,"name": "Combine the ingredients:"
+,"text": "In a large bowl, toss together the carrots, apples, lemon juice, and salt until combined. Season with additional salt to taste and garnish with walnuts, if using. Refrigerate leftovers in an airtight container for up to 2 days."
+} ]
+,"recipeYield": "6"
+,"totalTime": "PT10M"
+,"mainEntityOfPage": {
+"@type": ["WebPage"]
+,"@id": "https://www.simplyrecipes.com/three-ingredient-carrot-apple-salad-recipe-12173697"
+,"name": "My Auntie Deb’s 3-Ingredient Carrot-Apple Salad Is My Favorite Fall Side Dish"
+,"breadcrumb": {
+"@type": "BreadcrumbList",
+"itemListElement": [
+{
+"@type": "ListItem",
+"position": 1,
+"item": {
+"@id": "https://www.simplyrecipes.com/dinner-recipes-5091433",
+"name": "Dinners"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 2,
+"item": {
+"@id": "https://www.simplyrecipes.com/dinner-recipes-by-type-5091419",
+"name": "Dinners By Types"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 3,
+"item": {
+"@id": "https://www.simplyrecipes.com/salad-recipes-5091411",
+"name": "Salads"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 4,
+"item": {
+"@id": "https://www.simplyrecipes.com/carrot-salad-recipes-5091409",
+"name": "Carrot Salads"
+}
+}
+]
+}} }
+]

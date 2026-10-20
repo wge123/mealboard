@@ -1,0 +1,70 @@
+{
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "Recipe",
+            "keywords": "Frosting \u0026 icing;;Cream cheese;;White Chocolate;;No-bake;;Quick \u0026 easy;;Celebrations;;Gluten-free;;Grain-free",
+            "name": "White Chocolate Cream Cheese Frosting",
+            "description": "Rose Levy Beranbaum makes this creamy, luscious frosting for carrot cake, but it would also be a perfect pairing for any spice cake. She says, \u0022It can easily be made days ahead and yet remains moist and delicious. Cream cheese gives a slight tang to the white chocolate buttercream, balancing out the sweetness and serving as a perfect flavor and texture for the tender crumb.\u0022",
+            "recipeYield": [
+                "24",
+                "3 cups, enough for a 9\u0022 x 13\u0022 cake or 18 to 24 cupcakes"
+            ],
+            "prepTime": "PT20M",
+            "datePublished": "August 25, 2018 at 8:00pm",
+            "cookTime": "PT0M",
+            "totalTime": "PT50M",
+            "recipeInstructions": [
+                "Thirty minutes before making the frosting, place the cream cheese and butter on the counter. Cut the butter into four pieces and coarsely chop the white chocolate.",
+                "Place the chocolate in a heatproof bowl and melt in the microwave in 15-second bursts, stirring in between, until the chocolate is 85% melted. Stir without further heating until the chocolate is completely melted. Let cool until just slightly warm to the touch (80°F to 85°F); a digital thermometer is a helpful tool here.",
+                "Place the cream cheese, butter, and crème fraîche (or sour cream) in the bowl of a food processor and process until smooth and creamy.",
+                "Scrape down the sides of the bowl. Add the cooled, melted white chocolate and pulse several times to incorporate. Add the vanilla and pulse until it disappears.",
+                "Use the white chocolate frosting to decorate carrot cake, cupcakes, or any spice cake. Store any leftover frosting, covered, in the refrigerator for up to 1 week; freeze for longer storage."
+            ],
+            "recipeIngredient": [
+                "12 ounces (340g) cream cheese",
+                "8 tablespoons (113g) unsalted butter, room temperature",
+                "10 1/2 ounces (298g) white chocolate",
+                "1 tablespoon plus 2 teaspoons (32g) crème fraîche or sour cream",
+                "1/2 teaspoon King Arthur Pure Vanilla Extract"
+            ],
+            "author": {
+                "@type": "Organization",
+                "name": "King Arthur Baking",
+                "url": "https://www.kingarthurbaking.com/",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://www.kingarthurbaking.com/themes/custom/kaf_nextgenweb/images/KA_Logo_Small.svg"
+                }
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "King Arthur Baking",
+                "url": "https://www.kingarthurbaking.com/"
+            },
+            "nutrition": {
+                "@type": "NutritionInformation",
+                "servingSize": "2 tablespoons, 33g",
+                "calories": "154 calories",
+                "carbohydrateContent": "9g",
+                "cholesterolContent": "28mg",
+                "fiberContent": "0G",
+                "proteinContent": "2g",
+                "sodiumContent": "55mg",
+                "sugarContent": "8g",
+                "fatContent": "13g",
+                "saturatedFatContent": "8G",
+                "transFatContent": "0G"
+            },
+            "image": {
+                "@type": "ImageObject",
+                "url": "https://www.kingarthurbaking.com/sites/default/files/2023-03/white-chocolate-cream-cheese-frosting_0223.jpg"
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.30",
+                "ratingCount": "14"
+            }
+        }
+    ]
+}

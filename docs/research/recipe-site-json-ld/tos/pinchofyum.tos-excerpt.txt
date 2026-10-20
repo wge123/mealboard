@@ -1,0 +1,18 @@
+SOURCE: https://pinchofyum.com/terms-of-service
+FETCHED: 2026-10-20 (curl)
+NOTE: sentences matching automated-access / copying keywords, extracted mechanically from the page text; not the whole document.
+
+- The e-book was developed solely for your personal use and may not be reproduced for publication or for the personal or commercial use of others without permission from Company.
+- The Meal Plans were developed solely for your personal use and may not be reproduced for publication or for the personal or commercial use of others without permission from Company.
+- Reproduction or duplication of any content in the Company Content for commercial purposes;
+- Such use is a limited license to republish the content on the approved social media channels only, with full credit to Company.
+- You must not use the Website to copy, store, host, transmit, send, use, publish, or distribute any material that consists of (or is linked to) any spyware, computer virus, Trojan horse, worm, keystroke logger, rootkit, and/or other harmful code or malicious software.
+- You must not conduct any systematic or automated data collection activities, including, but not limited to, scraping, data mining, data extraction, or data harvesting on or in relation to the Website without Company’s express written permission.
+- You must not use the Website for any third-party marketing without Company’s express written permission.
+- The owner of this website does not consent to the content on this website being used or downloaded by any third parties for the purposes of developing, training or operating artificial intelligence or other machine learning systems (“Artificial Intelligence Purposes”), except as authorized by the owner in writing (including written electronic communication).
+- Absent such consent, users of this website, including any third parties accessing the website through automated systems, are prohibited from using any of the content on the website for Artificial Intelligence Purposes.
+- Users or automated systems that fail to respect these choices will be considered to have breached these Terms of Use.
+- Unless otherwise noted, the design, content, and all components of the Website and Company Content are copyrights owned by Company or third parties and are protected by United States and international copyright laws and should not be reused or republished without express written permission.
+- You grant Company a worldwide, irrevocable, non-exclusive, royalty-free license to use, reproduce, adapt, publish, translate, and distribute any content you contribute to the Website.
+- (iii) materials prepared or provided by you including, but not limited to, any claims of infringement, or misappropriation of copyright, trademark, patent, trade secret, or other intellectual property or proprietary right, infringement of the rights of privacy or publicity, or defamation or libel;
+- and (2) you or We may seek equitable relief in court for infringement or other misuse of intellectual property rights (such as trademarks, trade dress, domain names, trade secrets, copyrights, and patents).

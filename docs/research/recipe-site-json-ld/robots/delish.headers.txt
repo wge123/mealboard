@@ -1,0 +1,17 @@
+HTTP/2 200 
+retry-after: 0
+content-type: text/plain
+accept-ranges: bytes
+date: Tue, 20 Oct 2026 18:27:41 GMT
+x-cache: HIT
+server-timing: time-start-msec;dur=1792520861122,time-elapsed;dur=111,fastly-pop;desc=MIA,hit-state;desc=HIT-SYNTH
+set-cookie: location_data={"country_code":"US","postal_code":"32805","geo_region":"FL"}; path=/;
+x-robots-tag: all
+strict-transport-security: max-age=31557600; includeSubDomains
+x-country: US
+cache-control: max-age=0, must-revalidate, private
+alt-svc: h3=":443";ma=86400,h3-29=":443";ma=86400,h3-27=":443";ma=86400
+trailer: server-timing
+content-length: 957
+
+server-timing: rtt; dur=29.841, retrans; dur=0, trailer-timestamp; dur=1792520861233

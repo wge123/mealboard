@@ -1,0 +1,40 @@
+SOURCE: https://help.nytimes.com/policies/115014893428-Terms-of-Service
+FETCHED: 2026-10-20 (curl)
+NOTE: sentences matching automated-access / copying keywords, extracted mechanically from the page text; not the whole document.
+
+- ”) are protected by copyright, and owned or controlled by The New York Times Company or the party credited as the provider of the Content.
+- The New York Times Company also owns copyright in the selection, coordination, compilation, and enhancement of such Content (“
+- You shall abide by all additional copyright notices, information, or restrictions contained in any Content accessed through the Service.
+- (1) the development of any software program, model, algorithm, or other generative AI tool, including, but not limited to, training or using the Content in connection with the development or operation of a machine learning or artificial intelligence (AI) system (including any use of the Content for training, fine tuning, or grounding the machine learning or AI system or as part of retrieval-augmented generation);
+- 2.2 The Services and Content are protected by copyrights, trademarks, patents, trade secrets, database rights, sui generis rights and other intellectual or proprietary rights in or to the Services and Content pursuant to U.S.
+- You may not modify, publish, transmit, participate in the transfer or sale of, reproduce (except as provided in
+- 2.3 You may download or copy certain Content and other downloadable items displayed on the Services for your personal use only, provided that you maintain all copyright and other notices contained in the Content and other downloadable items.
+- Copying or storing of any Content for other than personal use is expressly prohibited without prior written permission from
+- The New York Times Rights and Permissions Department
+- , or the copyright holder identified in the copyright notice contained in the Content.
+- You shall not use automated means to upload to, or distribute or otherwise publish to, the Services any content.
+- We may use automated scanning and moderation technology to monitor users’ direct messages in order to identify any violations of an applicable Acceptable Use Policy and these Terms of Service, to help ensure a safe and respectful experience for you and other users.
+- Submissions made to the Services may also be included in our RSS feeds and APIs and made available for republishing through other formats.
+- 3.4 You grant NYT a perpetual, nonexclusive, world-wide, royalty-free, sub-licensable license to the Submissions, which includes without limitation the right for NYT, or any third party it designates, to use, copy, transmit, excerpt, publish, distribute, publicly display, publicly perform, communicate to the public, create derivative works of, host, index, cache, tag, encode, modify and adapt (including without limitation the right to adapt to streaming, downloading, broadcast, mobile, digital, thumbnail, scanning or other technologies) in any form or media now known or developed at any time, any Submission posted by you on or to the Services or any other website owned by NYT, including any Submission posted on or to the Services through a third party.
+- However, while NYT does not and cannot review every Submission and is not responsible for the content of these messages, NYT reserves the right to delete, move, or edit Submissions that it, in its sole discretion, deems abusive, defamatory, obscene, in violation of copyright or trademark laws, in violation of these Terms of Service, or otherwise unacceptable.
+- (1) access any part of the Services, Content, data or information you do not have permission or authorization to access or for which NYT has revoked your access;
+- (2) use robots, spiders, scripts, service, software or any manual or automatic device, tool, or process designed to data mine or scrape the Content, data or information from the Services, or otherwise use, access, or collect the Content, data or information from the Services using automated means;
+- (3) use the Content for the development of any software program, model, algorithm, or generative AI tool, including, but not limited to, training or using the Content in connection with the development or operation of a machine learning or artificial intelligence (AI) system (including any use of the Content for training, fine tuning, or grounding the machine learning or AI system or as part of retrieval-augmented generation).
+- (4) use services, software or any manual or automatic device, tool, or process designed to circumvent any restriction, condition, or technological measure that controls access to the Services in any way, including overriding any security feature, bypassing or circumventing any access controls or use limits of the Services, or failing to abide by exclusionary protocols such as the Robots Exclusion Protocol or the Automated Content Access protocol (NYT’s robots.txt notice does not constitute NYT’s prior written consent under these Terms of Service);
+- (5) cache or archive the Content (except for a public search engine’s use of spiders for creating search indices solely for the inclusion of links and short, non-AI synthesized snippets of the Content in search results);
+- (8) perform text and data mining activities under Art.
+- 4 of the EU Directive on Copyright in the Digital Single Market.
+- (a) violate, plagiarize, or infringe upon the rights of any third party, including copyright, trademark, privacy or other personal or proprietary rights, or (b) contain libelous or otherwise unlawful material;
+- You may make one copy of such Software for archival purposes only.
+- You may not otherwise copy, distribute, modify, reverse engineer, or create derivative works from Software.
+- Please note that terminating your NYT account does not automatically terminate your account with The Athletic.
+- In the event you have a claim of copyright infringement with respect to material that is contained in a Service, please notify
+- 13.7 If you believe that your work has been copied in a way that constitutes copyright infringement, please provide us the following information in writing to NYT's Copyright Agent (see 17 U.S.C.
+- a physical or electronic signature of the person authorized to act on behalf of the owner of an exclusive copyright that is allegedly infringed;
+- a description of the copyrighted work that you claim has been infringed;
+- a statement by you that you have a good faith belief that the disputed use is not authorized by the copyright owner, its agent, or the law;
+- a statement by you, made under penalty of perjury, that the above information in your Notice is accurate and that you are the copyright owner or authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.
+- If you believe that any content or materials you uploaded, posted, or submitted to the NYT Service, that were subsequently removed from the NYT Service, or to which access was disabled, improperly removed or disabled, please provide the following Counter-Notification to NYT's Copyright Agent (see 17 U.S.C.
+- Notices of claimed copyright infringement should be directed to:
+- (1) not copy or reproduce the Pre-Release Materials;
+- (2) safeguard the Pre-Release Materials and prevent unauthorized access to, reproduction of, disclosure of and/or unauthorized use of, the Pre-Release Materials;

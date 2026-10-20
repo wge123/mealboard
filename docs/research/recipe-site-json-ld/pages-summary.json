@@ -1,0 +1,1623 @@
+[
+ {
+  "site": "allrecipes",
+  "page": "p1",
+  "bytes": 565558,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 13,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 2,
+  "instr_entities": false,
+  "totalTime": "PT110M",
+  "prepTime": "PT20M",
+  "cookTime": "PT90M",
+  "yield": [
+   "8",
+   "8 servings"
+  ],
+  "name": "Portuguese Soup",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "allrecipes",
+  "page": "p2",
+  "bytes": 580301,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 7,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 5,
+  "instr_entities": false,
+  "totalTime": "PT30M",
+  "prepTime": "PT15M",
+  "cookTime": "PT15M",
+  "yield": "4",
+  "name": "Balsamic Roasted Brussels Sprouts with Bacon",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "allrecipes",
+  "page": "p3",
+  "bytes": 563444,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 11,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 3,
+  "instr_entities": false,
+  "totalTime": "PT60M",
+  "prepTime": "PT15M",
+  "cookTime": "PT35M",
+  "yield": [
+   "8",
+   "8 servings"
+  ],
+  "name": "Instant Pot Ham and Bean Soup",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "bbcgoodfood",
+  "page": "p1",
+  "bytes": 580134,
+  "ldjson_blocks": 4,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 10,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "the white part of 1 leek",
+   "finely chopped chives"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 8,
+  "instr_entities": false,
+  "totalTime": "PT45M",
+  "prepTime": "PT20M",
+  "cookTime": "PT25M",
+  "yield": 8,
+  "name": "Leek & potato soup (Vichyssoise)",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "bbcgoodfood",
+  "page": "p2",
+  "bytes": 579240,
+  "ldjson_blocks": 4,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 9,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "vegetable oil for cooking",
+   "maple syrup",
+   "toppings of your choice, such as  cooked bacon chocolate chips, blueberries or peanut butter and jam"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 6,
+  "instr_entities": false,
+  "totalTime": "PT55M",
+  "prepTime": "PT25M",
+  "cookTime": "PT30M",
+  "yield": 4,
+  "name": "Fluffy American pancakes",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "bbcgoodfood",
+  "page": "p3",
+  "bytes": 583591,
+  "ldjson_blocks": 4,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 8,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "maple syrup and icing sugar, to serve (optional)"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 7,
+  "instr_entities": false,
+  "totalTime": "PT25M",
+  "prepTime": "PT5M",
+  "cookTime": "PT20M",
+  "yield": "Makes 4-6 (depending on your waffle maker)",
+  "name": "Classic waffles",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "bonappetit",
+  "page": "p1",
+  "bytes": 1260359,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 11,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 7,
+  "instr_entities": false,
+  "totalTime": "50 minutes",
+  "totalTime_bad": true,
+  "prepTime": null,
+  "cookTime": null,
+  "yield": "4 servings",
+  "name": "Chili Crisp Yogurt Chicken",
+  "has_nutrition": false,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "bonappetit",
+  "page": "p2",
+  "bytes": 1248613,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 7,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Kosher salt",
+   "Thinly sliced scallions and/or toasted sesame seeds (for serving; optional)"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 4,
+  "instr_entities": false,
+  "totalTime": "35 minutes",
+  "totalTime_bad": true,
+  "prepTime": null,
+  "cookTime": null,
+  "yield": "4 servings ",
+  "name": "Broiled Salmon Teriyaki",
+  "has_nutrition": false,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "bonappetit",
+  "page": "p3",
+  "bytes": 1404353,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 8,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Kosher salt",
+   "Freshly ground black pepper"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 6,
+  "instr_entities": false,
+  "totalTime": "50 minutes",
+  "totalTime_bad": true,
+  "prepTime": null,
+  "cookTime": "10 minutes",
+  "cookTime_bad": true,
+  "yield": "8 servings",
+  "name": "Make-Ahead Mashed Potatoes",
+  "has_nutrition": false,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "budgetbytes",
+  "page": "p1",
+  "bytes": 558660,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 14,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 1,
+  "instr": "list[HowToStep]",
+  "steps": 11,
+  "instr_entities": true,
+  "totalTime": "PT45M",
+  "prepTime": "PT15M",
+  "cookTime": "PT30M",
+  "yield": [
+   "4",
+   "4 servings (2 cups each)"
+  ],
+  "name": "Rasta Pasta",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "budgetbytes",
+  "page": "p2",
+  "bytes": 663730,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 17,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "fresh parsley (chopped, optional)"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToSection]",
+  "steps": 13,
+  "instr_entities": false,
+  "totalTime": "PT60M",
+  "prepTime": "PT30M",
+  "cookTime": "PT30M",
+  "yield": [
+   "6",
+   "6 servings (1.5 cups each)"
+  ],
+  "name": "Italian Wedding Soup",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "budgetbytes",
+  "page": "p3",
+  "bytes": 622826,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 10,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 8,
+  "instr_entities": false,
+  "totalTime": "PT70M",
+  "prepTime": "PT40M",
+  "cookTime": "PT20M",
+  "yield": [
+   "4",
+   "4 servings (if not more!)"
+  ],
+  "name": "Baked Chicken Breast Recipe",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "cookieandkate",
+  "page": "p1",
+  "bytes": 381904,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 19,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Black pepper, to taste",
+   "Cooked brown jasmine rice or long-grain rice, for serving (optional)",
+   "Lime wedges, for serving"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 5,
+  "instr_entities": false,
+  "totalTime": "PT50M",
+  "prepTime": "PT15M",
+  "cookTime": "PT35M",
+  "yield": [
+   "6",
+   "6 servings"
+  ],
+  "name": "Lentil Curry",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "cookieandkate",
+  "page": "p2",
+  "bytes": 525450,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 14,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "For serving: cooked brown rice (optional), sour cream, cilantro lime sauce or guacamole\u00a0"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 6,
+  "instr_entities": false,
+  "totalTime": "PT1H",
+  "prepTime": "PT15M",
+  "cookTime": "PT45M",
+  "yield": [
+   "6",
+   "6 servings"
+  ],
+  "name": "Stuffed Poblano Peppers",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "cookieandkate",
+  "page": "p3",
+  "bytes": 382526,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 10,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Optional serving suggestions: additional butter, honey or jam"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 7,
+  "instr_entities": false,
+  "totalTime": "PT45M",
+  "prepTime": "PT20M",
+  "cookTime": "PT25M",
+  "yield": [
+   "16",
+   "16 slices"
+  ],
+  "name": "Gluten-Free Cornbread",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "delish",
+  "page": "p1",
+  "bytes": 699302,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 5,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Finely chopped or crushed roasted, salted pistachios and/or maraschino cherries with stems, for serving (optional)"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 4,
+  "instr_entities": false,
+  "totalTime": "PT4H10M",
+  "prepTime": "PT5M",
+  "cookTime": "PT0S",
+  "yield": "6 - 8 serving(s)",
+  "name": "Watergate Salad",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "delish",
+  "page": "p2",
+  "bytes": 724996,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 11,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Warm caramel, for serving"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 6,
+  "instr_entities": false,
+  "totalTime": "PT6H",
+  "prepTime": "PT10M",
+  "cookTime": "PT0S",
+  "yield": "12 serving(s)",
+  "name": "Pumpkin Basque Cheesecake",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "delish",
+  "page": "p3",
+  "bytes": 702434,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 11,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 5,
+  "instr_entities": false,
+  "totalTime": "PT45M",
+  "prepTime": "PT10M",
+  "cookTime": "PT0S",
+  "yield": "27 - 28 serving(s)",
+  "name": "Air Fryer Pumpkin Donut Holes",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "epicurious",
+  "page": "p1",
+  "bytes": 959981,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 11,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 7,
+  "instr_entities": false,
+  "totalTime": "50 minutes",
+  "totalTime_bad": true,
+  "prepTime": null,
+  "cookTime": null,
+  "yield": "4 servings",
+  "name": "Chili Crisp Yogurt Chicken",
+  "has_nutrition": false,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "epicurious",
+  "page": "p2",
+  "bytes": 978160,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 12,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Freshly ground pepper"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 6,
+  "instr_entities": false,
+  "totalTime": "25 minutes",
+  "totalTime_bad": true,
+  "prepTime": null,
+  "cookTime": null,
+  "yield": "4 servings",
+  "name": "Creamy Miso Mushroom Pasta",
+  "has_nutrition": false,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "epicurious",
+  "page": "p3",
+  "bytes": 967991,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 10,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Kosher salt (optional)",
+   "Country-style bread or steamed white rice (for serving; optional)"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 4,
+  "instr_entities": false,
+  "totalTime": "20 minutes",
+  "totalTime_bad": true,
+  "prepTime": null,
+  "cookTime": null,
+  "yield": "4 servings",
+  "name": "Mussels With Garlicky Miso Broth",
+  "has_nutrition": false,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "foodnetwork",
+  "page": "p1",
+  "bytes": 456,
+  "ldjson_blocks": 0,
+  "bad_json_blocks": 0,
+  "shape": [],
+  "recipe_nodes": 0
+ },
+ {
+  "site": "foodnetwork",
+  "page": "p2",
+  "bytes": 473,
+  "ldjson_blocks": 0,
+  "bad_json_blocks": 0,
+  "shape": [],
+  "recipe_nodes": 0
+ },
+ {
+  "site": "foodnetwork",
+  "page": "p3",
+  "bytes": 373,
+  "ldjson_blocks": 0,
+  "bad_json_blocks": 0,
+  "shape": [],
+  "recipe_nodes": 0
+ },
+ {
+  "site": "justonecookbook",
+  "page": "p1",
+  "bytes": 532754,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 4,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToSection,HowToStep]",
+  "steps": 7,
+  "instr_entities": true,
+  "totalTime": "PT10M",
+  "prepTime": "PT10M",
+  "cookTime": null,
+  "yield": [
+   "4"
+  ],
+  "name": "Yuzu Kosho Edamame",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "justonecookbook",
+  "page": "p2",
+  "bytes": 536597,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 2,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToSection]",
+  "steps": 8,
+  "instr_entities": true,
+  "totalTime": "PT5M",
+  "prepTime": "PT5M",
+  "cookTime": null,
+  "yield": [
+   "3"
+  ],
+  "name": "Japanese Shredded Cabbage Salad",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "justonecookbook",
+  "page": "p3",
+  "bytes": 557660,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 9,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToSection,HowToStep]",
+  "steps": 9,
+  "instr_entities": true,
+  "totalTime": "PT20M",
+  "prepTime": "PT10M",
+  "cookTime": "PT10M",
+  "yield": [
+   "2",
+   "2 (as main dish)"
+  ],
+  "name": "Miso Eggplant Stir-Fry",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "kingarthur",
+  "page": "p1",
+  "bytes": 330743,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 6,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[str]",
+  "steps": 10,
+  "instr_entities": false,
+  "totalTime": "PT2H30M",
+  "prepTime": "PT30M",
+  "cookTime": "PT7M",
+  "yield": [
+   "8 servings",
+   "8 pitas"
+  ],
+  "name": "Spelt Pita",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "kingarthur",
+  "page": "p2",
+  "bytes": 333539,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 17,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[str]",
+  "steps": 13,
+  "instr_entities": false,
+  "totalTime": "PT3H35M",
+  "prepTime": "PT30M",
+  "cookTime": "PT25M",
+  "yield": [
+   "8",
+   "8 buns"
+  ],
+  "name": "Soft Chocolate Buns",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "kingarthur",
+  "page": "p3",
+  "bytes": 332239,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 5,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[str]",
+  "steps": 5,
+  "instr_entities": false,
+  "totalTime": "PT50M",
+  "prepTime": "PT20M",
+  "cookTime": "PT0M",
+  "yield": [
+   "24",
+   "3 cups, enough for a 9\" x 13\" cake or 18 to 24 cupcakes"
+  ],
+  "name": "White Chocolate Cream Cheese Frosting",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "loveandlemons",
+  "page": "p1",
+  "bytes": 567935,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 14,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 5,
+  "instr_entities": false,
+  "totalTime": "PT65M",
+  "prepTime": "PT20M",
+  "cookTime": "PT45M",
+  "yield": [
+   "6"
+  ],
+  "name": "Pastina Soup",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "loveandlemons",
+  "page": "p2",
+  "bytes": 580654,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 14,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Freshly ground black pepper",
+   "Fresh parsley (for garnish)"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 6,
+  "instr_entities": false,
+  "totalTime": "PT60M",
+  "prepTime": "PT10M",
+  "cookTime": "PT50M",
+  "yield": [
+   "4"
+  ],
+  "name": "French Onion Pasta",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "loveandlemons",
+  "page": "p3",
+  "bytes": 602438,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 15,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Freshly ground black pepper",
+   "Microgreens (optional, for garnish)"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 5,
+  "instr_entities": true,
+  "totalTime": "PT100M",
+  "prepTime": "PT20M",
+  "cookTime": "PT80M",
+  "yield": [
+   "6"
+  ],
+  "name": "Pumpkin Soup",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "minimalistbaker",
+  "page": "p1",
+  "bytes": 504944,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 17,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Green onion, thinly sliced",
+   "Fresh cilantro, roughly chopped"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 8,
+  "instr_entities": false,
+  "totalTime": "PT30M",
+  "prepTime": "PT10M",
+  "cookTime": "PT20M",
+  "yield": [
+   "4",
+   "4 (Servings)"
+  ],
+  "name": "Cheesy Vegan Enchilada Skillet",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "minimalistbaker",
+  "page": "p2",
+  "bytes": 545466,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 16,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Freshly chopped basil",
+   "Vegan parmesan cheese  ((dairy would also work))",
+   "Pasta  ((we like pappardelle or rigatoni // gluten-free as needed))"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 9,
+  "instr_entities": false,
+  "totalTime": "PT45M",
+  "prepTime": "PT15M",
+  "cookTime": "PT30M",
+  "yield": [
+   "4"
+  ],
+  "name": "Easy Eggplant Bolognese (1 Pot!)",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "minimalistbaker",
+  "page": "p3",
+  "bytes": 554924,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 13,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Avocado oil ((for cooking // or sub other neutral oil))",
+   "Go-To Guacamole",
+   "Creamy Cashew Jalape\u00f1o Sauce",
+   "Easy Vegan Ranch Dressing"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 5,
+  "instr_entities": false,
+  "totalTime": "PT30M",
+  "prepTime": "PT10M",
+  "cookTime": "PT20M",
+  "yield": [
+   "8",
+   "8 (Fritters)"
+  ],
+  "name": "Easy Jalape\u00f1o Corn Fritters (Vegan)",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "nytcooking",
+  "page": "p1",
+  "bytes": 487853,
+  "ldjson_blocks": 4,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 8,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Root vegetables, washed and halved (2 parsnips, 2 turnips, 4 large carrots)",
+   "Salt",
+   "Pepper"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 6,
+  "instr_entities": false,
+  "totalTime": "PT5H",
+  "prepTime": null,
+  "cookTime": null,
+  "yield": "10 to 12 servings",
+  "name": "Vina Slatalla\u2019s Beef Barley Soup",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "nytcooking",
+  "page": "p2",
+  "bytes": 628823,
+  "ldjson_blocks": 4,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 10,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 3,
+  "instr_entities": false,
+  "totalTime": "PT1H15M",
+  "prepTime": null,
+  "cookTime": "PT1H",
+  "yield": "1 loaf",
+  "name": "Quick Walnut Bread",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "nytcooking",
+  "page": "p3",
+  "bytes": 664979,
+  "ldjson_blocks": 4,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 11,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Kosher salt",
+   "Canola oil",
+   "Freshly ground black pepper"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 5,
+  "instr_entities": false,
+  "totalTime": "PT20M",
+  "prepTime": null,
+  "cookTime": null,
+  "yield": "6 servings",
+  "name": "Saut\u00e9ed Chicken Breasts With Tarragon",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "pinchofyum",
+  "page": "p1",
+  "bytes": 340589,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 9,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "freshly grated Parmesan cheese for topping"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 6,
+  "instr_entities": true,
+  "totalTime": "PT45M",
+  "prepTime": "PT5M",
+  "cookTime": "PT40M",
+  "yield": [
+   "6",
+   "6-8 servings"
+  ],
+  "name": "Pastina Soup (Italian Penicillin)",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "pinchofyum",
+  "page": "p2",
+  "bytes": 339043,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 12,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Mashed Potatoes",
+   "Green beans or salad"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 6,
+  "instr_entities": true,
+  "totalTime": "PT40M",
+  "prepTime": "PT10M",
+  "cookTime": "PT30M",
+  "yield": [
+   "4",
+   "4 servings"
+  ],
+  "name": "Chicken with Cajun Sauce",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "pinchofyum",
+  "page": "p3",
+  "bytes": 325744,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 10,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 5,
+  "instr_entities": true,
+  "totalTime": "PT1H",
+  "prepTime": "PT15M",
+  "cookTime": "PT45M",
+  "yield": [
+   "6",
+   "6-8 servings"
+  ],
+  "name": "Apple Crisp",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "recipetineats",
+  "page": "p1",
+  "bytes": 555268,
+  "ldjson_blocks": 2,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 18,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Pita bread (, warmed)",
+   "Extra virgin olive oil"
+  ],
+  "ing_entities": 1,
+  "instr": "list[HowToStep]",
+  "steps": 8,
+  "instr_entities": true,
+  "totalTime": null,
+  "prepTime": "PT15M",
+  "cookTime": "PT10M",
+  "yield": [
+   "4"
+  ],
+  "name": "Smashed Beef Koftas with Yogurt Sauce",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "recipetineats",
+  "page": "p2",
+  "bytes": 538269,
+  "ldjson_blocks": 2,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 19,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 10,
+  "instr_entities": true,
+  "totalTime": "PT45M",
+  "prepTime": "PT15M",
+  "cookTime": "PT30M",
+  "yield": [
+   "5",
+   "5 - 6"
+  ],
+  "name": "One Pot Broccoli Chicken Mac and Cheese",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "recipetineats",
+  "page": "p3",
+  "bytes": 537897,
+  "ldjson_blocks": 2,
+  "bad_json_blocks": 0,
+  "shape": [
+   "@graph"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 21,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Parmesan for serving"
+  ],
+  "ing_entities": 1,
+  "instr": "list[HowToSection]",
+  "steps": 11,
+  "instr_entities": true,
+  "totalTime": null,
+  "prepTime": "PT25M",
+  "cookTime": "PT210M",
+  "yield": [
+   "6",
+   "6 - 8"
+  ],
+  "name": "Slow Cooked Rosemary Lamb Ragu",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "seriouseats",
+  "page": "p1",
+  "bytes": 537921,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 13,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Kosher salt, to taste"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 4,
+  "instr_entities": false,
+  "totalTime": "PT30M",
+  "prepTime": "PT5M",
+  "cookTime": "PT25M",
+  "yield": "4",
+  "name": "Harissa Caesar Salad With Croutons and Jammy Eggs",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "seriouseats",
+  "page": "p2",
+  "bytes": 619275,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 8,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Kosher salt",
+   "Freshly ground black pepper"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 5,
+  "instr_entities": false,
+  "totalTime": "PT85M",
+  "prepTime": "PT10M",
+  "cookTime": "PT75M",
+  "yield": "8",
+  "name": "The Best Crispy Roast Potatoes Ever",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "seriouseats",
+  "page": "p3",
+  "bytes": 539412,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 14,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 4,
+  "instr_entities": false,
+  "totalTime": "PT60M",
+  "prepTime": "PT15M",
+  "cookTime": "PT20M",
+  "yield": [
+   "30",
+   "30 muffins"
+  ],
+  "name": "Strawberry Rhubarb Streusel Muffins Recipe",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "simplyrecipes",
+  "page": "p1",
+  "bytes": 542983,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 14,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Kosher salt & freshly ground black pepper",
+   "Freshly ground black pepper to taste"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 3,
+  "instr_entities": false,
+  "totalTime": "PT20M",
+  "prepTime": "PT5M",
+  "cookTime": "PT15M",
+  "yield": "4",
+  "name": "This 20-Minute Creamed Spinach Tortellini Turns a Classic Side Into Dinner",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "simplyrecipes",
+  "page": "p2",
+  "bytes": 539277,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 9,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 3,
+  "instr_entities": false,
+  "totalTime": "PT50M",
+  "prepTime": "PT20M",
+  "cookTime": "PT30M",
+  "yield": "4",
+  "name": "Maple Bacon Brussels Sprouts Will Turn the Biggest Skeptic Into a Fan",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "simplyrecipes",
+  "page": "p3",
+  "bytes": 537892,
+  "ldjson_blocks": 1,
+  "bad_json_blocks": 0,
+  "shape": [
+   "array"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 5,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "Chopped toasted walnuts, optional"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 1,
+  "instr_entities": false,
+  "totalTime": "PT10M",
+  "prepTime": "PT10M",
+  "cookTime": null,
+  "yield": "6",
+  "name": "My Auntie Deb\u2019s 3-Ingredient Carrot-Apple Salad Is My Favorite Fall Side Dish",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": true
+ },
+ {
+  "site": "smittenkitchen",
+  "page": "p1",
+  "bytes": 345243,
+  "ldjson_blocks": 0,
+  "bad_json_blocks": 0,
+  "shape": [],
+  "recipe_nodes": 0
+ },
+ {
+  "site": "smittenkitchen",
+  "page": "p2",
+  "bytes": 362530,
+  "ldjson_blocks": 0,
+  "bad_json_blocks": 0,
+  "shape": [],
+  "recipe_nodes": 0
+ },
+ {
+  "site": "smittenkitchen",
+  "page": "p3",
+  "bytes": 353300,
+  "ldjson_blocks": 0,
+  "bad_json_blocks": 0,
+  "shape": [],
+  "recipe_nodes": 0
+ },
+ {
+  "site": "tasteofhome",
+  "page": "p1",
+  "bytes": 263288,
+  "ldjson_blocks": 2,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 10,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 4,
+  "instr_entities": false,
+  "totalTime": "PT45M",
+  "prepTime": "PT15M",
+  "cookTime": "PT30M",
+  "yield": "6 servings",
+  "name": "Pinto Beans and Rice",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "tasteofhome",
+  "page": "p2",
+  "bytes": 269490,
+  "ldjson_blocks": 2,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 11,
+  "ing_all_str": true,
+  "ing_no_amount": [],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 4,
+  "instr_entities": false,
+  "totalTime": "PT03H50M",
+  "prepTime": "PT20M",
+  "cookTime": "PT03H30M",
+  "yield": "6 servings",
+  "name": "Slow-Cooker Sirloin Steak",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "tasteofhome",
+  "page": "p3",
+  "bytes": 270688,
+  "ldjson_blocks": 2,
+  "bad_json_blocks": 0,
+  "shape": [
+   "object"
+  ],
+  "recipe_nodes": 1,
+  "ing_type": "list",
+  "ing_n": 11,
+  "ing_all_str": true,
+  "ing_no_amount": [
+   "GLAZE:"
+  ],
+  "ing_entities": 0,
+  "instr": "list[HowToStep]",
+  "steps": 5,
+  "instr_entities": false,
+  "totalTime": "PT60M",
+  "prepTime": "PT15M",
+  "cookTime": "PT45M",
+  "yield": "16 servings",
+  "name": "Cinnamon Quick Bread",
+  "has_nutrition": true,
+  "has_author": true,
+  "mainEntityOfPage": false
+ },
+ {
+  "site": "woksoflife",
+  "page": "p1",
+  "bytes": 18347,
+  "ldjson_blocks": 0,
+  "bad_json_blocks": 0,
+  "shape": [],
+  "recipe_nodes": 0
+ },
+ {
+  "site": "woksoflife",
+  "page": "p2",
+  "bytes": 18371,
+  "ldjson_blocks": 0,
+  "bad_json_blocks": 0,
+  "shape": [],
+  "recipe_nodes": 0
+ },
+ {
+  "site": "woksoflife",
+  "page": "p3",
+  "bytes": 18362,
+  "ldjson_blocks": 0,
+  "bad_json_blocks": 0,
+  "shape": [],
+  "recipe_nodes": 0
+ }
+]

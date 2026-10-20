@@ -1,0 +1,10 @@
+Sitemap: http:///sitemap.xml
+Sitemap: http://smittenkitchen.com/news-sitemap.xml
+
+Sitemap: https://smittenkitchen.com/sitemap.xml
+Sitemap: https://smittenkitchen.com/news-sitemap.xml
+User-agent: *
+Disallow: /wp-admin/
+Allow: /wp-admin/admin-ajax.php
+Disallow: /*?replytocom=
+Disallow: /*&replytocom=

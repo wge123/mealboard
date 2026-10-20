@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>smitten kitchen</title>
+	<atom:link href="https://smittenkitchen.com/feed/" rel="self" type="application/rss+xml" />
+	<link>https://smittenkitchen.com</link>
+	<description>Fearless cooking from a tiny NYC kitchen.</description>
+	<lastBuildDate>Thu, 08 Oct 2026 19:49:50 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	
+
+<image>
+	<url>https://i0.wp.com/smittenkitchen.com/wp-content/uploads//2017/09/cropped-smitten-kitchen-logo_no_text.jpg?fit=32%2C32&#038;quality=89&#038;ssl=1</url>
+	<title>smitten kitchen</title>
+	<link>https://smittenkitchen.com</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+<site xmlns="com-wordpress:feed-additions:1">172052577</site>	<item>
+		<title>simple chicken tacos</title>
+		<link>https://smittenkitchen.com/2026/09/simple-chicken-tacos/</link>
+					<comments>https://smittenkitchen.com/2026/09/simple-chicken-tacos/#comments</comments>
+		
+		<dc:creator><![CDATA[deb]]></dc:creator>
+		<pubDate>Wed, 30 Sep 2026 21:00:08 +0000</pubDate>
+				<category><![CDATA[Budget]]></category>
+		<category><![CDATA[Chicken]]></category>
+		<category><![CDATA[Dairy-Free]]></category>
+		<category><![CDATA[Dinner]]></category>
+		<category><![CDATA[Egg-Free]]></category>
+		<category><![CDATA[Kid Favorites]]></category>
+		<category><![CDATA[Meat]]></category>
+		<category><![CDATA[Quick]]></category>
+		<category><![CDATA[Recipe]]></category>
+		<category><![CDATA[Tex-Mex]]></category>
+		<category><![CDATA[Weeknight Favorite]]></category>
+		<guid isPermaLink="false">https://smittenkitchen.com/?p=97875</guid>
+
+					<description><![CDATA[<img width="640" height="427" src="https://i0.wp.com/smittenkitchen.com/wp-content/uploads/2026/09/simple-chicken-tacos-09-scaled.jpg?fit=640%2C427&amp;quality=89&amp;ssl=1" class="attachment-large size-large wp-post-image" alt="" style="margin-bottom: 15px;" decoding="async" srcset="https://i0.wp.com/sm
+...[truncated]
+<item>
+		<title>tomato risotto with frizzled red onions</title>
+		<link>https://smittenkitchen.com/2026/09/tomato-risotto-with-frizzled-red-onions/</link>
+					<comments>https://smittenkitchen.com/2026/09/tomato-risotto-with-frizzled-red-onions/#comments</comments>
+		
+		<dc:creator><![CDATA[deb]]></dc:creator>
+		<pubDate>Wed, 16 Sep 2026 15:28:36 +0000</pubDate>
+				<category><![CDATA[Braiser]]></category>
+		<category><![CDATA[Gluten-Free]]></category>
+		<category><![CDATA[Grain/Rice]]></category>
+		<category><![CDATA[Onions]]></category>
+		<category><![CDATA[Recipe]]></category>
+		<category><![CDATA[Summer]]></category>
+		<category><![CDATA[Tomatoes]]></category>
+		<category><![CDATA[Vegetarian]]></category>
+		<guid isPermaLink="false">https://smittenkitchen.com/?p=97538</guid>
+
+					<description><![CDATA[<img width="640" height="427" src="https://i0.wp.com/smittenkitchen.com/wp-content/uploads/2026/09/tomato-risotto-with-frizzled-onions-14-scaled.jpg?fit=640%2C427&amp;quality=89&amp;ssl=1" class="attachment-large size-large wp-post-image" alt="" style="margin-bottom: 15px;" decoding="async" loading="lazy" srcset="https://i0.wp.com/smittenkitchen.com/wp-content/uploads/2026/09/tom
+...[truncated]
+
+<!-- full feed: 10 items, 70349 bytes; links of all items below -->
+https://smittenkitchen.com/2026/09/simple-chicken-tacos/
+https://smittenkitchen.com/2026/09/tomato-risotto-with-frizzled-red-onions/
+https://smittenkitchen.com/2026/08/peach-cobbler-loaf/
+https://smittenkitchen.com/2026/08/cucumber-salad-with-sesame-and-rice-vinegar/
+https://smittenkitchen.com/2026/07/spaghetti-aglio-e-olio/
+https://smittenkitchen.com/2026/07/house-lemonade/
+https://smittenkitchen.com/2026/07/hot-dogs-with-vinegared-iceberg-and-potato-chips/
+https://smittenkitchen.com/2026/06/strawberry-chiffon-shortcake-perfected/
+https://smittenkitchen.com/2026/06/snow-pea-salad-with-avocado/
+https://smittenkitchen.com/2026/05/chicken-salad-for-celery-enthusiasts/

@@ -1,0 +1,8 @@
+SOURCE: https://cookieandkate.com/terms-of-use/
+FETCHED: 2026-10-20 (curl)
+NOTE: sentences matching automated-access / copying keywords, extracted mechanically from the page text; not the whole document.
+
+- Cookie and Kate reserves the right to restrict comments that do not contribute constructively to the conversation at hand, contain profanity or crude language, personal attacks, false information, copyrighted information or seek to promote a personal or unrelated business.
+- By submitting your content, you grant Cookie and Kate permission to reproduce your content to our discretion.
+- If you find evidence of copyright infringement in the comments of cookieandkate.com, contact me at at hello@cookieandkate.com and I will remove the offending material as soon as possible.
+- By submitting or posting any User Content, you grant to Cookie and Kate a perpetual, irrevocable, royalty-free, worldwide, sublicensable and transferable license to copy, publish, translate, modify, create derivative works from, distribute, reproduce or use the User Content in any commercial or non-commercial manner whatsoever.

@@ -1,0 +1,23 @@
+HTTP/2 200 
+content-type: application/json; charset=UTF-8
+date: Tue, 20 Oct 2026 18:42:54 GMT
+cache-control: max-age=300, must-revalidate
+x-batcache: MISS
+server: nginx
+strict-transport-security: max-age=86400
+x-robots-tag: noindex
+x-content-type-options: nosniff
+access-control-expose-headers: X-WP-Total, X-WP-TotalPages, Link
+access-control-allow-headers: Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type
+x-wp-total: 1599
+x-wp-totalpages: 533
+link: <https://pinchofyum.com/wp-json/wp/v2/posts?per_page=3&_fields=id%2Cdate%2Cmodified%2Clink%2Ctitle&page=2>; rel="next"
+allow: GET
+last-modified: Tue, 20 Oct 2026 18:42:54 GMT
+vary: Cookie,Origin,Origin
+x-cache: Miss from cloudfront
+via: 1.1 e27c82fbcb42858202f744a49633c5a2.cloudfront.net (CloudFront)
+x-amz-cf-pop: MIA3-P1
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: gPK4exAhs-m1-VkTerxB9eiGzJ7O_yMdY4_G3wYD_g1Q4JAF7K1PhA==
+

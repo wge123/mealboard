@@ -1,0 +1,151 @@
+[
+{
+"@context": "http://schema.org",
+"@type": ["Recipe","NewsArticle"]
+,"headline": "Harissa Caesar Salad With Croutons and Jammy Eggs"
+,"datePublished": "2026-10-14T18:00:00-04:00"
+,"dateModified": "2026-10-14T18:00:00-04:00"
+,"author": [
+{"@type": "Person"
+,"name": "Nargisse Benkabbou"
+,"url": "https://www.seriouseats.com/nargisse-benkabbou-7109963"
+}
+]
+,"description": "This Caesar salad gets a spicy upgrade with creamy harissa dressing, crispy flatbread croutons, and jammy eggs for a satisfying lunch or light dinner."
+,"image": {
+"@type": "ImageObject",
+"url": "https://www.seriouseats.com/thmb/8wne6ncFnqok7N77DiTPrc1lpSk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/20261014-SEA-Harissa-Ceasar-Robby-Lozano-HERO-ec83e70997e34720ac487d126ab6fe7b.jpg",
+"height": 1125,
+"width": 1500
+}
+,"publisher": {
+"@type": "Organization",
+"name": "Serious Eats",
+"url": "https://www.seriouseats.com",
+"logo": {
+"@type": "ImageObject",
+"url": "https://www.seriouseats.com/thmb/tCg_KKb2J_OIG_QEUtCkqjhiJGQ=/2339x320/filters:no_upscale():max_bytes(150000):strip_icc()/Serious_Eats_Schema_Logo-30a63d9c07734d35836c8ff2d368419c.png",
+"width": 2339,
+"height": 320
+},
+"brand": "Serious Eats"
+, "publishingPrinciples": "https://www.seriouseats.com/about-us-5120006#toc-editorial-guidelines"
+, "sameAs" : [
+"https://www.instagram.com/seriouseats",
+"https://www.facebook.com/seriouseats",
+"https://www.threads.com/@seriouseats",
+"https://www.pinterest.com/seriouseats/",
+"https://www.tiktok.com/@serious_eats",
+"https://www.youtube.com/user/seriouseats",
+"https://flipboard.com/@SeriousEats",
+"https://www.linkedin.com/company/serious-eats",
+"https://en.wikipedia.org/wiki/Serious_Eats",
+"https://x.com/seriouseats",
+"https://profile.google.com/@seriouseats"
+]
+}
+,"name": "Harissa Caesar Salad With Croutons and Jammy Eggs"
+,"aggregateRating": {
+"@type": "AggregateRating",
+"ratingValue": "5",
+"ratingCount": "1"
+}
+,"cookTime": "PT25M"
+,"keywords": "Harissa Caesar salad, harissa Caesar dressing, Caesar salad, spicy Caesar salad, harissa dressing, romaine lettuce, pita croutons, flatbread croutons, jammy eggs, soft-boiled eggs, homemade Caesar dressing, North African harissa, lunch salads, main course salads"
+,"nutrition": {
+"@type": "NutritionInformation"
+,"calories": "674 kcal"
+,"carbohydrateContent": "43 g"
+,"cholesterolContent": "218 mg"
+,"fiberContent": "4 g"
+,"proteinContent": "19 g"
+,"saturatedFatContent": "10 g"
+,"sodiumContent": "1395 mg"
+,"sugarContent": "4 g"
+,"fatContent": "48 g"
+,"unsaturatedFatContent": "0 g"
+}
+,"prepTime": "PT5M"
+, "recipeCategory": ["Lunch","Dinner"]
+,"recipeCuisine": ["American"]
+,"recipeIngredient": [
+"4 large eggs",
+"4 medium flatbreads such as pita or naan (about 7 ounces; 200 g total), cut into 1-inch pieces (about 4 cups)",
+"2 tablespoons (30 ml) extra-virgin olive oil",
+"1/2 teaspoon Diamond Crystal kosher salt; for table salt, use half as much by volume",
+"4 small or 2 large romaine hearts (about 1 1/4 pounds; 565 g total), outer leaves removed, trimmed, and cut crosswise into 1-inch pieces",
+"2/3 cup (160 g) mayonnaise",
+"2 ounces (56 g) Parmesan cheese, finely grated (about 1/2 cup), plus 2 tablespoons for serving",
+"1 1/2 tablespoons (22 ml) fresh lemon juice from 1 lemon",
+"1 to 2 tablespoons (15 to 30 ml) harissa paste (see notes)",
+"1 tablespoon (15 ml) Worcestershire sauce",
+"4 anchovy fillets, finely minced (about 1 tablespoon)",
+"1/4 teaspoon freshly ground black pepper",
+"Kosher salt, to taste" ]
+,"recipeInstructions": [
+{
+"@type": "HowToStep"
+,"text": "For the Salad: Adjust oven rack to middle position and preheat oven to 375°F (190°C). Bring a small saucepan of water to a boil over high heat. Reduce heat to maintain a gentle simmer. Using a slotted spoon, carefully lower eggs into water and cook for 7 minutes (whites should be set and yolks jammy). Immediately transfer eggs to an ice bath and let cool. Peel and quarter eggs; set aside."
+} ,{
+"@type": "HowToStep"
+,"text": "Meanwhile, on a parchment-lined rimmed baking sheet, toss flatbread pieces with olive oil and salt until evenly coated. Spread into an even layer and bake until golden brown and crisp, 12 to 16 minutes, tossing halfway through. Let cool."
+} ,{
+"@type": "HowToStep"
+,"text": "For the Dressing: In a small bowl, whisk mayonnaise, Parmesan, lemon juice, 1 tablespoon harissa, Worcestershire sauce, anchovies, and black pepper until smooth. Taste and add up to 1 tablespoon more harissa, if desired. Season with salt to taste. If dressing is too thick, whisk in water, 1 teaspoon at a time, until creamy but pourable, adding no more than 1 tablespoon total."
+} ,{
+"@type": "HowToStep"
+,"text": "To Assemble Salad: Transfer romaine and flatbread croutons to a large serving bowl. Pour dressing over salad and, using tongs or serving utensils, toss gently until evenly coated. Top with remaining 2 tablespoons Parmesan and arrange egg quarters over salad. Serve immediately."
+} ]
+,"recipeYield": "4"
+,"totalTime": "PT30M"
+,"review": [
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "CozyGouda7914"
+},
+"reviewBody": "Would definitely incorporate harissa into future Caesar dressings! I love how it gives nice heat here and adds an extra citrus note that plays into classic Caesar dressing. Works really well with the mayo and Parmesan, which mellow it out and add nice color too.",
+"datePublished": "2026-10-15T18:45:21.455Z"
+}
+]
+,"mainEntityOfPage": {
+"@type": ["WebPage"]
+,"@id": "https://www.seriouseats.com/harissa-caesar-salad-recipe-12173982"
+,"name": "Harissa Caesar Salad With Croutons and Jammy Eggs"
+,"breadcrumb": {
+"@type": "BreadcrumbList",
+"itemListElement": [
+{
+"@type": "ListItem",
+"position": 1,
+"item": {
+"@id": "https://www.seriouseats.com/all-recipes-5117985",
+"name": "Recipes"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 2,
+"item": {
+"@id": "https://www.seriouseats.com/recipes-by-course-5117906",
+"name": "Recipes By Course"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 3,
+"item": {
+"@id": "https://www.seriouseats.com/salad-recipes-5117809",
+"name": "Salads"
+}
+}
+]
+}} }
+]

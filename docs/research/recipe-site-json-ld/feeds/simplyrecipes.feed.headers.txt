@@ -1,0 +1,39 @@
+HTTP/2 301 
+date: Tue, 20 Oct 2026 18:28:35 GMT
+content-type: text/html; charset=UTF-8
+location: /sitemap_1.xml
+strict-transport-security: max-age=15552000
+x-connection-protocol: HTTP/2
+nel: {"report_to":"network-errors","max_age":2592000,"success_fraction":0,"failure_fraction":1.0,"include_subdomains":true}
+report-to: {"group":"network-errors","max_age":2592000,"endpoints":[{"url":"https://rjs.3gl.net/hawklogserver/5462/re.p"}]}
+server: cloudflare
+cf-ray: a4da15484bc2cc09-MIA
+alt-svc: h3=":443"; ma=86400
+
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:28:35 GMT
+content-type: text/xml;charset=utf-8
+cf-ray: a4da15487cb1cc09-MIA
+cf-cache-status: DYNAMIC
+cache-control: max-age=5
+expires: Thu, 01 Jan 1970 00:00:00 GMT
+link: <//www.simplyrecipes.com/static/fonts/frank-ruhl-libre-v-6-latin-regular.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.simplyrecipes.com/static/fonts/roboto-v-20-latin-regular.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.simplyrecipes.com/static/fonts/roboto-v-20-latin-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.googletagmanager.com/gtm.js?id=GTM-5P3SZGS>; rel=preload; as=script; nopush, <//www.googletagmanager.com/gtag/js?id=G-WK8Q2KB0FS&l=dataLayer&cx=c>; rel=preload; as=script; nopush, <//securepubads.g.doubleclick.net/tag/js/gpt.js>; rel=preload; as=script; nopush
+server: cloudflare
+x-content-type-options: nosniff
+strict-transport-security: max-age=15552000
+vary: Origin, Access-Control-Request-Method, Access-Control-Request-Headers
+content-security-policy: frame-ancestors 'self' https://*.seo.aws.about.com https://*.dotdash.com *.simplyrecipes.com; upgrade-insecure-requests;
+cross-origin-opener-policy: same-origin-allow-popups
+nel: {"report_to":"network-errors","max_age":2592000,"success_fraction":0,"failure_fraction":1.0,"include_subdomains":true}
+referrer-policy: no-referrer-when-downgrade
+report-to: {"group":"network-errors","max_age":2592000,"endpoints":[{"url":"https://rjs.3gl.net/hawklogserver/5462/re.p"}]}
+x-abt-application-version: 2.229.0
+x-connection-protocol: HTTP/2
+x-content-security-policy: frame-ancestors 'self' https://*.seo.aws.about.com https://*.dotdash.com *.simplyrecipes.com; upgrade-insecure-requests;
+set-cookie: TMog=n52dd08c49384453db78b71617149fbc118; Path=/; Domain=.simplyrecipes.com; Expires=Sun, 7 Nov 2094 21:42:42 GMT; Max-Age=2147483647; Secure
+set-cookie: globalTI_SID=f0282513-c7f8-45af-916b-5e5aa07c29ec; Path=/; Domain=.simplyrecipes.com; Expires=Thu, 19 Oct 2028 18:28:35 GMT; Max-Age=63072000; Secure
+set-cookie: Mint=n52dd08c49384453db78b71617149fbc118; Path=/; Domain=.simplyrecipes.com; Expires=Tue, 20 Oct 2026 18:58:35 GMT; Max-Age=1800; Secure
+set-cookie: pc=1; Path=/; Domain=.simplyrecipes.com; Expires=Tue, 20 Oct 2026 18:58:35 GMT; Max-Age=1800; Secure
+set-cookie: __cf_bm=gXbHAwH72lo35Ovyo6_xu_py_vRa.b4568zMms4TGAc-1792520915.2759547-1.0.1.1-BWJYckqgFZ0ilM2JjUFSx1C9ipSA14ASVp2HTB8BbwHPl.2sMA.bJBQR.8mOGK0s4oO46ldiJBb_4yDR2eJ9M_rDGPTFMyqx0jZEEdVQXjWZWPMS4rzs463E4W6PpnQu; HttpOnly; SameSite=None; Secure; Path=/; Domain=simplyrecipes.com; Expires=Tue, 20 Oct 2026 18:58:35 GMT
+alt-svc: h3=":443"; ma=86400
+

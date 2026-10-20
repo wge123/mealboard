@@ -1,0 +1,13 @@
+SOURCE: https://www.kingarthurbaking.com/policies/terms-of-use
+FETCHED: 2026-10-20 (curl)
+NOTE: sentences matching automated-access / copying keywords, extracted mechanically from the page text; not the whole document.
+
+- We recommend you print out a copy of these Terms for your records.
+- Upon request by you or King Arthur Baking, we each agree to sign and provide to each other a signed copy of these Terms.
+- A copy of the arbitration demand shall be emailed to
+- create accounts or access data (including user information) through unauthorized means, such as by using an automated device, caching, script, bot, spider, crawler or scraper;
+- use any means to scrape or crawl any web pages contained in the Website;
+- cause the Website or portions of it to be displayed on, or appear to be displayed by, any other site (for example, scraping, framing, deep linking, or in-line linking);
+- In uploading content, you grant King Arthur Baking a non-exclusive, fully paid and royalty-free, transferable, sub-licensable, perpetual and irrevocable, worldwide license to use, reproduce, modify, perform, display, distribute, and otherwise disclose to third parties the User Contributions that you post through the Website or otherwise provide to King Arthur Baking, subject to our
+- King Arthur Baking Content is protected by copyright, trademark, patent, trade secret and other laws, and, as between you and King Arthur Baking, King Arthur Baking owns and retains all rights in King Arthur Baking Content and the Website.
+- Unless we give you permission to do so, you will not remove, alter or conceal any copyright, trademark, service mark or other proprietary rights notices incorporated in or accompanying King Arthur Baking Content and you will not reproduce, modify, adapt, prepare derivative works based on, perform, display, publish, distribute, transmit, broadcast, sell, license or otherwise exploit King Arthur Baking Content without the prior written permission of King Arthur Baking.

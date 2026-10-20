@@ -1,0 +1,25 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:28:30 GMT
+content-type: application/rss+xml; charset=UTF-8
+link: <https://thewoksoflife.com/>; rel="canonical"
+cf-ray: a4da15277bcd8058-MIA
+cf-cache-status: HIT
+cache-control: public, max-age=0, must-revalidate
+etag: "34051db5b0d7ee8eb155bbc3bb712516"
+last-modified: Tue, 20 Oct 2026 17:05:19 GMT
+server: cloudflare
+strict-transport-security: max-age=15552000; preload
+vary: accept-encoding
+x-content-type-options: nosniff
+cdn-cache-control: max-age=300, stale-while-revalidate=60, stale-if-error=21600
+x-bigscoots-cache: cache
+x-bigscoots-cache-control: public, max-age=0, must-revalidate
+x-bigscoots-cache-plan: boost
+x-bigscoots-cache-status: HIT
+x-bigscoots-cdn-cache-control: max-age=300, stale-while-revalidate=60, stale-if-error=21600
+x-hosted-by: BigScoots
+set-cookie: __cf_bm=N5joWOkMYEUj7Xg8JjHrtk7MIqE_rzix0a9RhrwbtT8-1792520909.9956381-1.0.1.1-LEhODU5kutwo6LEZ2EuL5KcOju4ZVwYkPZeW55jixmYD6mv1Q92EtXNTBo3rtkuKS4GeGNPVLvnBQJcPcNenq.Eps.yixlppJs1NqfjN6c1aJs1R02LgtFt_fq7H2QxC; HttpOnly; SameSite=None; Secure; Path=/; Domain=thewoksoflife.com; Expires=Tue, 20 Oct 2026 18:58:30 GMT
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=NkBX%2FkTm%2BP3acd0ljbce41CT3K4Bobjg6GtiJmrk5jtn4vEpDLq3Mq%2B9zjh4ObK5GmrgOfm4V0OOj0BiuwZ%2Fz0RFEbfJVp1n9CHls6T3hbKB13gjDGcicXA%2FqbPAyLoHVnv%2B"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.01,"max_age":604800}
+alt-svc: h3=":443"; ma=86400
+

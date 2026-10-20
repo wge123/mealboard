@@ -1,0 +1,36 @@
+HTTP/2 404 
+x-envoy-upstream-service-time: 8
+x-frame-options: SAMEORIGIN
+x-permitted-cross-domain-policies: none
+referrer-policy: strict-origin-when-cross-origin
+x-envoy-decorator-operation: np-cooking-web.cooking.nyti.nyt.net:443/*
+x-content-type-options: nosniff
+via: 1.1 varnish, 1.1 varnish
+x-download-options: noopen
+cache-control: no-cache
+x-timer: S1792520926.805468,VS0,VE34
+x-xss-protection: 1; mode=block
+x-request-id: 4ddce8cb-f45a-42b5-95c7-f1d75c2494c7
+x-runtime: 0.002994
+content-type: text/html; charset=utf-8
+accept-ranges: bytes
+age: 0
+date: Tue, 20 Oct 2026 18:28:45 GMT
+set-cookie: nyt-gdpr=0; Expires=Wed, 21 Oct 2026 00:28:45 GMT; Path=/; Domain=.nytimes.com
+x-gdpr: 0
+set-cookie: nyt-geo=US; Expires=Wed, 21 Oct 2026 00:28:45 GMT; Path=/; Domain=.nytimes.com
+x-nyt-geo: US
+set-cookie: nyt-a=nTWTdWJy3-0R-9vLHvwU09; Expires=Wed, 20 Oct 2027 18:28:45 GMT; Path=/; Domain=.nytimes.com
+set-cookie: nyt-purr=cfshcfhshckfhdfshgas2taaaa; Expires=Wed, 20 Oct 2027 18:28:45 GMT; Path=/; Domain=.nytimes.com; SameSite=Lax; Secure
+permissions-policy: browsing-topics=()
+x-nyt-backend: np_cooking_web
+x-nyt-route: default
+strict-transport-security: max-age=63072000; preload; includeSubdomains
+x-nyt-edge-cache: MISS
+access-control-allow-headers: traceparent, tracestate, X-B3-Sampled, X-B3-SpanId, X-B3-TraceId, x-datadog-origin, x-datadog-parent-id, x-datadog-sampling-priority, x-datadog-trace-id, x-nyt-entitlements, x-nyt-internal-meter-override
+x-served-by: cache-mia-kmia1760051-MIA, cache-mia-kmia1760051-MIA, cache-mia-kfll1870059-MIA
+x-cache: MISS, MISS
+x-cache-hits: 0, 0
+vary: Accept-Encoding
+content-length: 5524
+

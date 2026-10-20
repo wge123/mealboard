@@ -1,0 +1,16 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:28:20 GMT
+content-type: application/rss+xml; charset=UTF-8
+link: <https://www.loveandlemons.com/wp-json/>; rel="https://api.w.org/", <https://www.loveandlemons.com/>; rel="canonical"
+pragma: public
+cache-control: max-age=3600, public
+etag: W/"cc56a00c8cf3acea387b594f172cb0fe"
+vary: Accept-Encoding,X-Forwarded-Proto
+x-content-type-options: nosniff
+last-modified: Tue, 20 Oct 2026 18:08:43 GMT
+server: cloudflare
+age: 1176
+cf-cache-status: HIT
+cf-ray: a4da14eeba9adfe6-MIA
+alt-svc: h3=":443"; ma=86400
+

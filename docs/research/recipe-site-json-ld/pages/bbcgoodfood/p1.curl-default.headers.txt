@@ -1,0 +1,46 @@
+HTTP/2 200 
+content-type: text/html; charset=utf-8
+backend: https://content-resolution-service-production.headless.imdserve.com
+x-proxied-request: true
+cache-control: public, max-age=0, s-maxage=900, stale-while-revalidate=86400, stale-if-error=86400
+content-encoding: gzip
+etag: bb5f504e04c3d18a45e495ba31115d767e6b19b0
+link: <https://www.bbcgoodfood.com/stitcher-assets/bbcgoodfood/ad-manager.js>; rel="preload"; as="script"
+link: <https://www.bbcgoodfood.com/unified/wrapperMessagingWithoutDetection.js>; rel="preload"; as="script"
+link: <https://cp.bbcgoodfood.com/now.js>; rel="preload"; as="script"
+link: <https://api.permutive.app>; rel="preconnect"
+link: <https://api.edkt.io>; rel="dns-prefetch"
+link: <https://adservice.google.co.uk>; rel="dns-prefetch"
+link: <https://cdn.doubleverify.com>; rel="dns-prefetch"
+link: <https://region1.google-analytics.com>; rel="dns-prefetch"
+link: <https://use.typekit.net>; rel="preconnect"
+link: <https://cdn.speedcurve.com>; rel="dns-prefetch"
+link: <https://www.google-analytics.com>; rel="dns-prefetch"
+link: <https://www.googletagmanager.com>; rel="dns-prefetch"
+link: <https://ib.adnxs.com>; rel="dns-prefetch"
+link: <https://tlx.3lift.com>; rel="dns-prefetch"
+link: <https://htlb.casalemedia.com>; rel="dns-prefetch"
+link: <https://g2.gumgum.com>; rel="dns-prefetch"
+link: <https://a.teads.tv>; rel="dns-prefetch"
+link: <https://grid.bidswitch.net>; rel="dns-prefetch"
+referrer-policy: strict-origin-when-cross-origin
+x-frame-options: SAMEORIGIN
+x-powered-by: Next.js
+x-service-name: editorial
+x-service-type: frontend
+x-xss-protection: 1; mode=block
+via: 1.1 varnish, 1.1 varnish
+accept-ranges: bytes
+age: 191
+date: Tue, 20 Oct 2026 18:35:41 GMT
+x-served-by: cache-dub4382-DUB, cache-mia-kmia1760050-MIA
+x-cache: HIT, HIT
+x-cache-hits: 34, 0
+x-timer: S1792521341.020057,VS0,VE1
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+fastly-geoip-countrycode: US
+access-control-allow-origin: *
+vary: Accept-Encoding, X-Routing-Control-Resolve-Only, routing_service_test
+content-length: 91330
+

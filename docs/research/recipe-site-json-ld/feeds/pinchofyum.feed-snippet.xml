@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	 xmlns:media="http://search.yahoo.com/mrss/" >
+
+<channel>
+	<title>Pinch of Yum</title>
+	<atom:link href="https://pinchofyum.com/feed" rel="self" type="application/rss+xml" />
+	<link>https://pinchofyum.com/</link>
+	<description>A food blog with simple and tasty recipes.</description>
+	<lastBuildDate>Fri, 09 Oct 2026 17:21:06 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://www.altis-dxp.com/?v=7.0.7</generator>
+
+<image>
+	<url>https://pinchofyum.com/tachyon/cropped-Pinch-of-Yum-Favicon-512.png?fit=32%2C32</url>
+	<title>Pinch of Yum</title>
+	<link>https://pinchofyum.com/</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Apple Streusel Meal Prep Muffins</title>
+		<link>https://pinchofyum.com/apple-streusel-meal-prep-muffins</link>
+					<comments>https://pinchofyum.com/apple-streusel-meal-prep-muffins#comments</comments>
+		
+		<dc:creator><![CDATA[Lindsay]]></dc:creator>
+		<pubDate>Fri, 09 Oct 2026 16:17:51 +0000</pubDate>
+				<category><![CDATA[Baking]]></category>
+		<category><![CDATA[Breakfast]]></category>
+		<category><![CDATA[Gluten-Free]]></category>
+		<category><![CDATA[Healthy]]></category>
+		<category><![CDATA[Kid-Friendly]]></category>
+		<category><![CDATA[Recipes]]></category>
+		<category><![CDATA[Snacks]]></category>
+		<guid isPermaLink="false">urn:uuid:ef1e4273-8e4b-47ca-9678-7c9ff5e1e940</guid>
+
+					<description><![CDATA[<p>Super wholesome, loaded with streusel, and ideal for meal prep! My kids love them!</p>
+<p>The post <a href="https://pinchofyum.com/apple-streusel-meal-prep-muffins">Apple Streusel Meal Prep Muffins</a> appeared first on <a href="https://pinchofyum.com">Pinch of Yum</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<figure class="wp-block-image size-full"><img loading="lazy" width="2188" height="2560" decoding="async" data-pin-url="https
+...[truncated]
+<item>
+		<title>Pastina Soup (Italian Penicillin)</title>
+		<link>https://pinchofyum.com/pastina-soup-italian-penicillin</link>
+					<comments>https://pinchofyum.com/pastina-soup-italian-penicillin#comments</comments>
+		
+		<dc:creator><![CDATA[Lindsay]]></dc:creator>
+		<pubDate>Thu, 01 Oct 2026 14:58:20 +0000</pubDate>
+				<category><![CDATA[All Recipes]]></category>
+		<category><![CDATA[Recipes]]></category>
+		<category><![CDATA[Soups]]></category>
+		<category><![CDATA[Vegetarian]]></category>
+		<category><![CDATA[Winter]]></category>
+		<guid isPermaLink="false">urn:uuid:2ecae009-5e87-4abb-a016-9b3dc88c8f17</guid>
+
+					<description><![CDATA[<p>This soup is my new go-to when my family is sick. The broth here is AMAZING - light, flavorful, and nourishing. Absolute comfort food. </p>
+<p>The post <a href="https://pinchofyum.com/pastina-soup-italian-penicillin">Pastina Soup (Italian Penicillin)</a> appeared first on <a href="https://pinchofyum.com">Pinch of Yum</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<figure class="wp-block-image size-full"><img loading="lazy" width="1983" height="2560" decoding="async" data-pin-url="https://pinchofyum.com/pastina-soup-italian-
+...[truncated]
+
+<!-- full feed: 6 items, 340077 bytes; links of all items below -->
+https://pinchofyum.com/apple-streusel-meal-prep-muffins
+https://pinchofyum.com/pastina-soup-italian-penicillin
+https://pinchofyum.com/apple-crisp
+https://pinchofyum.com/healthy-fall-dinners
+https://pinchofyum.com/chicken-with-cajun-cream-sauce
+https://pinchofyum.com/fall-baking-recipes

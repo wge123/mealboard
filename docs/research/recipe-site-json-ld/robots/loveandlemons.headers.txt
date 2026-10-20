@@ -1,0 +1,14 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:27:49 GMT
+content-type: text/plain
+x-content-type-options: nosniff
+vary: X-Forwarded-Proto,Accept-Encoding
+last-modified: Sun, 04 Oct 2020 12:34:17 GMT
+etag: W/"7a-5b0d7958c2440-gzip"
+pragma: public
+cache-control: max-age=3600, public
+server: cloudflare
+cf-cache-status: HIT
+cf-ray: a4da1427b957d8f0-MIA
+alt-svc: h3=":443"; ma=86400
+

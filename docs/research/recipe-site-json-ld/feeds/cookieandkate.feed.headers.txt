@@ -1,0 +1,23 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:28:19 GMT
+content-type: application/rss+xml; charset=UTF-8
+last-modified: Fri, 16 Oct 2026 23:56:46 GMT
+etag: "cf26020653de84e0106189e9038e01a1"
+permissions-policy: private-state-token-redemption=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com"), private-state-token-issuance=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com")
+x-hosted-by: BigScoots
+server: cloudflare
+content-security-policy: block-all-mixed-content;
+strict-transport-security: max-age=31536000; includeSubdomains;
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+referrer-policy: strict-origin-when-cross-origin
+vary: Accept, Accept-Encoding
+age: 8936
+cf-cache-status: HIT
+link: <https://cookieandkate.com/wp-json/>; rel="https://api.w.org/"
+link: <https://cookieandkate.com/>; rel="canonical"
+x-np-cfe: dns1
+cf-ray: a4da14e46fedfc81-MIA
+alt-svc: h3=":443"; ma=86400
+

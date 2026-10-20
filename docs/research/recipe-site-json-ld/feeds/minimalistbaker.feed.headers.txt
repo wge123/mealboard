@@ -1,0 +1,19 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:28:26 GMT
+content-type: application/rss+xml; charset=UTF-8
+server: cloudflare
+cf-edge-cache: cache,platform=wordpress
+last-modified: Tue, 20 Oct 2026 15:19:13 GMT
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+permissions-policy: private-state-token-redemption=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com"), private-state-token-issuance=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com")
+link: <https://minimalistbaker.com/wp-json/>; rel="https://api.w.org/"
+link: <https://minimalistbaker.com/>; rel="canonical"
+vary: Accept-Encoding
+etag: W/"9dc42c2caa69aa4b1e1e4411134e9465-gzip"
+access-control-allow-origin: *
+x-content-type-options: nosniff
+age: 11347
+cache-control: max-age=86400
+cf-cache-status: HIT
+cf-ray: a4da15119a358dac-MIA
+

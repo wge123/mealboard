@@ -1,0 +1,33 @@
+HTTP/2 200 
+x-content-type-options: nosniff
+link: <https://affiliate-attribution-service.kubeprod.hearstapps.com>; rel=preconnect; crossorigin,<https://cdn.cookielaw.org>; rel=preconnect; crossorigin,<https://securepubads.g.doubleclick.net>; rel=preconnect,<https://hips.hearstapps.com>; rel=preconnect,</_assets/fre/scopes/hdm/_next/static/chunks/webpack-c02f6e369f1e2ad9.js>; rel=preload; as=script; nopush,</_assets/fre/scopes/hdm/_next/static/chunks/framework-f9a30afd7bcb8580.js>; rel=preload; as=script; nopush,</_assets/fre/scopes/hdm/_next/static/chunks/main-08e61ff6f0fd4c53.js>; rel=preload; as=script; nopush,</_assets/fre/scopes/hdm/_next/static/chunks/pages/_templates/recipe-1.5-445d1d7ee796b976.js>; rel=preload; as=script; nopush,</api/styles.css?id=d2798604-5123-457a-bd25-ec32b82a1806&type=brand&slugs=recipe-default%2Crecipe-1_5-default&source=content%3Arecipe>; rel=preload; as=style; nopush
+expires: Tue, 20 Oct 2026 18:33:13 GMT
+content-encoding: gzip
+etag: "d0mrm5w9mjez7i"
+x-app-version: 1.9.753
+referrer-policy: no-referrer-when-downgrade
+content-security-policy: upgrade-insecure-requests; default-src https: data: 'unsafe-inline' 'unsafe-eval' https: https://accounts.google.com/gsi/; script-src data: 'unsafe-inline' 'unsafe-eval' https: blob: https://accounts.google.com/gsi/client; style-src data: 'unsafe-inline' https: https://accounts.google.com/gsi/style; img-src data: https: blob:; font-src data: https:; connect-src https: wss: blob: https://accounts.google.com/gsi/; media-src data: https: blob:; object-src https:; child-src https: data: blob:; form-action https:; frame-ancestors 'self'
+x-xss-protection: 1; mode=block
+content-type: text/html; charset=utf-8
+x-robots-tag: all
+accept-ranges: bytes
+age: 684
+date: Tue, 20 Oct 2026 18:44:39 GMT
+x-cache: MISS, HIT, HIT
+set-cookie: mosb=d71e4d85-0a5e-59fd-ae41-e64785d1ebfc; domain=delish.com; expires=Wed, 24 Nov 2027 18:44:39 GMT; secure; path=/;
+set-cookie: optimizely-user-id=8ccfbd02-02c0-4d30-b73e-9abb0be9f9fc; domain=delish.com; expires=Wed, 21 Apr 2027 06:44:39 GMT; secure; path=/
+set-cookie: optimizely-user-attributes=%7B%22device%22%3A%22desktop%22%2C%22paid_traffic%22%3Afalse%2C%22mylo_login%22%3Afalse%2C%22qa_audience%22%3Anull%2C%22url%22%3A%22www.delish.com%2Fcooking%2Frecipe-ideas%2Fa45270%2Fbest-watergate-salad-recipe%2F%22%2C%22platform%22%3A%22Macintosh%3B%20Intel%20Mac%20OS%20X%2010_15_7%22%2C%22browser%22%3A%22Other%22%2C%22browser_language%22%3A%22unknown%22%2C%22%24opt_user_agent%22%3A%22Mozilla%2F5.0%20(Macintosh%3B%20Intel%20Mac%20OS%20X%2010_15_7)%20Mealboard%2F1.0%22%7D; expires=Wed, 21 Apr 2027 06:44:39 GMT; secure; path=/
+optimizely-sdk-key: Ap6qCzsEQh8Q4gM2yo1EX
+server-timing: time-start-msec;dur=1792521879396,time-elapsed;dur=63,fastly-pop;desc=MIA,hit-state;desc=HIT-CLUSTER
+set-cookie: _perhip=d61f85dceb5508cd9f8f2856e10f912f758c6d5f24d29dc85841df5030b24e4b; path=/;
+set-cookie: _HFID=hfid:f47a5c9854733d0fef76aae4c68449d7444295d8d535a99645cb66fbc8439a39eaa55b5a7cf30ccb197676c57b4a927923639752b4ba3870657c682640ff061f; httponly; expires=Wed, 20 Oct 2027 18:44:39 GMT; secure; path=/;
+set-cookie: _HFID=hfid:f47a5c9854733d0fef76aae4c68449d7444295d8d535a99645cb66fbc8439a39eaa55b5a7cf30ccb197676c57b4a927923639752b4ba3870657c682640ff061f; expires=Wed, 20 Oct 2027 18:44:39 GMT; secure; path=/;
+set-cookie: location_data={"country_code":"US","postal_code":"32805","geo_region":"FL"}; path=/;
+strict-transport-security: max-age=31557600; includeSubDomains
+x-country: US
+cache-control: max-age=0, must-revalidate, private
+alt-svc: h3=":443";ma=86400,h3-29=":443";ma=86400,h3-27=":443";ma=86400
+trailer: server-timing
+content-length: 117860
+
+server-timing: rtt; dur=26.168, retrans; dur=0, trailer-timestamp; dur=1792521879489

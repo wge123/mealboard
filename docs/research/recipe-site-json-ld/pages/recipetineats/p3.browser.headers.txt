@@ -1,0 +1,23 @@
+HTTP/2 200 
+content-type: text/html; charset=UTF-8
+date: Tue, 20 Oct 2026 18:33:58 GMT
+x-batcache: HIT
+content-encoding: gzip
+server: nginx
+last-modified: Tue, 20 Oct 2026 18:28:28 GMT
+cache-control: max-age=10, must-revalidate
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+content-security-policy: object-src 'none'; base-uri 'self'
+link: <https://www.recipetineats.com/wp-json/>; rel="https://api.w.org/"
+link: <https://www.recipetineats.com/wp-json/wp/v2/posts/204666>; rel="alternate"; title="JSON"; type="application/json"
+link: <https://wp.me/phlyB4-Rf4>; rel=shortlink
+vary: Cookie,Origin
+x-cache: Miss from cloudfront
+via: 1.1 066a2e4240809625c951daf9d45cabda.cloudfront.net (CloudFront)
+x-amz-cf-pop: TPA52-P1
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: IHktV-1vxk7XBESACH3Ox1ECNFjpLAMDEezQKgC8BcfapWR2YNnYIw==
+

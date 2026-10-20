@@ -1,0 +1,17 @@
+HTTP/2 200 
+content-type: text/xml; charset=utf-8
+x-robots-tag: all
+accept-ranges: bytes
+age: 11
+date: Tue, 20 Oct 2026 18:28:40 GMT
+x-cache: MISS, HIT, MISS
+server-timing: time-start-msec;dur=1792520920745,time-elapsed;dur=159,fastly-pop;desc=MIA,hit-state;desc=MISS-CLUSTER
+set-cookie: location_data={"country_code":"US","postal_code":"32805","geo_region":"FL"}; path=/;
+strict-transport-security: max-age=31557600; includeSubDomains
+x-country: US
+cache-control: max-age=0, must-revalidate, private
+alt-svc: h3=":443";ma=86400,h3-29=":443";ma=86400,h3-27=":443";ma=86400
+trailer: server-timing
+content-length: 33471
+
+server-timing: rtt; dur=24.877, retrans; dur=0, trailer-timestamp; dur=1792520920904

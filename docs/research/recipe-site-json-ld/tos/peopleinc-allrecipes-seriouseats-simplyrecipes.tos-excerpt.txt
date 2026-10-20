@@ -1,0 +1,28 @@
+SOURCE: https://www.people.inc/brands-termsofservice
+FETCHED: 2026-10-20 (curl)
+NOTE: sentences matching automated-access / copying keywords, extracted mechanically from the page text; not the whole document.
+
+- Subject to any applicable Account settings that you select or license agreement you may be asked to agree to when posting or submitting Your Content on or though the Services, you grant Company, its agent(s) and supplier(s), and anyone else authorized by Company, an irrevocable, non-exclusive, perpetual, worldwide, royalty-free right and license to use, copy, display, publicly perform, transmit, modify, publish, distribute, make derivative works of, sublicense, and otherwise commercially and non-commercially exploit and use Your Content (in whole or in part) in any manner or medium now existing or hereafter developed (including print and electronic storage) and for any purpose.
+- The foregoing grant includes the right to exploit any proprietary rights in Your Content, including, but not limited to, under copyright, trademark, trade secret, patent or other intellectual property laws that exist in any relevant jurisdiction, and a waiver of any “moral rights” in Your Content.
+- Note that other Users may search for, see, use, modify, and reproduce any of Your Content that you submit to any "public" area of the Services.
+- (i) infringes any patent, trademark, trade secret, copyright, right of publicity or other right of any person or entity;
+- The Services are protected by copyright and other intellectual property laws throughout the world.
+- Company's stylized name and other related trademarks, graphics, logos, service marks, and trade names used on or in connection with the Services are the trademarks of Company and may not be used without permission in connection with any third-party products or services.
+- You will not remove, alter, or obscure any copyright notice, trademark, service mark or other proprietary rights notices incorporated in or accompanying the Services.
+- (a) you shall not license, sell, rent, lease, transfer, assign, reproduce, distribute, host, or otherwise commercially exploit the Services or any portion of the Services;
+- (e) you shall not use any manual or automated software, devices, or other processes (including but not limited to spiders, robots, scrapers, crawlers, avatars, data mining tools or the like) to "scrape," harvest, or download data from the Services (except that we grant the operators of public search engines revocable permission to use spiders to copy materials from the Website for the sole purpose of and solely to the extent necessary for creating publicly available searchable indices of the materials, but not caches or archives of such materials);
+- (f) you shall not use any data from the Services for the development of any software program (including but not limited to training a machine learning or artificial intelligence (AI) system);
+- (h) you shall not except as expressly stated herein, no part of the Services may be copied, reproduced, distributed, republished, downloaded, displayed, posted, or transmitted in any form or by any means;
+- (i) you shall not remove or destroy any copyright notices or other proprietary markings contained on or in the Services or use the Services in violation of any third party’s intellectual property or other proprietary or legal rights;
+- (b) the Embedded Video is not used for the development of any software program (including but not limited to training a machine learning or artificial intelligence (AI) system);
+- Procedure for Making Claims of Copyright Infringement.
+- If you believe content posted on the Services infringes your copyright rights, please provide our Copyright Agent with the following information:
+- (1) an electronic or physical signature of the person authorized to act on behalf of the owner of the copyright interest;
+- (2) a description of the copyrighted work that you claim has been infringed;
+- (5) a written statement that you have a good faith belief that the disputed use is not authorized by the copyright owner, its agent or the law;
+- and (6) a statement by you, made under penalty of perjury, that the above information in your notice is accurate and that you are the copyright owner or authorized to act on the copyright owner's behalf.
+- Correspondence to our Copyright Agent regarding notice of claims of copyright infringement should be addressed to:
+- Company maintains a policy to terminate in appropriate circumstances the Service use privileges of all repeat infringers of copyright rights.
+- The Copyright Agent has no responsibility for and will not respond to Usage/Reprint permission requests or Subscriber/Customer Service inquiries.
+- Questions, Complaints, Claims, Permissions.
+- For usage and/or reprint permission requests, please email

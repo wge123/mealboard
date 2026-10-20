@@ -1,0 +1,17 @@
+SOURCE: https://www.wbd.com/visitor-agreement
+FETCHED: 2026-10-20 (curl)
+NOTE: sentences matching automated-access / copying keywords, extracted mechanically from the page text; not the whole document.
+
+- A copy of the Privacy Policy can be found
+- When using the Website, you agree to comply with all applicable laws, including, without limitation, copyright law.
+- Except as expressly permitted in this Visitor Agreement, you may not use, reproduce, distribute, create derivative works based upon, publicly display, publicly perform, publish, transmit, or otherwise exploit Website Content (as defined below) for any purpose whatsoever without obtaining prior written consent, in each instance, of WBD or, in the case of third-party content, its respective owner.
+- (i) remove, alter, cover, or distort any copyright, trademark, or other proprietary rights notices on the Website or Website Content;
+- (ii) circumvent, disable or otherwise interfere with security-related features of the Website, including, without limitation, any features that prevent or restrict use or copying of any content or enforce limitations on the use of the Website or Website Content;
+- (iii) use an automatic device (such as a robot or spider) or manual process to copy or “scrape” the Website or Website Content for any purpose without the express written permission of WBD, frame the Website or Website Content except to the extent we have given you explicit written permission to do so, or use any of our trademarks as meta tags.
+- (iv) collect or harvest any personally identifiable information from the Website, including, without limitation, user names, passwords, e-mail addresses;
+- You may not use on your website any trademarks, service marks or copyrighted materials appearing on the Website, including but not limited to any logos or characters, without the express written consent of the owner of the mark or right.
+- NOTICE AND PROCEDURE FOR MAKING CLAIMS OF COPYRIGHT INFRINGEMENT
+- Pursuant to Title 17, United States Code, Section 512(c)(2), notifications of claimed copyright infringement must be sent to WBD’s Designated Agent.
+- Identification of the copyrighted work claimed to have been infringed, or, if multiple copyrighted works are covered by a single notification, a representative list of such works;
+- A statement that the complaining party has a good-faith belief that use of the material in the manner complained of is not authorized by the copyright owner, its agent or the law;
+- WBD is not responsible for the accuracy, copyright compliance, legality, decency, or any other aspect of these third-party sites and WBD is not liable to you for any loss or damage of any sort incurred as a result of your dealings with any third-party or their website.

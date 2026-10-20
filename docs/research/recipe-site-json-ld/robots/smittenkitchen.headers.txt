@@ -1,0 +1,14 @@
+HTTP/2 200 
+server: nginx
+date: Tue, 20 Oct 2026 18:27:50 GMT
+content-type: text/plain
+content-length: 300
+strict-transport-security: max-age=31536000
+last-modified: Fri, 15 May 2026 10:48:29 GMT
+etag: "6a06f9fd-12c"
+x-ac: 23.mia _atomic_dca MISS
+accept-ranges: bytes
+x-remembering: Eric Binnion <https://friendsofericbinnion.wordpress.com/>
+alt-svc: clear
+server-timing: a8c-cdn, dc;desc=mia, cache;desc=MISS;dur=61.0
+

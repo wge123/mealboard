@@ -1,0 +1,22 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:28:15 GMT
+content-type: application/rss+xml; charset=UTF-8
+last-modified: Tue, 20 Oct 2026 10:37:09 GMT
+etag: "1eb465f2ca6d3031cfe7b593b6907c1f"
+permissions-policy: private-state-token-redemption=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com"), private-state-token-issuance=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com")
+x-hosted-by: BigScoots
+server: cloudflare
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+vary: Accept, Accept-Encoding
+age: 18188
+cf-cache-status: HIT
+link: <https://www.budgetbytes.com/wp-json/>; rel="https://api.w.org/"
+link: <https://www.budgetbytes.com/>; rel="canonical"
+x-frame-options: SAMEORIGIN
+x-np-cfe: dns1
+cache-control: no-cache
+strict-transport-security: max-age=31536000
+cf-ray: a4da14cc9c55b4aa-MIA
+alt-svc: h3=":443"; ma=86400
+

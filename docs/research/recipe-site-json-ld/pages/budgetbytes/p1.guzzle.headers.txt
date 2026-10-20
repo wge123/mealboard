@@ -1,0 +1,25 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:36:29 GMT
+content-type: text/html; charset=UTF-8
+permissions-policy: private-state-token-redemption=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com"), private-state-token-issuance=(self "https://www.google.com" "https://www.gstatic.com" "https://recaptcha.net" "https://challenges.cloudflare.com" "https://hcaptcha.com")
+x-hosted-by: BigScoots
+server: cloudflare
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+vary: Accept, Accept-Encoding
+age: 18653
+last-modified: Tue, 20 Oct 2026 16:03:52 GMT
+cf-cache-status: HIT
+set-cookie: _cfuvid=nKRxQkDseLCTzhKUOfiYuex_XLyDdxmlqKcTiDa75h4-1792521389.5376751-1.0.1.1-AJSR.cCHuG6.jbl4PaVYqmO1L8LWyrcfmzD7F.QGr0M; HttpOnly; SameSite=None; Secure; Path=/; Domain=www.budgetbytes.com
+link: <https://www.budgetbytes.com/wp-json/>; rel="https://api.w.org/"
+link: <https://www.budgetbytes.com/wp-json/wp/v2/posts/166410>; rel="alternate"; title="JSON"; type="application/json"
+link: <https://www.budgetbytes.com/?p=166410>; rel=shortlink
+content-security-policy: upgrade-insecure-requests
+x-frame-options: SAMEORIGIN
+x-np-cfe: dns1
+cache-control: no-cache
+strict-transport-security: max-age=31536000
+content-encoding: gzip
+cf-ray: a4da20dc997b5c70-MIA
+alt-svc: h3=":443"; ma=86400
+

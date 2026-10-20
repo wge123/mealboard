@@ -1,0 +1,27 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:27:33 GMT
+content-type: text/plain;charset=utf-8
+cf-ray: a4da13c7fe23e1ca-MIA
+cf-cache-status: DYNAMIC
+cache-control: max-age=3600, private
+set-cookie: TMog=nef2ccc738ad944a092571a1e0e63b57318; Path=/; Domain=.simplyrecipes.com; Expires=Sun, 7 Nov 2094 21:41:40 GMT; Max-Age=2147483647; Secure
+set-cookie: globalTI_SID=254be376-54e7-417f-8d6c-a4bd500bcbe3; Path=/; Domain=.simplyrecipes.com; Expires=Thu, 19 Oct 2028 18:27:33 GMT; Max-Age=63072000; Secure
+set-cookie: Mint=nef2ccc738ad944a092571a1e0e63b57318; Path=/; Domain=.simplyrecipes.com; Expires=Tue, 20 Oct 2026 18:57:33 GMT; Max-Age=1800; Secure
+set-cookie: pc=1; Path=/; Domain=.simplyrecipes.com; Expires=Tue, 20 Oct 2026 18:57:33 GMT; Max-Age=1800; Secure
+set-cookie: __cf_bm=ydYXTjz6ncn0J8lKMjmm4HvTzztGJmt9_OhsHaRxm.M-1792520853.762865-1.0.1.1-HFhMDqTTu2tTqBeuMhYlo9rLAz.RdanWx_gcKxsuHK9pakp0dNWPOf6lVk95eWMAcoqYwn34fuUfYKffrA3M2S088xeroOOD2b2kUje8gESj6Me._LRhqIgc5YX9Ttbt; HttpOnly; SameSite=None; Secure; Path=/; Domain=simplyrecipes.com; Expires=Tue, 20 Oct 2026 18:57:33 GMT
+expires: Thu, 01 Jan 1970 00:00:00 GMT
+link: <//www.simplyrecipes.com/static/fonts/frank-ruhl-libre-v-6-latin-regular.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.simplyrecipes.com/static/fonts/roboto-v-20-latin-regular.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.simplyrecipes.com/static/fonts/roboto-v-20-latin-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.googletagmanager.com/gtm.js?id=GTM-5P3SZGS>; rel=preload; as=script; nopush, <//www.googletagmanager.com/gtag/js?id=G-WK8Q2KB0FS&l=dataLayer&cx=c>; rel=preload; as=script; nopush, <//securepubads.g.doubleclick.net/tag/js/gpt.js>; rel=preload; as=script; nopush
+server: cloudflare
+x-content-type-options: nosniff
+strict-transport-security: max-age=15552000
+vary: Accept-Encoding, Origin, Access-Control-Request-Method, Access-Control-Request-Headers
+content-security-policy: frame-ancestors 'self' https://*.seo.aws.about.com https://*.dotdash.com *.simplyrecipes.com; upgrade-insecure-requests;
+cross-origin-opener-policy: same-origin-allow-popups
+nel: {"report_to":"network-errors","max_age":2592000,"success_fraction":0,"failure_fraction":1.0,"include_subdomains":true}
+referrer-policy: no-referrer-when-downgrade
+report-to: {"group":"network-errors","max_age":2592000,"endpoints":[{"url":"https://rjs.3gl.net/hawklogserver/5462/re.p"}]}
+x-abt-application-version: 2.229.0
+x-connection-protocol: HTTP/2
+x-content-security-policy: frame-ancestors 'self' https://*.seo.aws.about.com https://*.dotdash.com *.simplyrecipes.com; upgrade-insecure-requests;
+alt-svc: h3=":443"; ma=86400
+

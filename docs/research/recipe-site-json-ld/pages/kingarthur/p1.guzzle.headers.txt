@@ -1,0 +1,29 @@
+HTTP/2 200 
+x-pantheon-styx-hostname: styx-us-a-fbbcf58dd-m6wxd
+x-content-type-options: nosniff
+via: 1.1 varnish, 1.1 varnish, 1.1 varnish, 1.1 varnish
+accept-ranges: bytes
+x-styx-req-id: befc55da-ccb4-11f1-bf34-7a45c3b7d669
+cache-control: max-age=600, public, s-maxage=2764800
+content-language: en
+x-drupal-dynamic-cache: MISS
+content-encoding: gzip
+age: 173
+x-frame-options: SAMEORIGIN
+fastly-drupal-html: YES
+content-type: text/html; charset=utf-8
+x-generator: Drupal 11 (https://www.drupal.org)
+server: nginx
+last-modified: Tue, 20 Oct 2026 18:33:29 GMT
+etag: W/"1792521209"
+date: Tue, 20 Oct 2026 18:36:23 GMT
+x-served-by: cache-chi-klot8100167-CHI, cache-iad-kcgs7200039-IAD, cache-iad-kcgs7200039-IAD, cache-iad-kiad7000161-IAD, cache-mia-kmia1760022-MIA
+x-cache: MISS, HIT, MISS, MISS, MISS
+x-cache-hits: 0, 0, 0, 0, 0
+x-timer: S1792521383.977425,VS0,VE98
+vary: Accept-Encoding
+expires: Thu, 01 Jan 1970 00:00:00 GMT
+strict-transport-security: max-age=300
+alt-svc: h3=":443";ma=86400,h3-29=":443";ma=86400,h3-27=":443";ma=86400
+content-length: 81763
+

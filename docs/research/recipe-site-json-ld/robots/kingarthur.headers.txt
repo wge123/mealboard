@@ -1,0 +1,22 @@
+HTTP/2 200 
+server: nginx
+x-styx-req-id: 149319e7-c320-11f1-b431-aef860b5f89c
+content-type: text/plain
+via: 1.1 varnish, 1.1 varnish, 1.1 varnish, 1.1 varnish
+cache-control: max-age=31622400
+etag: W/"6ac79bb8-a56"
+last-modified: Thu, 08 Oct 2026 13:33:44 GMT
+x-pantheon-styx-hostname: styx-us-a-58d475665b-xcvtg
+accept-ranges: bytes
+age: 446546
+date: Tue, 20 Oct 2026 18:27:43 GMT
+x-served-by: cache-chi-klot8100098-CHI, cache-iad-kiad7000138-IAD, cache-iad-kiad7000138-IAD, cache-iad-kiad7000138-IAD, cache-mia-kfll1870064-MIA
+x-cache: MISS, HIT, MISS, HIT, HIT
+x-cache-hits: 0, 1, 0, 36, 0
+x-timer: S1792520864.580327,VS0,VE2
+vary: Accept-Encoding
+expires: Thu, 01 Jan 1970 00:00:00 GMT
+strict-transport-security: max-age=300
+alt-svc: h3=":443";ma=86400,h3-29=":443";ma=86400,h3-27=":443";ma=86400
+content-length: 2646
+

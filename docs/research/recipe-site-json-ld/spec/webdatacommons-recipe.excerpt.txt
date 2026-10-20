@@ -1,0 +1,13 @@
+SOURCE: https://webdatacommons.org/structureddata/2024-12/stats/schema_org_subsets.html and .../2023-12/stats/schema_org_subsets.html
+FETCHED: 2026-10-20 via curl
+
+2024-12: n/a
+2024-12 Recipe entity count: schema.org/Recipe (2,922,378)
+
+2023-12: n/a
+2023-12 Recipe entity count: schema.org/Recipe (5,683,640)
+
+Hand-copied from the same pages (page text reads "Recipe | Quads: ... | URLs: ... | Hosts: ..."):
+2024-12 (October 2024 corpus): Recipe subset - Quads 258,349,284; URLs 2,746,545; Hosts 37,304; schema.org/Recipe entities 2,922,378
+2023-12 (October 2023 corpus): Recipe subset - Quads 502,684,939; URLs 4,489,240; Hosts 42,727; schema.org/Recipe entities 5,683,640
+The pages give counts only; no completeness or validity rates for Recipe properties.

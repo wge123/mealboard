@@ -1,0 +1,36 @@
+HTTP/2 200 
+x-frame-options: SAMEORIGIN
+x-content-type-options: nosniff
+referrer-policy: strict-origin-when-cross-origin
+x-statsig-used-assignments: %7B%22gates%22%3A%5B%22adexp_cooking_web_medianet_0526%22%5D%2C%22configs%22%3A%5B%5D%2C%22layers%22%3A%5B%5D%7D
+cache-control: s-maxage=0, max-age=0
+x-nyt-debug-recipe-type: scoop
+etag: "z0e83p7pi0dh7b"
+content-type: text/html; charset=utf-8
+content-encoding: gzip
+x-envoy-upstream-service-time: 119
+server: envoy
+x-envoy-decorator-operation: cooking-frontend.cooking.nyti.nyt.net:443/*
+accept-ranges: bytes
+age: 0
+date: Tue, 20 Oct 2026 18:32:23 GMT
+via: 1.1 varnish
+set-cookie: nyt-gdpr=0; Expires=Wed, 21 Oct 2026 00:32:23 GMT; Path=/; Domain=.nytimes.com
+x-gdpr: 0
+set-cookie: nyt-geo=US; Expires=Wed, 21 Oct 2026 00:32:23 GMT; Path=/; Domain=.nytimes.com
+x-nyt-geo: US
+set-cookie: nyt-a=mpMNzOSAl-JGR4IyWQUEaH; Expires=Wed, 20 Oct 2027 18:32:23 GMT; Path=/; Domain=.nytimes.com
+set-cookie: nyt-purr=cfshcfhshckfhdfshgas2taaaa; Expires=Wed, 20 Oct 2027 18:32:23 GMT; Path=/; Domain=.nytimes.com; SameSite=Lax; Secure
+permissions-policy: browsing-topics=()
+set-cookie: nyt.et.dd=iv=AD821CDB2CBB448283EEC4FAF3784DE8&val=m3aWbxAvL1WqvKyjqkG1SrhEbvTpRYlQRUXnNX7tFX43xIH2mRRmxOql7rRW37nyLe1mGINYTzhvtFRP1JP6Mgz3NfyDBDREQfD/CWRu74+zYNdt+Pf1UTUDEOtakdLRptSh+IpZ8FPVjVZ4+K7+KRlPA4w80CRoPoQmBgS7gYci0Jupqx+cl5UEOqapm5gEA8bpLBJ62K183gv0fPSMF5/fyenMjOiUpJKMT46l3eEUqIeBwP/YhArx+og3SQgRBPFymFWDyaM5O6IveAUIqcKUrgv9LhDxXcg9uu3tQrq480ET5rG4UkFCuMNsS5WtcrrN3iRfH4j30ATUGvNjtKjMKL90IaFE7gggXk6wz0SPKayDlIFTI6Hn8dJXDuc++IYEpivfUX+nRdE7yc2t2L4cl5pZBgNHyvofTTo6IqVofahAX4ZPvo63Pb3jxT7H3vDow2gDmrXbr4/mNdYDOA==; Max-Age=60; Path=/; Domain=.nytimes.com; SameSite=none; Secure
+x-nyt-backend: cooking_frontend
+x-nyt-route: recipe-page
+strict-transport-security: max-age=63072000; preload; includeSubdomains
+x-nyt-edge-cache: MISS
+access-control-allow-headers: traceparent, tracestate, X-B3-Sampled, X-B3-SpanId, X-B3-TraceId, x-datadog-origin, x-datadog-parent-id, x-datadog-sampling-priority, x-datadog-trace-id, x-nyt-entitlements, x-nyt-internal-meter-override
+x-served-by: cache-mia-kmia1760021-MIA
+x-cache: MISS
+x-cache-hits: 0
+vary: x-statsig-assignments, Accept-Encoding
+content-length: 93634
+

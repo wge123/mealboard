@@ -1,0 +1,17 @@
+SOURCE: https://developers.google.com/search/docs/appearance/structured-data/recipe
+FETCHED: 2026-10-20 via curl; text extracted mechanically
+
+Required properties image URL or ImageObject Image of the co
+...
+Recommended properties aggregateRating AggregateRating Annotation for the average review score assigned to the item. Follow the Review snippet guidelines and list of required and recommended Aggregate
+
+ | recipeIngredient | Text | An ingredient used in the recipe. | For example: | "recipeIngredient" | : | [ | "1 (15 ounce) package double crust ready-to-use pie crust" | , | "6 cups thinly sliced, peeled apples (6 medium)" | , | "3/4 cup sugar" | , | "2 tablespoons all-purpose flour" | , | "3/4 teaspoon ground cinnamon" | , | "1/4 teaspoon salt" | , | "1/8 teaspoon ground nutmeg" | , | "1 tablespoon lemon juice" | ] | Additional guidelines | : | Include only the ingredient text that is necessary for making the recipe. | Don't include unnecessary information, such as a
+
+ | recipeInstructions | HowToStep | , | HowToSection | , or | Text | The steps to make the dish. | There are several options for setting the value of | recipeInstructions | . We recommend using | HowToStep | . | HowToSection | can also be used to group HowToSteps when the recipe has sections. | HowToStep | : Specify this recipe's steps with | HowToStep | . | "recipeInstructions" | : | [ | { | "@type" | : | "HowToStep" | , | "name" | : | "Preheat" | , | "text" | : | "Heat oven to 425°F." | , | "url" | : | "https://example.com/recipe#step1" | , | "image" | : | "https://example.com/photos/recipe/st
+
+ | totalTime | Duration | The total time it takes to prepare | the cook the dish, in | ISO 8601 format | , if applicable. | Use | totalTime | or a combination of both | cookTime | and | prepTime | . | video | VideoObject | A video depicting the steps to make the dish. Follow the list of required and recommended | Video properties | . | HowToSection | Most recipes don't have sections. Start by splitting the recipe instructions | into | HowToStep | properties, and only add | HowToSection | if you need to | additionally specify sections of steps. | Use | HowToSection | to gr
+
+ | recipeYield | must be defined | with the number of servings. | prepTime | Duration | The length of time it takes to prepare ingredients and workspace for the dish, in | ISO 8601 format | , | if applicable. | Always use in combination with | cookTime | . | recipeCategory | Text | The type of meal or course your recipe is about. For example: "dinner", "main course", or "dessert, snack". | recipeCuisine | Text | The region associated with your recipe. For example, "French", Mediterranean", or "American". | recipeIngredient | Text | An ingredient used in th
+
+ | prepTime | . | datePublished | Date | The date the recipe was published in | ISO 8601 format | , | if applicable. | description | Text | A short summary describing the dish. | keywords | Text | Other terms for your recipe such as the season ("summer"), the holiday ("Halloween"), or other descriptors ("quick", "easy", "authentic"). | Additional guidelines | Separate multiple entries in a keywords list with commas. | Don't use a tag that's actually a | recipeCategory | or | recipeCuisine | . | Not recommended | : | "keywords": "dessert, American" | Recommended | : | 
+

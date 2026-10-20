@@ -1,0 +1,33 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:43:15 GMT
+content-type: application/json; charset=UTF-8
+link: <https://thewoksoflife.com/wp-json/wp/v2/wprm_recipe?per_page=2&_fields=id%2Cdate%2Clink%2Cslug&page=2>; rel="next"
+cf-ray: a4da2ac368f9f326-MIA
+cf-cache-status: BYPASS
+allow: GET
+cache-control: private, no-cache, must-revalidate, max-age=0
+expires: Tue, 20 Oct 2026 18:43:15 GMT
+server: cloudflare
+strict-transport-security: max-age=15552000; preload
+vary: Origin, accept-encoding
+pragma: no-cache
+access-control-allow-headers: Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type, X-OptinMonster-ApiKey
+access-control-expose-headers: X-WP-Total, X-WP-TotalPages, Link
+cdn-cache-control: private, no-cache, must-revalidate, max-age=0
+x-bigscoots-cache: no-cache
+x-bigscoots-cache-bypass-reason: rest-api
+x-bigscoots-cache-control: private, no-cache, must-revalidate, max-age=0
+x-bigscoots-cache-plan: boost
+x-bigscoots-cache-status: BYPASS
+x-bigscoots-cdn-cache-control: private, no-cache, must-revalidate, max-age=0
+x-content-type-options: nosniff
+x-hosted-by: BigScoots
+x-robots-tag: noindex
+x-wp-total: 1413
+x-wp-totalpages: 707
+set-cookie: __cf_bm=MXi8AsDI14Qp7mUJwV8cx0j9IB1mbV7BGtw3ULv5l0g-1792521795.103443-1.0.1.1-QBFHUKYpr_xXtTZ7lbFirUuB1weEmtahr19UatM8lwcvKtKeaFsfGzKcs6kLbnFyWgUkEOmjHsx1Bi5fbFR5_Y9v_MTMCBSq4y_PYd2qQslOvyNcPOq2S1ku4u0QwOWO; HttpOnly; SameSite=None; Secure; Path=/; Domain=thewoksoflife.com; Expires=Tue, 20 Oct 2026 19:13:15 GMT
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=jBgBPatXGEDukuBt0IPpspCs6nk21RgTRg3oZbwKVzKSxQVUjBM1QFTtfdXIxGJn5UX0WBiNJXYUOJ%2FPgRcdh8sVVsPEkZiQj3wFD9hi76lXif62thy3zpX2vbtLDz%2BVUgS2"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.01,"max_age":604800}
+content-encoding: gzip
+alt-svc: h3=":443"; ma=86400
+

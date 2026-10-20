@@ -1,0 +1,31 @@
+HTTP/2 200 
+x-frame-options: SAMEORIGIN
+x-content-type-options: nosniff
+referrer-policy: strict-origin-when-cross-origin
+cache-control: s-maxage=0, max-age=0
+last-modified: Mon, 19 Oct 2026 18:13:30 GMT
+etag: W/"d5a-1a1555e5d10"
+content-type: text/plain; charset=UTF-8
+x-envoy-upstream-service-time: 4
+x-envoy-decorator-operation: cooking-frontend.cooking.nyti.nyt.net:443/*
+fastly-restarts: 1
+accept-ranges: bytes
+age: 38280
+date: Tue, 20 Oct 2026 18:27:35 GMT
+via: 1.1 varnish
+set-cookie: nyt-gdpr=0; Expires=Wed, 21 Oct 2026 00:27:35 GMT; Path=/; Domain=.nytimes.com
+x-gdpr: 0
+set-cookie: nyt-geo=US; Expires=Wed, 21 Oct 2026 00:27:35 GMT; Path=/; Domain=.nytimes.com
+x-nyt-geo: US
+permissions-policy: browsing-topics=()
+x-nyt-backend: cooking_frontend
+x-nyt-route: robots-txt
+strict-transport-security: max-age=63072000; preload; includeSubdomains
+x-nyt-edge-cache: HIT
+access-control-allow-headers: traceparent, tracestate, X-B3-Sampled, X-B3-SpanId, X-B3-TraceId, x-datadog-origin, x-datadog-parent-id, x-datadog-sampling-priority, x-datadog-trace-id, x-nyt-entitlements, x-nyt-internal-meter-override
+x-served-by: cache-mia-kfll1870073-MIA
+x-cache: HIT
+x-cache-hits: 0
+vary: Accept-Encoding
+content-length: 3418
+

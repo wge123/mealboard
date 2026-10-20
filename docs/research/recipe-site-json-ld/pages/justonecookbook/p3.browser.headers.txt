@@ -1,0 +1,24 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:34:57 GMT
+content-type: text/html; charset=UTF-8
+cf-ray: a4da1e9be8b0a576-MIA
+cf-cache-status: HIT
+age: 595043
+link: <https://www.justonecookbook.com/wp-json/>; rel="https://api.w.org/", <https://www.justonecookbook.com/wp-json/wp/v2/posts/113939>; rel="alternate"; title="JSON"; type="application/json", <https://www.justonecookbook.com/?p=113939>; rel=shortlink
+server: cloudflare
+strict-transport-security: max-age=2592000
+vary: Accept-Encoding
+cf-apo-via: tcache
+alt-svc: h3=":443"; ma=86400
+cf-edge-cache: cache,platform=wordpress
+content-security-policy: block-all-mixed-content
+cross-origin-opener-policy: same-origin
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+x-litespeed-cache: hit
+x-powered-by: PHP/8.4.26
+x-turbo-charged-by: LiteSpeed
+x-xss-protection: 1; mode=block
+speculation-rules: "/cdn-cgi/speculation"
+content-encoding: gzip
+

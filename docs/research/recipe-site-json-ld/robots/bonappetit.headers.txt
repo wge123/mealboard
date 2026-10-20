@@ -1,0 +1,19 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:27:37 GMT
+content-type: text/plain
+server: cloudflare
+last-modified: Tue, 29 Sep 2026 15:20:07 GMT
+x-amz-server-side-encryption: AES256
+etag: W/"74b729c4aea61fe3424585972dae90e5"
+vary: Accept-Encoding
+vary: Origin
+x-cache: Hit from cloudfront
+via: 1.1 ed047841b922f7dcf5bcfb295eb3311c.cloudfront.net (CloudFront)
+x-amz-cf-pop: MIA3-P4
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: xyVG0SpPFsUab7GT8scq81O70wgfQ-_5K29ZfMEVzizGLUXupNzs1Q==
+age: 11172
+cache-control: max-age=604800
+cf-cache-status: DYNAMIC
+cf-ray: a4da13dfcbf5443a-MIA
+

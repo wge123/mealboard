@@ -1,0 +1,15 @@
+HTTP/2 403 
+mime-version: 1.0
+content-type: text/html
+content-length: 456
+cache-control: max-age=0
+expires: Tue, 20 Oct 2026 18:32:59 GMT
+date: Tue, 20 Oct 2026 18:32:59 GMT
+set-cookie: layout=DESKTOP; path=/
+set-cookie: __ds_loc_country=US; path=/; domain=.foodnetwork.com
+set-cookie: __ds_loc_state=FL; path=/; domain=.foodnetwork.com
+server-timing: cdn-cache; desc=HIT
+server-timing: edge; dur=1
+vary: User-Agent
+server-timing: ak_p; desc="1792521179780_388761254_493715480_27_9272_28_36_15";dur=1
+

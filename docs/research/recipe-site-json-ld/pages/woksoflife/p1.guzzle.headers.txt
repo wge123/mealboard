@@ -1,0 +1,25 @@
+HTTP/2 403 
+date: Tue, 20 Oct 2026 18:37:21 GMT
+content-type: text/html; charset=UTF-8
+accept-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cf-mitigated: challenge
+x-frame-options: SAMEORIGIN
+server: cloudflare
+critical-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+cross-origin-embedder-policy: require-corp
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+permissions-policy: accelerometer=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),xr-spatial-tracking=*
+referrer-policy: same-origin
+server-timing: chlray;desc="a4da221e4d023561"
+x-content-type-options: nosniff
+strict-transport-security: max-age=15552000; preload
+vary: accept-encoding
+set-cookie: __cf_bm=XYxaYnIgOBKKfTtmTg16j6fsduAZL04Yo7kfyRA8n2M-1792521441.003975-1.0.1.1-Y_lVqBNCLt2FN_.cofoznIdv03mG9SQWW8yihnCgzehfpF9u1n_5zfZJGpLsSHe9ik8xowadplsAL16ztYJwl5NiSjdxUwAhzfyfPwdcB4MsR78bz6ratLofgTfib6zx; HttpOnly; SameSite=None; Secure; Path=/; Domain=thewoksoflife.com; Expires=Tue, 20 Oct 2026 19:07:21 GMT
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=9O3ol0kwdqsj11wN7SNqBgOqAYPS%2BkhZbp1n6G8xZZPsG%2BQxWagfSbdux3THEsx9NmRr%2FClz2JdH%2Fh%2F82EtEPLJ7L2vjiOJEfIrMVKPPDeaPU%2BhfQOa%2F8wbcHv0ic7oIToBH"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.01,"max_age":604800}
+content-encoding: gzip
+cf-ray: a4da221e4d023561-MIA
+alt-svc: h3=":443"; ma=86400
+

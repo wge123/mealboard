@@ -1,0 +1,27 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:42:28 GMT
+content-type: application/json; charset=UTF-8
+x-robots-tag: noindex
+x-content-type-options: nosniff
+access-control-expose-headers: X-WP-Total, X-WP-TotalPages, Link
+access-control-allow-headers: Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type, X-OptinMonster-ApiKey
+x-wp-total: 1889
+x-wp-totalpages: 945
+allow: GET
+vary: Origin
+vary: Accept, Accept-Encoding
+x-hosted-by: BigScoots
+server: cloudflare
+x-xss-protection: 1; mode=block
+last-modified: Tue, 20 Oct 2026 18:42:28 GMT
+cf-cache-status: MISS
+set-cookie: _cfuvid=H0i.PbEYp1uT3ZXFj_tD1HFtLUMidLMCeBWNOPSws70-1792521747.6446843-1.0.1.1-RXOHpIloaiWa.9r1RjQSgJbHjTrDerjf5A7SCqUCV1k; HttpOnly; SameSite=None; Secure; Path=/; Domain=www.budgetbytes.com
+link: <https://www.budgetbytes.com/wp-json/wp/v2/wprm_recipe?per_page=2&_fields=id%2Cdate%2Clink%2Cslug&page=2>; rel="next"
+x-frame-options: SAMEORIGIN
+x-np-cfe: dns1
+cache-control: no-cache
+strict-transport-security: max-age=31536000
+content-encoding: gzip
+cf-ray: a4da299ace097a26-MIA
+alt-svc: h3=":443"; ma=86400
+

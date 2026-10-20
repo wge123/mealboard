@@ -1,0 +1,408 @@
+[
+{
+"@context": "http://schema.org",
+"@type": ["Recipe"]
+,"headline": "Portuguese Soup"
+,"datePublished": "2019-04-03T23:28:37-04:00"
+,"dateModified": "2026-10-20T14:22:41-04:00"
+,"author": [
+{"@type": "Person"
+,"name": "Patti Peil"
+}
+]
+,"description": "Smoked sausage, cabbage, potatoes and kidney beans are cooked with ketchup and beef broth in this soup."
+,"image": {
+"@type": "ImageObject",
+"url": "https://www.allrecipes.com/thmb/Kq60TedilApcR2xE0EG2354KipE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/6224316-portuguese-soup-Timothy-Charles-Connor-4x3-1-05cedc80fb764cf5a0f177efde317103.jpg",
+"height": 1125,
+"width": 1500
+}
+,"publisher": {
+"@type": "Organization",
+"name": "Allrecipes",
+"url": "https://www.allrecipes.com",
+"logo": {
+"@type": "ImageObject",
+"url": "https://www.allrecipes.com/thmb/Z9lwz1y0B5aX-cemPiTgpn5YB0k=/112x112/filters:no_upscale():max_bytes(150000):strip_icc()/allrecipes_logo_schema-867c69d2999b439a9eba923a445ccfe3.png",
+"width": 112,
+"height": 112
+},
+"brand": "Allrecipes"
+, "publishingPrinciples": "https://www.allrecipes.com/about-us-6648102#toc-editorial-guidelines"
+, "sameAs" : [
+"https://www.facebook.com/allrecipes",
+"https://www.instagram.com/allrecipes/",
+"https://www.pinterest.com/allrecipes/",
+"https://www.tiktok.com/@allrecipes",
+"https://www.youtube.com/allrecipes",
+"https://profile.google.com/@allrecipes",
+"https://flipboard.com/@Allrecipes",
+"https://en.wikipedia.org/wiki/Allrecipes.com",
+"http://linkedin.com/company/allrecipes.com",
+"https://www.threads.com/@allrecipes",
+"https://x.com/allrecipes"
+]
+}
+,"name": "Portuguese Soup"
+,"aggregateRating": {
+"@type": "AggregateRating",
+"ratingValue": "4",
+"ratingCount": "60"
+}
+,"cookTime": "PT90M"
+,"nutrition": {
+"@type": "NutritionInformation"
+,"calories": "537 kcal"
+,"carbohydrateContent": "73 g"
+,"cholesterolContent": "37 mg"
+,"fiberContent": "12 g"
+,"proteinContent": "21 g"
+,"saturatedFatContent": "6 g"
+,"sodiumContent": "2127 mg"
+,"sugarContent": "22 g"
+,"fatContent": "20 g"
+,"unsaturatedFatContent": "0 g"
+}
+,"prepTime": "PT20M"
+, "recipeCategory": ["Dinner"]
+,"recipeCuisine": ["Portuguese"]
+,"recipeIngredient": [
+"0.25 cup vegetable oil",
+"2 cups chopped onion",
+"1 pound smoked sausage, sliced",
+"1 medium head cabbage, chopped",
+"6 potatoes, peeled and cubed",
+"2 (15 ounce) cans kidney beans",
+"2 cups ketchup",
+"1 (10.5 ounce) can beef consomme",
+"2.6666667461395 quarts water",
+"2 teaspoons garlic powder",
+"2 teaspoons ground black pepper",
+"1 teaspoon salt",
+"0.5 cup vinegar" ]
+,"recipeInstructions": [
+{
+"@type": "HowToStep"
+,"text": "In a large pot over medium heat, cook onions in oil until just tender. Stir in sausage and cook 5 minutes more. Place cabbage, potatoes, beans, ketchup, consomme and water in the pot. Season with garlic powder, pepper and salt. Bring to a boil, then reduce heat and simmer 30 to 45 minutes."
+} ,{
+"@type": "HowToStep"
+,"text": "Stir in vinegar and simmer 1 hour more. Add more water if needed."
+} ]
+,"recipeYield": ["8", "8 servings"]
+,"totalTime": "PT110M"
+,"review": [
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "4"
+},
+"author": {
+"@type": "Person",
+"name": "RebeccaO"
+}
+,
+"reviewBody": "I made this recipe last night and it was amazing!! I accidentally bought white kidney beans and regular (non-smoked/non-spicy) sausage. My family loved the soup!! However, I think it would be better if next time I make sure to use red beans and either smoked or spicy sausages to give it a bit of a kick. I cut the recipe in half and it fed 4 of us, next day too! Definitely will make again!!!! Also, I think more veggies would be an added bonus! :)"
+},
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Susie"
+},
+"reviewBody": "I have to admit, I was a little scared of this recipe but intrigued by the ingredients. I even called my girlfriend (who is of Portuguese decent) to make sure the ingredients sounded cohesive. The only changes I made was to use Chorizo instead of smoked sausage (make sure to drain the Chorizo after you cook it) and I used beef broth instead of water &amp; I reserves 1/4 of the cabbage and didn't add it until the last 15 minutes of cooking so it had some crunch to it. The first 2 bites I thought 'Oh my goodness this was a mistake' and then on the 3rd bite it was like it all came together and it was amazing! Each bite got better and better. It just takes getting use to the uniqueness of the ingredients but it is so worth it. This will be a perfect dish to make in the Winter. I served mine with a garden salad and a crusty French bread. Thank you for sharing the recipe. It will be made in our house over and over.",
+"datePublished": "2008-07-14T14:53:55.780Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "2"
+},
+"author": {
+"@type": "Person",
+"name": "tilly"
+},
+"reviewBody": "Portuguese soup NEVER INCLUDES KETCHUP. NEVER! This is from an acetilaste português cook who makes Portuguese soups every Sunday throughout the year. I was taught by my Portuguese mother and aunts. Next time omit the ketchup entirely. Use ground linguica or chourico. Cannellini beans and elbow macaroni.",
+"datePublished": "2023-10-08T14:58:27.845Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Madeline"
+},
+"reviewBody": "I make this soup without a recipe. I saute sausage and minced garlic, add 64 oz of beef broth, only about 1/2 to 3/4 cup of catsup, around 1/4 cup vinegar, pinch of sugar, halved baby red potatoes, chopped cabbage, 1 can kidney beans, drained. You can adjust the catsup and vinegar to taste. But by using 64 oz of beef broth, you get a richer soup.",
+"datePublished": "2026-05-07T15:25:20.054Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "1"
+},
+"author": {
+"@type": "Person",
+"name": "Maria70"
+},
+"reviewBody": "I've been making Portuguese soups for 30 years and never once have I made it with ketchup and vinegar. It should have diced tomatoes and tomato sauce. Not to mention it's missing carrots and ham hocks. And even though I don't add it usually elbow macaroni is added. I also always add watercress at the end. I would never cook this version.",
+"datePublished": "2021-01-29T10:37:01.960Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "AJ Wischmeyer"
+},
+"reviewBody": "love this soup. I added carrots and celery, and used minced garlic instead of powder. I also used a tablespoon of tomato paste and a can of diced tomatoes rather than ketchup. a 32 ounce carton of beef broth rather than a can and cut the water to 2 quarts. I will make this again and again depending on what I have in the fridge.",
+"datePublished": "2016-01-23T15:01:46.873Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Wanda B"
+},
+"reviewBody": "Delicious and will make again. I modified the recipe slightly by substituting 2 yams for 2 potatoes and adding a sliced carrot. Next time I may try adding a can of diced tomatoes and cutting back on the ketchup. But really this is an easy and tasty recipe. For the novice, soup tastes better the longer you cook it.",
+"datePublished": "2021-01-31T03:31:51.840Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "RedSpam4114"
+},
+"reviewBody": "Love this soup!! My entire family and friends love the sweet and sour taste. The only things that I change is I use Turkey smoked sausage and limit the potato to 1 large one. It's excellent and a go to in the winter!",
+"datePublished": "2024-10-03T00:29:31.512Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Eileen614"
+},
+"reviewBody": "This was a great recipe. I was actually searching for a base recipe for Portuguese Kale soup. Unfortunately I didn't have any cabbage but I added two bunches of kale at the end and it was the bomb! I used hot chourico (Portuguese sausage) and tomato paste instead of ketchup. The only other change I made was to saute fresh garlic instead of garlic powder. Very good and as everyone else said, it makes a huge pot! Ty for this recipe.",
+"datePublished": "2012-01-21T15:19:12.727Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "CREEPER00"
+},
+"reviewBody": "I'm glad others reviewed this recipe first. I'd never have tried it without those reviews. As it turned out, it was wonderful and the more I eat the better I like it. I was a little short on catsup so I threw in most of a can of tomato paste I had in the refrig plus two tablespoons of chili sauce. Couldn't get consomme' nearby so I used a can of beef broth and added a tablespoon of beef base to the water. Also added two teaspoons of sugar. Oh, and two chopped Roma tomatoes that needed to be used. This one goes on my list of favorite soups. It's foolproof.",
+"datePublished": "2009-12-18T21:18:33.280Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Laura Manos Emms"
+},
+"reviewBody": "Turned out great! Used a 8 qt stock pot and it was almost full to the top - makes a ton of soup! Added: carrots, celery and corn. Used low sodium beef broth instread of consomme. Used only 1/4 cup of apple cider vinegar and omitted the salt completely - did not need it. Everyone young and old liked it. Makes super size portions and freezes well. The longer it sits - the better it tastes. Will put this on the soup rotation.",
+"datePublished": "2010-11-14T14:19:26.800Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Allrecipes Member"
+},
+"reviewBody": "I make this soup with short ribs like my Mom did. Yummy.",
+"datePublished": "2025-03-15T14:24:32.931Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "1"
+},
+"author": {
+"@type": "Person",
+"name": "HonestGouda1023"
+},
+"reviewBody": "Where’s my olive oil, chorizo, and red beans? Smoked sausage doesn’t count!",
+"datePublished": "2024-09-16T19:25:29.710Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "3"
+},
+"author": {
+"@type": "Person",
+"name": "Barbara McCallister"
+},
+"reviewBody": "I agree with Toronto Cooks review. It was ok but tasted too much of the catsup. My husband ate it but he wasn't too enthused. If I were to make it again, I would put more sausage in it and cut up some carrots and cut the recipe in half. It made a big pot of soup which I ended up freezing.",
+"datePublished": "2021-02-03T14:00:30.880Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Timothy Charles Connor"
+},
+"reviewBody": "Easy and great",
+"datePublished": "2019-01-05T22:28:52.067Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "1"
+},
+"author": {
+"@type": "Person",
+"name": "Pat C"
+},
+"reviewBody": "I, like a few of the reviewers before me couldn’t imagine a soup with ketchup and vinegar as the main ingredients but my wife wanted to try it. Never again! Before adding the vinegar it tasted like ketchup. After adding the vinegar it tasted like vinegar. I guess more people like vinegar as some reviewers loved it. Not me.",
+"datePublished": "2018-11-14T00:32:38.410Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "QL7"
+},
+"reviewBody": "Use Heinz ketchup only!",
+"datePublished": "2018-09-27T14:04:06.023Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "1"
+},
+"author": {
+"@type": "Person",
+"name": "Loriltx"
+},
+"reviewBody": "I strongly disliked this but my husband loved it. He had asked me to make “Portuguese Soup” as he saw it on an Anthony Bourdain segment and thought it sounded good. I tried this recipe because it had so many high reviews. I was leery about the amount of ketchup, but after reading other reviews from people who had also been leery about the amount of ketchup but who thought it turned out fantastic, I went ahead and tried it. Tastes too much like ketchup for me, which is exactly what my husband likes about it. I also wished I would have halved the recipe. This makes at least 12 servings, not 8.",
+"datePublished": "2018-06-12T14:14:13.043Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "3"
+},
+"author": {
+"@type": "Person",
+"name": "NMChef1"
+},
+"reviewBody": "I thought this soup was nothing special. I made it exactly as written, using red potatoes (since the recipe didn't specify which kind) and distilled white vinegar (ditto). Also, I drained and rinsed the beans. The results were decent, and a good mix of veggies and meat, but the liquid itself was a little odd. The mixture of ketchup, consomme, vinegar and water was just a little too different for my tastes. It was worth trying, though.",
+"datePublished": "2016-03-23T13:45:08.287Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Taina Williams"
+},
+"reviewBody": "I used chorizo (nearest I could find), no potatoes and lemon juice instead o vinegar (that's what I had at home). Delicious!",
+"datePublished": "2015-04-06T06:19:25.817Z"
+}
+]
+,"mainEntityOfPage": {
+"@type": ["WebPage"]
+,"@id": "https://www.allrecipes.com/recipe/25736/portuguese-soup/"
+,"name": "Portuguese Soup"
+,"breadcrumb": {
+"@type": "BreadcrumbList",
+"itemListElement": [
+{
+"@type": "ListItem",
+"position": 1,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/",
+"name": "Recipes"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 2,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/94/soups-stews-and-chili/",
+"name": "Soups, Stews and Chili Recipes"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 3,
+"item": {
+"@id": "https://www.allrecipes.com/recipes/16369/soups-stews-and-chili/soup/",
+"name": "Soup Recipes"
+}
+}
+]
+}} }
+]

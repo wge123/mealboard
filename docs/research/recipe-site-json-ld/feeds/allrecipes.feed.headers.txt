@@ -1,0 +1,39 @@
+HTTP/2 301 
+date: Tue, 20 Oct 2026 18:28:37 GMT
+content-length: 0
+location: https://www.allrecipes.com/feeds
+cf-ray: a4da1553fc12e1ca-MIA
+cf-cache-status: DYNAMIC
+server: cloudflare
+strict-transport-security: max-age=15552000
+vary: Accept-Encoding, Origin, Access-Control-Request-Method, Access-Control-Request-Headers
+nel: {"report_to":"network-errors","max_age":2592000,"success_fraction":0,"failure_fraction":1.0,"include_subdomains":true}
+referrer-policy: no-referrer-when-downgrade
+report-to: {"group":"network-errors","max_age":2592000,"endpoints":[{"url":"https://rjs.3gl.net/hawklogserver/7823/re.p"}]}
+x-abt-application-version: 5.162.0
+x-connection-protocol: HTTP/2
+x-content-type-options: nosniff
+set-cookie: __cf_bm=ZUGQXwVkcinLO_6CzqfIFkNjnPbNShwYbNLuy7Y2pHY-1792520917.1172788-1.0.1.1-kySsSmplIdMUZycQc2_Gr3vTEZo8GHw0qXYOxgAJrZLC9ME1CLMamTM2Le6btnuDA_4yYr6_5T2eA_ha541i1cv6nM630g2SBbkkmEBgwItyzPb.I0ssgpmUnjd_XcQ4; HttpOnly; SameSite=None; Secure; Path=/; Domain=allrecipes.com; Expires=Tue, 20 Oct 2026 18:58:37 GMT
+alt-svc: h3=":443"; ma=86400
+
+HTTP/2 404 
+date: Tue, 20 Oct 2026 18:28:37 GMT
+content-type: text/html;charset=utf-8
+cf-ray: a4da15549f3de1ca-MIA
+cf-cache-status: DYNAMIC
+cache-control: no-cache
+link: <//www.allrecipes.com/static/5.162.0/cache/eNqtVUFywyAM_FAZesgPeu0nFKPYmoLwIJw0vy9gJ3ZqlzrTHjwgaXfBa4G1RIjUaAccLepGROcMvuh1gRy0qHoLDXbeGgxbIIeBDAFrYoOfd0QpAfGK4l3vGTmKPgZgk1DXkB91E5olZugZ2fig-0E6e52GivKFTItp7JDaLr51wC2-k0RkDJvJilZr_RFsYoEpZFj6sBe3lmU4U5tqnvUQyVK8qpRazn9fZAFWKlk4L-fNYFGWTOcyAhvqURT0veqDd14dgbMn1eqf3qJsTJ28NxWZkw8u9SFCaDqVg-W8wnMoklv09hYP4b5tj1aWXc_TfdTTYK00AZEL_TH8B4lv37SmI74hsEWjnOh7uNVE27wNzo-HIX3OmPweh0qfbuPqjhTs6MZ9-hTVEn_IQ7CPbnw0IJ0amM4YZLJlM1sRTDeY9e001BbGi1iMeY8TZZWpGPsMe732WFB9OiuiD6-H_KjGc7oKY4VWfgelv1o6fQFJzmlF.min.css>; rel=preload; as=style; nopush, <//www.allrecipes.com/static/fonts/copperpot.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.allrecipes.com/static/fonts/copperpot-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.allrecipes.com/static/fonts/sourcesanspro.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.allrecipes.com/static/fonts/sourcesanspro-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.googletagmanager.com/gtm.js?id=GTM-P3X3VT7>; rel=preload; as=script; nopush, <//www.googletagmanager.com/gtag/js?id=G-9D9M6LNQMD&l=dataLayer&cx=c>; rel=preload; as=script; nopush, <//securepubads.g.doubleclick.net/tag/js/gpt.js>; rel=preload; as=script; nopush, <//www.allrecipes.com/static/5.162.0/cache/eNrTLy5JLMlM1s9NzCvJSdXPKtYvKE0qLk3S0ceQSM7PK07NKwEA3xES_A.min.js>; rel=preload; as=script; nopush; group=prioritized, <//www.allrecipes.com/static/5.162.0/cache/eNp9kVuKwzAMRTdU40XM98BsQZGVVPVDwVJT0tXXKXSgxfWPMToHWb7yamCMPkOxRP6i3iognfx7HSWvUqiY-gS7XO0wL-rwTBg_5YaSQKDQASgSmbRDrsaJrc_m4kY4SB7y40uRyzKUNipBqrdzFWulL23IQdCvDG9bh-V2cVMliKtwi_BfaQxSqoS8kg6HS3Dfle_NQikzL59K4knfvfYQVSU0ljLYJmqdn0dvbtinXg4rLOQ2ptug72L5ue7EGN0r_06vn9-_B00C8qk.min.js>; rel=preload; as=script; nopush; group=top, <//www.allrecipes.com/static/5.162.0/cache/eNqNVFtywyAMvFAZJmfoby-h4DVWK8ADchL39MV2Jo-mZfwlsWglsQhsUVJ2NlBUgf0sNlTHnCiyCJnichJ5s89RLoUxRUQtlqMiRxLboUde-KuT0d1JqZsE5ZGl-WKo71mYFEbJe-TfqHD8MhnnzLolrvyA7NCKa3SKy9Ypf2-csuR8ARsJXKpnvehEYkaaw39YI8OZO49qB7Af9H2g6PHBRRHrCf8CG7m8pGOVfQB1K3kxt_C9cde0wsdVDTocZtMxSfKNypFO7OteinbSegk6mwo9-q2rD8GEOcPxiGJoHM2YU0jmSHERobnb6KlPORRbQNkNZlk8-g1eQCnkcSv_tGzwNpGuZp2cfYJt-q963d191H4Sqc8RiCv9ebm31VYpnItA63u4jsAr0voHQtVtmSHP_Q9XuqpM.min.js>; rel=preload; as=script; nopush; group=bottom, <//cdn.cookielaw.org/scripttemplates/otSDKStub.js>; rel=preload; as=script; nopush
+server: cloudflare
+strict-transport-security: max-age=15552000
+content-security-policy: frame-ancestors 'self' https://*.seo.aws.about.com https://*.dotdash.com *.allrecipes.com; upgrade-insecure-requests;
+cross-origin-opener-policy: same-origin-allow-popups
+nel: {"report_to":"network-errors","max_age":2592000,"success_fraction":0,"failure_fraction":1.0,"include_subdomains":true}
+referrer-policy: no-referrer-when-downgrade
+report-to: {"group":"network-errors","max_age":2592000,"endpoints":[{"url":"https://rjs.3gl.net/hawklogserver/7823/re.p"}]}
+x-abt-application-version: 5.162.0
+x-connection-protocol: HTTP/2
+x-content-security-policy: frame-ancestors 'self' https://*.seo.aws.about.com https://*.dotdash.com *.allrecipes.com; upgrade-insecure-requests;
+x-content-type-options: nosniff
+set-cookie: __cf_bm=GYAlX124B.ljoQ2HcQusENT4WOg3PUFSL6L3TOWpOO4-1792520917.2125516-1.0.1.1-1vU18nsbQHcOqejlHyUVO_KieBhiFTX_nrIKaVx0hykc1zcNQL4wcTxO.2FnFa32cG2E81ZfI9ybkfuG_tsdiQRfH72yRtdTqgHf6pMXkrd7Nt5MX3_Isf6JKZtpC4pg; HttpOnly; SameSite=None; Secure; Path=/; Domain=allrecipes.com; Expires=Tue, 20 Oct 2026 18:58:37 GMT
+alt-svc: h3=":443"; ma=86400
+

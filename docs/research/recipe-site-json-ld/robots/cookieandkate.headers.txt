@@ -1,0 +1,21 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:27:47 GMT
+content-type: text/plain; charset=utf-8
+content-length: 560
+last-modified: Fri, 06 Jun 2025 10:59:41 GMT
+etag: "6842ca1d-230"
+x-hosted-by: BigScoots
+server: cloudflare
+content-security-policy: block-all-mixed-content;
+strict-transport-security: max-age=31536000; includeSubdomains;
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+referrer-policy: strict-origin-when-cross-origin
+vary: Accept, Accept-Encoding
+accept-ranges: bytes
+cf-cache-status: HIT
+x-np-cfe: dns1
+cf-ray: a4da14201dee41e4-MIA
+alt-svc: h3=":443"; ma=86400
+

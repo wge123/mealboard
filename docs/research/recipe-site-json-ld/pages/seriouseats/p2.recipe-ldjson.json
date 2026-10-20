@@ -1,0 +1,440 @@
+[
+{
+"@context": "http://schema.org",
+"@type": ["Recipe"]
+,"headline": "The Best Crispy Roast Potatoes Ever"
+,"datePublished": "2016-12-02T05:15:00-05:00"
+,"dateModified": "2026-10-19T15:59:13-04:00"
+,"author": [
+{"@type": "Person"
+,"name": "J. Kenji López-Alt"
+,"url": "https://www.seriouseats.com/j-kenji-lopez-alt-5118720"
+}
+]
+,"description": "These are the most flavorful crispy roast potatoes you’ll ever make. And they just happen to be gluten-free and vegan (if you use oil) to boot."
+,"image": {
+"@type": "ImageObject",
+"url": "https://www.seriouseats.com/thmb/vSk76sDv7giIX9e1JIA44PWpasA=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/20211201-crispy-roasted-potatoes-vicky-wasik-48-7bca1f8c09ee46c087b0865f9a053c45.jpg",
+"height": 1125,
+"width": 1500
+}
+,"video": {
+"@type": "VideoObject",
+"contentUrl": "https://content.jwplatform.com/videos/zERoZ1SV-YWmivM3Y.mp4",
+"description": "I firmly and un-humbly believe these are the greatest roast potatoes you'll ever taste: incredibly crisp and crunchy on the outside, with centers that are creamy and packed with potato flavor. I dare you to make them and not love them.",
+"duration": "PT3M36S",
+"name": "The Best Roast Potatoes Ever",
+"thumbnailUrl": "https://cdn.jwplayer.com/v2/media/zERoZ1SV/poster.jpg?width=1280",
+"uploadDate": "2021-04-26T11:59:29-04:00"}
+,"publisher": {
+"@type": "Organization",
+"name": "Serious Eats",
+"url": "https://www.seriouseats.com",
+"logo": {
+"@type": "ImageObject",
+"url": "https://www.seriouseats.com/thmb/tCg_KKb2J_OIG_QEUtCkqjhiJGQ=/2339x320/filters:no_upscale():max_bytes(150000):strip_icc()/Serious_Eats_Schema_Logo-30a63d9c07734d35836c8ff2d368419c.png",
+"width": 2339,
+"height": 320
+},
+"brand": "Serious Eats"
+, "publishingPrinciples": "https://www.seriouseats.com/about-us-5120006#toc-editorial-guidelines"
+, "sameAs" : [
+"https://www.instagram.com/seriouseats",
+"https://www.facebook.com/seriouseats",
+"https://www.threads.com/@seriouseats",
+"https://www.pinterest.com/seriouseats/",
+"https://www.tiktok.com/@serious_eats",
+"https://www.youtube.com/user/seriouseats",
+"https://flipboard.com/@SeriousEats",
+"https://www.linkedin.com/company/serious-eats",
+"https://en.wikipedia.org/wiki/Serious_Eats",
+"https://x.com/seriouseats",
+"https://profile.google.com/@seriouseats"
+]
+}
+,"name": "The Best Crispy Roast Potatoes Ever"
+,"aggregateRating": {
+"@type": "AggregateRating",
+"ratingValue": "4.9",
+"ratingCount": "147"
+}
+,"cookTime": "PT75M"
+,"keywords": "Christmas, holiday, potato, side, thanksgiving"
+,"nutrition": {
+"@type": "NutritionInformation"
+,"calories": "275 kcal"
+,"carbohydrateContent": "46 g"
+,"cholesterolContent": "0 mg"
+,"fiberContent": "5 g"
+,"proteinContent": "5 g"
+,"saturatedFatContent": "1 g"
+,"sodiumContent": "346 mg"
+,"sugarContent": "3 g"
+,"fatContent": "9 g"
+,"servingSize": "Serves 6 to 8"
+,"unsaturatedFatContent": "0 g"
+}
+,"prepTime": "PT10M"
+, "recipeCategory": ["Side Dish","Sides"]
+,"recipeCuisine": ["American"]
+,"recipeIngredient": [
+"Kosher salt",
+"1/2 teaspoon (4g) baking soda",
+"4 pounds (about 2kg) russet or Yukon Gold potatoes, peeled and cut into quarters, sixths, or eighths, depending on size (see note)",
+"5 tablespoons (75ml) extra-virgin olive oil, duck fat, goose fat, or beef fat",
+"Small handful picked rosemary leaves, finely chopped",
+"3 medium cloves garlic, minced",
+"Freshly ground black pepper",
+"Small handful fresh parsley leaves, minced" ]
+,"recipeInstructions": [
+{
+"@type": "HowToStep"
+,"text": "Adjust oven rack to center position and preheat oven to 450°F (230°C) or 400°F (200°C) if using convection. Heat 2 quarts (2L) water in a large pot over high heat until boiling. Add 2 tablespoons kosher salt (about 1 ounce; 25g), baking soda, and potatoes and stir. Return to a boil, reduce to a simmer, and cook until a knife meets little resistance when inserted into a potato chunk, about 10 minutes after returning to a boil."
+} ,{
+"@type": "HowToStep"
+,"image": [
+{
+"@type": "ImageObject",
+"url": "https://www.seriouseats.com/thmb/iCQJXZVqPEaTUfBOmcHi__JROSE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/__opt__aboutcom__coeus__resources__content_migration__serious_eats__seriouseats.com__images__2016__11__20161201-crispy-roast-potatoes-21-457834b7428c4cdab68535d6d9a2725e.jpg"
+}
+]
+,"text": "Meanwhile, combine olive oil, duck fat, or beef fat with rosemary, garlic, and a few grinds of black pepper in a small saucepan and heat over medium heat. Cook, stirring and shaking pan constantly, until garlic just begins to turn golden, about 3 minutes. Immediately strain oil through a fine-mesh strainer set in a large bowl. Set garlic/rosemary mixture aside and reserve separately."
+} ,{
+"@type": "HowToStep"
+,"image": [
+{
+"@type": "ImageObject",
+"url": "https://www.seriouseats.com/thmb/tpXwtu5SQYE5d_AaoF3CTvhaWv8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/20211201-crispy-roasted-potatoes-vicky-wasik-35-475fe6f38f254845a9da228ec739fabe.jpg"
+}
+]
+,"text": "When potatoes are cooked, drain carefully and let them rest in the pot for about 30 seconds to allow excess moisture to evaporate. Transfer to bowl with infused oil, season to taste with a little more salt and pepper, and toss to coat, shaking bowl roughly, until a thick layer of mashed potato–like paste has built up on the potato chunks."
+} ,{
+"@type": "HowToStep"
+,"image": [
+{
+"@type": "ImageObject",
+"url": "https://www.seriouseats.com/thmb/c5fY5QNT6o1bES28_NS3eQ989mg=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/20211201-crispy-roasted-potatoes-vicky-wasik-38-7a61990d4f344b99b842800041af97b4.jpg"
+}
+]
+,"text": "Transfer potatoes to a large rimmed baking sheet and separate them, spreading them out evenly. Transfer to oven and roast, without moving, for 20 minutes. Using a thin, flexible metal spatula to release any stuck potatoes, shake pan and turn potatoes. Continue roasting until potatoes are deep brown and crisp all over, turning and shaking them a few times during cooking, 30 to 40 minutes longer."
+} ,{
+"@type": "HowToStep"
+,"image": [
+{
+"@type": "ImageObject",
+"url": "https://www.seriouseats.com/thmb/vSk76sDv7giIX9e1JIA44PWpasA=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/20211201-crispy-roasted-potatoes-vicky-wasik-48-7bca1f8c09ee46c087b0865f9a053c45.jpg"
+}
+]
+,"text": "Transfer potatoes to a large bowl and add garlic/rosemary mixture and minced parsley. Toss to coat and season with more salt and pepper to taste. Serve immediately."
+} ]
+,"recipeYield": "8"
+,"totalTime": "PT85M"
+,"review": [
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "DapperBun3181"
+}
+,
+"reviewBody": "I am anxious to gather the ingredients and give this recipe for potatoes a try! My family and I want potatoes served every evening with Dinner! This recipe sounds yummy! Thank you"
+},
+{
+"@type": "Review",
+"author": {
+"@type": "Person",
+"name": "Tyler Dopps"
+},
+"reviewBody": "Wonderful recipe. I did fail at making them the first go - the bottom of the potatoes burned on the sheet pan at 450. on attempt #2, i put them on a wire rack to allow heat to cook the top and bottom simultaneously, and used convection at 400. maybe the best roasted potatoes i've ever had.",
+"datePublished": "2022-01-09T08:21:32.000Z"
+}
+,
+{
+"@type": "Review",
+"author": {
+"@type": "Person",
+"name": "AmberFlax7127"
+},
+"reviewBody": "Really good! So much better than roasting the potatoes without par boiling them. I used Crisco for the fat as one person recommended and the potatoes came out perfect and did not stick. I also greased the sheet pan with a light coating of Crisco. Made the recipe exactly as written except for the Crisco",
+"datePublished": "2022-12-31T20:31:05.000Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "RoseParm6846"
+},
+"reviewBody": "This is delicious. I just made this tonight. Definitely add the soda to your water and it just makes fluffy outside and then when you bake the potatoes, they’re super crispy and delicious.",
+"datePublished": "2026-07-01T02:49:20.021Z"
+}
+,
+{
+"@type": "Review",
+"author": {
+"@type": "Person",
+"name": "Orion"
+},
+"reviewBody": "Made this as I had a bag of potatoes that got forgotten about, they were some generic variety that comes from the supermarket here in the UK. They most definitely weren't perfect for roasting but this recipe still managed to make them an absolute delight. This method is CERTAINLY being used from now on. I used 850g potatoes with a tablespoon of Thyme and Parsley, a teaspoon of Smoked Paprika, 6 or 7 cloves of Garlic sliced into 3mm thick slices and 1 teaspoon of dried Red Pepper Flakes. I also finished them in the last 15 minutes at 250⁰c to get some extra colour (I like some quite dark areas on my potatoes.)",
+"datePublished": "2022-02-20T18:38:55.000Z"
+}
+,
+{
+"@type": "Review",
+"author": {
+"@type": "Person",
+"name": "kimberly77"
+},
+"reviewBody": "These were incredible! Better than I've had at restaurants! This will be my go-to recipe for roasted potatoes now! Thank you so much!I made one deviation from the recipe which is that I cut my russet potatoes a little smaller than called for because I tend to like a higher ratio of crispy exterior to soft interior, so that's just my personal preference. It turned out perfect with this modification still.The rosemary infused oil and topping is really incredible, do not skip this step. I found it much easier to coat all the potatoes with the herb/garlic mixture at the end by shaking it in a container with a lid rather than tossing it in a bowl. I would probably use a couple extra garlic cloves next time, but I really love garlic.",
+"datePublished": "2019-08-20T17:44:07.000Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "TackyPrune8636"
+},
+"reviewBody": "I didn't fry garlic, I used granulated garlic instead, a mix of dry French herbs, on top of salt and freshly ground black pepper. The end result was very tasty, and loved the crunch! Next time I will leave the potatoes in the oven a bit longer. Thank you ! PS - roasted them at 400F with ventilation a total of 40 mins. And yes, they are much better than roasting the potatoes without boiling them first. :)",
+"datePublished": "2026-09-05T16:10:57.457Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "UniqueDuck9066"
+},
+"reviewBody": "These potatoes were amazing!!! Made them last night and we ate every bite. I’m contemplating making some more today because SOOOO GOOD! I followed the directions exactly except I used the air fryer to cook them on bake 425 for 15 mins and then another 10 after flipping. I also didn’t infuse the oil, just opted to season the potatoes really well with choice seasoning and then tossed in a healthy amount of olive oil before spreading on a pan lined with parchment. My husband enjoyed them a lot too. Perfect crisp outside with soft inside, flavorful inside.",
+"datePublished": "2026-06-27T00:14:50.112Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "Chef_Italia"
+},
+"reviewBody": "WOW! These were delicious and the texture was off the hook! I did a combo of duck fat and olive oil, slivered shallot instead of garlic because that's what was on hand, and some fresh rosemary. I didn't strain the oil, and the fried shallots were fantastic!",
+"datePublished": "2024-10-29T06:44:25.000Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "ClassyUdon9385"
+},
+"reviewBody": "Lined pan with foil and then basted a bit of olive oil before adding potatoes. Reserved the olive oil used to sauté garlic and rosemary. Basted after turning and then added a drizzle when serving. Wish I could add my picture! They looked 5 star worthy",
+"datePublished": "2026-10-03T00:25:12.631Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "LoftyCow2959"
+},
+"reviewBody": "Do you think you could boil them in advance and roast a day later if they are room temperate?",
+"datePublished": "2026-09-10T13:59:25.497Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "NimbleYam9657"
+},
+"reviewBody": "My daughter made these for our triple October family birthday celebration. We serve them with fresh lamb bratwurst and homemade German sauerkraut. They were the hit of the meal. Everybody wanted the recipe. She followed the directions exactly and used Yukon gold potatoes. I can hardly wait to make them again Thank you for the recipe",
+"datePublished": "2026-10-20T16:40:04.231Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "ProDish1967"
+},
+"reviewBody": "Very good but I'm confused about the baking soda amounts. In the recipe it says 1/2 tsp/4 grams but in the directions it says 1 ounce or 25 grams of baking soda.",
+"datePublished": "2026-10-07T20:59:34.175Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "HeartyWrap7221"
+},
+"reviewBody": "made these for my wife and she needed a cigarette afterwards...very good recipe...",
+"datePublished": "2026-10-07T02:48:38.139Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "FunBasil8317"
+},
+"reviewBody": "The potatoes were so crispy. I will definitely make these again.",
+"datePublished": "2026-09-23T16:11:58.222Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "GreenWrap9067"
+},
+"reviewBody": "Turned out perfectly. Crispy outside soft inside",
+"datePublished": "2026-09-21T15:36:27.343Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "4 Hubby"
+},
+"reviewBody": "Yes, these are the BEST. Worth a bit of extra effort. We call them crack-potatoes.",
+"datePublished": "2026-09-20T18:31:39.675Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "PlushMead7312"
+},
+"reviewBody": "I used to think I didn't care about potatoes. Now I care. These are unbelievable!",
+"datePublished": "2026-09-13T23:05:37.899Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "PerkyTray2075"
+},
+"reviewBody": "Hands down best crispy GF roasted potatoes I’ve ever made. Worth the extra steps and time. A REAL crowd pleaser.",
+"datePublished": "2026-09-10T01:25:07.305Z"
+}
+,
+{
+"@type": "Review",
+"reviewRating": {
+"@type": "Rating",
+"ratingValue": "5"
+},
+"author": {
+"@type": "Person",
+"name": "WobblyRib8138"
+},
+"reviewBody": "This is soooo good. I didn’t read the instructions very well and kinda did the herbs in the wrong order, and my oven seems to be too hot which I knew and should have remembered so they were a tad too brown. That being said THESE WERE AMAZING!!!!!!! I will make them again and I’m confident they’ll be even more of a hit!",
+"datePublished": "2026-09-09T02:31:26.228Z"
+}
+]
+,"mainEntityOfPage": {
+"@type": ["WebPage"]
+,"@id": "https://www.seriouseats.com/the-best-roast-potatoes-ever-recipe"
+,"name": "The Best Crispy Roast Potatoes Ever"
+,"breadcrumb": {
+"@type": "BreadcrumbList",
+"itemListElement": [
+{
+"@type": "ListItem",
+"position": 1,
+"item": {
+"@id": "https://www.seriouseats.com/all-recipes-5117985",
+"name": "Recipes"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 2,
+"item": {
+"@id": "https://www.seriouseats.com/recipes-by-ingredient-recipes-5117749",
+"name": "Recipes By Ingredients"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 3,
+"item": {
+"@id": "https://www.seriouseats.com/vegetable-recipes-5117510",
+"name": "Vegetables"
+}
+}
+,
+{
+"@type": "ListItem",
+"position": 4,
+"item": {
+"@id": "https://www.seriouseats.com/potato-recipes-5117428",
+"name": "Potatoes"
+}
+}
+]
+}} }
+]

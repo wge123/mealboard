@@ -1,0 +1,20 @@
+HTTP/2 404 
+server: nginx
+date: Tue, 20 Oct 2026 18:42:51 GMT
+content-type: application/json; charset=UTF-8
+strict-transport-security: max-age=31536000
+vary: Accept-Encoding
+host-header: wpcloud
+vary: accept, content-type, cookie
+x-robots-tag: noindex
+link: <https://smittenkitchen.com/wp-json/>; rel="https://api.w.org/"
+x-content-type-options: nosniff
+access-control-expose-headers: X-WP-Total, X-WP-TotalPages, Link
+access-control-allow-headers: Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type
+vary: Origin
+content-encoding: gzip
+x-ac: 36.mia _atomic_dca MISS
+x-remembering: Eric Binnion <https://friendsofericbinnion.wordpress.com/>
+alt-svc: clear
+server-timing: a8c-cdn, dc;desc=mia, cache;desc=MISS;dur=426.0
+

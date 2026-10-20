@@ -1,0 +1,22 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:28:31 GMT
+content-type: rss2; charset=UTF-8
+referrer-policy: no-referrer-when-downgrade
+last-modified: Tue, 20 Oct 2026 16:23:26 GMT
+etag: "f66eebfe6d5e56a8a6d5458dba5a57b6"
+x-vc-enabled: true
+x-vc-ttl: 10
+cache-control: public, max-age=1800
+expires: Tue, 20 Oct 2026 18:58:31 GMT
+link: <https://www.tasteofhome.com/wp-json/>; rel="https://api.w.org/"
+link: <https://www.tasteofhome.com/>; rel="canonical"
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+age: 1766
+cf-cache-status: HIT
+vary: accept-encoding
+set-cookie: __cf_bm=81RoyykLzA9skBgJl7XgOW.UUZX86H8SeTr4lbRet9g-1792520911.6891398-1.0.1.1-TKqDwzqF9TOu1fvVCkvbB7_tb4qkWfUpajY2IiwW2sH4k0OgP8DZuWq1CUhFpZB7XHrzAXmt2a6ibB_mvDAaONzSWPw4oGvUiNrnauhanpCclOyxeDV0PmRy5sve.zHscnzJU0pu4p.O.fLLLR2rcg; HttpOnly; SameSite=None; Secure; Path=/; Domain=tasteofhome.com; Expires=Tue, 20 Oct 2026 18:58:31 GMT
+server: cloudflare
+cf-ray: a4da15320991256a-MIA
+alt-svc: h3=":443"; ma=86400
+

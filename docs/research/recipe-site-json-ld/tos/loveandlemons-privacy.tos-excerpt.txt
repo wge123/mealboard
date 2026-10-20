@@ -1,0 +1,6 @@
+SOURCE: https://www.loveandlemons.com/privacy-policy/
+FETCHED: 2026-10-20 (curl)
+NOTE: sentences matching automated-access / copying keywords, extracted mechanically from the page text; not the whole document.
+
+- We use Google reCAPTCHA to protect our signup forms from automated abuse.
+- reCAPTCHA collects device and browser information and sends it to Google to tell real visitors apart from bots, and it sets a cookie in your browser.

@@ -1,0 +1,28 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:27:31 GMT
+content-type: text/plain;charset=utf-8
+cf-ray: a4da13b8bb0a28b2-MIA
+cf-cache-status: DYNAMIC
+cache-control: max-age=3600, private
+set-cookie: TMog=n43382fd725914c0ab6d29d0692dba63918; Path=/; Domain=.allrecipes.com; Expires=Sun, 7 Nov 2094 21:41:38 GMT; Max-Age=2147483647; Secure
+set-cookie: globalTI_SID=1b0dc4a3-6ab5-4c2b-b17c-7765669d81fd; Path=/; Domain=.allrecipes.com; Expires=Thu, 19 Oct 2028 18:27:31 GMT; Max-Age=63072000; Secure
+set-cookie: Mint=n43382fd725914c0ab6d29d0692dba63918; Path=/; Domain=.allrecipes.com; Secure
+set-cookie: CSRFToken=44fe36a449abd32c57deaf810b40077d; Path=/; Domain=.allrecipes.com; Secure
+set-cookie: pc=1; Path=/; Domain=.allrecipes.com; Secure
+set-cookie: __cf_bm=jIxA7ENuzHxMahaDA5X7D3_1DiWp1evWQxQoaMTMF1k-1792520851.3217473-1.0.1.1-nJQ4u_l_BZwmqWJQc5oyUWAUeEKlz8ybVvhOVoWfIHB5wM6C_wnqqmCUxsEZ9eRYWriRwEabSPuLb8KZIsfoLIuwd5xwvNB7s__wZAiXHV0QXmNXg35Na5_1wgrX6HHC; HttpOnly; SameSite=None; Secure; Path=/; Domain=allrecipes.com; Expires=Tue, 20 Oct 2026 18:57:31 GMT
+expires: Thu, 01 Jan 1970 00:00:00 GMT
+link: <//www.allrecipes.com/static/fonts/copperpot.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.allrecipes.com/static/fonts/copperpot-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.allrecipes.com/static/fonts/sourcesanspro.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.allrecipes.com/static/fonts/sourcesanspro-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin; nopush, <//www.googletagmanager.com/gtm.js?id=GTM-P3X3VT7>; rel=preload; as=script; nopush, <//www.googletagmanager.com/gtag/js?id=G-9D9M6LNQMD&l=dataLayer&cx=c>; rel=preload; as=script; nopush, <//securepubads.g.doubleclick.net/tag/js/gpt.js>; rel=preload; as=script; nopush
+server: cloudflare
+x-content-type-options: nosniff
+strict-transport-security: max-age=15552000
+vary: Accept-Encoding, Origin, Access-Control-Request-Method, Access-Control-Request-Headers
+content-security-policy: frame-ancestors 'self' https://*.seo.aws.about.com https://*.dotdash.com *.allrecipes.com; upgrade-insecure-requests;
+cross-origin-opener-policy: same-origin-allow-popups
+nel: {"report_to":"network-errors","max_age":2592000,"success_fraction":0,"failure_fraction":1.0,"include_subdomains":true}
+referrer-policy: no-referrer-when-downgrade
+report-to: {"group":"network-errors","max_age":2592000,"endpoints":[{"url":"https://rjs.3gl.net/hawklogserver/7823/re.p"}]}
+x-abt-application-version: 5.162.0
+x-connection-protocol: HTTP/2
+x-content-security-policy: frame-ancestors 'self' https://*.seo.aws.about.com https://*.dotdash.com *.allrecipes.com; upgrade-insecure-requests;
+alt-svc: h3=":443"; ma=86400
+

@@ -37,7 +37,7 @@ The most total time and the most ingredients a recipe found by daily discovery m
 _Avoid_: weeknight caps, healthy/easy thresholds
 
 **Avoided ingredient**:
-An ingredient the household never wants in a meal. A hard exclusion: no discovered recipe may contain it, including recipes the household asked for, and auto-fill never plans a library recipe that does.
+An ingredient the household never wants in a meal. A hard exclusion: no discovered recipe may contain it, including recipes the household asked for, and auto-fill never plans a library recipe that does. An imported recipe may contain one; it is kept and shown as containing it.
 _Avoid_: dislike, blocked ingredient, allergy (an allergy is one reason to avoid)
 
 ## Recipes
@@ -45,6 +45,26 @@ _Avoid_: dislike, blocked ingredient, allergy (an allergy is one reason to avoid
 **Recipe shape**:
 The three parts every recipe has, in order: its kitchen tools, its mise en place, and its cooking steps. A recipe missing tools, ingredients or cooking steps is not a recipe.
 _Avoid_: recipe format, template
+
+**Source**:
+The published page or video, written by a person, that a recipe's ingredients, amounts and steps come from. Every recipe has one.
+_Avoid_: inspiration, citation, reference
+
+**Restructuring**:
+Turning a source's own ingredients and steps into the recipe shape: splitting each ingredient line into amount, name and prep note, and reading the kitchen tools off the steps. It never adds, drops or changes an ingredient, amount or step, and never scales or shortens the recipe: an amount the source does not state stays blank, and a unit changes only into an exactly equal one or one the source itself gives.
+_Avoid_: rewriting, adapting, shaping, AI parse
+
+**Imported recipe**:
+A recipe the household brought in itself from a source it found, by pasting the source's address. It joins the library approved, because the household chose it; the weekday limits do not apply to it.
+_Avoid_: saved recipe, clipped recipe, bookmark
+
+**Recipe site**:
+A website the household lets daily discovery read for new recipes, alongside its YouTube channels. A site qualifies only when its own terms and robots rules allow automated reading.
+_Avoid_: blog, source site, feed
+
+**Discovered recipe**:
+A recipe the app found on its own, by daily discovery or for a request, and offered for approval.
+_Avoid_: suggested recipe, generated recipe
 
 **Mise en place**:
 The part of a recipe that gets everything ready before the heat goes on: each ingredient with its amount and its prep note. Always present, because a recipe always has ingredients.

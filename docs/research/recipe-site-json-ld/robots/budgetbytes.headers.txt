@@ -1,0 +1,18 @@
+HTTP/2 200 
+date: Tue, 20 Oct 2026 18:27:44 GMT
+content-type: text/plain; charset=utf-8
+last-modified: Fri, 18 Sep 2026 19:54:13 GMT
+strict-transport-security: max-age=31536000
+x-hosted-by: BigScoots
+server: cloudflare
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+vary: Accept, Accept-Encoding
+etag: W/"6aad96e5-7a6"
+cf-cache-status: HIT
+x-frame-options: SAMEORIGIN
+x-np-cfe: dns1
+cache-control: no-cache
+cf-ray: a4da140d18617449-MIA
+alt-svc: h3=":443"; ma=86400
+

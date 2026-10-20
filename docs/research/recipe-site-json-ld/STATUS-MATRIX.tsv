@@ -1,0 +1,189 @@
+site	file	final_status	server	cf-mitigated	content-type
+allrecipes	feeds/allrecipes.feed.headers.txt	HTTP/2 404 	cloudflare		text/html;charset=utf-8
+bbcgoodfood	feeds/bbcgoodfood.feed.headers.txt	HTTP/2 200 			application/rss+xml; charset=utf-8
+bonappetit	feeds/bonappetit.feed.headers.txt	HTTP/2 200 	cloudflare		application/xml
+budgetbytes	feeds/budgetbytes.feed.headers.txt	HTTP/2 200 	cloudflare		application/rss+xml; charset=UTF-8
+cookieandkate	feeds/cookieandkate.feed.headers.txt	HTTP/2 200 	cloudflare		application/rss+xml; charset=UTF-8
+delish	feeds/delish.feed.headers.txt	HTTP/2 200 			text/xml; charset=utf-8
+epicurious	feeds/epicurious.feed.headers.txt	HTTP/2 200 	CloudFront		application/xml
+foodnetwork	feeds/foodnetwork.feed.headers.txt	HTTP/2 403 			text/html
+justonecookbook	feeds/justonecookbook.feed.headers.txt	HTTP/2 200 	cloudflare		application/rss+xml; charset=UTF-8
+kingarthur	feeds/kingarthur.feed.headers.txt	HTTP/2 404 	nginx		text/html; charset=utf-8
+loveandlemons	feeds/loveandlemons.feed.headers.txt	HTTP/2 200 	cloudflare		application/rss+xml; charset=UTF-8
+minimalistbaker	feeds/minimalistbaker.feed.headers.txt	HTTP/2 200 	cloudflare		application/rss+xml; charset=UTF-8
+nytcooking	feeds/nytcooking.feed.headers.txt	HTTP/2 404 			text/html; charset=utf-8
+pinchofyum	feeds/pinchofyum.feed.headers.txt	HTTP/2 200 	nginx		application/rss+xml; charset=UTF-8
+recipetineats	feeds/recipetineats.feed.headers.txt	HTTP/2 200 	nginx		application/rss+xml; charset=UTF-8
+seriouseats	feeds/seriouseats.feed.headers.txt	HTTP/2 404 	cloudflare		text/html;charset=utf-8
+simplyrecipes	feeds/simplyrecipes.feed.headers.txt	HTTP/2 200 	cloudflare		text/xml;charset=utf-8
+smittenkitchen	feeds/smittenkitchen.feed.headers.txt	HTTP/1.1 200 OK	ESF		text/xml; charset=utf-8
+tasteofhome	feeds/tasteofhome.feed.headers.txt	HTTP/2 200 	cloudflare		rss2; charset=UTF-8
+woksoflife	feeds/woksoflife.feed.headers.txt	HTTP/2 200 	cloudflare		application/rss+xml; charset=UTF-8
+allrecipes	pages/allrecipes/p1.browser.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+allrecipes	pages/allrecipes/p1.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+allrecipes	pages/allrecipes/p1.guzzle.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+allrecipes	pages/allrecipes/p1.mealboard-ua.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+allrecipes	pages/allrecipes/p2.browser.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+allrecipes	pages/allrecipes/p3.browser.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+bbcgoodfood	pages/bbcgoodfood/p1.browser.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+bbcgoodfood	pages/bbcgoodfood/p1.curl-default.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+bbcgoodfood	pages/bbcgoodfood/p1.guzzle.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+bbcgoodfood	pages/bbcgoodfood/p1.mealboard-ua.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+bbcgoodfood	pages/bbcgoodfood/p2.browser.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+bbcgoodfood	pages/bbcgoodfood/p3.browser.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+bonappetit	pages/bonappetit/p1.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=utf-8
+bonappetit	pages/bonappetit/p1.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=utf-8
+bonappetit	pages/bonappetit/p1.guzzle.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=utf-8
+bonappetit	pages/bonappetit/p1.mealboard-ua.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=utf-8
+bonappetit	pages/bonappetit/p2.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=utf-8
+bonappetit	pages/bonappetit/p3.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=utf-8
+budgetbytes	pages/budgetbytes/p1.browser-retry.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+budgetbytes	pages/budgetbytes/p1.browser.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+budgetbytes	pages/budgetbytes/p1.curl-default-retry.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+budgetbytes	pages/budgetbytes/p1.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+budgetbytes	pages/budgetbytes/p1.guzzle.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+budgetbytes	pages/budgetbytes/p1.mealboard-ua.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+budgetbytes	pages/budgetbytes/p2.browser.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+budgetbytes	pages/budgetbytes/p2.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+budgetbytes	pages/budgetbytes/p3.browser.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+budgetbytes	pages/budgetbytes/p3.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+cookieandkate	pages/cookieandkate/p1.browser-retry.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+cookieandkate	pages/cookieandkate/p1.browser.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+cookieandkate	pages/cookieandkate/p1.curl-default-retry.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+cookieandkate	pages/cookieandkate/p1.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+cookieandkate	pages/cookieandkate/p1.guzzle.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+cookieandkate	pages/cookieandkate/p1.mealboard-ua.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+cookieandkate	pages/cookieandkate/p2.browser.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+cookieandkate	pages/cookieandkate/p2.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+cookieandkate	pages/cookieandkate/p3.browser.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+cookieandkate	pages/cookieandkate/p3.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+delish	pages/delish/p1.browser.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+delish	pages/delish/p1.curl-default.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+delish	pages/delish/p1.guzzle.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+delish	pages/delish/p1.mealboard-ua.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+delish	pages/delish/p2.browser.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+delish	pages/delish/p3.browser.headers.txt	HTTP/2 200 			text/html; charset=utf-8
+epicurious	pages/epicurious/p1.browser.headers.txt	HTTP/2 200 	CloudFront		text/html; charset=utf-8
+epicurious	pages/epicurious/p1.curl-default.headers.txt	HTTP/2 200 	CloudFront		text/html; charset=utf-8
+epicurious	pages/epicurious/p1.guzzle.headers.txt	HTTP/2 200 	CloudFront		text/html; charset=utf-8
+epicurious	pages/epicurious/p1.mealboard-ua.headers.txt	HTTP/2 200 	CloudFront		text/html; charset=utf-8
+epicurious	pages/epicurious/p2.browser.headers.txt	HTTP/2 200 	CloudFront		text/html; charset=utf-8
+epicurious	pages/epicurious/p3.browser.headers.txt	HTTP/2 200 	CloudFront		text/html; charset=utf-8
+foodnetwork	pages/foodnetwork/p1.browser.headers.txt	HTTP/2 403 			text/html
+foodnetwork	pages/foodnetwork/p1.curl-default.headers.txt	HTTP/2 403 			text/html
+foodnetwork	pages/foodnetwork/p1.guzzle.headers.txt	HTTP/2 403 			text/html
+foodnetwork	pages/foodnetwork/p1.mealboard-ua.headers.txt	HTTP/2 403 			text/html
+foodnetwork	pages/foodnetwork/p2.browser.headers.txt	HTTP/2 403 			text/html
+foodnetwork	pages/foodnetwork/p3.browser.headers.txt	HTTP/2 403 			text/html
+justonecookbook	pages/justonecookbook/p1.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+justonecookbook	pages/justonecookbook/p1.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+justonecookbook	pages/justonecookbook/p1.guzzle.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+justonecookbook	pages/justonecookbook/p1.mealboard-ua.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+justonecookbook	pages/justonecookbook/p2.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+justonecookbook	pages/justonecookbook/p3.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+kingarthur	pages/kingarthur/p1.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=utf-8
+kingarthur	pages/kingarthur/p1.curl-default.headers.txt	HTTP/2 406 			
+kingarthur	pages/kingarthur/p1.guzzle.headers.txt	HTTP/2 200 	nginx		text/html; charset=utf-8
+kingarthur	pages/kingarthur/p1.mealboard-ua.headers.txt	HTTP/2 200 	nginx		text/html; charset=utf-8
+kingarthur	pages/kingarthur/p2.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=utf-8
+kingarthur	pages/kingarthur/p3.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=utf-8
+loveandlemons	pages/loveandlemons/p1.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+loveandlemons	pages/loveandlemons/p1.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+loveandlemons	pages/loveandlemons/p1.guzzle.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+loveandlemons	pages/loveandlemons/p1.mealboard-ua.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+loveandlemons	pages/loveandlemons/p2.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+loveandlemons	pages/loveandlemons/p3.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+minimalistbaker	pages/minimalistbaker/p1.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+minimalistbaker	pages/minimalistbaker/p1.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+minimalistbaker	pages/minimalistbaker/p1.guzzle.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+minimalistbaker	pages/minimalistbaker/p1.mealboard-ua.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+minimalistbaker	pages/minimalistbaker/p2.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+minimalistbaker	pages/minimalistbaker/p3.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+nytcooking	pages/nytcooking/p1.browser.headers.txt	HTTP/2 200 	envoy		text/html; charset=utf-8
+nytcooking	pages/nytcooking/p1.curl-default.headers.txt	HTTP/2 200 	envoy		text/html; charset=utf-8
+nytcooking	pages/nytcooking/p1.guzzle.headers.txt	HTTP/2 200 	envoy		text/html; charset=utf-8
+nytcooking	pages/nytcooking/p1.mealboard-ua.headers.txt	HTTP/2 200 	envoy		text/html; charset=utf-8
+nytcooking	pages/nytcooking/p2.browser.headers.txt	HTTP/2 200 	envoy		text/html; charset=utf-8
+nytcooking	pages/nytcooking/p3.browser.headers.txt	HTTP/2 200 	envoy		text/html; charset=utf-8
+pinchofyum	pages/pinchofyum/p1.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+pinchofyum	pages/pinchofyum/p1.curl-default.headers.txt	HTTP/2 403 	CloudFront		text/html
+pinchofyum	pages/pinchofyum/p1.guzzle.headers.txt	HTTP/2 403 	CloudFront		text/html
+pinchofyum	pages/pinchofyum/p1.mealboard-ua.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+pinchofyum	pages/pinchofyum/p2.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+pinchofyum	pages/pinchofyum/p3.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+recipetineats	pages/recipetineats/p1.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+recipetineats	pages/recipetineats/p1.curl-default.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+recipetineats	pages/recipetineats/p1.guzzle.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+recipetineats	pages/recipetineats/p1.mealboard-ua.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+recipetineats	pages/recipetineats/p2.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+recipetineats	pages/recipetineats/p3.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+seriouseats	pages/seriouseats/p1.browser.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+seriouseats	pages/seriouseats/p1.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+seriouseats	pages/seriouseats/p1.guzzle.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+seriouseats	pages/seriouseats/p1.mealboard-ua.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+seriouseats	pages/seriouseats/p2.browser.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+seriouseats	pages/seriouseats/p3.browser.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+simplyrecipes	pages/simplyrecipes/p1.browser.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+simplyrecipes	pages/simplyrecipes/p1.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+simplyrecipes	pages/simplyrecipes/p1.guzzle.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+simplyrecipes	pages/simplyrecipes/p1.mealboard-ua.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+simplyrecipes	pages/simplyrecipes/p2.browser.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+simplyrecipes	pages/simplyrecipes/p3.browser.headers.txt	HTTP/2 200 	cloudflare		text/html;charset=utf-8
+smittenkitchen	pages/smittenkitchen/p1.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+smittenkitchen	pages/smittenkitchen/p1.curl-default.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+smittenkitchen	pages/smittenkitchen/p1.guzzle.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+smittenkitchen	pages/smittenkitchen/p1.mealboard-ua.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+smittenkitchen	pages/smittenkitchen/p2.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+smittenkitchen	pages/smittenkitchen/p3.browser.headers.txt	HTTP/2 200 	nginx		text/html; charset=UTF-8
+tasteofhome	pages/tasteofhome/p1.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+tasteofhome	pages/tasteofhome/p1.curl-default.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+tasteofhome	pages/tasteofhome/p1.guzzle.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+tasteofhome	pages/tasteofhome/p1.mealboard-ua.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+tasteofhome	pages/tasteofhome/p2.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+tasteofhome	pages/tasteofhome/p3.browser.headers.txt	HTTP/2 200 	cloudflare		text/html; charset=UTF-8
+woksoflife	pages/woksoflife/p1.browser-retry.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+woksoflife	pages/woksoflife/p1.browser.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+woksoflife	pages/woksoflife/p1.curl-default-retry.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+woksoflife	pages/woksoflife/p1.curl-default.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+woksoflife	pages/woksoflife/p1.guzzle.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+woksoflife	pages/woksoflife/p1.mealboard-ua.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+woksoflife	pages/woksoflife/p2.browser.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+woksoflife	pages/woksoflife/p3.browser.headers.txt	HTTP/2 403 	cloudflare	challenge	text/html; charset=UTF-8
+allrecipes	robots/allrecipes.headers.txt	HTTP/2 200 	cloudflare		text/plain;charset=utf-8
+bbcgoodfood	robots/bbcgoodfood.headers.txt	HTTP/2 200 			text/plain
+bonappetit	robots/bonappetit.headers.txt	HTTP/2 200 	cloudflare		text/plain
+budgetbytes	robots/budgetbytes.headers.txt	HTTP/2 200 	cloudflare		text/plain; charset=utf-8
+cookieandkate	robots/cookieandkate.headers.txt	HTTP/2 200 	cloudflare		text/plain; charset=utf-8
+delish	robots/delish.headers.txt	HTTP/2 200 			text/plain
+epicurious	robots/epicurious.headers.txt	HTTP/2 200 	AmazonS3		text/plain
+foodnetwork	robots/foodnetwork.headers.txt	HTTP/2 403 			text/html
+justonecookbook	robots/justonecookbook.headers.txt	HTTP/2 200 	cloudflare		text/plain; charset=utf-8
+kingarthur	robots/kingarthur.headers.txt	HTTP/2 200 	nginx		text/plain
+loveandlemons	robots/loveandlemons.headers.txt	HTTP/2 200 	cloudflare		text/plain
+minimalistbaker	robots/minimalistbaker.headers.txt	HTTP/2 200 	cloudflare		text/plain
+nytcooking	robots/nytcooking.headers.txt	HTTP/2 200 			text/plain; charset=UTF-8
+pinchofyum	robots/pinchofyum.headers.txt	HTTP/2 200 	nginx		text/plain; charset=utf-8
+recipetineats	robots/recipetineats.headers.txt	HTTP/2 200 	nginx		text/plain; charset=utf-8
+seriouseats	robots/seriouseats.headers.txt	HTTP/2 200 	cloudflare		text/plain;charset=utf-8
+simplyrecipes	robots/simplyrecipes.headers.txt	HTTP/2 200 	cloudflare		text/plain;charset=utf-8
+smittenkitchen	robots/smittenkitchen.headers.txt	HTTP/2 200 	nginx		text/plain
+tasteofhome	robots/tasteofhome.headers.txt	HTTP/2 200 	cloudflare		text/plain; charset=UTF-8
+woksoflife	robots/woksoflife.headers.txt	HTTP/2 200 	cloudflare		text/plain; charset=UTF-8
+budgetbytes	wp-json/budgetbytes.posts.headers.txt	HTTP/2 200 	cloudflare		application/json; charset=UTF-8
+budgetbytes	wp-json/budgetbytes.wprm.headers.txt	HTTP/2 200 	cloudflare		application/json; charset=UTF-8
+cookieandkate	wp-json/cookieandkate.posts.headers.txt	HTTP/2 200 	cloudflare		application/json; charset=UTF-8
+cookieandkate	wp-json/cookieandkate.wprm.headers.txt	HTTP/2 404 	cloudflare		application/json; charset=UTF-8
+justonecookbook	wp-json/justonecookbook.posts.headers.txt	HTTP/2 403 	cloudflare		text/html; charset=UTF-8
+justonecookbook	wp-json/justonecookbook.wprm.headers.txt	HTTP/2 403 	cloudflare		text/html; charset=UTF-8
+loveandlemons	wp-json/loveandlemons.posts.headers.txt	HTTP/2 200 	cloudflare		application/json; charset=UTF-8
+loveandlemons	wp-json/loveandlemons.wprm.headers.txt	HTTP/2 200 	cloudflare		application/json; charset=UTF-8
+minimalistbaker	wp-json/minimalistbaker.posts.headers.txt	HTTP/2 200 	cloudflare		application/json; charset=UTF-8
+minimalistbaker	wp-json/minimalistbaker.wprm.headers.txt	HTTP/2 200 	cloudflare		application/json; charset=UTF-8
+pinchofyum	wp-json/pinchofyum.posts.headers.txt	HTTP/2 200 	nginx		application/json; charset=UTF-8
+pinchofyum	wp-json/pinchofyum.wprm.headers.txt	HTTP/2 404 	nginx		application/json; charset=UTF-8
+recipetineats	wp-json/recipetineats.posts.headers.txt	HTTP/2 200 	nginx		application/json; charset=UTF-8
+recipetineats	wp-json/recipetineats.wprm.headers.txt	HTTP/2 200 	nginx		application/json; charset=UTF-8
+smittenkitchen	wp-json/smittenkitchen.posts.headers.txt	HTTP/2 200 	nginx		application/json; charset=UTF-8
+smittenkitchen	wp-json/smittenkitchen.wprm.headers.txt	HTTP/2 404 	nginx		application/json; charset=UTF-8
+woksoflife	wp-json/woksoflife.posts.headers.txt	HTTP/2 200 	cloudflare		application/json; charset=UTF-8
+woksoflife	wp-json/woksoflife.wprm.headers.txt	HTTP/2 200 	cloudflare		application/json; charset=UTF-8
