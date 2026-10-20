@@ -76,9 +76,11 @@ class RecipeCreate extends Component
         $this->cuisine = $candidate['cuisine'] ?? '';
         // The reader returns 0 for a time the page leaves out. No model may guess it
         // (ADR 0004) and no sensible code estimate exists, so it stays blank and required.
+        // Servings may be estimated on an import (ADR 0003): the reader returns null for
+        // none stated, and the form keeps the household size.
         $this->prepMinutes = $candidate['prep_minutes'] > 0 ? $candidate['prep_minutes'] : null;
         $this->cookMinutes = $candidate['cook_minutes'] > 0 ? $candidate['cook_minutes'] : null;
-        $this->servings = $candidate['servings'] > 0 ? $candidate['servings'] : $this->servings;
+        $this->servings = $candidate['servings'] ?? $this->servings;
         $this->rows = [];
         $this->tools = [];
         $this->steps = [];

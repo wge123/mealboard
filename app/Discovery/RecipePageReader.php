@@ -65,11 +65,12 @@ class RecipePageReader
 
     /**
      * The cheap facts of a page's recipe data, before anything is restructured:
-     * the raw ingredient lines and the stated minutes (0 when stated nowhere).
+     * the raw ingredient lines, the stated minutes (0 when stated nowhere) and the
+     * stated servings (null when stated nowhere).
      * Null when the page has no recipe data. Lets a caller refuse a page on
      * time or ingredients without paying for restructuring.
      *
-     * @return ?array{ingredients: list<string>, prep_minutes: int, cook_minutes: int}
+     * @return ?array{ingredients: list<string>, prep_minutes: int, cook_minutes: int, servings: ?int}
      */
     public function preview(string $html): ?array
     {
@@ -85,6 +86,7 @@ class RecipePageReader
             'ingredients' => $this->textList($recipe['recipeIngredient'] ?? null),
             'prep_minutes' => $prep ?? 0,
             'cook_minutes' => $cook ?? 0,
+            'servings' => $this->servings($recipe['recipeYield'] ?? null),
         ];
     }
 
@@ -241,15 +243,16 @@ class RecipePageReader
         return preg_match('/^(\d+)\s*(?:min|minutes?)$/i', trim($value), $m) ? (int) $m[1] : null;
     }
 
-    private function servings(mixed $yield): int
+    /** The servings the page states, or null: a yield is never estimated here. */
+    private function servings(mixed $yield): ?int
     {
         foreach ((array) $yield as $item) {
             if (preg_match('/\d+/', (string) $item, $m)) {
-                return (int) $m[0];
+                return (int) $m[0] >= 1 ? (int) $m[0] : null;
             }
         }
 
-        return 0;
+        return null;
     }
 
     /**

@@ -101,7 +101,7 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
             return null; // an article, not a recipe: skipped quietly
         }
 
-        $early = $this->preferences->refusalsBeforeRestructuring($preview['ingredients'], $preview['prep_minutes'], $preview['cook_minutes']);
+        $early = $this->preferences->refusalsBeforeRestructuring($preview['ingredients'], $preview['prep_minutes'], $preview['cook_minutes'], $preview['servings']);
 
         if ($early !== []) {
             return $this->refused($link, $early);

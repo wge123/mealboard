@@ -42,6 +42,10 @@ class CandidateValidator
             }
         }
 
+        if (is_numeric($item['servings'] ?? null) && (int) $item['servings'] < 1) {
+            $errors[] = 'servings: must be a whole number of 1 or more';
+        }
+
         $sourceUrl = $item['source_url'] ?? null;
 
         if (! is_string($sourceUrl)
