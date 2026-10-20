@@ -7,6 +7,7 @@ use App\Models\DiscoveryRun;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Support\HouseholdPreferences;
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Log;
 
@@ -172,6 +173,28 @@ it('is scheduled every hour from 05:30 so a run missed while the Mac slept catch
 
     expect($event)->not->toBeNull()
         ->and($event->expression)->toBe('30 5-22 * * *');
+});
+
+it('reads its schedule in the household time zone, not the app clock', function () {
+    $event = collect(app(Schedule::class)->events())
+        ->first(fn ($event) => str_contains($event->command ?? '', 'recipes:discover'));
+
+    expect($event->timezone)->toBe('America/New_York');
+});
+
+it('counts a run late on the household evening as that day, though the UTC date has rolled over', function () {
+    FakeDiscoveryDriver::$candidates = [discoveredCandidate('Morning Bowl')];
+
+    // 09:30 New York (13:30 UTC), then 20:30 New York (00:30 UTC the next day).
+    $this->travelTo(Carbon::parse('2026-10-20 13:30', 'UTC'));
+    $this->artisan('recipes:discover')->assertSuccessful();
+
+    FakeDiscoveryDriver::$candidates = [discoveredCandidate('Evening Bowl')];
+    $this->travelTo(Carbon::parse('2026-10-21 00:30', 'UTC'));
+    $this->artisan('recipes:discover')->assertSuccessful();
+
+    expect(DiscoveryRun::count())->toBe(1)
+        ->and(Recipe::where('title', 'Evening Bowl')->exists())->toBeFalse();
 });
 
 it('runs only once a day however many hourly ticks fire', function () {
