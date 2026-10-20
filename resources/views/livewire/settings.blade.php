@@ -9,6 +9,7 @@
         'preferences' => ['Preferences', 'Preferences', 'preferences', null, null],
         'pantry' => ['Pantry staples', 'Pantry', 'pantry-staples', $stapleCount, 'on hand'],
         'channels' => ['YouTube channels', 'Channels', 'channel-settings', $activeChannelCount, 'active'],
+        'sites' => ['Recipe sites', 'Sites', 'recipe-site-settings', $activeRecipeSiteCount, 'active'],
     ];
 @endphp
 
