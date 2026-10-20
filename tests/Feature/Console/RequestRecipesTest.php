@@ -6,7 +6,6 @@ use App\Models\DiscoveredVideo;
 use App\Models\Recipe;
 use App\Models\RecipeRequest;
 use App\Support\HouseholdPreferences;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 
 function hibachiCandidateJson(string $title = 'Hibachi Steak and Fried Rice'): string
@@ -37,15 +36,26 @@ beforeEach(function () {
     config()->set('mealboard.claude_bin', '/fake/bin/claude');
     config()->set('mealboard.yt_dlp', '/fake/bin/yt-dlp');
     config()->set('mealboard.yt_python', '/fake/bin/python3');
-    Http::fake(['example.com/*' => Http::response()]);
 });
 
-it('stores a requested recipe that would breach the weeknight caps', function () {
+/**
+ * One YouTube search hit, classified likely_recipe and extracted into $title.
+ */
+function fakeHibachiVideo(string $title = 'Griddle Hibachi from the Video'): void
+{
     Process::fake([
-        // No search hits: the claude lane alone answers this request.
-        '*yt-dlp*' => Process::result(output: ''),
-        '*claude*' => Process::result(output: hibachiCandidateJson()),
+        '*yt-dlp*' => Process::result(output: json_encode([
+            'id' => 'vidHibachi9', 'title' => 'Blackstone Hibachi', 'channel_id' => 'UCc1',
+        ])),
+        '*python3*' => Process::result(output: 'heat the griddle and sear the steak'),
+        '*claude*' => Process::sequence()
+            ->push(json_encode([['video_id' => 'vidHibachi9', 'classification' => 'likely_recipe', 'score' => 92]]))
+            ->push(json_encode(json_decode(hibachiCandidateJson($title), true)[0])),
     ]);
+}
+
+it('stores a requested recipe that would breach the weeknight caps', function () {
+    fakeHibachiVideo();
 
     $this->artisan('recipes:request', ['query' => 'hibachi for 4 on a flat-top griddle'])
         ->assertSuccessful();
@@ -59,50 +69,25 @@ it('stores a requested recipe that would breach the weeknight caps', function ()
         ->and($request->completed_at)->not->toBeNull()
         ->and($recipe->recipe_request_id)->toBe($request->id)
         ->and($recipe->status)->toBe(RecipeStatus::Pending)
-        ->and($recipe->prep_minutes + $recipe->cook_minutes)->toBeGreaterThan(30);
+        ->and($recipe->prep_minutes + $recipe->cook_minutes)->toBeGreaterThan(30)
+        ->and(DiscoveredVideo::sole()->recipe_request_id)->toBe($request->id);
 });
 
-it('runs both lanes and keeps what each returns', function () {
-    Process::fake([
-        '*yt-dlp*' => Process::result(output: json_encode([
-            'id' => 'vidHibachi9', 'title' => 'Blackstone Hibachi', 'channel_id' => 'UCc1',
-        ])),
-        '*python3*' => Process::result(output: 'heat the griddle and sear the steak'),
-        '*claude*' => Process::sequence()
-            // Classification of the one search hit, then the video extraction,
-            // then the claude lane's own candidate.
-            ->push(json_encode([['video_id' => 'vidHibachi9', 'classification' => 'likely_recipe', 'score' => 92]]))
-            ->push(json_encode(json_decode(hibachiCandidateJson('Griddle Hibachi from the Video'), true)[0]))
-            ->push(hibachiCandidateJson('Hibachi Steak from Claude')),
-    ]);
+it('stores only YouTube candidates and never asks claude to write a recipe', function () {
+    fakeHibachiVideo();
 
     $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
 
-    expect(Recipe::count())->toBe(2)
-        ->and(Recipe::pluck('title')->all())
-        ->toContain('Griddle Hibachi from the Video', 'Hibachi Steak from Claude')
-        ->and(DiscoveredVideo::sole()->recipe_request_id)->toBe(RecipeRequest::sole()->id);
+    expect(Recipe::pluck('source_url')->all())->toBe(['https://www.youtube.com/watch?v=vidHibachi9']);
+
+    // Only the classification and the video extraction ran; no third call
+    // asked for candidate recipes.
+    Process::assertRanTimes(fn ($process) => ($process->command[0] ?? '') === '/fake/bin/claude', 2);
 });
 
-it('completes with a partial failure recorded when only one lane dies', function () {
+it('fails with a non-zero exit when the YouTube search dies', function () {
     Process::fake([
         '*yt-dlp*' => Process::result(errorOutput: 'ERROR: search unavailable', exitCode: 1),
-        '*claude*' => Process::result(output: hibachiCandidateJson()),
-    ]);
-
-    $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
-
-    $request = RecipeRequest::sole();
-
-    expect($request->status)->toBe(RequestStatus::Completed)
-        ->and($request->error)->toContain('youtube:')
-        ->and(Recipe::count())->toBe(1);
-});
-
-it('fails with a non-zero exit when every lane dies', function () {
-    Process::fake([
-        '*yt-dlp*' => Process::result(errorOutput: 'ERROR: search unavailable', exitCode: 1),
-        '*claude*' => Process::result(errorOutput: 'claude exploded', exitCode: 1),
     ]);
 
     $this->artisan('recipes:request', ['query' => 'hibachi'])->assertFailed();
@@ -111,19 +96,17 @@ it('fails with a non-zero exit when every lane dies', function () {
 
     expect($request->status)->toBe(RequestStatus::Failed)
         ->and($request->error)->toContain('youtube:')
-        ->and($request->error)->toContain('claude:')
         ->and(Recipe::count())->toBe(0);
+
+    Process::assertNotRan(fn ($process) => str_contains(implode(' ', $process->command), 'claude'));
 });
 
 it('succeeds without storing anything when the request only matches known recipes', function () {
-    Recipe::factory()->create(['title' => 'Hibachi Steak and Fried Rice']);
+    Recipe::factory()->create(['title' => 'Griddle Hibachi from the Video']);
 
-    Process::fake([
-        '*yt-dlp*' => Process::result(output: ''),
-        '*claude*' => Process::result(output: hibachiCandidateJson()),
-    ]);
+    fakeHibachiVideo();
 
-    // Zero NEW candidates is an answer, not a failure: the lanes ran fine.
+    // Zero NEW candidates is an answer, not a failure: the search ran fine.
     $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
 
     expect(Recipe::count())->toBe(1)
@@ -131,7 +114,16 @@ it('succeeds without storing anything when the request only matches known recipe
         ->and(RecipeRequest::sole()->status)->toBe(RequestStatus::Completed);
 });
 
-it('rejects an empty request without touching the lanes', function () {
+it('succeeds with nothing stored when the search finds no videos', function () {
+    Process::fake(['*yt-dlp*' => Process::result(output: '')]);
+
+    $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
+
+    expect(Recipe::count())->toBe(0)
+        ->and(RecipeRequest::sole()->status)->toBe(RequestStatus::Completed);
+});
+
+it('rejects an empty request without touching the search', function () {
     Process::fake();
 
     $this->artisan('recipes:request', ['query' => '   '])->assertFailed();
@@ -140,33 +132,8 @@ it('rejects an empty request without touching the lanes', function () {
     Process::assertNothingRan();
 });
 
-it('stores a shaped recipe from the claude lane with tools, prep notes and steps', function () {
-    Process::fake([
-        '*yt-dlp*' => Process::result(output: ''),
-        '*claude*' => Process::result(output: hibachiCandidateJson()),
-    ]);
-
-    $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
-
-    $recipe = Recipe::sole();
-
-    expect($recipe->hasShape())->toBeTrue()
-        ->and($recipe->recipeTools)->toHaveCount(1)
-        ->and($recipe->cookingSteps->pluck('text')->all())->toBe(['Heat the griddle.', 'Sear the steak.', 'Fry the rice.'])
-        ->and($recipe->ingredients->firstWhere('name', 'sirloin steak')->pivot->note)->toBe('cubed');
-});
-
 it('stores a shaped recipe from the youtube lane', function () {
-    Process::fake([
-        '*yt-dlp*' => Process::result(output: json_encode([
-            'id' => 'vidHibachi9', 'title' => 'Blackstone Hibachi', 'channel_id' => 'UCc1',
-        ])),
-        '*python3*' => Process::result(output: 'heat the griddle and sear the steak'),
-        '*claude*' => Process::sequence()
-            ->push(json_encode([['video_id' => 'vidHibachi9', 'classification' => 'likely_recipe', 'score' => 92]]))
-            ->push(json_encode(json_decode(hibachiCandidateJson('Griddle Hibachi from the Video'), true)[0]))
-            ->push('[]'),
-    ]);
+    fakeHibachiVideo();
 
     $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
 
@@ -174,46 +141,10 @@ it('stores a shaped recipe from the youtube lane', function () {
 
     expect($recipe->title)->toBe('Griddle Hibachi from the Video')
         ->and($recipe->hasShape())->toBeTrue()
+        ->and($recipe->recipeTools)->toHaveCount(1)
+        ->and($recipe->cookingSteps->pluck('text')->all())->toBe(['Heat the griddle.', 'Sear the steak.', 'Fry the rice.'])
+        ->and($recipe->ingredients->firstWhere('name', 'sirloin steak')->pivot->note)->toBe('cubed')
         ->and($recipe->source_url)->toBe('https://www.youtube.com/watch?v=vidHibachi9');
-});
-
-it('retries the claude lane once with its own output and the errors', function () {
-    $broken = json_decode(hibachiCandidateJson('Broken Hibachi'), true);
-    $broken[0]['steps'] = [];
-
-    Process::fake([
-        '*yt-dlp*' => Process::result(output: ''),
-        '*claude*' => Process::sequence()
-            ->push(json_encode($broken))
-            ->push(hibachiCandidateJson('Fixed Hibachi')),
-    ]);
-
-    $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
-
-    expect(Recipe::pluck('title')->all())->toBe(['Fixed Hibachi']);
-
-    Process::assertRanTimes(fn ($process) => ($process->command[0] ?? '') === '/fake/bin/claude', 2);
-
-    // Only the retry prompt can contain the first output and its errors.
-    Process::assertRan(fn ($process) => str_contains($process->command[2] ?? '', 'Broken Hibachi')
-        && str_contains($process->command[2], 'steps: at least one step is required'));
-});
-
-it('drops a claude-lane candidate that fails the check twice', function () {
-    $broken = json_decode(hibachiCandidateJson('Broken Hibachi'), true);
-    $broken[0]['steps'] = [];
-
-    Process::fake([
-        '*yt-dlp*' => Process::result(output: ''),
-        '*claude*' => Process::result(output: json_encode($broken)),
-    ]);
-
-    $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
-
-    expect(Recipe::count())->toBe(0)
-        ->and(RecipeRequest::sole()->status)->toBe(RequestStatus::Completed);
-
-    Process::assertRanTimes(fn ($process) => ($process->command[0] ?? '') === '/fake/bin/claude', 2);
 });
 
 it('stores a requested recipe over the weekday limits but drops one with an avoided ingredient', function () {
@@ -221,15 +152,22 @@ it('stores a requested recipe over the weekday limits but drops one with an avoi
     $preferences->setWeekdayLimits(10, 1);
     $preferences->avoid('anchovies');
 
-    $withAnchovies = json_decode(hibachiCandidateJson('Anchovy Hibachi'), true);
-    $withAnchovies[0]['ingredients'][] = ['qty' => 4, 'unit' => null, 'name' => 'Anchovies', 'prep_note' => 'chopped'];
+    $withAnchovies = json_decode(hibachiCandidateJson('Anchovy Hibachi'), true)[0];
+    $withAnchovies['ingredients'][] = ['qty' => 4, 'unit' => null, 'name' => 'Anchovies', 'prep_note' => 'chopped'];
 
     Process::fake([
-        '*yt-dlp*' => Process::result(output: ''),
-        '*claude*' => Process::result(output: json_encode([
-            json_decode(hibachiCandidateJson('Long Hibachi'), true)[0],
-            $withAnchovies[0],
-        ])),
+        '*yt-dlp*' => Process::sequence()->push(
+            json_encode(['id' => 'vidLong00001', 'title' => 'Long Hibachi', 'channel_id' => 'UCc1'])
+            ."\n".json_encode(['id' => 'vidAnch00001', 'title' => 'Anchovy Hibachi', 'channel_id' => 'UCc1']),
+        ),
+        '*python3*' => Process::result(output: 'heat the griddle and sear the steak'),
+        '*claude*' => Process::sequence()
+            ->push(json_encode([
+                ['video_id' => 'vidLong00001', 'classification' => 'likely_recipe', 'score' => 92],
+                ['video_id' => 'vidAnch00001', 'classification' => 'likely_recipe', 'score' => 90],
+            ]))
+            ->push(json_encode(json_decode(hibachiCandidateJson('Long Hibachi'), true)[0]))
+            ->push(json_encode($withAnchovies)),
     ]);
 
     $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();

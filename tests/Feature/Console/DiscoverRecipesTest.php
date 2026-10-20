@@ -1,6 +1,5 @@
 <?php
 
-use App\Discovery\AnthropicDriver;
 use App\Discovery\RecipeDiscoveryDriver;
 use App\Enums\RecipeSource;
 use App\Enums\RecipeStatus;
@@ -9,8 +8,6 @@ use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Support\HouseholdPreferences;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Process;
 
 class FakeDiscoveryDriver implements RecipeDiscoveryDriver
 {
@@ -176,25 +173,12 @@ it('is scheduled daily at 05:30', function () {
         ->and($event->expression)->toBe('30 5 * * *');
 });
 
-it('stores claude candidates with tools, prep notes and steps when the claude CLI is faked', function () {
-    config()->set('mealboard.drivers', [AnthropicDriver::class]);
-    config()->set('mealboard.claude_bin', '/fake/bin/claude');
-    Http::fake(['example.com/*' => Http::response()]);
-
-    Process::fake(['*' => Process::result(output: json_encode([[
-        'title' => 'Lemon Garlic Salmon Bowls',
-        'description' => 'Quick pan-seared salmon.',
-        'meal_type' => 'dinner',
-        'prep_minutes' => 10,
-        'cook_minutes' => 15,
-        'servings' => 2,
-        'cuisine' => null,
-        'tags' => [],
-        'source_url' => 'https://example.com/salmon',
+it('stores discovered candidates with tools, prep notes and steps', function () {
+    FakeDiscoveryDriver::$candidates = [discoveredCandidate('Lemon Garlic Salmon Bowls', [
         'tools' => [['alternatives' => ['skillet', 'wok'], 'count' => 2]],
         'ingredients' => [['qty' => 1, 'unit' => null, 'name' => 'lemon', 'prep_note' => 'juiced']],
         'steps' => ['Sear the salmon.', 'Serve.'],
-    ]]))]);
+    ])];
 
     $this->artisan('recipes:discover')->expectsOutputToContain('Created 1 pending recipe(s)')->assertSuccessful();
 

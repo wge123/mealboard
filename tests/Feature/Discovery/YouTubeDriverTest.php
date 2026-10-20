@@ -1,7 +1,5 @@
 <?php
 
-use App\Discovery\AnthropicDriver;
-use App\Discovery\TheMealDbDriver;
 use App\Discovery\YouTubeDriver;
 use App\Enums\VideoClassification;
 use App\Models\DiscoveredVideo;
@@ -57,12 +55,8 @@ beforeEach(function () {
     config()->set('mealboard.yt_python', '/fake/bin/python3');
 });
 
-it('is registered between the anthropic and themealdb drivers', function () {
-    expect(config('mealboard.drivers'))->toBe([
-        AnthropicDriver::class,
-        YouTubeDriver::class,
-        TheMealDbDriver::class,
-    ]);
+it('is the only registered discovery driver', function () {
+    expect(config('mealboard.drivers'))->toBe([YouTubeDriver::class]);
 });
 
 it('chains poll, classify, and extract into recipe candidates', function () {
