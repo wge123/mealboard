@@ -86,7 +86,7 @@ it('refuses a blank or duplicate avoided word', function (string $word) {
     $preferences->avoid($word);
 })->with(['   ', 'Cilantro'])->throws(HouseholdPreferenceRefused::class);
 
-it('refuses a scheduled candidate over the time limit and passes one with an unknown time', function () {
+it('refuses a scheduled candidate over the time limit or with no stated time, and passes a timeless request', function () {
     $preferences = new HouseholdPreferences;
 
     expect($preferences->refusals(shapedCandidate(['prep_minutes' => 20, 'cook_minutes' => 15]), DiscoveryLane::Scheduled))
@@ -94,7 +94,11 @@ it('refuses a scheduled candidate over the time limit and passes one with an unk
         ->and($preferences->refusals(shapedCandidate(['prep_minutes' => 20, 'cook_minutes' => 15]), DiscoveryLane::Scheduled)[0])
         ->toContain('35 minutes')
         ->and($preferences->refusals(shapedCandidate(['prep_minutes' => 15, 'cook_minutes' => 15]), DiscoveryLane::Scheduled))->toBe([])
-        ->and($preferences->refusals(shapedCandidate(['prep_minutes' => 0, 'cook_minutes' => 0]), DiscoveryLane::Scheduled))->toBe([]);
+        ->and($preferences->refusals(shapedCandidate(['prep_minutes' => 0, 'cook_minutes' => 0]), DiscoveryLane::Scheduled))
+        ->toHaveCount(1)
+        ->and($preferences->refusals(shapedCandidate(['prep_minutes' => 0, 'cook_minutes' => 0]), DiscoveryLane::Scheduled)[0])
+        ->toContain('no stated time')
+        ->and($preferences->refusals(shapedCandidate(['prep_minutes' => 0, 'cook_minutes' => 0]), DiscoveryLane::Request))->toBe([]);
 });
 
 it('refuses a scheduled candidate over the ingredient limit without counting pantry staples', function () {
