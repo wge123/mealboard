@@ -11,3 +11,7 @@ The five canonical labels, applied as store tags. See `docs/agents/triage-labels
 ### Domain docs
 
 Single-context: root `GLOSSARY.md` + `docs/adr/`, with `DECISIONS.md` as the pre-ADR log. See `docs/agents/domain.md`.
+
+### Worktrees
+
+A fresh worktree runs `scripts/worktree-setup.sh` first: it copies vendor, the built frontend and .env from the main checkout and switches on the repo hooks.
