@@ -29,6 +29,20 @@ class KitchenToolInventory
     }
 
     /**
+     * Every word the inventory knows: kind names and other names.
+     *
+     * @return list<string>
+     */
+    public function words(): array
+    {
+        return KitchenToolKind::query()->pluck('name')
+            ->merge(KitchenToolOtherName::query()->pluck('name'))
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
      * How many distinct recipes call for each kind, through any of a tool
      * entry's alternatives. Keyed by kind id; kinds no recipe uses are absent.
      *

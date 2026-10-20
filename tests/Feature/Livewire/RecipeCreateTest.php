@@ -6,6 +6,8 @@ use App\Livewire\RecipeCreate;
 use App\Models\Recipe;
 use App\Models\User;
 use App\Support\HouseholdPreferences;
+use App\Support\MissingKitchenTools;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 use Livewire\Livewire;
 
@@ -55,7 +57,7 @@ it('saves a manual recipe with ingredient pivot rows and redirects to it', funct
 
     expect($recipe)->not->toBeNull()
         ->and($recipe->source)->toBe(RecipeSource::Manual)
-        ->and($recipe->status)->toBe(RecipeStatus::Pending)
+        ->and($recipe->status)->toBe(RecipeStatus::Approved)
         ->and($recipe->tags)->toBe(['quick', 'leftovers'])
         ->and($recipe->ingredients)->toHaveCount(2)
         ->and($recipe->hasShape())->toBeTrue()
@@ -262,4 +264,82 @@ it('starts servings at the household size on the create form', function () {
     Livewire::actingAs(User::factory()->create())
         ->test(RecipeCreate::class)
         ->assertSet('servings', 4);
+});
+
+function pastinaPageResponse()
+{
+    return Http::response(file_get_contents(base_path('tests/Fixtures/recipe-pages/loveandlemons-pastina-soup.html')));
+}
+
+it('fills the form from a pasted recipe link and saves it approved, imported, with the page address as source', function () {
+    Process::fake();
+    Http::fake(['www.loveandlemons.com/*' => pastinaPageResponse()]);
+    $user = User::factory()->create();
+
+    $component = Livewire::actingAs($user)
+        ->test(RecipeCreate::class)
+        ->set('link', 'https://www.loveandlemons.com/pastina-soup/')
+        ->call('importLink')
+        ->assertHasNoErrors()
+        ->assertSet('title', 'Pastina Soup')
+        ->assertSet('sourceUrl', 'https://www.loveandlemons.com/pastina-soup/')
+        ->assertSet('prepMinutes', 20)
+        ->assertSet('cookMinutes', 45)
+        ->assertSet('servings', 6)
+        ->assertSet('importError', '');
+
+    expect($component->get('rows'))->toHaveCount(14)
+        ->and($component->get('rows')[0])->toBe(['name' => 'extra-virgin olive oil', 'qty' => '2', 'unit' => 'tbsp', 'prep_note' => ''])
+        ->and($component->get('steps'))->toHaveCount(5)
+        ->and(collect($component->get('tools'))->pluck('alternatives')->all())->toContain('pot, dutch oven', 'blender');
+
+    $component->call('save')->assertHasNoErrors();
+
+    $recipe = Recipe::firstWhere('title', 'Pastina Soup');
+
+    expect($recipe->source)->toBe(RecipeSource::Imported)
+        ->and($recipe->status)->toBe(RecipeStatus::Approved)
+        ->and($recipe->source_url)->toBe('https://www.loveandlemons.com/pastina-soup/')
+        ->and($recipe->approved_by)->toBe($user->id)
+        ->and($recipe->ingredients)->toHaveCount(14)
+        ->and($recipe->cookingSteps)->toHaveCount(5);
+
+    Http::assertSent(fn ($request) => str_contains($request->header('User-Agent')[0] ?? '', 'Mealboard'));
+    Process::assertNothingRan();
+});
+
+it('shows a missing kitchen tool on an imported recipe the usual way', function () {
+    Http::fake(['www.loveandlemons.com/*' => pastinaPageResponse()]);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', 'https://www.loveandlemons.com/pastina-soup/')
+        ->call('importLink')
+        ->call('save');
+
+    $recipe = Recipe::firstWhere('title', 'Pastina Soup');
+
+    expect(collect(app(MissingKitchenTools::class)->for($recipe))->map->label()->all())->toContain('blender');
+});
+
+it('says the page could not be fetched and fills nothing', function () {
+    Http::fake(['*' => Http::response('Forbidden', 403)]);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', 'https://www.loveandlemons.com/pastina-soup/')
+        ->call('importLink')
+        ->assertSet('title', '')
+        ->assertSee('could not be fetched');
+});
+
+it('says a page with no recipe data has none and fills nothing', function () {
+    Http::fake(['*' => Http::response('<html><body>An article</body></html>')]);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', 'https://example.com/article')
+        ->call('importLink')
+        ->assertSet('title', '')
+        ->assertSee('no recipe data');
 });
