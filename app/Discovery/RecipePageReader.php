@@ -47,7 +47,7 @@ class RecipePageReader
             return $this->refuse(RecipePageRefusal::NotLineForLine);
         }
 
-        return new RecipePageReading([
+        return RecipePageReading::of([
             'title' => $this->text($recipe['name'] ?? ''),
             'description' => $this->text($recipe['description'] ?? ''),
             'meal_type' => $this->mealType($this->textList($recipe['recipeCategory'] ?? null)),
@@ -144,7 +144,7 @@ class RecipePageReader
 
     private function refuse(RecipePageRefusal $refusal): RecipePageReading
     {
-        return new RecipePageReading(null, $refusal);
+        return RecipePageReading::refused($refusal);
     }
 
     /**

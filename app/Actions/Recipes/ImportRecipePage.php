@@ -26,7 +26,7 @@ class ImportRecipePage
             // and the cause (status, challenge, timeout) is kept in the log.
             Log::warning("recipe import refused: {$e->getMessage()}");
 
-            return new RecipePageReading(null, RecipePageRefusal::CouldNotFetch);
+            return RecipePageReading::refused(RecipePageRefusal::CouldNotFetch);
         }
 
         return $this->reader->read($body, $url);
