@@ -56,6 +56,8 @@ class RecipeCreate extends Component
 
         if ($reading->candidate === null) {
             $this->importError = $reading->refusal->message();
+            // Paste-the-text is the way on: keep the address so the saved recipe still names its source.
+            $this->sourceUrl = $link;
 
             return;
         }
