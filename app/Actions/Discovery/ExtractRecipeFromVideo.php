@@ -149,6 +149,8 @@ class ExtractRecipeFromVideo
         return <<<PROMPT
         You are the recipe extraction engine for a household meal planner. Below is the transcript of a YouTube cooking video. Extract ONE cookable recipe from it.
 
+        Copy, never invent. Copy every amount, unit, time and serving count exactly as the transcript or the video description states it. If the video does not state an amount, set that ingredient's qty (and unit) to null; if it states no prep or cook time, use 0 for it. Do not guess: never estimate, never round to a typical amount, never scale the recipe, and never add, drop or change an ingredient or step.
+
         Video title: {$video->title}
         Video description: {$video->description}
 

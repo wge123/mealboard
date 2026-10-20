@@ -8,9 +8,9 @@ use App\Models\RecipeRequest;
 use App\Support\HouseholdPreferences;
 use Illuminate\Support\Facades\Process;
 
-function hibachiCandidateJson(string $title = 'Hibachi Steak and Fried Rice'): string
+function hibachiCandidateJson(string $title = 'Hibachi Steak and Fried Rice', array $overrides = []): string
 {
-    return json_encode([[
+    return json_encode([array_merge([
         'title' => $title,
         'description' => 'Flat-top steak with garlic butter and fried rice.',
         'meal_type' => 'dinner',
@@ -29,7 +29,7 @@ function hibachiCandidateJson(string $title = 'Hibachi Steak and Fried Rice'): s
             ['qty' => 4, 'unit' => 'cup', 'name' => 'cooked rice', 'prep_note' => 'day-old'],
         ],
         'steps' => ['Heat the griddle.', 'Sear the steak.', 'Fry the rice.'],
-    ]]);
+    ], $overrides)]);
 }
 
 beforeEach(function () {
@@ -41,7 +41,7 @@ beforeEach(function () {
 /**
  * One YouTube search hit, classified likely_recipe and extracted into $title.
  */
-function fakeHibachiVideo(string $title = 'Griddle Hibachi from the Video'): void
+function fakeHibachiVideo(string $title = 'Griddle Hibachi from the Video', array $overrides = []): void
 {
     Process::fake([
         '*yt-dlp*' => Process::result(output: json_encode([
@@ -50,7 +50,7 @@ function fakeHibachiVideo(string $title = 'Griddle Hibachi from the Video'): voi
         '*python3*' => Process::result(output: 'heat the griddle and sear the steak'),
         '*claude*' => Process::sequence()
             ->push(json_encode([['video_id' => 'vidHibachi9', 'classification' => 'likely_recipe', 'score' => 92]]))
-            ->push(json_encode(json_decode(hibachiCandidateJson($title), true)[0])),
+            ->push(json_encode(json_decode(hibachiCandidateJson($title, $overrides), true)[0])),
     ]);
 }
 
@@ -71,6 +71,17 @@ it('stores a requested recipe that would breach the weeknight caps', function ()
         ->and($recipe->status)->toBe(RecipeStatus::Pending)
         ->and($recipe->prep_minutes + $recipe->cook_minutes)->toBeGreaterThan(30)
         ->and(DiscoveredVideo::sole()->recipe_request_id)->toBe($request->id);
+});
+
+it('stores a requested recipe whose video states no time', function () {
+    fakeHibachiVideo('Timeless Hibachi', ['prep_minutes' => 0, 'cook_minutes' => 0]);
+
+    $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
+
+    $recipe = Recipe::sole();
+
+    expect($recipe->title)->toBe('Timeless Hibachi')
+        ->and($recipe->prep_minutes + $recipe->cook_minutes)->toBe(0);
 });
 
 it('stores only YouTube candidates and never asks claude to write a recipe', function () {
