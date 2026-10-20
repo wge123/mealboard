@@ -11,4 +11,15 @@ use Illuminate\Database\Eloquent\Model;
 class SeenPost extends Model
 {
     protected $fillable = ['url'];
+
+    /**
+     * The given addresses that an earlier run fetched.
+     *
+     * @param  list<string>  $urls
+     * @return list<string>
+     */
+    public static function seenAmong(array $urls): array
+    {
+        return self::query()->whereIn('url', $urls)->pluck('url')->all();
+    }
 }
