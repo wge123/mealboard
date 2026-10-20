@@ -190,3 +190,21 @@ it('records the error on the video row when the retry also fails', function () {
     // One retry, never a third call.
     Process::assertRanTimes(fn ($process) => ($process->command[0] ?? '') === '/fake/bin/claude', 2);
 });
+
+it('extracts a recipe from a transcript too long to pass as a command-line argument', function () {
+    $video = DiscoveredVideo::factory()->likelyRecipe()->create(['video_id' => 'vidLong00001']);
+    $transcript = str_repeat('boil the noodles then sizzle the garlic. ', 4000);
+
+    Process::fake([
+        '*python3*' => Process::result(output: $transcript),
+        '*claude*' => Process::result(output: json_encode(validVideoRecipeObject())),
+    ]);
+
+    $candidate = app(ExtractRecipeFromVideo::class)->handle($video);
+
+    expect($candidate['title'])->toBe('Garlic Butter Noodles');
+
+    Process::assertRan(fn ($process) => ($process->command[0] ?? '') === '/fake/bin/claude'
+        && strlen($process->input ?? '') > 122880
+        && collect($process->command)->every(fn ($arg) => strlen($arg) < 1000));
+});
