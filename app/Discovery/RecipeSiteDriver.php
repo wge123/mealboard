@@ -66,7 +66,7 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
                     break;
                 }
 
-                SeenPost::query()->firstOrCreate(['url' => $link]);
+                SeenPost::remember($link);
 
                 if (($candidate = $this->candidateFrom($html, $link)) !== null) {
                     $candidates[] = $candidate;
@@ -171,7 +171,7 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
         }
 
         $links = array_values(array_unique($links));
-        $seen = SeenPost::query()->whereIn('url', $links)->pluck('url')->all();
+        $seen = SeenPost::seenAmong($links);
 
         return array_values(array_diff($links, $seen));
     }
