@@ -1,0 +1,23 @@
+#!/bin/sh
+# Pint on the staged PHP files. Enabled by scripts/worktree-setup.sh, which
+# sets core.hooksPath=.githooks for this clone (shared by every worktree).
+#
+# Pint reads the working tree, not the index, so an unstaged fix can make a
+# commit pass. Good enough for a one-person repo; stage what you lint.
+set -u
+root="$(git rev-parse --show-toplevel)"
+files=$(git diff --cached --name-only --diff-filter=ACMR -- '*.php')
+[ -n "$files" ] || exit 0
+
+if [ ! -x "$root/vendor/bin/pint" ]; then
+  echo "pre-commit: $root/vendor/bin/pint is missing; run scripts/worktree-setup.sh (worktree) or composer install." >&2
+  exit 1
+fi
+
+cd "$root" || exit 1
+# shellcheck disable=SC2086 # one path per word; repo paths carry no spaces
+if ! vendor/bin/pint --test $files >&2; then
+  echo "pre-commit: Pint failed; run vendor/bin/pint on the files above and stage the result." >&2
+  exit 1
+fi
+exit 0
