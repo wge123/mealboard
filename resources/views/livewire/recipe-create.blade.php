@@ -1,6 +1,23 @@
 <div>
     <x-ui.page-header title="Add recipe" :back="route('recipes.index')" />
 
+    <x-ui.card title="Paste a recipe link" class="mb-4">
+        <p class="text-base-content/70">
+            Paste the address of a recipe page. The app reads the page's own recipe data and fills the form below,
+            copied as the page has it. Check it, then save.
+        </p>
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+            <input type="url" class="input min-h-11 flex-1 sm:min-h-9" wire:model="link" wire:keydown.enter.prevent="importLink" placeholder="https://" aria-label="Recipe link">
+            <x-ui.button variant="primary" wire:click="importLink" busy="importLink" busy-label="Reading&hellip;">Fill from link</x-ui.button>
+            @if ($imported)
+                <x-ui.badge tone="primary">Imported</x-ui.badge>
+            @endif
+        </div>
+        @if ($importError !== '')
+            <x-ui.alert tone="error" class="mt-3">{{ $importError }} You can still paste the recipe text below.</x-ui.alert>
+        @endif
+    </x-ui.card>
+
     <form wire:submit="save">
         {{-- Paste-to-parse: the fastest way in; heuristic and AI parsers side by side. --}}
         <x-ui.card title="Paste a recipe" class="mb-4">

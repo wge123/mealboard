@@ -3,11 +3,13 @@
 namespace App\Livewire;
 
 use App\Actions\Recipes\CreateRecipe;
+use App\Actions\Recipes\ImportRecipePage;
 use App\Actions\Recipes\ParsePastedIngredients;
 use App\Discovery\ClaudeCliFailed;
 use App\Discovery\ShapingPass;
 use App\Enums\MealType;
 use App\Enums\RecipeSource;
+use App\Enums\RecipeStatus;
 use App\Livewire\Concerns\InteractsWithRecipeForm;
 use App\Support\HouseholdPreferences;
 use Illuminate\Contracts\View\View;
@@ -27,6 +29,50 @@ class RecipeCreate extends Component
     public string $parsedWith = '';
 
     public string $parseError = '';
+
+    public string $link = '';
+
+    public string $importError = '';
+
+    /** Whether the form was filled from a recipe link: saving then makes an Imported recipe. */
+    public bool $imported = false;
+
+    public function importLink(): void
+    {
+        $this->importError = '';
+        $link = trim($this->link);
+
+        if ($link === '') {
+            return;
+        }
+
+        $reading = app(ImportRecipePage::class)->handle($link);
+
+        if ($reading->candidate === null) {
+            $this->importError = $reading->refusal->message();
+
+            return;
+        }
+
+        $candidate = $reading->candidate;
+
+        $this->title = $candidate['title'];
+        $this->description = $candidate['description'];
+        $this->sourceUrl = $candidate['source_url'];
+        $this->mealType = $candidate['meal_type'];
+        $this->cuisine = $candidate['cuisine'] ?? '';
+        $this->prepMinutes = $candidate['prep_minutes'];
+        $this->cookMinutes = $candidate['cook_minutes'];
+        $this->servings = $candidate['servings'] > 0 ? $candidate['servings'] : $this->servings;
+        $this->rows = [];
+        $this->tools = [];
+        $this->steps = [];
+        $this->fillRows($candidate['ingredients']);
+        $this->fillTools($candidate['tools']);
+        $this->fillSteps($candidate['steps']);
+        $this->imported = true;
+        $this->link = '';
+    }
 
     public function mount(HouseholdPreferences $preferences): void
     {
@@ -129,7 +175,14 @@ class RecipeCreate extends Component
         $this->validate();
 
         $recipe = app(CreateRecipe::class)->handle(
-            [...$this->recipeAttributes(), 'source' => RecipeSource::Manual],
+            [
+                ...$this->recipeAttributes(),
+                'source' => $this->imported ? RecipeSource::Imported : RecipeSource::Manual,
+                // The household chose this recipe, so it joins the library approved.
+                'status' => RecipeStatus::Approved,
+                'approved_at' => now(),
+                'approved_by' => auth()->id(),
+            ],
             $this->rows,
             $this->toolsPayload(),
             $this->stepsPayload(),
