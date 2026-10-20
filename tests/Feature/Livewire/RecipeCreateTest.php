@@ -343,3 +343,109 @@ it('says a page with no recipe data has none and fills nothing', function () {
         ->assertSet('title', '')
         ->assertSee('no recipe data');
 });
+
+it('opens the library recipe instead of importing when the pasted address is already in the library', function () {
+    Http::fake();
+    Process::fake();
+    $existing = Recipe::factory()->create(['source_url' => 'https://www.loveandlemons.com/pastina-soup/']);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', 'https://www.loveandlemons.com/pastina-soup/')
+        ->call('importLink')
+        ->assertRedirect("/recipes/{$existing->id}")
+        ->assertSet('title', '');
+
+    Http::assertNothingSent();
+    expect(Recipe::count())->toBe(1);
+});
+
+it('matches a pasted address already in the library ignoring a trailing slash', function () {
+    Http::fake();
+    $existing = Recipe::factory()->create(['source_url' => 'https://www.loveandlemons.com/pastina-soup']);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', 'https://www.loveandlemons.com/pastina-soup/')
+        ->call('importLink')
+        ->assertRedirect("/recipes/{$existing->id}");
+
+    Http::assertNothingSent();
+});
+
+it('warns about a title matching a library recipe and still saves', function () {
+    Http::fake(['www.loveandlemons.com/*' => pastinaPageResponse()]);
+    Recipe::factory()->create(['title' => 'pastina soup', 'source_url' => 'https://other.example.com/pastina']);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', 'https://www.loveandlemons.com/pastina-soup/')
+        ->call('importLink')
+        ->assertSee('already have a recipe called')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(Recipe::where('title', 'Pastina Soup')->count())->toBe(1)
+        ->and(Recipe::count())->toBe(2);
+});
+
+it('shows no title warning when no library recipe has the title', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('title', 'Something New')
+        ->assertDontSee('already have a recipe called');
+});
+
+it('warns naming an avoided ingredient on an import and still saves it', function () {
+    Http::fake(['www.loveandlemons.com/*' => pastinaPageResponse()]);
+    app(HouseholdPreferences::class)->avoid('parmesan');
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', 'https://www.loveandlemons.com/pastina-soup/')
+        ->call('importLink')
+        ->assertSee('Contains an avoided ingredient: parmesan')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(Recipe::firstWhere('title', 'Pastina Soup')->status)->toBe(RecipeStatus::Approved);
+});
+
+it('applies no weekday limit to an import: 60 minutes and 15 ingredients save without a limit message', function () {
+    Http::fake(['www.loveandlemons.com/*' => pastinaPageResponse()]);
+    $limits = app(HouseholdPreferences::class)->weekdayLimits();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', 'https://www.loveandlemons.com/pastina-soup/')
+        ->call('importLink')
+        ->set('prepMinutes', 20)
+        ->set('cookMinutes', 40)
+        ->call('addRow')
+        ->set('rows.14.name', 'extra thing')
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertDontSee('weekday limit');
+
+    $recipe = Recipe::firstWhere('title', 'Pastina Soup');
+    expect($recipe)->not->toBeNull()
+        ->and($recipe->prep_minutes + $recipe->cook_minutes)->toBe(60)
+        ->and($recipe->ingredients)->toHaveCount(15)
+        ->and($limits['minutes'])->toBeLessThan(60);
+});
+
+it('leaves times the page does not state blank and required for the household to fill in', function () {
+    Http::fake(['*' => Http::response('<html><head><script type="application/ld+json">{"@type":"Recipe","name":"Plain Toast","description":"Toast.","recipeIngredient":["2 slices bread"],"recipeInstructions":[{"@type":"HowToStep","text":"Toast the bread in a toaster."}]}</script></head></html>')]);
+    Process::fake();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(RecipeCreate::class)
+        ->set('link', 'https://example.com/plain-toast')
+        ->call('importLink')
+        ->assertSet('prepMinutes', null)
+        ->assertSet('cookMinutes', null)
+        ->call('save')
+        ->assertHasErrors(['prepMinutes', 'cookMinutes']);
+
+    Process::assertNothingRan();
+});
