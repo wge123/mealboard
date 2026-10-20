@@ -4,6 +4,7 @@ namespace App\Discovery;
 
 use App\Actions\Recipes\RestructureIngredientLine;
 use App\Enums\RecipePageRefusal;
+use App\Support\Text;
 
 /**
  * Reads one recipe page: page HTML and its address in, either a candidate in
@@ -236,7 +237,7 @@ class RecipePageReader
 
     private function text(mixed $value): string
     {
-        return is_string($value) ? trim(preg_replace('/\s+/u', ' ', html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'))) : '';
+        return is_string($value) ? Text::collapseWhitespace(html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8')) : '';
     }
 
     /** ISO 8601 duration ("PT1H20M") or plain "50 minutes", in whole minutes. */

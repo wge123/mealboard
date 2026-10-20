@@ -2,6 +2,8 @@
 
 namespace App\Actions\Recipes;
 
+use App\Support\Text;
+
 /**
  * Restructuring of one source ingredient line by code (GLOSSARY: Restructuring,
  * ADR 0004): amount, unit, name and prep note. A stricter cousin of the
@@ -24,7 +26,7 @@ class RestructureIngredientLine
      */
     public function handle(string $line): array
     {
-        $rest = $this->normalize($line);
+        $rest = Text::collapseWhitespace($line);
         $notes = [];
 
         // Text after the first comma is the prep note; a bracketed note just before it comes first.
@@ -68,11 +70,6 @@ class RestructureIngredientLine
             'name' => $name,
             'prep_note' => $notes === [] ? null : implode(', ', $notes),
         ];
-    }
-
-    private function normalize(string $line): string
-    {
-        return trim(preg_replace('/\s+/u', ' ', $line));
     }
 
     /**
@@ -128,24 +125,16 @@ class RestructureIngredientLine
             return null;
         }
 
-        $depth = 0;
+        $open = $this->walkBrackets($text)['pairs'][strlen($text) - 1] ?? null;
 
-        for ($i = strlen($text) - 1; $i >= 0; $i--) {
-            $depth += match ($text[$i]) {
-                ')' => 1,
-                '(' => -1,
-                default => 0,
-            };
-
-            if ($depth === 0) {
-                $before = trim(substr($text, 0, $i));
-                $inside = trim(substr($text, $i + 1, -1));
-
-                return $before === '' || $inside === '' ? null : [$before, $inside];
-            }
+        if ($open === null) {
+            return null;
         }
 
-        return null;
+        $before = trim(substr($text, 0, $open));
+        $inside = trim(substr($text, $open + 1, -1));
+
+        return $before === '' || $inside === '' ? null : [$before, $inside];
     }
 
     /**
@@ -154,18 +143,32 @@ class RestructureIngredientLine
      */
     private function commaIsInsideBrackets(string $text): bool
     {
-        $depth = 0;
+        return ($this->walkBrackets($text)['commaDepth'] ?? 0) > 0;
+    }
 
-        foreach (str_split($text) as $char) {
+    /**
+     * The one walk over a text's round brackets: the position of the "(" that
+     * each ")" closes (a stray ")" closes nothing), and how deep the first
+     * comma sits.
+     *
+     * @return array{pairs: array<int, int>, commaDepth: ?int}
+     */
+    private function walkBrackets(string $text): array
+    {
+        $open = [];
+        $pairs = [];
+        $commaDepth = null;
+
+        foreach (str_split($text) as $i => $char) {
             if ($char === '(') {
-                $depth++;
-            } elseif ($char === ')') {
-                $depth--;
-            } elseif ($char === ',') {
-                return $depth > 0;
+                $open[] = $i;
+            } elseif ($char === ')' && $open !== []) {
+                $pairs[$i] = array_pop($open);
+            } elseif ($char === ',' && $commaDepth === null) {
+                $commaDepth = count($open);
             }
         }
 
-        return false;
+        return ['pairs' => $pairs, 'commaDepth' => $commaDepth];
     }
 }
