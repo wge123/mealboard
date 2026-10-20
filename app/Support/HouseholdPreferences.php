@@ -201,13 +201,7 @@ class HouseholdPreferences
         }
 
         $limits = $this->weekdayLimits();
-        $minutes = (int) $candidate['prep_minutes'] + (int) $candidate['cook_minutes'];
-
-        if ($minutes === 0) {
-            $reasons[] = 'no stated time, so it cannot be checked against the weekday limit';
-        } elseif ($minutes > $limits['minutes']) {
-            $reasons[] = "{$minutes} minutes total is over the weekday limit of {$limits['minutes']}";
-        }
+        $reasons = [...$reasons, ...$this->timeRefusals((int) $candidate['prep_minutes'] + (int) $candidate['cook_minutes'])];
 
         $staples = $this->staples()->flip();
         $counted = collect($names)
@@ -221,6 +215,42 @@ class HouseholdPreferences
         }
 
         return $reasons;
+    }
+
+    /**
+     * The scheduled lane's refusals that can be decided from a page's raw
+     * ingredient lines and stated minutes, before the page is restructured:
+     * an avoided word in a line, no stated time, over the weekday time limit.
+     * The ingredient-count limit is left out, since it needs cleaned names to
+     * tell pantry staples apart; refusals() applies it after shaping.
+     *
+     * @param  list<string>  $ingredientLines
+     * @return list<string>
+     */
+    public function refusalsBeforeShaping(array $ingredientLines, int $prepMinutes, int $cookMinutes): array
+    {
+        $reasons = [];
+        $avoided = $this->avoidedIn($ingredientLines, $this->avoidedIngredients());
+
+        if ($avoided !== []) {
+            $reasons[] = 'contains avoided ingredient: '.implode(', ', $avoided);
+        }
+
+        return [...$reasons, ...$this->timeRefusals($prepMinutes + $cookMinutes)];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function timeRefusals(int $minutes): array
+    {
+        $limit = $this->weekdayLimits()['minutes'];
+
+        return match (true) {
+            $minutes === 0 => ['no stated time, so it cannot be checked against the weekday limit'],
+            $minutes > $limit => ["{$minutes} minutes total is over the weekday limit of {$limit}"],
+            default => [],
+        };
     }
 
     /**

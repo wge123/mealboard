@@ -1,5 +1,6 @@
 <?php
 
+use App\Discovery\RecipeSiteDriver;
 use App\Discovery\YouTubeDriver;
 use App\Enums\VideoClassification;
 use App\Models\DiscoveredVideo;
@@ -55,8 +56,8 @@ beforeEach(function () {
     config()->set('mealboard.yt_python', '/fake/bin/python3');
 });
 
-it('is the only registered discovery driver', function () {
-    expect(config('mealboard.drivers'))->toBe([YouTubeDriver::class]);
+it('registers the YouTube and recipe site discovery drivers and no other', function () {
+    expect(config('mealboard.drivers'))->toBe([YouTubeDriver::class, RecipeSiteDriver::class]);
 });
 
 it('chains poll, classify, and extract into recipe candidates', function () {

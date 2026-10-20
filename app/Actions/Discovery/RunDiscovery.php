@@ -2,6 +2,7 @@
 
 namespace App\Actions\Discovery;
 
+use App\Discovery\ReportsPartialFailures;
 use App\Models\DiscoveryRun;
 use Throwable;
 
@@ -27,8 +28,15 @@ class RunDiscovery
             $found = [];
 
             try {
-                $found = app($driverClass)->discover($count);
+                $driver = app($driverClass);
+                $found = $driver->discover($count);
                 $candidates = [...$candidates, ...$found];
+
+                // A driver that failed in part keeps its candidates; the run still records why.
+                if ($driver instanceof ReportsPartialFailures && $driver->failures() !== []) {
+                    $error = implode('; ', $driver->failures());
+                    $errors[$driverClass] = $error;
+                }
             } catch (Throwable $e) {
                 // report() before reducing the exception to its message: the
                 // DiscoveryRun row keeps one line, and without this the stack

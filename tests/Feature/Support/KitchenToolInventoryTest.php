@@ -4,6 +4,7 @@ use App\Enums\KitchenToolOrigin;
 use App\Exceptions\KitchenToolRefused;
 use App\Models\KitchenToolKind;
 use App\Models\KitchenToolOtherName;
+use App\Models\Recipe;
 use App\Support\KitchenToolInventory;
 
 it('starts owning the basics', function () {
@@ -134,9 +135,9 @@ it('marks nothing when one of the kinds does not exist', function () {
 });
 
 /** A recipe whose tool entries are the given lists of kind names (each list is one either-or entry). */
-function recipeUsingKinds(array $entries): App\Models\Recipe
+function recipeUsingKinds(array $entries): Recipe
 {
-    $recipe = App\Models\Recipe::factory()->create();
+    $recipe = Recipe::factory()->create();
     $recipe->recipeTools()->delete();
 
     foreach ($entries as $position => $names) {

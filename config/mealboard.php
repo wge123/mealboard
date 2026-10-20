@@ -1,5 +1,6 @@
 <?php
 
+use App\Discovery\RecipeSiteDriver;
 use App\Discovery\YouTubeDriver;
 
 return [
@@ -10,7 +11,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | DECISIONS.md #1 — discovery runs DAILY, 3 candidates per run.
-    | One run executes ALL listed drivers (YouTube only, ADR 0003); each driver is asked for
+    | One run executes ALL listed drivers (YouTube and recipe sites, ADRs 0003 and 0004); each driver is asked for
     | candidates_per_run candidates and failures are recorded per driver.
     |
     */
@@ -51,7 +52,8 @@ return [
     'yt_dlp' => env('MEALBOARD_YT_DLP'),
 
     'drivers' => [
-        YouTubeDriver::class, // channel RSS -> classify -> transcript pipeline (the only lane, ADR 0003)
+        YouTubeDriver::class, // channel RSS -> classify -> transcript pipeline (ADR 0003)
+        RecipeSiteDriver::class, // recipe site RSS -> page reader, restructured by code (ADR 0004)
     ],
 
     /*
