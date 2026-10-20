@@ -165,12 +165,22 @@ it('schedules every command with a failure notification and its own log', functi
     }
 });
 
-it('is scheduled daily at 05:30', function () {
+it('is scheduled every hour from 05:30 so a run missed while the Mac slept catches up', function () {
     $event = collect(app(Schedule::class)->events())
         ->first(fn ($event) => str_contains($event->command ?? '', 'recipes:discover'));
 
     expect($event)->not->toBeNull()
-        ->and($event->expression)->toBe('30 5 * * *');
+        ->and($event->expression)->toBe('30 5-22 * * *');
+});
+
+it('runs only once a day however many hourly ticks fire', function () {
+    FakeDiscoveryDriver::$candidates = [discoveredCandidate('Hourly Tick Bowl')];
+
+    $this->artisan('recipes:discover')->assertSuccessful();
+    $this->artisan('recipes:discover')->assertSuccessful();
+
+    expect(DiscoveryRun::count())->toBe(1)
+        ->and(Recipe::where('title', 'Hourly Tick Bowl')->count())->toBe(1);
 });
 
 it('stores discovered candidates with tools, prep notes and steps', function () {
