@@ -7,6 +7,7 @@ use App\Exceptions\RecipePageNotFetched;
 use App\Models\RecipeSite;
 use App\Models\SeenPost;
 use App\Support\HouseholdPreferences;
+use App\Support\RecipeAddress;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -166,7 +167,7 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
             $link = trim((string) $item->link);
 
             if ($link !== '') {
-                $links[] = explode('#', explode('?', $link)[0])[0];
+                $links[] = RecipeAddress::clean($link);
             }
         }
 

@@ -4,6 +4,7 @@ namespace App\Discovery;
 
 use App\Actions\Recipes\RestructureIngredientLine;
 use App\Enums\RecipePageRefusal;
+use App\Support\RecipeAddress;
 use App\Support\Text;
 
 /**
@@ -60,7 +61,7 @@ class RecipePageReader
             'tools' => $this->toolsInSteps->find($steps),
             'ingredients' => $ingredients,
             'steps' => $steps,
-        ]);
+        ], $this->canonicalUrl($html, $recipe));
     }
 
     /**
@@ -88,6 +89,46 @@ class RecipePageReader
             'cook_minutes' => $cook ?? 0,
             'servings' => $this->servings($recipe['recipeYield'] ?? null),
         ];
+    }
+
+    /**
+     * The address the page names itself by: its link rel=canonical, else the
+     * Recipe node's url or mainEntityOfPage. Tracking parameters are stripped;
+     * anything that is not an absolute web address is no address.
+     *
+     * @param  array<string, mixed>  $recipe
+     */
+    private function canonicalUrl(string $html, array $recipe): ?string
+    {
+        $page = $recipe['mainEntityOfPage'] ?? null;
+
+        $candidates = [
+            $this->canonicalLink($html),
+            $recipe['url'] ?? null,
+            is_array($page) ? ($page['@id'] ?? $page['url'] ?? null) : $page,
+        ];
+
+        foreach ($candidates as $address) {
+            $address = is_string($address) ? RecipeAddress::clean(html_entity_decode($address, ENT_QUOTES | ENT_HTML5, 'UTF-8')) : '';
+
+            if (RecipeAddress::isWebAddress($address)) {
+                return $address;
+            }
+        }
+
+        return null;
+    }
+
+    private function canonicalLink(string $html): ?string
+    {
+        foreach (preg_match_all('/<link\b[^>]*>/i', $html, $tags) ? $tags[0] : [] as $tag) {
+            if (preg_match('/\brel\s*=\s*["\']?canonical["\']?(?=[\s>\/"\'])/i', $tag)
+                && preg_match('/\bhref\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s>"\']+))/i', $tag, $m)) {
+                return trim(($m[1] ?? '') ?: ($m[2] ?? '') ?: ($m[3] ?? ''));
+            }
+        }
+
+        return null;
     }
 
     /**
