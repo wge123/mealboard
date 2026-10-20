@@ -13,6 +13,7 @@ use App\Enums\RecipeStatus;
 use App\Livewire\Concerns\InteractsWithRecipeForm;
 use App\Models\Recipe;
 use App\Support\HouseholdPreferences;
+use App\Support\RecipeAddress;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -42,7 +43,7 @@ class RecipeCreate extends Component
     public function importLink(): void
     {
         $this->importError = '';
-        $link = trim($this->link);
+        $link = RecipeAddress::clean($this->link);
 
         if ($link === '') {
             return;
@@ -63,22 +64,25 @@ class RecipeCreate extends Component
         }
 
         $candidate = $reading->candidate;
+        $address = $reading->canonicalUrl ?? $candidate['source_url'];
 
         // The page may name itself by another address than the one pasted.
-        if ($this->openLibraryRecipeAt($candidate['source_url'])) {
+        if ($this->openLibraryRecipeAt($address)) {
             return;
         }
 
         $this->title = $candidate['title'];
         $this->description = $candidate['description'];
-        $this->sourceUrl = $candidate['source_url'];
+        $this->sourceUrl = $address;
         $this->mealType = $candidate['meal_type'];
         $this->cuisine = $candidate['cuisine'] ?? '';
         // The reader returns 0 for a time the page leaves out. No model may guess it
         // (ADR 0004) and no sensible code estimate exists, so it stays blank and required.
+        // Servings may be estimated on an import (ADR 0003): the reader returns null for
+        // none stated, and the form keeps the household size.
         $this->prepMinutes = $candidate['prep_minutes'] > 0 ? $candidate['prep_minutes'] : null;
         $this->cookMinutes = $candidate['cook_minutes'] > 0 ? $candidate['cook_minutes'] : null;
-        $this->servings = $candidate['servings'] > 0 ? $candidate['servings'] : $this->servings;
+        $this->servings = $candidate['servings'] ?? $this->servings;
         $this->rows = [];
         $this->tools = [];
         $this->steps = [];

@@ -15,7 +15,7 @@ class DiscoverRecipes extends Command
 {
     protected $signature = 'recipes:discover {--force : Run even if discovery already ran today}';
 
-    protected $description = 'Run the YouTube discovery driver and store new candidates as pending recipes';
+    protected $description = 'Run the discovery drivers (YouTube channels and recipe sites) and store new candidates as pending recipes';
 
     public function handle(RunDiscovery $runDiscovery, StoreCandidate $store, NearDuplicateFilter $duplicates, HouseholdPreferences $preferences): int
     {

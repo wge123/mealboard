@@ -2,12 +2,12 @@
 
 namespace App\Discovery;
 
-use App\Actions\Recipes\ImportRecipePage;
 use App\Enums\DiscoveryLane;
 use App\Exceptions\RecipePageNotFetched;
 use App\Models\RecipeSite;
 use App\Models\SeenPost;
 use App\Support\HouseholdPreferences;
+use App\Support\RecipeAddress;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -28,7 +28,7 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
     private array $failures = [];
 
     public function __construct(
-        private ImportRecipePage $page,
+        private RecipePageFetcher $fetcher,
         private RecipePageReader $reader,
         private CandidateValidator $validator,
         private HouseholdPreferences $preferences,
@@ -45,9 +45,9 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
             }
 
             try {
-                $links = $this->unseenPostLinks($this->page->fetchBody($site->feed_url), $site->feed_url);
+                $links = $this->unseenPostLinks($this->fetcher->fetch($site->feed_url), $site->feed_url);
             } catch (RecipePageNotFetched|FeedNotReadable $e) {
-                $this->failures[] = "{$site->name}: {$e->getMessage()}";
+                $this->fail($site, $e);
 
                 continue;
             }
@@ -58,16 +58,16 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
                 }
 
                 try {
-                    $html = $this->page->fetchBody($link);
+                    $html = $this->fetcher->fetch($link);
                 } catch (RecipePageNotFetched $e) {
                     // Not remembered: a blocked page is tried again tomorrow, and the
                     // rest of this site's posts wait, since the site is saying no.
-                    $this->failures[] = "{$site->name}: {$e->getMessage()}";
+                    $this->fail($site, $e);
 
                     break;
                 }
 
-                SeenPost::query()->firstOrCreate(['url' => $link]);
+                SeenPost::remember($link);
 
                 if (($candidate = $this->candidateFrom($html, $link)) !== null) {
                     $candidates[] = $candidate;
@@ -83,8 +83,16 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
         return $this->failures;
     }
 
+    /** A site the run could not read: kept for the run's record, with its cause also in the log. */
+    private function fail(RecipeSite $site, RecipePageNotFetched|FeedNotReadable $e): void
+    {
+        $this->failures[] = "{$site->name}: {$e->getMessage()}";
+
+        Log::warning("recipes:discover could not read {$site->name}: {$e->getMessage()}");
+    }
+
     /**
-     * @return ?array<string, mixed> the shaped candidate, or null when the post is skipped or refused
+     * @return ?array<string, mixed> the restructured candidate, or null when the post is skipped or refused
      */
     private function candidateFrom(string $html, string $link): ?array
     {
@@ -94,7 +102,7 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
             return null; // an article, not a recipe: skipped quietly
         }
 
-        $early = $this->preferences->refusalsBeforeShaping($preview['ingredients'], $preview['prep_minutes'], $preview['cook_minutes']);
+        $early = $this->preferences->refusalsBeforeRestructuring($preview['ingredients'], $preview['prep_minutes'], $preview['cook_minutes'], $preview['servings']);
 
         if ($early !== []) {
             return $this->refused($link, $early);
@@ -138,10 +146,19 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
      */
     private function unseenPostLinks(string $xml, string $feedUrl): array
     {
-        $feed = @simplexml_load_string($xml);
+        $previous = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        $feed = simplexml_load_string($xml);
+        $reason = trim(implode('; ', array_map(fn ($error) => trim($error->message), libxml_get_errors())));
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
 
-        if ($feed === false || ! isset($feed->channel)) {
-            throw new FeedNotReadable("{$feedUrl} is not an RSS feed the app can read");
+        if ($feed === false) {
+            throw new FeedNotReadable("{$feedUrl} is not XML the app can read: {$reason}");
+        }
+
+        if (! isset($feed->channel)) {
+            throw new FeedNotReadable("{$feedUrl} is not an RSS feed the app can read: it has no channel");
         }
 
         $links = [];
@@ -150,12 +167,12 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
             $link = trim((string) $item->link);
 
             if ($link !== '') {
-                $links[] = explode('#', explode('?', $link)[0])[0];
+                $links[] = RecipeAddress::clean($link);
             }
         }
 
         $links = array_values(array_unique($links));
-        $seen = SeenPost::query()->whereIn('url', $links)->pluck('url')->all();
+        $seen = SeenPost::seenAmong($links);
 
         return array_values(array_diff($links, $seen));
     }

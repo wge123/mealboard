@@ -49,7 +49,7 @@ Schedule::command('brain:sync')
     ->appendOutputTo($logFor('brain-sync'))
     ->onFailure(fn () => $notifyFail('mealboard brain:sync'));
 
-// DECISIONS.md #1 — discovery runs DAILY (3 candidates per driver, config; YouTube only, ADR 0003).
+// DECISIONS.md #1 — discovery runs DAILY (3 candidates per driver, config; YouTube channels and recipe sites, ADR 0003 and 0004).
 // It is offered every hour from 05:30 rather than once at 05:30 because the
 // scheduler runs on a laptop: a tick missed while the Mac slept is never
 // replayed, so the first waking hour runs it and the command's once-a-day

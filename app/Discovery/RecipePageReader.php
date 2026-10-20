@@ -4,6 +4,8 @@ namespace App\Discovery;
 
 use App\Actions\Recipes\RestructureIngredientLine;
 use App\Enums\RecipePageRefusal;
+use App\Support\RecipeAddress;
+use App\Support\Text;
 
 /**
  * Reads one recipe page: page HTML and its address in, either a candidate in
@@ -46,7 +48,7 @@ class RecipePageReader
             return $this->refuse(RecipePageRefusal::NotLineForLine);
         }
 
-        return new RecipePageReading([
+        return RecipePageReading::of([
             'title' => $this->text($recipe['name'] ?? ''),
             'description' => $this->text($recipe['description'] ?? ''),
             'meal_type' => $this->mealType($this->textList($recipe['recipeCategory'] ?? null)),
@@ -59,16 +61,17 @@ class RecipePageReader
             'tools' => $this->toolsInSteps->find($steps),
             'ingredients' => $ingredients,
             'steps' => $steps,
-        ]);
+        ], $this->canonicalUrl($html, $recipe));
     }
 
     /**
      * The cheap facts of a page's recipe data, before anything is restructured:
-     * the raw ingredient lines and the stated minutes (0 when stated nowhere).
+     * the raw ingredient lines, the stated minutes (0 when stated nowhere) and the
+     * stated servings (null when stated nowhere).
      * Null when the page has no recipe data. Lets a caller refuse a page on
      * time or ingredients without paying for restructuring.
      *
-     * @return ?array{ingredients: list<string>, prep_minutes: int, cook_minutes: int}
+     * @return ?array{ingredients: list<string>, prep_minutes: int, cook_minutes: int, servings: ?int}
      */
     public function preview(string $html): ?array
     {
@@ -84,7 +87,48 @@ class RecipePageReader
             'ingredients' => $this->textList($recipe['recipeIngredient'] ?? null),
             'prep_minutes' => $prep ?? 0,
             'cook_minutes' => $cook ?? 0,
+            'servings' => $this->servings($recipe['recipeYield'] ?? null),
         ];
+    }
+
+    /**
+     * The address the page names itself by: its link rel=canonical, else the
+     * Recipe node's url or mainEntityOfPage. Tracking parameters are stripped;
+     * anything that is not an absolute web address is no address.
+     *
+     * @param  array<string, mixed>  $recipe
+     */
+    private function canonicalUrl(string $html, array $recipe): ?string
+    {
+        $page = $recipe['mainEntityOfPage'] ?? null;
+
+        $candidates = [
+            $this->canonicalLink($html),
+            $recipe['url'] ?? null,
+            is_array($page) ? ($page['@id'] ?? $page['url'] ?? null) : $page,
+        ];
+
+        foreach ($candidates as $address) {
+            $address = is_string($address) ? RecipeAddress::clean(html_entity_decode($address, ENT_QUOTES | ENT_HTML5, 'UTF-8')) : '';
+
+            if (RecipeAddress::isWebAddress($address)) {
+                return $address;
+            }
+        }
+
+        return null;
+    }
+
+    private function canonicalLink(string $html): ?string
+    {
+        foreach (preg_match_all('/<link\b[^>]*>/i', $html, $tags) ? $tags[0] : [] as $tag) {
+            if (preg_match('/\brel\s*=\s*["\']?canonical["\']?(?=[\s>\/"\'])/i', $tag)
+                && preg_match('/\bhref\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s>"\']+))/i', $tag, $m)) {
+                return trim(($m[1] ?? '') ?: ($m[2] ?? '') ?: ($m[3] ?? ''));
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -107,11 +151,11 @@ class RecipePageReader
     }
 
     /**
-     * One restructured ingredient per source line, and no word in a name or
-     * prep note that the source line does not carry (nothing added).
+     * One restructured ingredient per source line, each carrying all of its
+     * line and nothing more (see RestructureIngredientLine::isLineForLine).
      *
      * @param  list<string>  $lines
-     * @param  array<int, array{name: string, prep_note: ?string}>  $ingredients
+     * @param  array<int, array{qty: ?float, unit: ?string, name: string, prep_note: ?string}>  $ingredients
      */
     private function isLineForLine(array $lines, array $ingredients): bool
     {
@@ -120,10 +164,7 @@ class RecipePageReader
         }
 
         foreach ($lines as $i => $line) {
-            $source = $this->words($line);
-            $made = $this->words($ingredients[$i]['name'].' '.($ingredients[$i]['prep_note'] ?? ''));
-
-            if ($ingredients[$i]['name'] === '' || array_diff($made, $source) !== []) {
+            if (! $this->restructure->isLineForLine($line, $ingredients[$i])) {
                 return false;
             }
         }
@@ -131,19 +172,9 @@ class RecipePageReader
         return true;
     }
 
-    /**
-     * @return list<string>
-     */
-    private function words(string $text): array
-    {
-        preg_match_all('/\p{L}+|\p{N}+/u', mb_strtolower($text), $m);
-
-        return $m[0];
-    }
-
     private function refuse(RecipePageRefusal $refusal): RecipePageReading
     {
-        return new RecipePageReading(null, $refusal);
+        return RecipePageReading::refused($refusal);
     }
 
     /**
@@ -236,7 +267,7 @@ class RecipePageReader
 
     private function text(mixed $value): string
     {
-        return is_string($value) ? trim(preg_replace('/\s+/u', ' ', html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'))) : '';
+        return is_string($value) ? Text::collapseWhitespace(html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8')) : '';
     }
 
     /** ISO 8601 duration ("PT1H20M") or plain "50 minutes", in whole minutes. */
@@ -253,15 +284,16 @@ class RecipePageReader
         return preg_match('/^(\d+)\s*(?:min|minutes?)$/i', trim($value), $m) ? (int) $m[1] : null;
     }
 
-    private function servings(mixed $yield): int
+    /** The servings the page states, or null: a yield is never estimated here. */
+    private function servings(mixed $yield): ?int
     {
         foreach ((array) $yield as $item) {
             if (preg_match('/\d+/', (string) $item, $m)) {
-                return (int) $m[0];
+                return (int) $m[0] >= 1 ? (int) $m[0] : null;
             }
         }
 
-        return 0;
+        return null;
     }
 
     /**

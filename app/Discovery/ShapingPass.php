@@ -140,7 +140,7 @@ class ShapingPass
     private function pastePrompt(string $text): string
     {
         $kindsSection = RecipeOutputFormat::kindsSection($this->tools->kinds());
-        $schema = RecipeOutputFormat::schema();
+        $schema = RecipeOutputFormat::schema('string or null');
 
         return <<<PROMPT
         Below is the text of a recipe someone pasted. It may hold the ingredients and the method together, with headings or other page text around them. Extract the recipe's ingredients, the kitchen tools it needs and its cooking steps from that text. Do not change the dish.
