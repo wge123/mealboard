@@ -23,4 +23,9 @@ it('splits an ingredient line into amount, unit, name and prep note without inve
     'cups map to cup' => ['8 cups vegetable broth', 8.0, 'cup', 'vegetable broth', null],
     'a line with no amount' => ['fresh basil, torn', null, null, 'fresh basil', 'torn'],
     'a slash fraction after a whole number' => ['1 1/2 cups flour', 1.5, 'cup', 'flour', null],
+    'a bracketed exact amount after the container' => ['1 can (400 g) tomatoes', 400.0, 'g', 'tomatoes', '1 can'],
+    'a bracketed exact amount before the container' => ['1 (14-ounce) can tomatoes', 14.0, 'oz', 'tomatoes', '1 can'],
+    'a bracketed amount with a space and a spelled-out unit' => ['1 jar (12 ounces) roasted red peppers, drained', 12.0, 'oz', 'roasted red peppers', '1 jar, drained'],
+    'several containers keep the count and leave the bracket where the page put it' => ['2 cans (400 g) tomatoes', 2.0, null, 'cans (400 g) tomatoes', null],
+    'a bracket that is not an amount and unit stays put' => ['1 can (about this much) tomatoes', 1.0, null, 'can (about this much) tomatoes', null],
 ]);
