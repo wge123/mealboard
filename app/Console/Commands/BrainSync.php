@@ -18,7 +18,8 @@ class BrainSync extends Command
         // Deviation from the original step text: DECISIONS.md #5 homes the
         // YouTube channel list in the youtube_channels table + the
         // /settings/channels UI, so channel sync is NOT part of brain:sync —
-        // only food/recipe preference notes are pulled here.
+        // only food/recipe preference notes are pulled here. The recipe_sites
+        // list is the same: managed in Settings, never exported by brain:sync.
         $repo = config('mealboard.brain_repo');
         $paths = config('mealboard.brain_files');
 
