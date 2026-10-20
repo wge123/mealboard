@@ -178,8 +178,9 @@ class HouseholdPreferences
     /**
      * Why a shaped candidate is refused on this lane; empty when it passes.
      * Avoided ingredients refuse on both lanes. The weekday limits refuse on
-     * the scheduled lane only: a total time of 0 is unknown and passes, and
-     * pantry staples do not count toward the ingredient limit.
+     * the scheduled lane only: a total time of 0 is a time the source never
+     * stated, which is refused there (a guessed time could not be checked
+     * against the limit) but kept on the request lane; pantry staples do not count toward the ingredient limit.
      *
      * @param  array<string, mixed>  $candidate
      * @return list<string>
@@ -202,7 +203,9 @@ class HouseholdPreferences
         $limits = $this->weekdayLimits();
         $minutes = (int) $candidate['prep_minutes'] + (int) $candidate['cook_minutes'];
 
-        if ($minutes > $limits['minutes']) {
+        if ($minutes === 0) {
+            $reasons[] = 'no stated time, so it cannot be checked against the weekday limit';
+        } elseif ($minutes > $limits['minutes']) {
             $reasons[] = "{$minutes} minutes total is over the weekday limit of {$limits['minutes']}";
         }
 
@@ -245,6 +248,17 @@ class HouseholdPreferences
         }
 
         return $result;
+    }
+
+    /**
+     * The avoided words these ingredient names contain, each once; empty when none.
+     *
+     * @param  list<string>  $names
+     * @return list<string>
+     */
+    public function avoidedInNames(array $names): array
+    {
+        return $this->avoidedIn($names, $this->avoidedIngredients());
     }
 
     /**

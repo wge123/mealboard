@@ -8,6 +8,7 @@ use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Support\HouseholdPreferences;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Log;
 
 class FakeDiscoveryDriver implements RecipeDiscoveryDriver
 {
@@ -230,9 +231,39 @@ it('drops a scheduled candidate over a weekday limit or with an avoided ingredie
     ];
 
     $this->artisan('recipes:discover')
-        ->expectsOutputToContain('Created 2 pending recipe(s), skipped 0 duplicate(s).')
-        ->expectsOutputToContain('Refused 3 candidate(s) by the household preferences.')
+        ->expectsOutputToContain('Created 1 pending recipe(s), skipped 0 duplicate(s).')
+        ->expectsOutputToContain('Refused 4 candidate(s) by the household preferences.')
         ->assertSuccessful();
 
-    expect(Recipe::pluck('title')->sort()->values()->all())->toBe(['Three Plus Salt', 'Unknown Time Soup']);
+    expect(Recipe::pluck('title')->all())->toBe(['Three Plus Salt']);
+});
+
+it('refuses a scheduled candidate with no stated time and logs why, storing nothing', function () {
+    Log::spy();
+    FakeDiscoveryDriver::$candidates = [
+        discoveredCandidate('Guessed Time Soup', ['prep_minutes' => 0, 'cook_minutes' => 0]),
+    ];
+
+    $this->artisan('recipes:discover')
+        ->expectsOutputToContain('Refused 1 candidate(s) by the household preferences.')
+        ->assertSuccessful();
+
+    expect(Recipe::count())->toBe(0);
+    Log::shouldHaveReceived('info')->withArgs(fn ($m) => str_contains($m, 'Guessed Time Soup') && str_contains($m, 'no stated time'))->once();
+});
+
+it('stores a scheduled candidate whose amounts are null', function () {
+    FakeDiscoveryDriver::$candidates = [
+        discoveredCandidate('To Taste Greens', ['ingredients' => [
+            ['qty' => null, 'unit' => null, 'name' => 'spinach', 'prep_note' => null],
+            ['qty' => null, 'unit' => null, 'name' => 'lemon', 'prep_note' => 'juiced'],
+        ]]),
+    ];
+
+    $this->artisan('recipes:discover')->assertSuccessful();
+
+    $recipe = Recipe::firstWhere('title', 'To Taste Greens');
+
+    expect($recipe)->not->toBeNull()
+        ->and($recipe->ingredients->map(fn ($i) => $i->pivot->qty)->all())->toBe([null, null]);
 });

@@ -11,8 +11,10 @@ use App\Enums\MealType;
 use App\Enums\RecipeSource;
 use App\Enums\RecipeStatus;
 use App\Livewire\Concerns\InteractsWithRecipeForm;
+use App\Models\Recipe;
 use App\Support\HouseholdPreferences;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -46,6 +48,10 @@ class RecipeCreate extends Component
             return;
         }
 
+        if ($this->openLibraryRecipeAt($link)) {
+            return;
+        }
+
         $reading = app(ImportRecipePage::class)->handle($link);
 
         if ($reading->candidate === null) {
@@ -58,13 +64,20 @@ class RecipeCreate extends Component
 
         $candidate = $reading->candidate;
 
+        // The page may name itself by another address than the one pasted.
+        if ($this->openLibraryRecipeAt($candidate['source_url'])) {
+            return;
+        }
+
         $this->title = $candidate['title'];
         $this->description = $candidate['description'];
         $this->sourceUrl = $candidate['source_url'];
         $this->mealType = $candidate['meal_type'];
         $this->cuisine = $candidate['cuisine'] ?? '';
-        $this->prepMinutes = $candidate['prep_minutes'];
-        $this->cookMinutes = $candidate['cook_minutes'];
+        // The reader returns 0 for a time the page leaves out. No model may guess it
+        // (ADR 0004) and no sensible code estimate exists, so it stays blank and required.
+        $this->prepMinutes = $candidate['prep_minutes'] > 0 ? $candidate['prep_minutes'] : null;
+        $this->cookMinutes = $candidate['cook_minutes'] > 0 ? $candidate['cook_minutes'] : null;
         $this->servings = $candidate['servings'] > 0 ? $candidate['servings'] : $this->servings;
         $this->rows = [];
         $this->tools = [];
@@ -74,6 +87,46 @@ class RecipeCreate extends Component
         $this->fillSteps($candidate['steps']);
         $this->imported = true;
         $this->link = '';
+    }
+
+    /**
+     * Open the library recipe that already has this address, if any. A trailing
+     * slash makes no difference. Returns whether it redirected.
+     */
+    private function openLibraryRecipeAt(string $address): bool
+    {
+        $bare = rtrim($address, '/');
+        $existing = Recipe::query()->whereIn('source_url', [$bare, $bare.'/'])->first();
+
+        if ($existing === null) {
+            return false;
+        }
+
+        $this->redirect(route('recipes.show', $existing));
+
+        return true;
+    }
+
+    /**
+     * The library recipe whose title matches the form's title, ignoring case; a warning only.
+     */
+    #[Computed]
+    public function sameTitleRecipe(): ?Recipe
+    {
+        $title = trim($this->title);
+
+        return $title === '' ? null : Recipe::query()->whereRaw('lower(title) = ?', [mb_strtolower($title)])->first();
+    }
+
+    /**
+     * The avoided ingredients the form's rows contain; a warning only, the recipe still saves.
+     *
+     * @return list<string>
+     */
+    #[Computed]
+    public function avoidedInRows(): array
+    {
+        return app(HouseholdPreferences::class)->avoidedInNames(array_column($this->rows, 'name'));
     }
 
     public function mount(HouseholdPreferences $preferences): void

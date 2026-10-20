@@ -40,6 +40,22 @@
             @endif
         </x-ui.card>
 
+        @if ($this->sameTitleRecipe)
+            <x-ui.alert tone="warning" class="mb-4">
+                You already have a recipe called "{{ $this->sameTitleRecipe->title }}". Another site's version may well be a different recipe, so you can still save this one.
+            </x-ui.alert>
+        @endif
+        @if ($this->avoidedInRows !== [])
+            <x-ui.alert tone="warning" class="mb-4">
+                Contains an avoided ingredient: {{ implode(', ', $this->avoidedInRows) }}. You can still save it; auto-fill will not plan it.
+            </x-ui.alert>
+        @endif
+        @if ($imported && ($prepMinutes === null || $cookMinutes === null))
+            <x-ui.alert tone="info" class="mb-4">
+                The page left out some times. Fill in prep and cook minutes before saving.
+            </x-ui.alert>
+        @endif
+
         @include('livewire.partials.recipe-form-fields')
 
         <div class="mt-6 flex gap-2">
