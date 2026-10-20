@@ -42,15 +42,14 @@ $notifyFail = function (string $job): void {
  */
 $logFor = fn (string $name) => storage_path("logs/schedule-{$name}.log");
 
-// Vault preference notes sync BEFORE discovery so the day's discovery
-// prompt sees fresh notes (step 25).
+// Vault preference notes sync (step 25).
 Schedule::command('brain:sync')
     ->dailyAt('05:15')
     ->withoutOverlapping()
     ->appendOutputTo($logFor('brain-sync'))
     ->onFailure(fn () => $notifyFail('mealboard brain:sync'));
 
-// DECISIONS.md #1 — discovery runs DAILY (3 candidates per driver, config).
+// DECISIONS.md #1 — discovery runs DAILY (3 candidates per driver, config; YouTube only, ADR 0003).
 // withoutOverlapping matters here specifically: a discovery run can legitimately
 // block for many minutes (claude CLI timeout is 600s, transcripts 120s each),
 // so a slow run must not be re-entered by the next tick.

@@ -1,6 +1,6 @@
 <div class="mx-auto w-full max-w-2xl">
     <x-ui.page-header title="Request a recipe"
-        subtitle="Ask for a specific dish and Mealboard searches YouTube and asks Claude for it. Requests ignore the weekday limits that shape the daily suggestions." />
+        subtitle="Ask for a specific dish and Mealboard searches YouTube for it. Requests ignore the weekday limits that shape the daily suggestions." />
 
     <x-ui.card class="mb-6">
         <form wire:submit="submit" class="flex flex-col gap-3">
@@ -9,7 +9,7 @@
             <div class="flex flex-wrap items-center gap-3">
                 <x-ui.button type="submit" variant="primary" icon="tabler-search" busy="submit" busy-label="Searching…">Find it</x-ui.button>
                 <p class="hidden text-base-content/70" wire:loading.class.remove="hidden" wire:target="submit" aria-live="polite">
-                    Searching YouTube and asking Claude. This takes a minute or two.
+                    Searching YouTube. This takes a minute or two.
                 </p>
             </div>
         </form>
@@ -20,7 +20,7 @@
             <p class="font-medium">{{ $lastRequest->query }}</p>
 
             @if ($lastRequest->status === \App\Enums\RequestStatus::Failed)
-                <x-ui.alert tone="error" class="mt-3">Every lane failed, so nothing was stored.</x-ui.alert>
+                <x-ui.alert tone="error" class="mt-3">The YouTube search failed, so nothing was stored.</x-ui.alert>
             @elseif ($lastRequest->candidates_found === 0)
                 <p class="mt-2">
                     Nothing new came back. Everything found was either already in your library or already rejected.

@@ -12,8 +12,8 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 /**
- * Ask for one specific dish. The run is synchronous on purpose: both lanes
- * shell out to local CLIs with their own timeouts, there is no queue worker in
+ * Ask for one specific dish. The run is synchronous on purpose: the search
+ * and extraction shell out to local CLIs with their own timeouts, there is no queue worker in
  * this codebase, and a household asking for dinner wants the answer in the
  * same visit rather than a job id.
  */

@@ -15,7 +15,7 @@ final class RecipeOutputFormat
      * source_url value, which differs per path (a video extraction injects
      * it itself).
      */
-    public static function schema(string $sourceUrl = 'string (see source rule below)'): string
+    public static function schema(string $sourceUrl = 'string or null (not used)'): string
     {
         return <<<SCHEMA
         {

@@ -2,7 +2,6 @@
 
 namespace App\Actions\Discovery;
 
-use App\Discovery\AnthropicDriver;
 use App\Discovery\NearDuplicateFilter;
 use App\Enums\DiscoveryLane;
 use App\Enums\RequestStatus;
@@ -14,13 +13,11 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * Run one household request end to end: search YouTube for it, ask claude for
- * it, and store whatever survives as pending recipes tagged with the request.
- *
- * Lane failures are independent. One lane dying still lets the other deliver
- * candidates, and the request completes carrying the failure text. Only a
- * request in which EVERY lane died is a failed request, because that is the
- * case where the household asked for something and got nothing back.
+ * Run one household request end to end: search YouTube for it and store
+ * whatever survives as pending recipes tagged with the request. YouTube is the
+ * only lane (ADR 0003): no model writes a recipe for a request. When the
+ * search itself dies the request is failed, because the household asked for
+ * something and got nothing back.
  */
 class RunRequest
 {
@@ -28,7 +25,6 @@ class RunRequest
         private SearchYouTube $search,
         private ClassifyDiscoveredVideos $classify,
         private ExtractRecipeFromVideo $extract,
-        private AnthropicDriver $anthropic,
         private NearDuplicateFilter $duplicates,
         private StoreCandidate $storeCandidate,
         private HouseholdPreferences $preferences,
@@ -41,25 +37,14 @@ class RunRequest
     {
         $request->update(['status' => RequestStatus::Running, 'error' => null]);
 
-        $candidates = [];
-        $errors = [];
-        $lanes = 0;
+        try {
+            $candidates = $this->youtubeLane($request);
+        } catch (Throwable $e) {
+            report($e);
 
-        foreach (['youtube' => fn () => $this->youtubeLane($request), 'claude' => fn () => $this->claudeLane($request)] as $lane => $run) {
-            $lanes++;
-
-            try {
-                $candidates = [...$candidates, ...$run()];
-            } catch (Throwable $e) {
-                report($e);
-                $errors[] = "{$lane}: ".$e->getMessage();
-            }
-        }
-
-        if (count($errors) === $lanes) {
             $request->update([
                 'status' => RequestStatus::Failed,
-                'error' => implode("\n", $errors),
+                'error' => 'youtube: '.$e->getMessage(),
                 'completed_at' => now(),
             ]);
 
@@ -71,7 +56,6 @@ class RunRequest
         $request->update([
             'status' => RequestStatus::Completed,
             'candidates_found' => $created,
-            'error' => $errors === [] ? null : implode("\n", $errors),
             'completed_at' => now(),
         ]);
 
@@ -110,14 +94,6 @@ class RunRequest
         }
 
         return $candidates;
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function claudeLane(RecipeRequest $request): array
-    {
-        return $this->anthropic->discoverFor($request, (int) config('mealboard.request_candidates_per_lane'));
     }
 
     /**
