@@ -68,6 +68,14 @@ return [
     'timezone' => 'UTC',
 
     /*
+    | The scheduler reads its times in the household's time zone, while the app
+    | keeps storing UTC: "discovery at 05:30" means 05:30 in the kitchen, and a
+    | day for the once-a-day guards is the household's day, not the UTC date.
+    */
+
+    'schedule_timezone' => env('SCHEDULE_TIMEZONE', 'America/New_York'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------

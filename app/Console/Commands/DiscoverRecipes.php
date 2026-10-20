@@ -19,9 +19,10 @@ class DiscoverRecipes extends Command
 
     public function handle(RunDiscovery $runDiscovery, StoreCandidate $store, NearDuplicateFilter $duplicates, HouseholdPreferences $preferences): int
     {
-        // Idempotent per day — the scheduler fires daily (DECISIONS.md #1)
-        // and a manual rerun should not double the day's candidates.
-        if (! $this->option('force') && DiscoveryRun::query()->whereDate('ran_at', today())->exists()) {
+        // Idempotent per household day — the scheduler offers a run every hour
+        // (DECISIONS.md #1) and a manual rerun should not double the day's
+        // candidates. The day starts at the household's midnight, not UTC's.
+        if (! $this->option('force') && DiscoveryRun::query()->where('ran_at', '>=', now(config('app.schedule_timezone'))->startOfDay())->exists()) {
             $this->info('Discovery already ran today — skipping (use --force to rerun).');
 
             return self::SUCCESS;
