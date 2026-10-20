@@ -42,15 +42,14 @@ $notifyFail = function (string $job): void {
  */
 $logFor = fn (string $name) => storage_path("logs/schedule-{$name}.log");
 
-// Vault preference notes sync BEFORE discovery so the day's discovery
-// prompt sees fresh notes (step 25).
+// Vault preference notes sync (step 25).
 Schedule::command('brain:sync')
     ->dailyAt('05:15')
     ->withoutOverlapping()
     ->appendOutputTo($logFor('brain-sync'))
     ->onFailure(fn () => $notifyFail('mealboard brain:sync'));
 
-// DECISIONS.md #1 — discovery runs DAILY (3 candidates per driver, config).
+// DECISIONS.md #1 — discovery runs DAILY (3 candidates per driver, config; YouTube only, ADR 0003).
 // It is offered every hour from 05:30 rather than once at 05:30 because the
 // scheduler runs on a laptop: a tick missed while the Mac slept is never
 // replayed, so the first waking hour runs it and the command's once-a-day

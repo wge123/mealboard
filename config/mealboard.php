@@ -1,7 +1,5 @@
 <?php
 
-use App\Discovery\AnthropicDriver;
-use App\Discovery\TheMealDbDriver;
 use App\Discovery\YouTubeDriver;
 
 return [
@@ -12,7 +10,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | DECISIONS.md #1 — discovery runs DAILY, 3 candidates per run.
-    | One run executes ALL listed drivers; each driver is asked for
+    | One run executes ALL listed drivers (YouTube only, ADR 0003); each driver is asked for
     | candidates_per_run candidates and failures are recorded per driver.
     |
     */
@@ -30,7 +28,7 @@ return [
     | for one named dish, so it is deliberately NOT bound by the weeknight
     | caps the scheduled run enforces in its prompts. request_search_results
     | is how many YouTube hits yt-dlp fetches for one request;
-    | request_candidates_per_lane caps what each lane (video extraction, claude)
+    | request_candidates_per_lane caps what the YouTube lane (video extraction)
     | contributes, so one request cannot flood the approval queue.
     |
     */
@@ -53,9 +51,7 @@ return [
     'yt_dlp' => env('MEALBOARD_YT_DLP'),
 
     'drivers' => [
-        AnthropicDriver::class, // primary (DECISIONS.md #2 — claude CLI)
-        YouTubeDriver::class, // channel RSS -> classify -> transcript pipeline
-        TheMealDbDriver::class, // free-API fallback
+        YouTubeDriver::class, // channel RSS -> classify -> transcript pipeline (the only lane, ADR 0003)
     ],
 
     /*
@@ -63,8 +59,9 @@ return [
     | Claude CLI binary
     |--------------------------------------------------------------------------
     |
-    | Explicit path to the `claude` binary for the AnthropicDriver. When null,
-    | the driver locates it on PATH at runtime and fails fast if missing.
+    | Explicit path to the `claude` binary for the claude CLI wrapper (video
+    | classification and extraction, pasted-text shaping). When null,
+    | the wrapper locates it on PATH at runtime and fails fast if missing.
     |
     */
 
@@ -77,7 +74,7 @@ return [
     |
     | DECISIONS.md #4 — transcripts come from a thin python3 subprocess using
     | youtube_transcript_api out of yt2md's venv. Transcript fetching ONLY;
-    | Mealboard's own claude driver does the structuring.
+    | Mealboard's own claude CLI step does the structuring.
     |
     */
 
