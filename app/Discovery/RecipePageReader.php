@@ -38,13 +38,7 @@ class RecipePageReader
             return $this->refuse(RecipePageRefusal::NoSteps);
         }
 
-        $total = $this->minutes($recipe['totalTime'] ?? null);
-        $prep = $this->minutes($recipe['prepTime'] ?? null);
-        $cook = $this->minutes($recipe['cookTime'] ?? null);
-
-        if ($prep === null && $cook === null && $total !== null) {
-            $cook = $total;
-        }
+        [$prep, $cook] = $this->times($recipe);
 
         $ingredients = array_map($this->restructure->handle(...), $lines);
 
@@ -66,6 +60,50 @@ class RecipePageReader
             'ingredients' => $ingredients,
             'steps' => $steps,
         ]);
+    }
+
+    /**
+     * The cheap facts of a page's recipe data, before anything is restructured:
+     * the raw ingredient lines and the stated minutes (0 when stated nowhere).
+     * Null when the page has no recipe data. Lets a caller refuse a page on
+     * time or ingredients without paying for restructuring.
+     *
+     * @return ?array{ingredients: list<string>, prep_minutes: int, cook_minutes: int}
+     */
+    public function preview(string $html): ?array
+    {
+        $recipe = $this->findRecipe($html);
+
+        if ($recipe === null) {
+            return null;
+        }
+
+        [$prep, $cook] = $this->times($recipe);
+
+        return [
+            'ingredients' => $this->textList($recipe['recipeIngredient'] ?? null),
+            'prep_minutes' => $prep ?? 0,
+            'cook_minutes' => $cook ?? 0,
+        ];
+    }
+
+    /**
+     * Prep and cook minutes; a page that gives only a total time has it all as cook time.
+     *
+     * @param  array<string, mixed>  $recipe
+     * @return array{0: ?int, 1: ?int}
+     */
+    private function times(array $recipe): array
+    {
+        $total = $this->minutes($recipe['totalTime'] ?? null);
+        $prep = $this->minutes($recipe['prepTime'] ?? null);
+        $cook = $this->minutes($recipe['cookTime'] ?? null);
+
+        if ($prep === null && $cook === null && $total !== null) {
+            $cook = $total;
+        }
+
+        return [$prep, $cook];
     }
 
     /**
