@@ -45,11 +45,10 @@ it('sends titles and descriptions in the batch prompt', function () {
     app(ClassifyDiscoveredVideos::class)->handle();
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2];
+        $prompt = $process->input;
 
         return $process->command[1] === '-p'
-            && $process->command[3] === '--model'
-            && $process->command[4] === 'sonnet'
+            && $process->command[2] === '--model' && $process->command[3] === 'sonnet'
             && str_contains($prompt, 'vidPrompt01')
             && str_contains($prompt, 'Sheet-Pan Gnocchi')
             && str_contains($prompt, 'One pan, 20 minutes.')
@@ -138,7 +137,7 @@ it('includes youtube approve/reject history in the classifier prompt', function 
     app(ClassifyDiscoveredVideos::class)->handle();
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2];
+        $prompt = $process->input;
 
         return str_contains($prompt, 'APPROVED: Approved Garlic Noodles')
             && str_contains($prompt, 'REJECTED: Rejected Fish Stew')
@@ -162,7 +161,7 @@ it('scores scheduled videos against the household limits and names the pantry st
     app(ClassifyDiscoveredVideos::class)->handle();
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2];
+        $prompt = $process->input;
 
         return str_contains($prompt, 'Total time (prep + cook) 45 minutes or less')
             && str_contains($prompt, '12 ingredients or fewer')
@@ -184,16 +183,16 @@ it('tells the scheduled and request scoring prompts the avoided ingredients and 
 
     app(ClassifyDiscoveredVideos::class)->handle($recipeRequest);
 
-    Process::assertRan(fn ($process) => str_contains($process->command[2], 'Never use these ingredients')
-        && str_contains($process->command[2], 'cilantro')
-        && str_contains($process->command[2], 'serves about 5'));
+    Process::assertRan(fn ($process) => str_contains($process->input, 'Never use these ingredients')
+        && str_contains($process->input, 'cilantro')
+        && str_contains($process->input, 'serves about 5'));
 })->with([false, true]);
 
 it('classifies a large backlog in batches so no single claude call outgrows the argument limit', function () {
     DiscoveredVideo::factory()->count(85)->create();
 
     Process::fake(function ($process) {
-        preg_match_all('/"video_id": "([^"]+)"/', $process->command[2], $matches);
+        preg_match_all('/"video_id": "([^"]+)"/', $process->input, $matches);
 
         return Process::result(output: json_encode(array_map(
             fn (string $videoId) => ['video_id' => $videoId, 'classification' => 'likely_recipe', 'score' => 50],
@@ -220,6 +219,6 @@ it('cuts long descriptions down before they go into the prompt', function () {
 
     app(ClassifyDiscoveredVideos::class)->handle();
 
-    Process::assertRan(fn ($process) => str_contains($process->command[2], 'Ingredients up front.')
-        && strlen($process->command[2]) < 5000);
+    Process::assertRan(fn ($process) => str_contains($process->input, 'Ingredients up front.')
+        && strlen($process->input) < 5000);
 });

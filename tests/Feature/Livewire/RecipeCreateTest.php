@@ -135,8 +135,8 @@ it('AI-parses a realistic pasted recipe (ingredients and method together) into a
         ->assertSet('title', '')
         ->assertSet('sourceUrl', '');
 
-    Process::assertRan(fn ($process) => str_contains($process->command[2] ?? '', '2 cups rice, rinsed')
-        && str_contains($process->command[2] ?? '', 'Boil the rice in a saucepan'));
+    Process::assertRan(fn ($process) => str_contains($process->input ?? '', '2 cups rice, rinsed')
+        && str_contains($process->input ?? '', 'Boil the rice in a saucepan'));
 });
 
 it('shows the failed shape check on the form and fills nothing from a heuristic', function () {

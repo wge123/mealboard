@@ -35,7 +35,7 @@ it('scores request videos against the request instead of the weeknight rubric', 
     expect($video->fresh()->score)->toBe(95);
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2];
+        $prompt = $process->input;
 
         return str_contains($prompt, 'hibachi for 4')
             && str_contains($prompt, 'DO NOT apply here')
@@ -85,5 +85,5 @@ it('names the household limits in the request video rubric as the ones that do n
 
     app(ClassifyDiscoveredVideos::class)->handle($request);
 
-    Process::assertRan(fn ($process) => str_contains($process->command[2], '(45 minutes, 12 ingredients) DO NOT apply here'));
+    Process::assertRan(fn ($process) => str_contains($process->input, '(45 minutes, 12 ingredients) DO NOT apply here'));
 });
