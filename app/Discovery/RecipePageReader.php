@@ -46,6 +46,12 @@ class RecipePageReader
             $cook = $total;
         }
 
+        $ingredients = array_map($this->restructure->handle(...), $lines);
+
+        if (! $this->isLineForLine($lines, $ingredients)) {
+            return $this->refuse(RecipePageRefusal::NotLineForLine);
+        }
+
         return new RecipePageReading([
             'title' => $this->text($recipe['name'] ?? ''),
             'description' => $this->text($recipe['description'] ?? ''),
@@ -57,9 +63,44 @@ class RecipePageReader
             'tags' => [],
             'source_url' => $url,
             'tools' => $this->toolsInSteps->find($steps),
-            'ingredients' => array_map($this->restructure->handle(...), $lines),
+            'ingredients' => $ingredients,
             'steps' => $steps,
         ]);
+    }
+
+    /**
+     * One restructured ingredient per source line, and no word in a name or
+     * prep note that the source line does not carry (nothing added).
+     *
+     * @param  list<string>  $lines
+     * @param  array<int, array{name: string, prep_note: ?string}>  $ingredients
+     */
+    private function isLineForLine(array $lines, array $ingredients): bool
+    {
+        if (count($lines) !== count($ingredients)) {
+            return false;
+        }
+
+        foreach ($lines as $i => $line) {
+            $source = $this->words($line);
+            $made = $this->words($ingredients[$i]['name'].' '.($ingredients[$i]['prep_note'] ?? ''));
+
+            if ($ingredients[$i]['name'] === '' || array_diff($made, $source) !== []) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function words(string $text): array
+    {
+        preg_match_all('/\p{L}+|\p{N}+/u', mb_strtolower($text), $m);
+
+        return $m[0];
     }
 
     private function refuse(RecipePageRefusal $refusal): RecipePageReading

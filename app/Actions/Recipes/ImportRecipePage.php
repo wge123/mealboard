@@ -27,7 +27,8 @@ class ImportRecipePage
             return new RecipePageReading(null, RecipePageRefusal::CouldNotFetch);
         }
 
-        if (! $response->successful()) {
+        // A bot-wall challenge is the site refusing the app, whatever status it wears.
+        if (! $response->successful() || $response->header('cf-mitigated') === 'challenge') {
             return new RecipePageReading(null, RecipePageRefusal::CouldNotFetch);
         }
 
