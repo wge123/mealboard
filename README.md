@@ -52,7 +52,7 @@ There is no queue worker to run: nothing in this codebase implements
 Scheduled commands (`php artisan schedule:list`):
 
 - `brain:sync` — daily 05:15, pulls preference notes from the vault repo into discovery prompts
-- `recipes:discover` — daily 05:30, YouTube only (ADR 0003), 3 candidates/run, fuzzy-deduped, idempotent per day (`--force` to re-run)
+- `recipes:discover` — from 05:30 (hourly until 22:00, the first run of the day wins), reads YouTube channels and recipe sites (ADR 0003, 0004), 3 candidates per driver per run, fuzzy-deduped, idempotent per day (`--force` to re-run)
 - `meals:publish-today` — daily 00:10, pushes `meals/today.md` to the vault repo when a locked week covers today
 
 ## Daily use (phone-first)
