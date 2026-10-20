@@ -248,6 +248,17 @@ class HouseholdPreferences
     }
 
     /**
+     * The avoided words these ingredient names contain, each once; empty when none.
+     *
+     * @param  list<string>  $names
+     * @return list<string>
+     */
+    public function avoidedInNames(array $names): array
+    {
+        return $this->avoidedIn($names, $this->avoidedIngredients());
+    }
+
+    /**
      * The avoided words found in these ingredient names, whole-word and
      * ignoring case, each once.
      *
