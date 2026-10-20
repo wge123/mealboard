@@ -53,7 +53,7 @@ it('drops the time and ingredient caps from the generation prompt on a request',
     app(AnthropicDriver::class)->discoverFor($request, 1);
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2];
+        $prompt = $process->input;
 
         return str_contains($prompt, 'hibachi for 4 on a flat-top griddle')
             && str_contains($prompt, 'NO time limit and NO ingredient limit')
@@ -70,7 +70,7 @@ it('puts the shared format and the kinds list in a request prompt but not the ow
     app(AnthropicDriver::class)->discoverFor($request, 1);
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2];
+        $prompt = $process->input;
 
         return str_contains($prompt, RecipeOutputFormat::schema())
             && str_contains($prompt, "Kitchen tool words you may use:\n".app(KitchenToolInventory::class)->kinds()->implode(', '))
@@ -85,7 +85,7 @@ it('keeps the caps in the generation prompt for scheduled discovery', function (
     app(AnthropicDriver::class)->discover(1);
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2];
+        $prompt = $process->input;
 
         return str_contains($prompt, 'must be 30 minutes or less')
             && str_contains($prompt, '10 ingredients or fewer')
@@ -106,12 +106,12 @@ it('omits the over-30-minutes rejection theme on a request but keeps it when sch
     Process::fake(['*claude*' => Process::result(output: json_encode([requestCandidate()]))]);
 
     app(AnthropicDriver::class)->discover(1);
-    Process::assertRan(fn ($process) => str_contains($process->command[2], 'recipes over 30 minutes total'));
+    Process::assertRan(fn ($process) => str_contains($process->input, 'recipes over 30 minutes total'));
 
     Process::fake(['*claude*' => Process::result(output: json_encode([requestCandidate()]))]);
 
     app(AnthropicDriver::class)->discoverFor($request, 1);
-    Process::assertRan(fn ($process) => ! str_contains($process->command[2], 'recipes over 30 minutes total'));
+    Process::assertRan(fn ($process) => ! str_contains($process->input, 'recipes over 30 minutes total'));
 });
 
 it('scores request videos against the request instead of the weeknight rubric', function () {
@@ -132,7 +132,7 @@ it('scores request videos against the request instead of the weeknight rubric', 
     expect($video->fresh()->score)->toBe(95);
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2];
+        $prompt = $process->input;
 
         return str_contains($prompt, 'hibachi for 4')
             && str_contains($prompt, 'DO NOT apply here')
@@ -182,7 +182,7 @@ it('tells a request prompt the avoided ingredients and the household size but no
     app(AnthropicDriver::class)->discoverFor($request, 1);
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2];
+        $prompt = $process->input;
 
         return str_contains($prompt, 'Never use these ingredients (a household rule, no exceptions): cilantro')
             && str_contains($prompt, 'serves about 3')
@@ -202,5 +202,5 @@ it('names the household limits in the request video rubric as the ones that do n
 
     app(ClassifyDiscoveredVideos::class)->handle($request);
 
-    Process::assertRan(fn ($process) => str_contains($process->command[2], '(45 minutes, 12 ingredients) DO NOT apply here'));
+    Process::assertRan(fn ($process) => str_contains($process->input, '(45 minutes, 12 ingredients) DO NOT apply here'));
 });

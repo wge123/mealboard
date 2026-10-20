@@ -6,15 +6,16 @@ use Illuminate\Support\Facades\Process;
 use Symfony\Component\Process\ExecutableFinder;
 
 /**
- * Shared `claude -p <prompt> --model sonnet` invocation (DECISIONS.md #2 —
+ * Shared `claude -p --model sonnet` invocation (prompt on stdin) (DECISIONS.md #2 —
  * local CLI, no API key) plus JSON isolation for its chatty output.
  */
 class ClaudeCli
 {
     public function run(string $prompt): string
     {
-        $result = Process::timeout(600)->run([
-            $this->binary(), '-p', $prompt, '--model', 'sonnet',
+        // The prompt goes on stdin: an argument is capped (122880 bytes under cmux).
+        $result = Process::timeout(600)->input($prompt)->run([
+            $this->binary(), '-p', '--model', 'sonnet',
         ]);
 
         if ($result->failed()) {

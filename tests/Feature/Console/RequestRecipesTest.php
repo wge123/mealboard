@@ -195,8 +195,8 @@ it('retries the claude lane once with its own output and the errors', function (
     Process::assertRanTimes(fn ($process) => ($process->command[0] ?? '') === '/fake/bin/claude', 2);
 
     // Only the retry prompt can contain the first output and its errors.
-    Process::assertRan(fn ($process) => str_contains($process->command[2] ?? '', 'Broken Hibachi')
-        && str_contains($process->command[2], 'steps: at least one step is required'));
+    Process::assertRan(fn ($process) => str_contains($process->input ?? '', 'Broken Hibachi')
+        && str_contains($process->input, 'steps: at least one step is required'));
 });
 
 it('drops a claude-lane candidate that fails the check twice', function () {

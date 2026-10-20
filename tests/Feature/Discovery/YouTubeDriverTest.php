@@ -80,7 +80,7 @@ it('chains poll, classify, and extract into recipe candidates', function () {
             return Process::result(output: 'simmer the chickpeas in coconut milk');
         }
 
-        if (str_contains($process->command[2], 'pre-filter')) {
+        if (str_contains($process->input, 'pre-filter')) {
             return Process::result(output: json_encode([
                 ['video_id' => 'vidRecipe01', 'classification' => 'likely_recipe', 'score' => 90],
                 ['video_id' => 'vidTour0001', 'classification' => 'not_recipe', 'score' => 5],

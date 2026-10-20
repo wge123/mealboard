@@ -81,7 +81,7 @@ it('puts the raw text, the shared format and the tool kinds in the prompt', func
     app(ShapingPass::class)->once(rawRecipe(['prep_minutes' => 5]));
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2] ?? '';
+        $prompt = $process->input ?? '';
 
         return str_contains($prompt, 'Lemon Garlic Salmon Bowls')
             && str_contains($prompt, 'Sear the salmon in a skillet')
@@ -128,7 +128,7 @@ it('extracts ingredients, tools and steps from pasted text without a title or so
         ->and($check->candidate['ingredients'][0]['name'])->toBe('eggs')
         ->and($check->candidate['steps'])->toBe(['Fry the eggs.']);
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2] ?? '';
+        $prompt = $process->input ?? '';
 
         return str_contains($prompt, '2 eggs') && ! str_contains($prompt, 'Do not invent ingredients');
     });

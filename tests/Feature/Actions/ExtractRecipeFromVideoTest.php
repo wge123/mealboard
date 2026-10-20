@@ -70,8 +70,8 @@ it('extracts a validated candidate from the transcript and stamps the row', func
     // The claude prompt carries the transcript and video context.
     Process::assertRan(function ($process) {
         return $process->command[0] === '/fake/bin/claude'
-            && str_contains($process->command[2], 'boil the noodles then sizzle the garlic')
-            && str_contains($process->command[2], 'GARLIC NOODLES in 15 minutes');
+            && str_contains($process->input, 'boil the noodles then sizzle the garlic')
+            && str_contains($process->input, 'GARLIC NOODLES in 15 minutes');
     });
 });
 
@@ -86,7 +86,7 @@ it('puts the shared output format and the kinds list in the extraction prompt', 
     app(ExtractRecipeFromVideo::class)->handle($video);
 
     Process::assertRan(function ($process) {
-        $prompt = $process->command[2] ?? '';
+        $prompt = $process->input ?? '';
 
         return ($process->command[0] ?? '') === '/fake/bin/claude'
             && str_contains($prompt, RecipeOutputFormat::schema('null'))
@@ -116,8 +116,8 @@ it('retries once with its own output and the errors, then stores the corrected r
     Process::assertRanTimes(fn ($process) => ($process->command[0] ?? '') === '/fake/bin/claude', 2);
 
     // Only the retry prompt can contain the first output and its errors.
-    Process::assertRan(fn ($process) => str_contains($process->command[2] ?? '', 'Almost Noodles')
-        && str_contains($process->command[2], 'steps: at least one step is required'));
+    Process::assertRan(fn ($process) => str_contains($process->input ?? '', 'Almost Noodles')
+        && str_contains($process->input, 'steps: at least one step is required'));
 });
 
 it('records a captionless video failure without calling claude', function () {
