@@ -51,11 +51,15 @@ Schedule::command('brain:sync')
     ->onFailure(fn () => $notifyFail('mealboard brain:sync'));
 
 // DECISIONS.md #1 — discovery runs DAILY (3 candidates per driver, config).
+// It is offered every hour from 05:30 rather than once at 05:30 because the
+// scheduler runs on a laptop: a tick missed while the Mac slept is never
+// replayed, so the first waking hour runs it and the command's once-a-day
+// guard turns every later tick into a no-op.
 // withoutOverlapping matters here specifically: a discovery run can legitimately
 // block for many minutes (claude CLI timeout is 600s, transcripts 120s each),
 // so a slow run must not be re-entered by the next tick.
 Schedule::command('recipes:discover')
-    ->dailyAt('05:30')
+    ->cron('30 5-22 * * *')
     ->withoutOverlapping()
     ->appendOutputTo($logFor('recipes-discover'))
     ->onFailure(fn () => $notifyFail('mealboard recipes:discover'));
