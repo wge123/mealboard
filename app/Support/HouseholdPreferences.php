@@ -176,7 +176,7 @@ class HouseholdPreferences
     }
 
     /**
-     * Why a shaped candidate is refused on this lane; empty when it passes.
+     * Why a restructured candidate is refused on this lane; empty when it passes.
      * Avoided ingredients refuse on both lanes. The weekday limits refuse on
      * the scheduled lane only: a total time of 0 is a time the source never
      * stated, which is refused there (a guessed time could not be checked
@@ -222,12 +222,12 @@ class HouseholdPreferences
      * ingredient lines and stated minutes, before the page is restructured:
      * an avoided word in a line, no stated time, over the weekday time limit.
      * The ingredient-count limit is left out, since it needs cleaned names to
-     * tell pantry staples apart; refusals() applies it after shaping.
+     * tell pantry staples apart; refusals() applies it after restructuring.
      *
      * @param  list<string>  $ingredientLines
      * @return list<string>
      */
-    public function refusalsBeforeShaping(array $ingredientLines, int $prepMinutes, int $cookMinutes): array
+    public function refusalsBeforeRestructuring(array $ingredientLines, int $prepMinutes, int $cookMinutes): array
     {
         $reasons = [];
         $avoided = $this->avoidedIn($ingredientLines, $this->avoidedIngredients());

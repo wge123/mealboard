@@ -84,7 +84,7 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
     }
 
     /**
-     * @return ?array<string, mixed> the shaped candidate, or null when the post is skipped or refused
+     * @return ?array<string, mixed> the restructured candidate, or null when the post is skipped or refused
      */
     private function candidateFrom(string $html, string $link): ?array
     {
@@ -94,7 +94,7 @@ class RecipeSiteDriver implements RecipeDiscoveryDriver, ReportsPartialFailures
             return null; // an article, not a recipe: skipped quietly
         }
 
-        $early = $this->preferences->refusalsBeforeShaping($preview['ingredients'], $preview['prep_minutes'], $preview['cook_minutes']);
+        $early = $this->preferences->refusalsBeforeRestructuring($preview['ingredients'], $preview['prep_minutes'], $preview['cook_minutes']);
 
         if ($early !== []) {
             return $this->refused($link, $early);
