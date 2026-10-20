@@ -115,12 +115,18 @@ it('succeeds without storing anything when the request only matches known recipe
 });
 
 it('succeeds with nothing stored when the search finds no videos', function () {
-    Process::fake(['*yt-dlp*' => Process::result(output: '')]);
+    Process::fake([
+        '*yt-dlp*' => Process::result(output: ''),
+        // A model that would happily write a hibachi recipe if asked.
+        '*claude*' => Process::result(output: hibachiCandidateJson()),
+    ]);
 
     $this->artisan('recipes:request', ['query' => 'hibachi'])->assertSuccessful();
 
     expect(Recipe::count())->toBe(0)
         ->and(RecipeRequest::sole()->status)->toBe(RequestStatus::Completed);
+
+    Process::assertNotRan(fn ($process) => str_contains(implode(' ', $process->command), 'claude'));
 });
 
 it('rejects an empty request without touching the search', function () {
