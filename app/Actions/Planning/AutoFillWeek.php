@@ -66,6 +66,12 @@ class AutoFillWeek
         return $this->fill($plan)->meals;
     }
 
+    /**
+     * Fill as handle() does, and also report why any slot the household asked
+     * about stayed empty. A reason is a plain sentence in the result, never an
+     * exception: a new answer that can leave a slot empty adds its sentence to
+     * the same list.
+     */
     public function fill(MealPlan $plan): AutoFillResult
     {
         if ($plan->status !== MealPlanStatus::Draft) {
@@ -121,6 +127,12 @@ class AutoFillWeek
 
         $created = collect();
 
+        // Slots left empty for a reason the household can act on, in week order.
+        $unfilled = [];
+
+        $quickNights = $plan->quickNights()->flip();
+        $quickLimit = $this->preferences->quickNightLimit();
+
         for ($day = 0; $day < self::WEEKDAYS; $day++) {
             $date = $weekStart->copy()->addDays($day)->toDateString();
 
@@ -129,7 +141,19 @@ class AutoFillWeek
                     continue;
                 }
 
-                $pick = $this->pick($pools[$slot->value], $useCounts);
+                $pool = $pools[$slot->value];
+
+                // A quick night limits dinner only, to recipes whose total minutes
+                // are known and within the quick-night limit.
+                if ($slot === MealSlot::Dinner && $quickNights->has($date)) {
+                    $pool = $pool->filter(fn (Recipe $recipe) => ($minutes = $recipe->prep_minutes + $recipe->cook_minutes) > 0 && $minutes <= $quickLimit)->values();
+
+                    if ($pool->isEmpty()) {
+                        $unfilled[] = "No recipe under {$quickLimit} min for ".Carbon::parse($date)->format('D').' dinner';
+                    }
+                }
+
+                $pick = $this->pick($pool, $useCounts);
 
                 if ($pick === null) {
                     continue; // Empty pool — nothing eligible for this slot.
@@ -145,7 +169,7 @@ class AutoFillWeek
             }
         }
 
-        return new AutoFillResult($created);
+        return new AutoFillResult($created, $unfilled);
     }
 
     /**

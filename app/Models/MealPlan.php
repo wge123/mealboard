@@ -125,14 +125,26 @@ class MealPlan extends Model
         $this->update(['check_in' => [...($this->check_in ?? []), 'skipped' => $skipped]]);
     }
 
-    /** @return Collection<int, string> */
+    /**
+     * The week's quick nights (GLOSSARY) as "YYYY-MM-DD" dates.
+     *
+     * @return Collection<int, string>
+     */
     public function quickNights(): Collection
     {
-        return collect();
+        return collect($this->check_in['quick_nights'] ?? [])->values();
     }
 
-    /** @param  iterable<string>  $dates */
-    public function saveQuickNights(iterable $dates): void {}
+    /**
+     * Save the quick nights (as "YYYY-MM-DD" dates), keeping every other
+     * check-in answer as it was.
+     *
+     * @param  iterable<string>  $dates
+     */
+    public function saveQuickNights(iterable $dates): void
+    {
+        $this->update(['check_in' => [...($this->check_in ?? []), 'quick_nights' => collect($dates)->unique()->sort()->values()->all()]]);
+    }
 
     public function plannedMeals(): HasMany
     {

@@ -88,6 +88,14 @@ _Avoid_: week survey, week setup, preferences (those are the household's standin
 A breakfast, lunch or dinner on one date that the household will not cook (eating out, away), marked on the week check-in. Auto-fill never fills it, the week shows it as "Out", and it adds nothing to the shopping list. Choosing a recipe there by hand ends the skip.
 _Avoid_: blocked slot, empty slot (an empty slot is just not filled yet), day off
 
+**Quick night**:
+A weekday the household marks on the week check-in because there is little time to cook. Auto-fill plans only a dinner within the quick-night limit that day; breakfast and lunch are unaffected. When no recipe fits, the dinner stays empty and the week notice says why.
+_Avoid_: busy night, easy night, weeknight (the weekday limits are a different rule)
+
+**Quick-night limit**:
+The most total minutes (prep plus cook) a quick-night dinner may take. A household preference, set beside the weekday limits, at least 1 minute. It binds auto-fill only; the weekday limits remain the cap on discovery.
+_Avoid_: quick-night cap, weeknight time limit
+
 ## Shopping
 
 **Shopping list**:

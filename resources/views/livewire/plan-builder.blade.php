@@ -91,6 +91,17 @@
 
         @include('livewire.partials.week-notice')
 
+        {{-- Why the last fill left slots empty, kept until the next fill or a change of week. --}}
+        @if ($fillNotes !== [] && $editable)
+            <x-ui.alert tone="warning" class="mb-4" data-test="fill-notes">
+                <ul>
+                    @foreach ($fillNotes as $note)
+                        <li>{{ $note }}</li>
+                    @endforeach
+                </ul>
+            </x-ui.alert>
+        @endif
+
         {{-- The week check-in: what is different about this week, asked before Mealboard fills it. --}}
         @if ($checkInOpen && $editable)
             <div class="modal modal-open modal-bottom sm:modal-middle" role="dialog" aria-label="Week check-in"
@@ -116,6 +127,16 @@
                                 <x-ui.button variant="ghost" data-test="skip-day-{{ $day->toDateString() }}"
                                              wire:click="toggleSkipDay('{{ $day->toDateString() }}')">Whole day</x-ui.button>
                             </div>
+                        @endforeach
+                    </div>
+
+                    <h4 class="mt-5 text-sm font-medium">Quick nights</h4>
+                    <p class="text-xs text-base-content/70">Dinner on a quick night takes {{ $quickNightLimit }} min or less, prep and cook in total. Change the limit in Settings.</p>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        @foreach ($days as $day)
+                            <x-ui.button data-test="quick-{{ $day->toDateString() }}" wire:key="quick-{{ $day->toDateString() }}"
+                                         aria-pressed="{{ in_array($day->toDateString(), $quickNights, true) ? 'true' : 'false' }}"
+                                         wire:click="toggleQuickNight('{{ $day->toDateString() }}')">{{ $day->format('D') }}</x-ui.button>
                         @endforeach
                     </div>
 

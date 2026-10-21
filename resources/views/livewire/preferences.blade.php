@@ -2,6 +2,7 @@
     $rows = [
         ['key' => 'minutes', 'label' => 'Weekday time limit', 'help' => 'Prep and cook, in total.', 'presets' => $this::MINUTE_PRESETS, 'value' => $stored['minutes'], 'pick' => 'pickMinutes', 'model' => 'weekdayMinutes', 'save' => 'saveMinutes', 'suffix' => 'min'],
         ['key' => 'ingredients', 'label' => 'Weekday ingredient limit', 'help' => "Pantry staples don't count.", 'presets' => $this::INGREDIENT_PRESETS, 'value' => $stored['ingredients'], 'pick' => 'pickIngredients', 'model' => 'weekdayIngredients', 'save' => 'saveIngredients', 'suffix' => 'items'],
+        ['key' => 'quick-night', 'label' => 'Quick-night limit', 'help' => 'Dinner on a quick night, prep and cook in total.', 'presets' => $this::QUICK_NIGHT_PRESETS, 'value' => $stored['quickNight'], 'pick' => 'pickQuickNight', 'model' => 'quickNightMinutes', 'save' => 'saveQuickNight', 'suffix' => 'min'],
         ['key' => 'size', 'label' => 'Household size', 'help' => 'How many people you cook for.', 'presets' => $this::SIZE_PRESETS, 'value' => $stored['size'], 'pick' => 'pickHouseholdSize', 'model' => 'householdSize', 'save' => 'saveHouseholdSize', 'suffix' => 'people'],
     ];
 @endphp

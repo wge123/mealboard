@@ -16,6 +16,8 @@ class Preferences extends Component
     /** The tiles offered for each setting; any other whole number goes through the Other tile. */
     public const array MINUTE_PRESETS = [15, 20, 30, 45, 60, 90];
 
+    public const array QUICK_NIGHT_PRESETS = [10, 15, 20, 25, 30];
+
     public const array INGREDIENT_PRESETS = [5, 6, 8, 10, 12, 15];
 
     public const array SIZE_PRESETS = [1, 2, 3, 4, 5, 6];
@@ -31,10 +33,6 @@ class Preferences extends Component
 
     public int|string $quickNightMinutes = '';
 
-    public function saveQuickNight(HouseholdPreferences $preferences): void {}
-
-    public function pickQuickNight(HouseholdPreferences $preferences, int $minutes): void {}
-
     public string $newAvoided = '';
 
     public function mount(HouseholdPreferences $preferences): void
@@ -43,6 +41,7 @@ class Preferences extends Component
 
         $this->weekdayMinutes = $limits['minutes'];
         $this->weekdayIngredients = $limits['ingredients'];
+        $this->quickNightMinutes = $preferences->quickNightLimit();
         $this->householdSize = $preferences->householdSize();
     }
 
@@ -73,6 +72,23 @@ class Preferences extends Component
         } catch (HouseholdPreferenceRefused $e) {
             $this->addError('weekdayIngredients', $e->getMessage());
         }
+    }
+
+    public function saveQuickNight(HouseholdPreferences $preferences): void
+    {
+        $this->validate(['quickNightMinutes' => 'required|integer']);
+
+        try {
+            $preferences->setQuickNightLimit((int) $this->quickNightMinutes);
+        } catch (HouseholdPreferenceRefused $e) {
+            $this->addError('quickNightMinutes', $e->getMessage());
+        }
+    }
+
+    public function pickQuickNight(HouseholdPreferences $preferences, int $minutes): void
+    {
+        $this->quickNightMinutes = $minutes;
+        $this->saveQuickNight($preferences);
     }
 
     public function saveHouseholdSize(HouseholdPreferences $preferences): void
@@ -143,7 +159,7 @@ class Preferences extends Component
 
         // Tiles mark what is stored, not what a field holds after a refused save.
         return view('livewire.preferences', [
-            'stored' => [...$preferences->weekdayLimits(), 'size' => $preferences->householdSize()],
+            'stored' => [...$preferences->weekdayLimits(), 'quickNight' => $preferences->quickNightLimit(), 'size' => $preferences->householdSize()],
             'avoided' => $avoided,
             // Suggestions first, then the household's own words, each once.
             'avoidTiles' => collect(self::AVOID_SUGGESTIONS)->merge($avoided)->unique()->values(),

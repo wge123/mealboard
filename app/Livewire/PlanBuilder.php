@@ -41,6 +41,7 @@ class PlanBuilder extends Component
 
     public function updatedPlanId(): void
     {
+        $this->fillNotes = [];
         $this->closePicker();
     }
 
@@ -59,6 +60,7 @@ class PlanBuilder extends Component
         ]);
 
         $this->planId = $plan->id;
+        $this->fillNotes = [];
         $this->closePicker();
     }
 
@@ -76,10 +78,25 @@ class PlanBuilder extends Component
     /** @var list<string> */
     public array $quickNights = [];
 
-    /** @var list<string> */
+    /**
+     * Why slots stayed empty after the last fill, for the week notice. Held
+     * here, not derived: only the fill knows what it was asked and could not
+     * do. Cleared when the household changes week or fills again.
+     *
+     * @var list<string>
+     */
     public array $fillNotes = [];
 
-    public function toggleQuickNight(string $date): void {}
+    public function toggleQuickNight(string $date): void
+    {
+        $plan = $this->editablePlan();
+
+        abort_unless($this->weekDates($plan)->contains($date), 422);
+
+        $this->quickNights = in_array($date, $this->quickNights, true)
+            ? array_values(array_diff($this->quickNights, [$date]))
+            : [...$this->quickNights, $date];
+    }
 
     /** Open the week check-in, pre-filled with the answers saved on the week. */
     public function openCheckIn(): void
@@ -87,6 +104,7 @@ class PlanBuilder extends Component
         $plan = $this->editablePlan();
 
         $this->skips = $plan->skippedSlots()->all();
+        $this->quickNights = $plan->quickNights()->all();
         $this->checkInOpen = true;
     }
 
@@ -94,6 +112,7 @@ class PlanBuilder extends Component
     {
         $this->checkInOpen = false;
         $this->skips = [];
+        $this->quickNights = [];
     }
 
     public function toggleSkip(string $date, string $slot): void
@@ -129,6 +148,7 @@ class PlanBuilder extends Component
 
             return $date.'|'.$order[$slot];
         })->values());
+        $plan->saveQuickNights($this->quickNights);
 
         $this->closeCheckIn();
         $this->autoFill();
@@ -153,7 +173,7 @@ class PlanBuilder extends Component
 
     public function autoFill(): void
     {
-        app(AutoFillWeek::class)->handle($this->editablePlan());
+        $this->fillNotes = app(AutoFillWeek::class)->fill($this->editablePlan())->unfilled;
     }
 
     /** Warning surfaced when the post-lock vault publish failed. */
@@ -288,6 +308,7 @@ class PlanBuilder extends Component
         return view('livewire.plan-builder', [
             'plan' => $plan,
             'skipped' => $plan ? $plan->skippedSlots()->flip() : collect(),
+            'quickNightLimit' => app(HouseholdPreferences::class)->quickNightLimit(),
             'plans' => MealPlan::query()->orderByDesc('week_start_date')->get(),
             'days' => $plan ? $this->weekDates($plan)->map(fn (string $date) => Carbon::parse($date)) : collect(),
             'slots' => MealSlot::cases(),

@@ -45,15 +45,21 @@ class HouseholdPreferences
         ]);
     }
 
+    /**
+     * The most total minutes (prep + cook) a dinner may take on a quick night.
+     */
     public function quickNightLimit(): int
     {
-        return 0;
+        return $this->row()->quick_night_minutes_limit;
     }
 
     /**
      * @throws HouseholdPreferenceRefused
      */
-    public function setQuickNightLimit(int $minutes): void {}
+    public function setQuickNightLimit(int $minutes): void
+    {
+        $this->row()->update(['quick_night_minutes_limit' => $this->atLeastOne($minutes, 'The quick-night limit')]);
+    }
 
     public function householdSize(): int
     {
