@@ -102,6 +102,17 @@
             </x-ui.alert>
         @endif
 
+        @if ($clashes->isNotEmpty())
+            <x-ui.alert tone="warning" class="mb-4" data-test="clash-notes">
+                <p class="font-medium">These meals no longer fit your answers for the week. Change or clear them to remove the flag.</p>
+                <ul>
+                    @foreach ($clashes as $clash)
+                        <li>{{ $clash }}</li>
+                    @endforeach
+                </ul>
+            </x-ui.alert>
+        @endif
+
         {{-- The week check-in: what is different about this week, asked before Mealboard fills it. --}}
         @if ($checkInOpen && $editable)
             <div class="modal modal-open modal-bottom sm:modal-middle" role="dialog" aria-label="Week check-in"
