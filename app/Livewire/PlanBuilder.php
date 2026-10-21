@@ -73,6 +73,14 @@ class PlanBuilder extends Component
      */
     public array $skips = [];
 
+    /** @var list<string> */
+    public array $quickNights = [];
+
+    /** @var list<string> */
+    public array $fillNotes = [];
+
+    public function toggleQuickNight(string $date): void {}
+
     /** Open the week check-in, pre-filled with the answers saved on the week. */
     public function openCheckIn(): void
     {

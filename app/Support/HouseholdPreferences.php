@@ -45,6 +45,16 @@ class HouseholdPreferences
         ]);
     }
 
+    public function quickNightLimit(): int
+    {
+        return 0;
+    }
+
+    /**
+     * @throws HouseholdPreferenceRefused
+     */
+    public function setQuickNightLimit(int $minutes): void {}
+
     public function householdSize(): int
     {
         return $this->row()->household_size;

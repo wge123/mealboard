@@ -63,6 +63,11 @@ class AutoFillWeek
      */
     public function handle(MealPlan $plan): Collection
     {
+        return $this->fill($plan)->meals;
+    }
+
+    public function fill(MealPlan $plan): AutoFillResult
+    {
         if ($plan->status !== MealPlanStatus::Draft) {
             throw new LogicException('Only draft plans can be auto-filled.');
         }
@@ -140,7 +145,7 @@ class AutoFillWeek
             }
         }
 
-        return $created;
+        return new AutoFillResult($created);
     }
 
     /**

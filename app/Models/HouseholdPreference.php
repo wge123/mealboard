@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class HouseholdPreference extends Model
 {
-    protected $fillable = ['weekday_minutes_limit', 'weekday_ingredient_limit', 'household_size'];
+    protected $fillable = ['weekday_minutes_limit', 'weekday_ingredient_limit', 'quick_night_minutes_limit', 'household_size'];
 
     /**
      * @return array<string, string>
@@ -20,6 +20,7 @@ class HouseholdPreference extends Model
         return [
             'weekday_minutes_limit' => 'integer',
             'weekday_ingredient_limit' => 'integer',
+            'quick_night_minutes_limit' => 'integer',
             'household_size' => 'integer',
         ];
     }

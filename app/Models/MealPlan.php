@@ -125,6 +125,15 @@ class MealPlan extends Model
         $this->update(['check_in' => [...($this->check_in ?? []), 'skipped' => $skipped]]);
     }
 
+    /** @return Collection<int, string> */
+    public function quickNights(): Collection
+    {
+        return collect();
+    }
+
+    /** @param  iterable<string>  $dates */
+    public function saveQuickNights(iterable $dates): void {}
+
     public function plannedMeals(): HasMany
     {
         return $this->hasMany(PlannedMeal::class);

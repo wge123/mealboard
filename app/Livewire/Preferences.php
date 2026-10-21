@@ -29,6 +29,12 @@ class Preferences extends Component
 
     public int|string $householdSize = '';
 
+    public int|string $quickNightMinutes = '';
+
+    public function saveQuickNight(HouseholdPreferences $preferences): void {}
+
+    public function pickQuickNight(HouseholdPreferences $preferences, int $minutes): void {}
+
     public string $newAvoided = '';
 
     public function mount(HouseholdPreferences $preferences): void
