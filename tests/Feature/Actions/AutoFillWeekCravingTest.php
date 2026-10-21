@@ -128,7 +128,7 @@ it('gives a quick night a craving dinner only within the quick-night limit', fun
     $result = cravingFill($plan);
 
     expect(cravingDinners($plan))->toBe(['2026-09-07' => $fast->id])
-        ->and($result->unfilled)->toBe(['Found only 1 of 2 thai dinners for your craving']);
+        ->and($result->unfilled)->toBe(['Only 1 free dinner for your thai craving']);
 });
 
 it('reports a shortfall when the library has too few of the craved cuisine', function () {
@@ -182,4 +182,43 @@ it('fills as before when no craving is saved', function () {
     cravingRecipe('thai');
 
     expect(cravingFill(cravingPlan(['quick_nights' => []]))->unfilled)->toBe([]);
+});
+
+it('blames the free dinners, not the library, when the week has too few dinners left', function () {
+    cravingRecipe('thai', rating: 3);
+    cravingRecipe('thai', rating: 2);
+    cravingRecipe('thai', rating: 1);
+
+    $skipped = collect(['2026-09-08', '2026-09-09', '2026-09-10', '2026-09-11'])
+        ->map(fn ($date) => ['date' => $date, 'slot' => 'dinner'])->all();
+
+    $result = cravingFill(cravingPlan(['craving' => 'thai', 'skipped' => $skipped]));
+
+    expect($result->unfilled)->toBe(['Only 1 free dinner for your thai craving']);
+});
+
+it('says no dinner is free when every dinner is already taken', function () {
+    cravingRecipe('thai', rating: 3);
+    cravingRecipe('thai', rating: 2);
+
+    $skipped = collect(['2026-09-07', '2026-09-08', '2026-09-09', '2026-09-10', '2026-09-11'])
+        ->map(fn ($date) => ['date' => $date, 'slot' => 'dinner'])->all();
+
+    $result = cravingFill(cravingPlan(['craving' => 'thai', 'skipped' => $skipped]));
+
+    expect($result->unfilled)->toBe(['No free dinner left for your thai craving']);
+});
+
+it('reports both causes when the library and the free dinners are both short', function () {
+    cravingRecipe('thai', rating: 3);
+
+    $skipped = collect(['2026-09-08', '2026-09-09', '2026-09-10', '2026-09-11'])
+        ->map(fn ($date) => ['date' => $date, 'slot' => 'dinner'])->all();
+
+    $result = cravingFill(cravingPlan(['craving' => 'thai', 'skipped' => $skipped]));
+
+    expect($result->unfilled)->toBe([
+        'Found only 1 of 2 thai dinners for your craving',
+        'Only 1 free dinner for your thai craving',
+    ]);
 });

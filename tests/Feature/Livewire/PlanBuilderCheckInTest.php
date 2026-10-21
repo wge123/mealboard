@@ -206,3 +206,31 @@ it('keeps the saved craving when the household presses Just fill it', function (
 
     expect($plan->fresh()->check_in)->toBe(['craving' => 'thai']);
 });
+
+it('does not count Out slots as empty gaps or as plannable meals', function () {
+    Recipe::factory()->approved()->count(15)->create(['meal_type' => MealType::Any]);
+    $plan = MealPlan::factory()->create();
+    $monday = $plan->week_start_date->toDateString();
+    $plan->saveSkippedSlots(["{$monday}|lunch", "{$monday}|dinner"]);
+
+    checkInScreen()
+        ->call('justFill')
+        ->assertSee('13 of 13 meals')
+        ->assertDontSee('still empty')
+        ->assertDontSee('Fill the gaps');
+});
+
+it('saves nothing when the craving is refused', function () {
+    Recipe::factory()->approved()->create(['meal_type' => MealType::Any, 'cuisine' => 'thai']);
+    $plan = MealPlan::factory()->create();
+
+    checkInScreen()
+        ->call('openCheckIn')
+        ->call('toggleSkip', $plan->week_start_date->toDateString(), 'lunch')
+        ->call('toggleQuickNight', $plan->week_start_date->toDateString())
+        ->set('craving', 'klingon')
+        ->call('submitCheckIn')
+        ->assertStatus(422);
+
+    expect($plan->fresh()->check_in)->toBeNull();
+});
