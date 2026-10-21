@@ -78,6 +78,9 @@ class PlanBuilder extends Component
     /** @var list<string> */
     public array $quickNights = [];
 
+    /** The cuisine chosen as this week's craving in the open sheet; '' for none. */
+    public string $craving = '';
+
     /**
      * Why slots stayed empty after the last fill, for the week notice. Held
      * here, not derived: only the fill knows what it was asked and could not
@@ -308,6 +311,7 @@ class PlanBuilder extends Component
         return view('livewire.plan-builder', [
             'plan' => $plan,
             'skipped' => $plan ? $plan->skippedSlots()->flip() : collect(),
+            'cuisines' => [],
             'quickNightLimit' => app(HouseholdPreferences::class)->quickNightLimit(),
             'plans' => MealPlan::query()->orderByDesc('week_start_date')->get(),
             'days' => $plan ? $this->weekDates($plan)->map(fn (string $date) => Carbon::parse($date)) : collect(),

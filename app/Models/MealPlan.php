@@ -146,6 +146,15 @@ class MealPlan extends Model
         $this->update(['check_in' => [...($this->check_in ?? []), 'quick_nights' => collect($dates)->unique()->sort()->values()->all()]]);
     }
 
+    /** The cuisine the household craves this week (GLOSSARY), if they chose one. */
+    public function craving(): ?string
+    {
+        return null;
+    }
+
+    /** Save the craving, keeping every other check-in answer as it was; null clears it. */
+    public function saveCraving(?string $cuisine): void {}
+
     public function plannedMeals(): HasMany
     {
         return $this->hasMany(PlannedMeal::class);
