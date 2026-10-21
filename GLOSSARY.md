@@ -67,12 +67,16 @@ A recipe the app found on its own, by daily discovery or for a request, and offe
 _Avoid_: suggested recipe, generated recipe
 
 **Mise en place**:
-The part of a recipe that gets everything ready before the heat goes on: each ingredient with its amount and its prep note. Always present, because a recipe always has ingredients.
+The part of a recipe that gets everything ready before the heat goes on: each ingredient with its amount, its prep note and, when it is combined with others, its prep bowl. Always present, because a recipe always has ingredients.
 _Avoid_: mise (the app's name), prep section, ingredients section
 
 **Prep note**:
-What to do to one ingredient before cooking starts ("chopped", "whites and greens apart", "into the spice bowl"). Optional; a task spanning several ingredients is written on each of them.
+What to do to one ingredient before cooking starts ("chopped", "whites and greens apart", "into the spice bowl"). Optional; a task spanning several ingredients is written on each of them, and their shared bowl is their prep bowl.
 _Avoid_: prep step, prep task, instruction
+
+**Prep bowl**:
+A bowl several ingredients are prepped into before the heat goes on ("spice bowl", "aromatics", "sauce"), named on each of those ingredients. The mise en place shows them together under the bowl's name. Optional; an ingredient prepped on its own has none (ADR 0005).
+_Avoid_: group, prep group, prep task
 
 **Cooking step**:
 One plain-text action once the heat is on. It names tools and ingredients in words only; the recipe declares its tools once, not per step.

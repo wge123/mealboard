@@ -192,7 +192,7 @@ class RecipeCreate extends Component
      * Map parsed rows into form-row shape and append them, keeping any rows
      * already filled in (parsed rows replace blank ones only).
      *
-     * @param  array<int, array{qty: ?float, unit: ?string, name: string, note?: ?string, prep_note?: ?string}>  $parsed
+     * @param  array<int, array{qty: ?float, unit: ?string, name: string, note?: ?string, prep_note?: ?string, prep_bowl?: ?string}>  $parsed
      */
     private function fillRows(array $parsed): void
     {
@@ -201,6 +201,7 @@ class RecipeCreate extends Component
             'qty' => $row['qty'] !== null ? (string) $row['qty'] : '',
             'unit' => $row['unit'] ?? '',
             'prep_note' => $row['prep_note'] ?? $row['note'] ?? '',
+            'prep_bowl' => $row['prep_bowl'] ?? '',
         ], $parsed);
 
         $this->discardBlankRows();

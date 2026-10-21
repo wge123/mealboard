@@ -29,9 +29,9 @@ it('parses pasted text into editable ingredient rows', function () {
         ->set('paste', "2 cups diced onion\n1/2 tsp salt\neggs")
         ->call('parsePaste')
         ->assertSet('rows', [
-            ['name' => 'onion', 'qty' => '2', 'unit' => 'cup', 'prep_note' => 'diced'],
-            ['name' => 'salt', 'qty' => '0.5', 'unit' => 'tsp', 'prep_note' => ''],
-            ['name' => 'eggs', 'qty' => '', 'unit' => '', 'prep_note' => ''],
+            ['name' => 'onion', 'qty' => '2', 'unit' => 'cup', 'prep_note' => 'diced', 'prep_bowl' => ''],
+            ['name' => 'salt', 'qty' => '0.5', 'unit' => 'tsp', 'prep_note' => '', 'prep_bowl' => ''],
+            ['name' => 'eggs', 'qty' => '', 'unit' => '', 'prep_note' => '', 'prep_bowl' => ''],
         ]);
 });
 
@@ -100,8 +100,8 @@ it('AI-parses paste into tools, ingredient rows and steps with an AI badge', fun
         ->set('paste', 'Some messy pasted recipe blog text')
         ->call('aiParse')
         ->assertSet('rows', [
-            ['name' => 'cooked rice', 'qty' => '2', 'unit' => 'cup', 'prep_note' => ''],
-            ['name' => 'garlic', 'qty' => '3', 'unit' => '', 'prep_note' => 'minced'],
+            ['name' => 'cooked rice', 'qty' => '2', 'unit' => 'cup', 'prep_note' => '', 'prep_bowl' => ''],
+            ['name' => 'garlic', 'qty' => '3', 'unit' => '', 'prep_note' => 'minced', 'prep_bowl' => ''],
         ])
         ->assertSet('tools', [
             ['alternatives' => 'wok, large skillet', 'count' => 1],
@@ -130,8 +130,8 @@ it('AI-parses a realistic pasted recipe (ingredients and method together) into a
         ->set('paste', "Simple Rice\n\nIngredients\n2 cups rice, rinsed\n1 tsp salt\n\nMethod\nBoil the rice in a saucepan. Season.")
         ->call('aiParse')
         ->assertSet('rows', [
-            ['name' => 'rice', 'qty' => '2', 'unit' => 'cup', 'prep_note' => 'rinsed'],
-            ['name' => 'salt', 'qty' => '1', 'unit' => 'tsp', 'prep_note' => ''],
+            ['name' => 'rice', 'qty' => '2', 'unit' => 'cup', 'prep_note' => 'rinsed', 'prep_bowl' => ''],
+            ['name' => 'salt', 'qty' => '1', 'unit' => 'tsp', 'prep_note' => '', 'prep_bowl' => ''],
         ])
         ->assertSet('tools', [['alternatives' => 'saucepan', 'count' => 1]])
         ->assertSet('steps', ['Boil the rice.', 'Season.'])
@@ -150,7 +150,7 @@ it('shows the failed shape check on the form and fills nothing from a heuristic'
         ->test(RecipeCreate::class)
         ->set('paste', 'eggs')
         ->call('aiParse')
-        ->assertSet('rows', [['name' => '', 'qty' => '', 'unit' => '', 'prep_note' => '']])
+        ->assertSet('rows', [['name' => '', 'qty' => '', 'unit' => '', 'prep_note' => '', 'prep_bowl' => '']])
         ->assertSet('parsedWith', '')
         ->assertSee('tools: at least one tool is required')
         ->assertSee('steps: at least one step is required');
@@ -165,7 +165,7 @@ it('shows a claude CLI failure as the form error and fills nothing', function ()
         ->set('steps', ['Keep me.'])
         ->set('paste', "2 cups diced onion\n1/2 tsp salt")
         ->call('aiParse')
-        ->assertSet('rows', [['name' => '', 'qty' => '', 'unit' => '', 'prep_note' => '']])
+        ->assertSet('rows', [['name' => '', 'qty' => '', 'unit' => '', 'prep_note' => '', 'prep_bowl' => '']])
         ->assertSet('steps', ['Keep me.'])
         ->assertSet('parsedWith', '')
         ->assertSee('model overloaded');
@@ -290,7 +290,7 @@ it('fills the form from a pasted recipe link and saves it approved, imported, wi
         ->assertSet('importError', '');
 
     expect($component->get('rows'))->toHaveCount(14)
-        ->and($component->get('rows')[0])->toBe(['name' => 'extra-virgin olive oil', 'qty' => '2', 'unit' => 'tbsp', 'prep_note' => ''])
+        ->and($component->get('rows')[0])->toBe(['name' => 'extra-virgin olive oil', 'qty' => '2', 'unit' => 'tbsp', 'prep_note' => '', 'prep_bowl' => ''])
         ->and($component->get('steps'))->toHaveCount(5)
         ->and(collect($component->get('tools'))->pluck('alternatives')->all())->toContain('pot, dutch oven', 'blender');
 

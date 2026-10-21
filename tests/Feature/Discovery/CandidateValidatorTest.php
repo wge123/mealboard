@@ -33,7 +33,7 @@ it('returns the shaped candidate when every check passes', function () {
         ->and($check->candidate['tools'])->toBe([['alternatives' => ['skillet', 'frying pan'], 'count' => 1]])
         ->and($check->candidate['steps'])->toBe(['Sear the salmon.', 'Assemble the bowls.'])
         ->and($check->candidate['ingredients'][0])->toBe([
-            'qty' => 2.0, 'unit' => null, 'name' => 'salmon fillets', 'prep_note' => 'patted dry',
+            'qty' => 2.0, 'unit' => null, 'name' => 'salmon fillets', 'prep_note' => 'patted dry', 'prep_bowl' => null,
         ])
         ->and($check->candidate)->not->toHaveKey('instructions');
 });
@@ -60,6 +60,7 @@ it('rejects with a readable error', function (array $overrides, string $expected
     'nameless ingredient' => [['ingredients' => [['qty' => 1, 'unit' => null]]], 'ingredients[0].name: must be a non-empty string'],
     'non-numeric ingredient qty' => [['ingredients' => [['name' => 'salt', 'qty' => 'lots']]], 'ingredients[0].qty: must be a number or null'],
     'non-string step' => [['steps' => ['Cook.', 42]], 'steps[1]: must be a string'],
+    'non-string prep bowl' => [['ingredients' => [['name' => 'cumin', 'prep_bowl' => ['spice']]]], 'ingredients[0].prep_bowl: must be a string or null'],
     'negative tool count' => [['tools' => [['alternatives' => ['wok'], 'count' => -2]]], 'tools[0].count: must be a whole number of 1 or more'],
 ]);
 
@@ -94,6 +95,16 @@ it('repairs rather than rejects', function () {
         ->and($check->candidate['steps'])->toBe(['Sear.', 'Serve.'])
         ->and($check->candidate['ingredients'][0]['name'])->toBe('salmon')
         ->and($check->candidate['ingredients'][0]['prep_note'])->toBeNull();
+});
+
+it('keeps a prep bowl trimmed and turns a blank one into none', function () {
+    $check = (new CandidateValidator)->check(shapedItem(['ingredients' => [
+        ['name' => 'cumin', 'prep_bowl' => '  spice bowl '],
+        ['name' => 'salmon', 'prep_bowl' => '   '],
+    ]]));
+
+    expect($check->passes())->toBeTrue()
+        ->and(array_column($check->candidate['ingredients'], 'prep_bowl'))->toBe(['spice bowl', null]);
 });
 
 it('does not look for prep text inside a step', function () {

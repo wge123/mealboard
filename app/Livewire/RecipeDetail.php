@@ -43,6 +43,7 @@ class RecipeDetail extends Component
             'qty' => $ingredient->pivot->qty !== null ? (string) (float) $ingredient->pivot->qty : '',
             'unit' => $ingredient->pivot->unit ?? '',
             'prep_note' => $ingredient->pivot->note ?? '',
+            'prep_bowl' => $ingredient->pivot->prep_bowl ?? '',
         ])->values()->all();
         $this->tools = $this->loadedRecipe()->recipeTools->map(fn ($tool) => [
             'alternatives' => $tool->alternatives->pluck('word')->implode(', '),

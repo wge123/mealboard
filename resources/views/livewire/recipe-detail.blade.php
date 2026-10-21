@@ -21,11 +21,20 @@
             };
             $statusTone = ['pending' => 'warning', 'approved' => 'neutral', 'rejected' => 'error', 'archived' => 'neutral'][$recipe->status->value];
             $statusMoves = ['approved' => ['Approve', 'tabler-check'], 'rejected' => ['Reject', 'tabler-x'], 'archived' => ['Archive', 'tabler-archive']];
+            // The mise en place in ingredient order, each prep bowl gathered where its first ingredient sits; an ingredient with no bowl is its own entry.
+            $miseEntries = [];
+            foreach ($recipe->ingredients->values() as $n => $ingredient) {
+                $bowl = $ingredient->pivot->prep_bowl;
+                $key = $bowl !== null ? 'bowl:'.mb_strtolower(trim($bowl)) : 'line:'.$n;
+                $miseEntries[$key] ??= ['bowl' => $bowl, 'lines' => []];
+                $miseEntries[$key]['lines'][$n] = $ingredient;
+            }
+            $miseEntries = array_values($miseEntries);
             // A group row: sticky and folds on tap on the phone; a plain heading on desktop.
             $groupRow = 'sticky top-0 z-10 flex min-h-11 w-full items-center gap-2 border-b border-base-300 bg-base-200 px-3 text-left text-xs font-medium tracking-wide text-base-content/70 uppercase lg:pointer-events-none lg:static lg:min-h-0 lg:py-2';
         @endphp
 
-        <div x-data="{ open: { mise: true, cook: true, details: false }, ready: [], done: [] }" class="pb-20 lg:pb-0">
+        <div x-data="{ open: { mise: true, cook: true, details: false }, folded: [], ready: [], done: [] }" class="pb-20 lg:pb-0">
             <x-ui.page-header :title="$recipe->title" :back="route('recipes.index')" class="mb-3">
                 <x-slot:actions>
                     <div class="hidden items-center gap-2 lg:flex">
@@ -86,18 +95,40 @@
                                 </x-ui.badge>
                             @endforeach
                         </div>
-                        @foreach ($recipe->ingredients as $n => $ingredient)
-                            <label class="flex min-h-11 cursor-pointer items-start gap-3 border-b border-base-300 px-3 py-2.5 last:border-b-0 hover:bg-base-200"
-                                   x-bind:class="ready.includes({{ $n }}) && 'text-base-content/70'">
-                                <input type="checkbox" class="checkbox checkbox-sm checkbox-primary mt-0.5"
-                                       x-on:change="$event.target.checked ? ready.push({{ $n }}) : ready.splice(ready.indexOf({{ $n }}), 1);
-                                                    if (ready.length === {{ $ingredientCount }}) open.mise = false">
-                                <span class="w-16 shrink-0 text-right font-medium tabular-nums">{{ $amount($ingredient) }}</span>
-                                <span class="min-w-0">
-                                    <span x-bind:class="ready.includes({{ $n }}) && 'line-through'">{{ $ingredient->name }}</span>@if ($ingredient->is_pantry_staple)<x-ui.badge class="ms-1">staple</x-ui.badge>@endif
-                                    @if ($ingredient->pivot->note)<span class="block text-base-content/70">{{ $ingredient->pivot->note }}</span>@endif
-                                </span>
-                            </label>
+                        @foreach ($miseEntries as $e => $entry)
+                            @php($bowlLines = json_encode(array_keys($entry['lines'])))
+                            @if ($entry['bowl'] !== null)
+                                {{-- A prep bowl: its ingredients are prepped into one bowl before the heat goes on; it folds itself once every one is ready. --}}
+                                <div data-prep-bowl="{{ $entry['bowl'] }}">
+                                    <button type="button" class="flex min-h-11 w-full items-center gap-2 border-b border-base-300 bg-base-200/50 px-3 text-left font-medium"
+                                            x-on:click="folded.includes({{ $e }}) ? folded.splice(folded.indexOf({{ $e }}), 1) : folded.push({{ $e }})"
+                                            x-bind:aria-expanded="! folded.includes({{ $e }})">
+                                        <x-tabler-chevron-down class="size-4" x-bind:class="folded.includes({{ $e }}) ? '-rotate-90' : ''" />
+                                        <x-tabler-bowl class="size-4 text-base-content/70" />
+                                        <span>{{ ucfirst($entry['bowl']) }}</span>
+                                        <span class="ms-auto text-base-content/70 tabular-nums"
+                                              x-text="{{ $bowlLines }}.filter(n => ready.includes(n)).length + ' of {{ count($entry['lines']) }}'">0 of {{ count($entry['lines']) }}</span>
+                                    </button>
+                                    <div x-show="! folded.includes({{ $e }})">
+                            @endif
+                            @foreach ($entry['lines'] as $n => $ingredient)
+                                <label class="flex min-h-11 cursor-pointer items-start gap-3 border-b border-base-300 px-3 py-2.5 hover:bg-base-200 {{ $entry['bowl'] !== null ? 'ps-6' : 'last:border-b-0' }}"
+                                       x-bind:class="ready.includes({{ $n }}) && 'text-base-content/70'">
+                                    <input type="checkbox" class="checkbox checkbox-sm checkbox-primary mt-0.5"
+                                           x-on:change="$event.target.checked ? ready.push({{ $n }}) : ready.splice(ready.indexOf({{ $n }}), 1);
+                                                        @if ($entry['bowl'] !== null) if ({{ $bowlLines }}.every(n => ready.includes(n)) && ! folded.includes({{ $e }})) folded.push({{ $e }}); @endif
+                                                        if (ready.length === {{ $ingredientCount }}) open.mise = false">
+                                    <span class="w-16 shrink-0 text-right font-medium tabular-nums">{{ $amount($ingredient) }}</span>
+                                    <span class="min-w-0">
+                                        <span x-bind:class="ready.includes({{ $n }}) && 'line-through'">{{ $ingredient->name }}</span>@if ($ingredient->is_pantry_staple)<x-ui.badge class="ms-1">staple</x-ui.badge>@endif
+                                        @if ($ingredient->pivot->note)<span class="block text-base-content/70">{{ $ingredient->pivot->note }}</span>@endif
+                                    </span>
+                                </label>
+                            @endforeach
+                            @if ($entry['bowl'] !== null)
+                                    </div>
+                                </div>
+                            @endif
                         @endforeach
                     </div>
                 </x-ui.card>
