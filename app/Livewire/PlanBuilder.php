@@ -14,6 +14,7 @@ use App\Models\PlannedMeal;
 use App\Models\Recipe;
 use App\Support\HouseholdPreferences;
 use App\Support\MissingKitchenTools;
+use App\Support\SlotKey;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
@@ -41,7 +42,7 @@ class PlanBuilder extends Component
 
     public function updatedPlanId(): void
     {
-        $this->fillNotes = [];
+        $this->unfilled = [];
         $this->closePicker();
     }
 
@@ -60,7 +61,7 @@ class PlanBuilder extends Component
         ]);
 
         $this->planId = $plan->id;
-        $this->fillNotes = [];
+        $this->unfilled = [];
         $this->closePicker();
     }
 
@@ -88,7 +89,7 @@ class PlanBuilder extends Component
      *
      * @var list<string>
      */
-    public array $fillNotes = [];
+    public array $unfilled = [];
 
     public function toggleQuickNight(string $date): void
     {
@@ -96,9 +97,7 @@ class PlanBuilder extends Component
 
         abort_unless($this->weekDates($plan)->contains($date), 422);
 
-        $this->quickNights = in_array($date, $this->quickNights, true)
-            ? array_values(array_diff($this->quickNights, [$date]))
-            : [...$this->quickNights, $date];
+        $this->quickNights = $this->toggled($this->quickNights, $date);
     }
 
     /** Open the week check-in, pre-filled with the answers saved on the week. */
@@ -124,9 +123,7 @@ class PlanBuilder extends Component
     {
         $key = $this->skipKey($this->editablePlan(), $date, $slot);
 
-        $this->skips = in_array($key, $this->skips, true)
-            ? array_values(array_diff($this->skips, [$key]))
-            : [...$this->skips, $key];
+        $this->skips = $this->toggled($this->skips, $key);
     }
 
     /** Skip all three slots of a day, or clear them when they are all skipped already. */
@@ -142,21 +139,19 @@ class PlanBuilder extends Component
             : [...$this->skips, ...$missing];
     }
 
-    /** Save the sheet's answers on the week, then fill around them. */
+    /** Save the sheet's answers on the week, then fill around them. Everything is checked before anything is saved. */
     public function submitCheckIn(): void
     {
         $plan = $this->editablePlan();
 
-        $order = collect(MealSlot::cases())->map->value->flip();
-        $plan->saveSkippedSlots(collect($this->skips)->sortBy(function (string $key) use ($order) {
-            [$date, $slot] = explode('|', $key);
-
-            return $date.'|'.$order[$slot];
-        })->values());
-        $plan->saveQuickNights($this->quickNights);
-
         abort_unless($this->craving === '' || in_array($this->craving, $this->libraryCuisines(), true), 422);
-        $plan->saveCraving($this->craving);
+
+        $weekDates = $this->weekDates($plan);
+        abort_unless(collect($this->quickNights)->every(fn (string $date) => $weekDates->contains($date)), 422);
+
+        $skips = array_map(fn (string $key) => $this->skipKey($plan, ...SlotKey::parse($key)), $this->skips);
+
+        $plan->saveCheckIn($skips, $this->quickNights, $this->craving);
 
         $this->closeCheckIn();
         $this->autoFill();
@@ -176,12 +171,25 @@ class PlanBuilder extends Component
         abort_unless($this->weekDates($plan)->contains($date), 422);
         abort_unless(MealSlot::tryFrom($slot) !== null, 422);
 
-        return $date.'|'.$slot;
+        return SlotKey::make($date, $slot);
+    }
+
+    /**
+     * The list with the item removed when it is in, added when it is not.
+     *
+     * @param  list<string>  $list
+     * @return list<string>
+     */
+    private function toggled(array $list, string $item): array
+    {
+        return in_array($item, $list, true)
+            ? array_values(array_diff($list, [$item]))
+            : [...$list, $item];
     }
 
     public function autoFill(): void
     {
-        $this->fillNotes = app(AutoFillWeek::class)->fill($this->editablePlan())->unfilled;
+        $this->unfilled = app(AutoFillWeek::class)->fill($this->editablePlan())->unfilled;
     }
 
     /** Warning surfaced when the post-lock vault publish failed. */
@@ -265,7 +273,7 @@ class PlanBuilder extends Component
         );
 
         // Choosing a meal for a skipped slot ends the skip.
-        $skipKey = $this->pickerDate.'|'.$slot->value;
+        $skipKey = SlotKey::make($this->pickerDate, $slot);
 
         if ($plan->skippedSlots()->contains($skipKey)) {
             $plan->saveSkippedSlots($plan->skippedSlots()->reject(fn (string $key) => $key === $skipKey));
@@ -316,8 +324,8 @@ class PlanBuilder extends Component
             ->pluck('cuisine')
             ->map(fn (string $cuisine) => trim($cuisine))
             ->filter()
-            ->unique(fn (string $cuisine) => mb_strtolower($cuisine))
-            ->sortBy(fn (string $cuisine) => mb_strtolower($cuisine))
+            ->unique(fn (string $cuisine) => Recipe::cuisineKey($cuisine))
+            ->sortBy(fn (string $cuisine) => Recipe::cuisineKey($cuisine))
             ->values()
             ->all();
     }
@@ -327,7 +335,7 @@ class PlanBuilder extends Component
         $plan = $this->plan()?->load('plannedMeals.recipe', 'plannedMeals.logs');
 
         $meals = $plan
-            ? $plan->plannedMeals->keyBy(fn (PlannedMeal $meal) => $meal->date->toDateString().'|'.$meal->slot->value)
+            ? $plan->plannedMeals->keyBy(fn (PlannedMeal $meal) => SlotKey::make($meal->date, $meal->slot))
             : collect();
 
         $pickerRecipes = $this->pickerRecipes();
@@ -371,13 +379,13 @@ class PlanBuilder extends Component
     private function moveToNextEmptyCell(MealPlan $plan): void
     {
         $filled = $plan->plannedMeals()->get()
-            ->map(fn (PlannedMeal $meal) => $meal->date->toDateString().'|'.$meal->slot->value)
+            ->map(fn (PlannedMeal $meal) => SlotKey::make($meal->date, $meal->slot))
             ->flip();
 
         $cells = collect(MealSlot::cases())
-            ->flatMap(fn (MealSlot $slot) => $this->weekDates($plan)->map(fn (string $date) => $date.'|'.$slot->value));
+            ->flatMap(fn (MealSlot $slot) => $this->weekDates($plan)->map(fn (string $date) => SlotKey::make($date, $slot)));
 
-        $from = $cells->search($this->pickerDate.'|'.$this->pickerSlot);
+        $from = $cells->search(SlotKey::make($this->pickerDate, $this->pickerSlot));
         $next = $cells->slice($from + 1)->concat($cells->take($from))
             ->first(fn (string $cell) => ! $filled->has($cell));
 
@@ -387,7 +395,7 @@ class PlanBuilder extends Component
             return;
         }
 
-        [$this->pickerDate, $this->pickerSlot] = explode('|', $next);
+        [$this->pickerDate, $this->pickerSlot] = SlotKey::parse($next);
         $this->pickerSearch = '';
     }
 

@@ -62,7 +62,7 @@ it('fills every empty weekday slot with a recipe matching the slot meal type or 
 
     $plan = autoFillPlan();
 
-    $created = autoFillAction()->handle($plan);
+    $created = autoFillAction()->fill($plan)->meals;
 
     expect($created)->toHaveCount(15);
 
@@ -92,7 +92,7 @@ it('prefers higher-rated recipes and drops the lowest-rated when the pool overfl
 
     $plan = autoFillPlan();
 
-    $created = autoFillAction()->handle($plan);
+    $created = autoFillAction()->fill($plan)->meals;
 
     // Only dinner slots are fillable (no breakfast/lunch/any pool).
     expect($created)->toHaveCount(5);
@@ -117,7 +117,7 @@ it('penalizes recipes planned in the 14 days before the week start', function ()
 
     $plan = autoFillPlan();
 
-    $created = autoFillAction()->handle($plan);
+    $created = autoFillAction()->fill($plan)->meals;
 
     $mondayDinner = $created->first(fn (PlannedMeal $meal) => $meal->date->toDateString() === AUTO_FILL_WEEK
         && $meal->slot === MealSlot::Dinner);
@@ -129,7 +129,7 @@ it('penalizes recipes planned in the 14 days before the week start', function ()
 it('never repeats a recipe within the week when the pool is large enough', function () {
     Recipe::factory()->approved()->count(15)->create(['meal_type' => MealType::Any]);
 
-    $created = autoFillAction()->handle(autoFillPlan());
+    $created = autoFillAction()->fill(autoFillPlan())->meals;
 
     expect($created)->toHaveCount(15)
         ->and($created->pluck('recipe_id')->unique())->toHaveCount(15);
@@ -146,7 +146,7 @@ it('fills only empty slots and counts existing planned recipes toward the no-rep
         'slot' => MealSlot::Breakfast,
     ]);
 
-    $created = autoFillAction()->handle($plan);
+    $created = autoFillAction()->fill($plan)->meals;
 
     expect($created)->toHaveCount(14)
         ->and($created->pluck('id'))->not->toContain($existing->id)
@@ -159,7 +159,7 @@ it('fills only empty slots and counts existing planned recipes toward the no-rep
 it('reuses recipes evenly when the pool is smaller than the week', function () {
     Recipe::factory()->approved()->count(2)->create(['meal_type' => MealType::Any]);
 
-    $created = autoFillAction()->handle(autoFillPlan());
+    $created = autoFillAction()->fill(autoFillPlan())->meals;
 
     expect($created)->toHaveCount(15);
 
@@ -175,7 +175,7 @@ it('refuses to fill a plan that is not a draft', function () {
 
     $plan = MealPlan::factory()->locked()->create(['week_start_date' => AUTO_FILL_WEEK]);
 
-    expect(fn () => autoFillAction()->handle($plan))
+    expect(fn () => autoFillAction()->fill($plan))
         ->toThrow(LogicException::class, 'Only draft plans can be auto-filled.');
 
     expect($plan->plannedMeals()->count())->toBe(0);
@@ -196,7 +196,7 @@ it('boosts recipes matching profile-favored cuisines', function () {
         'meal_type' => MealType::Dinner, 'cuisine' => 'italian', 'tags' => [],
     ]);
 
-    $created = autoFillAction()->handle(autoFillPlan());
+    $created = autoFillAction()->fill(autoFillPlan())->meals;
 
     $mondayDinner = $created->first(fn (PlannedMeal $meal) => $meal->date->toDateString() === AUTO_FILL_WEEK
         && $meal->slot === MealSlot::Dinner);
@@ -230,7 +230,7 @@ it('prefers faster breakfasts when the profile shows breakfasts are often skippe
         ]);
     }
 
-    $withoutPattern = autoFillAction(seed: 7)->handle(autoFillPlan('2026-09-07'));
+    $withoutPattern = autoFillAction(seed: 7)->fill(autoFillPlan('2026-09-07'))->meals;
 
     $mondayBreakfast = fn ($created, string $monday) => $created->first(
         fn (PlannedMeal $meal) => $meal->date->toDateString() === $monday && $meal->slot === MealSlot::Breakfast,
@@ -252,7 +252,7 @@ it('prefers faster breakfasts when the profile shows breakfasts are often skippe
         ]);
     }
 
-    $withPattern = autoFillAction(seed: 7)->handle(autoFillPlan('2026-10-05'));
+    $withPattern = autoFillAction(seed: 7)->fill(autoFillPlan('2026-10-05'))->meals;
 
     // The per-minute penalty (0.02 * 60 = 1.2 vs 0.2) flips the pick to the
     // faster breakfast regardless of seed.
@@ -271,8 +271,8 @@ it('produces an identical fill for the same seed', function () {
         ])
         ->all();
 
-    $first = $layout(autoFillAction(seed: 42)->handle($planA), $planA);
-    $second = $layout(autoFillAction(seed: 42)->handle($planB), $planB);
+    $first = $layout(autoFillAction(seed: 42)->fill($planA)->meals, $planA);
+    $second = $layout(autoFillAction(seed: 42)->fill($planB)->meals, $planB);
 
     expect($second)->toBe($first);
 });
@@ -285,7 +285,7 @@ it('never plans a recipe with a missing kitchen tool', function () {
     $wok->update(['owned' => true]);
     $fine->recipeTools->first()->alternatives()->update(['word' => 'wok', 'kitchen_tool_kind_id' => $wok->id]);
 
-    $created = autoFillAction()->handle(autoFillPlan());
+    $created = autoFillAction()->fill(autoFillPlan())->meals;
 
     expect($created)->not->toBeEmpty()
         ->and($created->pluck('recipe_id')->unique()->all())->toBe([$fine->id])
@@ -299,7 +299,7 @@ it('never plans a recipe containing an avoided ingredient', function () {
     $herby->ingredients()->attach(Ingredient::factory()->create(['name' => 'fresh cilantro'])->id, ['qty' => 1, 'unit' => null, 'note' => null]);
     $safe = Recipe::factory()->approved()->create(['meal_type' => MealType::Any]);
 
-    $created = autoFillAction()->handle(autoFillPlan());
+    $created = autoFillAction()->fill(autoFillPlan())->meals;
 
     expect($created)->toHaveCount(15)
         ->and($created->pluck('recipe_id')->unique()->all())->toBe([$safe->id]);

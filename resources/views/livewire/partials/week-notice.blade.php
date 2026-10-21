@@ -1,4 +1,4 @@
-{{-- The in-screen notice: what the app prepared for this week, and the one thing to do next. Needs $state, $plan, $meals, $total, $completable. --}}
+{{-- The in-screen notice: what the app prepared for this week, and the one thing to do next. Needs $state, $plan, $meals, $total, $completable, $unfilled, $editable. --}}
 @php $gaps = $total - $meals->count(); @endphp
 <x-ui.alert class="mb-4">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -21,6 +21,14 @@
             @else
                 <p class="font-semibold">This week is done</p>
                 <p class="text-base-content/70">Tap a meal to log it late.</p>
+            @endif
+            {{-- Why the last fill left slots empty, kept until the next fill or a change of week. --}}
+            @if ($unfilled !== [] && $editable)
+                <ul class="mt-2 list-disc pl-5 text-warning" data-test="unfilled">
+                    @foreach ($unfilled as $reason)
+                        <li>{{ $reason }}</li>
+                    @endforeach
+                </ul>
             @endif
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">

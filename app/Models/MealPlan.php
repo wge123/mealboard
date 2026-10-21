@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\MealPlanStatus;
 use App\Enums\MealSlot;
+use App\Support\SlotKey;
 use Carbon\CarbonInterface;
 use Database\Factories\MealPlanFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -93,37 +94,66 @@ class MealPlan extends Model
     }
 
     /**
-     * The week's skipped slots (GLOSSARY) as "YYYY-MM-DD|slot" keys, the same
-     * keys the week screen uses for a cell.
+     * The week's skipped slots (GLOSSARY) as slot keys, the same keys the
+     * week screen uses for a cell.
      *
      * @return Collection<int, string>
      */
     public function skippedSlots(): Collection
     {
         return collect($this->check_in['skipped'] ?? [])
-            ->map(fn (array $skip) => $skip['date'].'|'.$skip['slot'])
+            ->map(fn (array $skip) => SlotKey::make($skip['date'], $skip['slot']))
             ->values();
     }
 
     /**
-     * Save the skipped slots (as "YYYY-MM-DD|slot" keys), keeping every other
-     * check-in answer as it was.
+     * Save the skipped slots (as slot keys, kept in week order), keeping every
+     * other check-in answer as it was.
      *
      * @param  iterable<string>  $keys
      */
     public function saveSkippedSlots(iterable $keys): void
     {
-        $skipped = collect($keys)
+        $this->update(['check_in' => [...($this->check_in ?? []), 'skipped' => $this->skippedRows($keys)]]);
+    }
+
+    /**
+     * Save all three check-in answers in one write: the skipped slots (slot
+     * keys), the quick nights (dates) and the craving (null or blank clears it).
+     *
+     * @param  iterable<string>  $skipKeys
+     * @param  iterable<string>  $quickNights
+     */
+    public function saveCheckIn(iterable $skipKeys, iterable $quickNights, ?string $craving): void
+    {
+        $checkIn = $this->check_in ?? [];
+        $checkIn['skipped'] = $this->skippedRows($skipKeys);
+        $checkIn['quick_nights'] = collect($quickNights)->unique()->sort()->values()->all();
+        unset($checkIn['craving']);
+
+        if ($craving !== null && trim($craving) !== '') {
+            $checkIn['craving'] = trim($craving);
+        }
+
+        $this->update(['check_in' => $checkIn]);
+    }
+
+    /**
+     * @param  iterable<string>  $keys
+     * @return list<array{date: string, slot: string}>
+     */
+    private function skippedRows(iterable $keys): array
+    {
+        return collect($keys)
             ->unique()
+            ->sortBy(fn (string $key) => SlotKey::order($key))
             ->map(function (string $key) {
-                [$date, $slot] = explode('|', $key);
+                [$date, $slot] = SlotKey::parse($key);
 
                 return ['date' => $date, 'slot' => $slot];
             })
             ->values()
             ->all();
-
-        $this->update(['check_in' => [...($this->check_in ?? []), 'skipped' => $skipped]]);
     }
 
     /**
@@ -136,34 +166,10 @@ class MealPlan extends Model
         return collect($this->check_in['quick_nights'] ?? [])->values();
     }
 
-    /**
-     * Save the quick nights (as "YYYY-MM-DD" dates), keeping every other
-     * check-in answer as it was.
-     *
-     * @param  iterable<string>  $dates
-     */
-    public function saveQuickNights(iterable $dates): void
-    {
-        $this->update(['check_in' => [...($this->check_in ?? []), 'quick_nights' => collect($dates)->unique()->sort()->values()->all()]]);
-    }
-
     /** The cuisine the household craves this week (GLOSSARY), if they chose one. */
     public function craving(): ?string
     {
         return $this->check_in['craving'] ?? null;
-    }
-
-    /** Save the craving, keeping every other check-in answer as it was; null clears it. */
-    public function saveCraving(?string $cuisine): void
-    {
-        $checkIn = $this->check_in ?? [];
-        unset($checkIn['craving']);
-
-        if ($cuisine !== null && trim($cuisine) !== '') {
-            $checkIn['craving'] = trim($cuisine);
-        }
-
-        $this->update(['check_in' => $checkIn]);
     }
 
     /**
@@ -185,15 +191,13 @@ class MealPlan extends Model
 
         foreach ($this->plannedMeals as $meal) {
             $date = $meal->date->toDateString();
-            $key = $date.'|'.$meal->slot->value;
+            $key = SlotKey::make($date, $meal->slot);
             $name = $meal->date->format('D').' '.$meal->slot->value;
 
             if ($skipped->has($key)) {
                 $flags[$key] = "{$name} is marked Out";
             } elseif ($meal->slot === MealSlot::Dinner && $quickNights->has($date)) {
-                $minutes = $meal->recipe->prep_minutes + $meal->recipe->cook_minutes;
-
-                if ($minutes <= 0 || $minutes > $quickNightLimit) {
+                if (! $meal->recipe->fitsQuickNight($quickNightLimit)) {
                     $flags[$key] = "{$name} is over your quick-night limit ({$quickNightLimit} min)";
                 }
             }

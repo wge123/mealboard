@@ -17,7 +17,7 @@ beforeEach(fn () => KitchenToolKind::where('name', 'skillet')->update(['owned' =
 
 function checkInFill(MealPlan $plan, int $seed = 1)
 {
-    return (new AutoFillWeek(new Randomizer(new Mt19937($seed))))->handle($plan);
+    return (new AutoFillWeek(new Randomizer(new Mt19937($seed))))->fill($plan)->meals;
 }
 
 /** A plan for the week of 2026-09-07 whose check-in skips the given date+slot pairs. */

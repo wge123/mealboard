@@ -52,6 +52,26 @@ class Recipe extends Model
     }
 
     /** @return BelongsTo<RecipeRequest, $this> */
+    /** Prep plus cook minutes; 0 when neither is known. */
+    public function totalMinutes(): int
+    {
+        return (int) $this->prep_minutes + (int) $this->cook_minutes;
+    }
+
+    /** Whether the total time is known and within the quick-night limit (GLOSSARY). */
+    public function fitsQuickNight(int $limit): bool
+    {
+        $minutes = $this->totalMinutes();
+
+        return $minutes > 0 && $minutes <= $limit;
+    }
+
+    /** A cuisine as compared: trimmed and lower-cased, so ' Thai ' and 'thai' are one. */
+    public static function cuisineKey(?string $cuisine): string
+    {
+        return mb_strtolower(trim((string) $cuisine));
+    }
+
     public function recipeRequest(): BelongsTo
     {
         return $this->belongsTo(RecipeRequest::class);

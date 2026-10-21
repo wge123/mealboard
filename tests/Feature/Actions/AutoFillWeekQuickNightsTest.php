@@ -118,11 +118,3 @@ it('still leaves out avoided-ingredient and missing-tool recipes on a quick nigh
     expect($plan->plannedMeals()->whereDate('date', '2026-09-08')->where('slot', 'dinner')->exists())->toBeFalse()
         ->and($result->unfilled)->toBe(['No recipe under 20 min for Tue dinner']);
 });
-
-it('keeps handle returning the created planned meals', function () {
-    recipeTakingMinutes(5, 5);
-
-    $created = (new AutoFillWeek(new Randomizer(new Mt19937(1))))->handle(planWithQuickTuesday());
-
-    expect($created)->toHaveCount(15);
-});

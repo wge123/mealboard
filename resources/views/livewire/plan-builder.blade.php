@@ -5,12 +5,15 @@
         $prevPlan = $at !== false ? $ordered->get($at - 1) : null;
         $nextPlan = $at !== false ? $ordered->get($at + 1) : null;
 
-        $cellKey = fn ($day, $slot) => $day->toDateString().'|'.$slot->value;
-        $openCell = $pickerDate && $pickerSlot ? $pickerDate.'|'.$pickerSlot : null;
+        $cellKey = fn ($day, $slot) => \App\Support\SlotKey::make($day, $slot);
+        $openCell = $pickerDate && $pickerSlot ? \App\Support\SlotKey::make($pickerDate, $pickerSlot) : null;
         $minutesOf = fn ($recipe) => (int) $recipe->prep_minutes + (int) $recipe->cook_minutes;
         $dayMinutes = fn ($day) => collect($slots)->sum(fn ($slot) => $meals->has($cellKey($day, $slot)) ? $minutesOf($meals->get($cellKey($day, $slot))->recipe) : 0);
         $hm = fn (int $min) => $min >= 60 ? intdiv($min, 60).'h'.($min % 60 ? ' '.($min % 60).'m' : '') : $min.' min';
-        $total = $days->count() * count($slots);
+        // Out slots are not gaps: only cells that are not skipped (or already hold a meal) are plannable.
+        $total = $days->flatMap(fn ($day) => collect($slots)->map(fn ($slot) => $cellKey($day, $slot)))
+            ->reject(fn ($key) => $skipped->has($key) && ! $meals->has($key))
+            ->count();
         // Ticked days of a suggested week; only days still in the week count.
         $reviewed = collect($plan?->reviewed_dates ?? [])->intersect($days->map->toDateString());
         $allReviewed = $days->isNotEmpty() && $reviewed->count() === $days->count();
@@ -91,17 +94,6 @@
 
         @include('livewire.partials.week-notice')
 
-        {{-- Why the last fill left slots empty, kept until the next fill or a change of week. --}}
-        @if ($fillNotes !== [] && $editable)
-            <x-ui.alert tone="warning" class="mb-4" data-test="fill-notes">
-                <ul>
-                    @foreach ($fillNotes as $note)
-                        <li>{{ $note }}</li>
-                    @endforeach
-                </ul>
-            </x-ui.alert>
-        @endif
-
         @if ($clashes->isNotEmpty())
             <x-ui.alert tone="warning" class="mb-4" data-test="clash-notes">
                 <p class="font-medium">These meals no longer fit your answers for the week. Change or clear them to remove the flag.</p>
@@ -132,7 +124,7 @@
                                 <span class="w-20 shrink-0 text-sm font-medium">{{ $day->format('D j M') }}</span>
                                 @foreach ($slots as $slot)
                                     <x-ui.button class="flex-1 capitalize" data-test="skip-{{ $day->toDateString() }}-{{ $slot->value }}"
-                                                 aria-pressed="{{ in_array($day->toDateString().'|'.$slot->value, $skips, true) ? 'true' : 'false' }}"
+                                                 aria-pressed="{{ in_array($cellKey($day, $slot), $skips, true) ? 'true' : 'false' }}"
                                                  wire:click="toggleSkip('{{ $day->toDateString() }}', '{{ $slot->value }}')">{{ $slot->value }}</x-ui.button>
                                 @endforeach
                                 <x-ui.button variant="ghost" data-test="skip-day-{{ $day->toDateString() }}"

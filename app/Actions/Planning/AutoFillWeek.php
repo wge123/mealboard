@@ -12,6 +12,7 @@ use App\Models\PlannedMeal;
 use App\Models\Recipe;
 use App\Support\HouseholdPreferences;
 use App\Support\MissingKitchenTools;
+use App\Support\SlotKey;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use LogicException;
@@ -59,18 +60,8 @@ class AutoFillWeek
 
     /**
      * Fill the plan's empty Mon–Fri breakfast/lunch/dinner slots with
-     * approved recipes, leaving the week check-in's skipped slots empty,
-     * and return the created planned meals.
-     *
-     * @return Collection<int, PlannedMeal>
-     */
-    public function handle(MealPlan $plan): Collection
-    {
-        return $this->fill($plan)->meals;
-    }
-
-    /**
-     * Fill as handle() does, and also report why any slot the household asked
+     * approved recipes, leaving the week check-in's skipped slots empty, and
+     * report the created planned meals and why any slot the household asked
      * about stayed empty. A reason is a plain sentence in the result, never an
      * exception: a new answer that can leave a slot empty adds its sentence to
      * the same list.
@@ -119,40 +110,28 @@ class AutoFillWeek
 
         $existing = $plan->plannedMeals()->get();
 
-        $filled = $existing
-            ->mapWithKeys(fn (PlannedMeal $meal) => [$meal->date->toDateString().'|'.$meal->slot->value => true]);
-
-        // A skipped slot (eating out, away) is never filled.
-        $filled = $filled->toBase()->merge($plan->skippedSlots()->flip());
-
+        // A slot with a meal, and a skipped slot (eating out, away), is never filled.
         // Recipes already on the plan count toward the no-repeat rule.
-        $useCounts = $existing->countBy('recipe_id')->all();
-
-        $created = collect();
-
-        // Slots left empty for a reason the household can act on, in week order.
-        $unfilled = [];
-
-        $quickNights = $plan->quickNights()->flip();
-        $quickLimit = $this->preferences->quickNightLimit();
+        $state = new FillState(
+            $existing->mapWithKeys(fn (PlannedMeal $meal) => [SlotKey::make($meal->date, $meal->slot) => true])
+                ->toBase()->merge($plan->skippedSlots()->flip()),
+            $existing->countBy('recipe_id')->all(),
+        );
 
         $quickNights = $plan->quickNights()->flip();
         $quickLimit = $this->preferences->quickNightLimit();
 
-        $craving = trim((string) $plan->craving());
+        $craving = $plan->craving();
 
-        if ($craving !== '') {
-            $this->placeCraving(
-                $plan, $craving, $existing, $pools[MealSlot::Dinner->value], $weekStart,
-                $filled, $quickNights, $quickLimit, $useCounts, $created, $unfilled,
-            );
+        if ($craving !== null) {
+            $this->placeCraving($plan, $craving, $existing, $pools[MealSlot::Dinner->value], $weekStart, $quickNights, $quickLimit, $state);
         }
 
         for ($day = 0; $day < self::WEEKDAYS; $day++) {
             $date = $weekStart->copy()->addDays($day)->toDateString();
 
             foreach (MealSlot::cases() as $slot) {
-                if ($filled->has($date.'|'.$slot->value)) {
+                if ($state->filled->has(SlotKey::make($date, $slot))) {
                     continue;
                 }
 
@@ -161,30 +140,24 @@ class AutoFillWeek
                 // A quick night limits dinner only, to recipes whose total minutes
                 // are known and within the quick-night limit.
                 if ($slot === MealSlot::Dinner && $quickNights->has($date)) {
-                    $pool = $this->withinQuickLimit($pool, $quickLimit);
+                    $pool = $pool->filter(fn (Recipe $recipe) => $recipe->fitsQuickNight($quickLimit))->values();
 
                     if ($pool->isEmpty()) {
-                        $unfilled[] = "No recipe under {$quickLimit} min for ".Carbon::parse($date)->format('D').' dinner';
+                        $state->unfilled[] = "No recipe under {$quickLimit} min for ".Carbon::parse($date)->format('D').' dinner';
                     }
                 }
 
-                $pick = $this->pick($pool, $useCounts);
+                $pick = $this->pick($pool, $state->useCounts);
 
                 if ($pick === null) {
                     continue; // Empty pool — nothing eligible for this slot.
                 }
 
-                $useCounts[$pick->id] = ($useCounts[$pick->id] ?? 0) + 1;
-
-                $created->push($plan->plannedMeals()->create([
-                    'recipe_id' => $pick->id,
-                    'date' => $date,
-                    'slot' => $slot,
-                ]));
+                $state->place($plan, $pick, $date, $slot);
             }
         }
 
-        return new AutoFillResult($created, $unfilled);
+        return new AutoFillResult($state->created, $state->unfilled);
     }
 
     /**
@@ -192,15 +165,12 @@ class AutoFillWeek
      * the craved cuisine, best score first, none repeated, on empty dinners
      * that are not quick nights (earliest first) and only then on quick nights,
      * where the recipe must fit the quick-night limit. A shortfall becomes a
-     * sentence in $unfilled.
+     * sentence in the state's unfilled list, naming its cause: too few
+     * eligible recipes in the library, too few free dinners on the week, or both.
      *
      * @param  Collection<int, PlannedMeal>  $existing
      * @param  Collection<int, Recipe>  $dinnerPool  sorted best score first
-     * @param  Collection<string, mixed>  $filled  slot keys taken, updated here
      * @param  Collection<string, int>  $quickNights  dates flipped to keys
-     * @param  array<int, int>  $useCounts  updated here
-     * @param  Collection<int, PlannedMeal>  $created  appended to here
-     * @param  list<string>  $unfilled  appended to here
      */
     private function placeCraving(
         MealPlan $plan,
@@ -208,36 +178,40 @@ class AutoFillWeek
         Collection $existing,
         Collection $dinnerPool,
         Carbon $weekStart,
-        Collection $filled,
         Collection $quickNights,
         int $quickLimit,
-        array &$useCounts,
-        Collection $created,
-        array &$unfilled,
+        FillState $state,
     ): void {
-        $matches = fn (?string $cuisine) => mb_strtolower(trim((string) $cuisine)) === mb_strtolower($craving);
+        $matches = fn (?string $cuisine) => Recipe::cuisineKey($cuisine) === Recipe::cuisineKey($craving);
 
         $have = $existing
             ->load('recipe')
-            ->filter(fn (PlannedMeal $meal) => $meal->slot === MealSlot::Dinner && $matches($meal->recipe?->cuisine))
+            ->filter(fn (PlannedMeal $meal) => $meal->slot === MealSlot::Dinner && $matches($meal->recipe->cuisine))
             ->count();
 
+        $needed = max(0, self::CRAVING_DINNERS - $have);
+
         $cravingPool = $dinnerPool
-            ->filter(fn (Recipe $recipe) => $matches($recipe->cuisine) && ! isset($useCounts[$recipe->id]))
+            ->filter(fn (Recipe $recipe) => $matches($recipe->cuisine) && ! isset($state->useCounts[$recipe->id]))
             ->values();
 
         $dates = collect(range(0, self::WEEKDAYS - 1))
             ->map(fn (int $day) => $weekStart->copy()->addDays($day)->toDateString())
-            ->filter(fn (string $date) => ! $filled->has($date.'|'.MealSlot::Dinner->value))
+            ->filter(fn (string $date) => ! $state->filled->has(SlotKey::make($date, MealSlot::Dinner)))
             ->sortBy(fn (string $date) => $quickNights->has($date))
             ->values();
+
+        $libraryShort = $cravingPool->count() < $needed;
+        $freeShort = $dates->count() < $needed;
 
         foreach ($dates as $date) {
             if ($have >= self::CRAVING_DINNERS) {
                 break;
             }
 
-            $pool = $quickNights->has($date) ? $this->withinQuickLimit($cravingPool, $quickLimit) : $cravingPool;
+            $pool = $quickNights->has($date)
+                ? $cravingPool->filter(fn (Recipe $recipe) => $recipe->fitsQuickNight($quickLimit))
+                : $cravingPool;
             $pick = $pool->first();
 
             if ($pick === null) {
@@ -245,31 +219,26 @@ class AutoFillWeek
             }
 
             $cravingPool = $cravingPool->reject(fn (Recipe $recipe) => $recipe->id === $pick->id)->values();
-            $useCounts[$pick->id] = 1;
-            $filled->put($date.'|'.MealSlot::Dinner->value, true);
+            $state->place($plan, $pick, $date, MealSlot::Dinner);
             $have++;
-
-            $created->push($plan->plannedMeals()->create([
-                'recipe_id' => $pick->id,
-                'date' => $date,
-                'slot' => MealSlot::Dinner,
-            ]));
         }
 
-        if ($have < self::CRAVING_DINNERS) {
-            $unfilled[] = 'Found only '.$have.' of '.self::CRAVING_DINNERS." {$craving} dinners for your craving";
+        if ($have >= self::CRAVING_DINNERS) {
+            return;
         }
-    }
 
-    /**
-     * Recipes whose total minutes are known and within the quick-night limit.
-     *
-     * @param  Collection<int, Recipe>  $pool
-     * @return Collection<int, Recipe>
-     */
-    private function withinQuickLimit(Collection $pool, int $quickLimit): Collection
-    {
-        return $pool->filter(fn (Recipe $recipe) => ($minutes = $recipe->prep_minutes + $recipe->cook_minutes) > 0 && $minutes <= $quickLimit)->values();
+        // Too few free dinners alone is not the library's fault; anything else
+        // (too few recipes, or none that fit a quick night) is.
+        if ($libraryShort || ! $freeShort) {
+            $state->unfilled[] = 'Found only '.$have.' of '.self::CRAVING_DINNERS." {$craving} dinners for your craving";
+        }
+
+        if ($freeShort) {
+            $free = $dates->count();
+            $state->unfilled[] = $free === 0
+                ? "No free dinner left for your {$craving} craving"
+                : "Only {$free} free dinner for your {$craving} craving";
+        }
     }
 
     /**
