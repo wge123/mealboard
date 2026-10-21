@@ -26,6 +26,9 @@
             @endif
         </span>
         <span class="num text-xs text-base-content/70">{{ $minutes > 0 ? $minutes.' min' : '' }}</span>
+        @if ($clashes->has($cellKey($day, $slot)))
+            <x-ui.badge tone="warning" data-test="clash-{{ $cellKey($day, $slot) }}" title="{{ $clashes->get($cellKey($day, $slot)) }}">Check this</x-ui.badge>
+        @endif
     @if ($actionable)
         </button>
     @else

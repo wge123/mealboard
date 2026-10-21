@@ -308,7 +308,8 @@ class PlanBuilder extends Component
         return view('livewire.plan-builder', [
             'plan' => $plan,
             'skipped' => $plan ? $plan->skippedSlots()->flip() : collect(),
-            'quickNightLimit' => app(HouseholdPreferences::class)->quickNightLimit(),
+            'quickNightLimit' => $quickNightLimit = app(HouseholdPreferences::class)->quickNightLimit(),
+            'clashes' => $plan?->status === MealPlanStatus::Draft ? $plan->clashes($quickNightLimit) : collect(),
             'plans' => MealPlan::query()->orderByDesc('week_start_date')->get(),
             'days' => $plan ? $this->weekDates($plan)->map(fn (string $date) => Carbon::parse($date)) : collect(),
             'slots' => MealSlot::cases(),

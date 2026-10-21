@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\MealPlanStatus;
+use App\Enums\MealSlot;
 use Carbon\CarbonInterface;
 use Database\Factories\MealPlanFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -144,6 +145,42 @@ class MealPlan extends Model
     public function saveQuickNights(iterable $dates): void
     {
         $this->update(['check_in' => [...($this->check_in ?? []), 'quick_nights' => collect($dates)->unique()->sort()->values()->all()]]);
+    }
+
+    /**
+     * Planned meals that break the week's saved answers (a clash), as the
+     * flag to show, keyed by "YYYY-MM-DD|slot". Derived on every call from the
+     * answers and the planned meals, never stored, so changing a meal or an
+     * answer changes the flags with no clean-up. Answers never swap or remove
+     * a meal: they only steer empty slots, and a clash is left for the
+     * household to fix by hand. A dinner whose time is unknown (0 minutes)
+     * does not fit a quick night, as in auto-fill.
+     *
+     * @return Collection<string, string>
+     */
+    public function clashes(int $quickNightLimit): Collection
+    {
+        $quickNights = $this->quickNights()->flip();
+        $skipped = $this->skippedSlots()->flip();
+        $flags = collect();
+
+        foreach ($this->plannedMeals as $meal) {
+            $date = $meal->date->toDateString();
+            $key = $date.'|'.$meal->slot->value;
+            $name = $meal->date->format('D').' '.$meal->slot->value;
+
+            if ($skipped->has($key)) {
+                $flags[$key] = "{$name} is marked Out";
+            } elseif ($meal->slot === MealSlot::Dinner && $quickNights->has($date)) {
+                $minutes = $meal->recipe->prep_minutes + $meal->recipe->cook_minutes;
+
+                if ($minutes <= 0 || $minutes > $quickNightLimit) {
+                    $flags[$key] = "{$name} is over your quick-night limit ({$quickNightLimit} min)";
+                }
+            }
+        }
+
+        return $flags;
     }
 
     public function plannedMeals(): HasMany
