@@ -108,6 +108,7 @@ class PlanBuilder extends Component
 
         $this->skips = $plan->skippedSlots()->all();
         $this->quickNights = $plan->quickNights()->all();
+        $this->craving = $plan->craving() ?? '';
         $this->checkInOpen = true;
     }
 
@@ -116,6 +117,7 @@ class PlanBuilder extends Component
         $this->checkInOpen = false;
         $this->skips = [];
         $this->quickNights = [];
+        $this->craving = '';
     }
 
     public function toggleSkip(string $date, string $slot): void
@@ -152,6 +154,9 @@ class PlanBuilder extends Component
             return $date.'|'.$order[$slot];
         })->values());
         $plan->saveQuickNights($this->quickNights);
+
+        abort_unless($this->craving === '' || in_array($this->craving, $this->libraryCuisines(), true), 422);
+        $plan->saveCraving($this->craving);
 
         $this->closeCheckIn();
         $this->autoFill();
@@ -298,6 +303,25 @@ class PlanBuilder extends Component
             ->delete();
     }
 
+    /**
+     * The distinct cuisines among approved library recipes, as stored, for the craving picker.
+     *
+     * @return list<string>
+     */
+    private function libraryCuisines(): array
+    {
+        return Recipe::query()
+            ->where('status', RecipeStatus::Approved)
+            ->whereNotNull('cuisine')
+            ->pluck('cuisine')
+            ->map(fn (string $cuisine) => trim($cuisine))
+            ->filter()
+            ->unique(fn (string $cuisine) => mb_strtolower($cuisine))
+            ->sortBy(fn (string $cuisine) => mb_strtolower($cuisine))
+            ->values()
+            ->all();
+    }
+
     public function render(): View
     {
         $plan = $this->plan()?->load('plannedMeals.recipe', 'plannedMeals.logs');
@@ -311,7 +335,7 @@ class PlanBuilder extends Component
         return view('livewire.plan-builder', [
             'plan' => $plan,
             'skipped' => $plan ? $plan->skippedSlots()->flip() : collect(),
-            'cuisines' => [],
+            'cuisines' => $this->checkInOpen ? $this->libraryCuisines() : [],
             'quickNightLimit' => app(HouseholdPreferences::class)->quickNightLimit(),
             'plans' => MealPlan::query()->orderByDesc('week_start_date')->get(),
             'days' => $plan ? $this->weekDates($plan)->map(fn (string $date) => Carbon::parse($date)) : collect(),

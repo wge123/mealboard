@@ -184,7 +184,7 @@ it('lists only the cuisines in the approved library, saves the craving, and reop
         ->set('craving', 'thai')
         ->call('submitCheckIn');
 
-    expect($plan->fresh()->check_in)->toBe(['quick_nights' => ['2099-01-06'], 'craving' => 'thai']);
+    expect($plan->fresh()->check_in)->toBe(['quick_nights' => ['2099-01-06'], 'skipped' => [], 'craving' => 'thai']);
 
     checkInScreen()->call('openCheckIn')->assertSet('craving', 'thai');
 });

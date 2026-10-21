@@ -96,6 +96,10 @@ _Avoid_: busy night, easy night, weeknight (the weekday limits are a different r
 The most total minutes (prep plus cook) a quick-night dinner may take. A household preference, set beside the weekday limits, at least 1 minute. It binds auto-fill only; the weekday limits remain the cap on discovery.
 _Avoid_: quick-night cap, weeknight time limit
 
+**Craving**:
+One cuisine the household picks on the week check-in from the cuisines already in the library. Before normal filling, auto-fill places two dinners of it, best score first and never repeating a recipe, on empty dinners that are not quick nights first (earliest first). A quick night gets one only if the recipe fits the quick-night limit. When the library has too few, the week notice says how many it found.
+_Avoid_: favourite cuisine (that is the taste profile), theme night
+
 ## Shopping
 
 **Shopping list**:

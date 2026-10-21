@@ -140,6 +140,15 @@
                         @endforeach
                     </div>
 
+                    <h4 class="mt-5 text-sm font-medium">Craving</h4>
+                    <p class="text-xs text-base-content/70">Pick a cuisine and Mealboard plans two dinners of it, on the nights you have time to cook.</p>
+                    <select class="select select-bordered mt-2 w-full" data-test="craving" aria-label="Craving" wire:model="craving">
+                        <option value="">No craving</option>
+                        @foreach ($cuisines as $cuisine)
+                            <option value="{{ $cuisine }}">{{ \Illuminate\Support\Str::ucfirst($cuisine) }}</option>
+                        @endforeach
+                    </select>
+
                     <div class="modal-action flex-wrap">
                         <x-ui.button wire:click="justFill" busy="justFill">Just fill it</x-ui.button>
                         <x-ui.button variant="primary" icon="tabler-wand" wire:click="submitCheckIn" busy="submitCheckIn">Fill</x-ui.button>

@@ -149,11 +149,21 @@ class MealPlan extends Model
     /** The cuisine the household craves this week (GLOSSARY), if they chose one. */
     public function craving(): ?string
     {
-        return null;
+        return $this->check_in['craving'] ?? null;
     }
 
     /** Save the craving, keeping every other check-in answer as it was; null clears it. */
-    public function saveCraving(?string $cuisine): void {}
+    public function saveCraving(?string $cuisine): void
+    {
+        $checkIn = $this->check_in ?? [];
+        unset($checkIn['craving']);
+
+        if ($cuisine !== null && trim($cuisine) !== '') {
+            $checkIn['craving'] = trim($cuisine);
+        }
+
+        $this->update(['check_in' => $checkIn]);
+    }
 
     public function plannedMeals(): HasMany
     {
