@@ -30,7 +30,7 @@ trait InteractsWithRecipeForm
 
     public string $tagsInput = '';
 
-    /** @var array<int, array{name: string, qty: string, unit: string, prep_note: string}> */
+    /** @var array<int, array{name: string, qty: string, unit: string, prep_note: string, prep_bowl: string}> */
     public array $rows = [];
 
     /** Alternatives are one comma-separated string per tool, split on save. @var array<int, array{alternatives: string, count: int|string}> */
@@ -64,12 +64,13 @@ trait InteractsWithRecipeForm
             'rows.*.qty' => ['nullable', 'numeric', 'min:0'],
             'rows.*.unit' => ['nullable', Rule::enum(Unit::class)],
             'rows.*.prep_note' => ['nullable', 'string', 'max:255'],
+            'rows.*.prep_bowl' => ['nullable', 'string', 'max:64'],
         ];
     }
 
     public function addRow(): void
     {
-        $this->rows[] = ['name' => '', 'qty' => '', 'unit' => '', 'prep_note' => ''];
+        $this->rows[] = ['name' => '', 'qty' => '', 'unit' => '', 'prep_note' => '', 'prep_bowl' => ''];
     }
 
     public function addTool(): void
