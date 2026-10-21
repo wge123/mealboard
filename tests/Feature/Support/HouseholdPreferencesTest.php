@@ -212,3 +212,22 @@ it('says whether a word is avoided, ignoring case and spaces', function () {
     expect($preferences->avoids(' Cilantro '))->toBeTrue()
         ->and($preferences->avoids('parsley'))->toBeFalse();
 });
+
+it('starts the quick-night limit at 20 minutes and saves a new one', function () {
+    $preferences = new HouseholdPreferences;
+
+    expect($preferences->quickNightLimit())->toBe(20);
+
+    $preferences->setQuickNightLimit(15);
+
+    expect($preferences->quickNightLimit())->toBe(15)
+        ->and($preferences->weekdayLimits())->toBe(['minutes' => 30, 'ingredients' => 10]);
+});
+
+it('refuses a quick-night limit under 1 and keeps the stored value', function () {
+    $preferences = new HouseholdPreferences;
+
+    expect(fn () => $preferences->setQuickNightLimit(0))->toThrow(HouseholdPreferenceRefused::class);
+
+    expect($preferences->quickNightLimit())->toBe(20);
+});

@@ -159,3 +159,33 @@ it('shows an avoided word that is not a suggestion as its own tile', function ()
         ->test(Preferences::class)
         ->assertSeeHtml('data-test="avoid-durian" aria-pressed="true"');
 });
+
+it('shows and saves the quick-night limit beside the weekday limits', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/settings')
+        ->assertSee('Quick-night limit');
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(Preferences::class)
+        ->assertSet('quickNightMinutes', 20)
+        ->set('quickNightMinutes', 25)
+        ->call('saveQuickNight')
+        ->assertHasNoErrors()
+        ->call('pickQuickNight', 15)
+        ->assertSet('quickNightMinutes', 15);
+
+    expect((new HouseholdPreferences)->quickNightLimit())->toBe(15);
+});
+
+it('refuses a quick-night limit that is not a whole number of at least 1', function () {
+    Livewire::actingAs(User::factory()->create())
+        ->test(Preferences::class)
+        ->set('quickNightMinutes', 0)
+        ->call('saveQuickNight')
+        ->assertHasErrors('quickNightMinutes')
+        ->set('quickNightMinutes', 'soon')
+        ->call('saveQuickNight')
+        ->assertHasErrors(['quickNightMinutes' => 'integer']);
+
+    expect((new HouseholdPreferences)->quickNightLimit())->toBe(20);
+});
