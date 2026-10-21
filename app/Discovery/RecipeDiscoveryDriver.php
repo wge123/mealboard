@@ -9,7 +9,7 @@ interface RecipeDiscoveryDriver
      *
      * Each candidate mirrors the recipes schema plus its ingredient rows, in
      * the recipe shape (see RecipeOutputFormat): `tools`, `steps` and
-     * ingredient `prep_note`.
+     * ingredient `prep_note` and `prep_bowl`.
      *
      * @return array<int, array{
      *     title: string,
@@ -23,7 +23,7 @@ interface RecipeDiscoveryDriver
      *     cuisine: ?string,
      *     tags: list<string>,
      *     source_url: ?string,
-     *     ingredients: list<array{qty: ?float, unit: ?string, name: string, prep_note?: ?string}>
+     *     ingredients: list<array{qty: ?float, unit: ?string, name: string, prep_note?: ?string, prep_bowl?: ?string}>
      * }>
      */
     public function discover(int $n): array;

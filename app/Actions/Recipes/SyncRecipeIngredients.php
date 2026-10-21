@@ -16,9 +16,10 @@ class SyncRecipeIngredients
      * recipe line's amount or prep ("200g tomato", "pinch of salt", "diced
      * onion") is cleaned first, so the ingredient row holds the bare name and
      * the amount lands on the pivot; a quantity or unit the row already gives
-     * wins over one read out of the name.
+     * wins over one read out of the name. A row's prep bowl is kept as given,
+     * trimmed, or null when blank.
      *
-     * @param  array<int, array{name: string, qty?: mixed, unit?: ?string, note?: ?string, prep_note?: ?string}>  $rows
+     * @param  array<int, array{name: string, qty?: mixed, unit?: ?string, note?: ?string, prep_note?: ?string, prep_bowl?: ?string}>  $rows
      */
     public function handle(Recipe $recipe, array $rows): void
     {
@@ -40,6 +41,7 @@ class SyncRecipeIngredients
                 'qty' => $qty ?? $clean['qty'],
                 'unit' => (($row['unit'] ?? null) ?: null) ?? $clean['unit'],
                 'note' => implode(', ', array_filter([$note, $clean['note']], fn (?string $part) => $part !== null && $part !== '')) ?: null,
+                'prep_bowl' => trim((string) ($row['prep_bowl'] ?? '')) ?: null,
             ];
         }
 

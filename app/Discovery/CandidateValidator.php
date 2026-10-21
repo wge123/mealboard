@@ -168,7 +168,7 @@ class CandidateValidator
 
     /**
      * @param  list<string>  $errors
-     * @return list<array{qty: ?float, unit: ?string, name: string, prep_note: ?string}>
+     * @return list<array{qty: ?float, unit: ?string, name: string, prep_note: ?string, prep_bowl: ?string}>
      */
     private function checkIngredients(mixed $raw, array &$errors): array
     {
@@ -192,6 +192,7 @@ class CandidateValidator
             $qty = $row['qty'] ?? null;
             $unit = $row['unit'] ?? null;
             $prepNote = $row['prep_note'] ?? null;
+            $prepBowl = $row['prep_bowl'] ?? null;
 
             if (! is_string($name) || trim($name) === '') {
                 $errors[] = "ingredients[{$i}].name: must be a non-empty string";
@@ -213,6 +214,11 @@ class CandidateValidator
                 $valid = false;
             }
 
+            if ($prepBowl !== null && ! is_string($prepBowl)) {
+                $errors[] = "ingredients[{$i}].prep_bowl: must be a string or null";
+                $valid = false;
+            }
+
             if (! $valid) {
                 continue;
             }
@@ -222,6 +228,7 @@ class CandidateValidator
                 'unit' => $unit,
                 'name' => trim($name),
                 'prep_note' => $prepNote === null || trim($prepNote) === '' ? null : trim($prepNote),
+                'prep_bowl' => $prepBowl === null || trim($prepBowl) === '' ? null : trim($prepBowl),
             ];
         }
 

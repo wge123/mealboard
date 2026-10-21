@@ -18,7 +18,7 @@ class UpdateRecipe
      * part (no tools, ingredients or steps) is refused before anything is saved.
      *
      * @param  array<string, mixed>  $attributes
-     * @param  array<int, array{name: string, qty?: mixed, unit?: ?string, note?: ?string, prep_note?: ?string}>  $ingredientRows
+     * @param  array<int, array{name: string, qty?: mixed, unit?: ?string, note?: ?string, prep_note?: ?string, prep_bowl?: ?string}>  $ingredientRows
      * @param  array<int, array{alternatives: array<int, string>, count?: ?int}>  $tools
      * @param  array<int, string>  $steps
      *
