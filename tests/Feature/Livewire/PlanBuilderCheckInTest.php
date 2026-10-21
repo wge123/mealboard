@@ -2,6 +2,7 @@
 
 use App\Enums\MealSlot;
 use App\Enums\MealType;
+use App\Enums\RecipeStatus;
 use App\Livewire\PlanBuilder;
 use App\Models\KitchenToolKind;
 use App\Models\MealPlan;
@@ -166,4 +167,42 @@ it('refuses a quick night outside the week', function () {
     MealPlan::factory()->create(['week_start_date' => '2099-01-05']);
 
     checkInScreen()->call('openCheckIn')->call('toggleQuickNight', '2099-02-01')->assertStatus(422);
+});
+
+it('lists only the cuisines in the approved library, saves the craving, and reopens pre-filled', function () {
+    Recipe::factory()->approved()->create(['cuisine' => 'thai']);
+    Recipe::factory()->approved()->create(['cuisine' => 'thai']);
+    Recipe::factory()->approved()->create(['cuisine' => 'Italian']);
+    Recipe::factory()->approved()->create(['cuisine' => null]);
+    Recipe::factory()->create(['status' => RecipeStatus::Pending, 'cuisine' => 'korean']);
+    $plan = MealPlan::factory()->create(['check_in' => ['quick_nights' => ['2099-01-06']], 'week_start_date' => '2099-01-05']);
+
+    checkInScreen()
+        ->call('openCheckIn')
+        ->assertSee('Craving')
+        ->assertViewHas('cuisines', ['Italian', 'thai'])
+        ->set('craving', 'thai')
+        ->call('submitCheckIn');
+
+    expect($plan->fresh()->check_in)->toBe(['quick_nights' => ['2099-01-06'], 'craving' => 'thai']);
+
+    checkInScreen()->call('openCheckIn')->assertSet('craving', 'thai');
+});
+
+it('clears the saved craving when none is chosen', function () {
+    Recipe::factory()->approved()->count(15)->create(['meal_type' => MealType::Any, 'cuisine' => 'thai']);
+    $plan = MealPlan::factory()->create(['check_in' => ['craving' => 'thai']]);
+
+    checkInScreen()->call('openCheckIn')->set('craving', '')->call('submitCheckIn');
+
+    expect($plan->fresh()->check_in)->not->toHaveKey('craving');
+});
+
+it('keeps the saved craving when the household presses Just fill it', function () {
+    Recipe::factory()->approved()->count(15)->create(['meal_type' => MealType::Any, 'cuisine' => 'thai']);
+    $plan = MealPlan::factory()->create(['check_in' => ['craving' => 'thai']]);
+
+    checkInScreen()->call('openCheckIn')->set('craving', '')->call('justFill');
+
+    expect($plan->fresh()->check_in)->toBe(['craving' => 'thai']);
 });
