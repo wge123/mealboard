@@ -23,6 +23,7 @@ class MealPlan extends Model
         'checked_items',
         'purchased_at',
         'reviewed_dates',
+        'check_in',
     ];
 
     /**
@@ -37,6 +38,7 @@ class MealPlan extends Model
             'checked_items' => 'array',
             'purchased_at' => 'datetime',
             'reviewed_dates' => 'array',
+            'check_in' => 'array',
         ];
     }
 

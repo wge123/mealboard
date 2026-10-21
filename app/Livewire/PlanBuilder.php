@@ -62,6 +62,21 @@ class PlanBuilder extends Component
         $this->closePicker();
     }
 
+    public bool $checkInOpen = false;
+
+    /** @var list<string> */
+    public array $skips = [];
+
+    public function openCheckIn(): void {}
+
+    public function justFill(): void {}
+
+    public function submitCheckIn(): void {}
+
+    public function toggleSkip(string $date, string $slot): void {}
+
+    public function toggleSkipDay(string $date): void {}
+
     public function autoFill(): void
     {
         app(AutoFillWeek::class)->handle($this->editablePlan());
