@@ -62,20 +62,86 @@ class PlanBuilder extends Component
         $this->closePicker();
     }
 
+    /** The week check-in sheet is open. */
     public bool $checkInOpen = false;
 
-    /** @var list<string> */
+    /**
+     * The slots ticked as skipped in the open sheet, as "YYYY-MM-DD|slot"
+     * keys. Held here until the sheet is submitted.
+     *
+     * @var list<string>
+     */
     public array $skips = [];
 
-    public function openCheckIn(): void {}
+    /** Open the week check-in, pre-filled with the answers saved on the week. */
+    public function openCheckIn(): void
+    {
+        $plan = $this->editablePlan();
 
-    public function justFill(): void {}
+        $this->skips = $plan->skippedSlots()->all();
+        $this->checkInOpen = true;
+    }
 
-    public function submitCheckIn(): void {}
+    public function closeCheckIn(): void
+    {
+        $this->checkInOpen = false;
+        $this->skips = [];
+    }
 
-    public function toggleSkip(string $date, string $slot): void {}
+    public function toggleSkip(string $date, string $slot): void
+    {
+        $key = $this->skipKey($this->editablePlan(), $date, $slot);
 
-    public function toggleSkipDay(string $date): void {}
+        $this->skips = in_array($key, $this->skips, true)
+            ? array_values(array_diff($this->skips, [$key]))
+            : [...$this->skips, $key];
+    }
+
+    /** Skip all three slots of a day, or clear them when they are all skipped already. */
+    public function toggleSkipDay(string $date): void
+    {
+        $plan = $this->editablePlan();
+
+        $keys = array_map(fn (MealSlot $slot) => $this->skipKey($plan, $date, $slot->value), MealSlot::cases());
+        $missing = array_values(array_diff($keys, $this->skips));
+
+        $this->skips = $missing === []
+            ? array_values(array_diff($this->skips, $keys))
+            : [...$this->skips, ...$missing];
+    }
+
+    /** Save the sheet's answers on the week, then fill around them. */
+    public function submitCheckIn(): void
+    {
+        $plan = $this->editablePlan();
+
+        $order = collect(MealSlot::cases())->map->value->flip();
+        $plan->saveSkippedSlots(collect($this->skips)->sortBy(function (string $key) use ($order) {
+            [$date, $slot] = explode('|', $key);
+
+            return $date.'|'.$order[$slot];
+        })->values());
+
+        $this->closeCheckIn();
+        $this->autoFill();
+    }
+
+    /** Fill with the answers already saved on the week; the sheet's own edits are dropped. */
+    public function justFill(): void
+    {
+        $this->editablePlan();
+
+        $this->closeCheckIn();
+        $this->autoFill();
+    }
+
+    private function skipKey(MealPlan $plan, string $date, string $slot): string
+    {
+        abort_unless($this->weekDates($plan)->contains($date), 422);
+        abort_unless(MealSlot::tryFrom($slot) !== null, 422);
+
+        return $date.'|'.$slot;
+    }
 
     public function autoFill(): void
     {
@@ -162,6 +228,13 @@ class PlanBuilder extends Component
             ['recipe_id' => $recipe->id],
         );
 
+        // Choosing a meal for a skipped slot ends the skip.
+        $skipKey = $this->pickerDate.'|'.$slot->value;
+
+        if ($plan->skippedSlots()->contains($skipKey)) {
+            $plan->saveSkippedSlots($plan->skippedSlots()->reject(fn (string $key) => $key === $skipKey));
+        }
+
         $this->moveToNextEmptyCell($plan);
     }
 
@@ -206,6 +279,7 @@ class PlanBuilder extends Component
 
         return view('livewire.plan-builder', [
             'plan' => $plan,
+            'skipped' => $plan ? $plan->skippedSlots()->flip() : collect(),
             'plans' => MealPlan::query()->orderByDesc('week_start_date')->get(),
             'days' => $plan ? $this->weekDates($plan)->map(fn (string $date) => Carbon::parse($date)) : collect(),
             'slots' => MealSlot::cases(),

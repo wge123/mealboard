@@ -31,6 +31,16 @@
     @else
         </a>
     @endif
+@elseif ($skipped->has($cellKey($day, $slot)))
+    {{-- A skipped slot (eating out, away): marked, not empty. On a draft week tapping it still opens the tray, and choosing a recipe ends the skip. --}}
+    @if ($editable)
+        <button type="button" class="{{ $wrap }} items-center justify-center text-base-content/70 hover:bg-base-200"
+                wire:click="openPicker('{{ $day->toDateString() }}', '{{ $slot->value }}')" aria-label="{{ $label }}: Out">
+            <x-ui.badge>Out</x-ui.badge>
+        </button>
+    @else
+        <div class="{{ $wrap }} items-center justify-center text-base-content/70"><x-ui.badge>Out</x-ui.badge></div>
+    @endif
 @elseif ($editable)
     <button type="button" class="{{ $wrap }} items-center justify-center text-base-content/70 hover:bg-base-200"
             wire:click="openPicker('{{ $day->toDateString() }}', '{{ $slot->value }}')" aria-label="Add {{ $label }}">

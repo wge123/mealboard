@@ -26,13 +26,13 @@
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
             @if ($state === 'suggested')
                 @if ($gaps > 0)
-                    <x-ui.button icon="tabler-wand" wire:click="autoFill" busy="autoFill">Fill the gaps</x-ui.button>
+                    <x-ui.button icon="tabler-wand" wire:click="openCheckIn" busy="openCheckIn">Fill the gaps</x-ui.button>
                 @endif
                 {{-- Outlined until every day is ticked, then solid. The ticks guide; Lock always works. --}}
                 <x-ui.button :variant="$allReviewed ? 'primary' : 'secondary'" icon="tabler-lock" wire:click="lock" busy="lock"
                              wire:confirm="Lock this week? It becomes read-only for both of you.">{{ $allReviewed ? 'Lock week' : 'Lock week · '.$reviewed->count().' of '.$days->count().' days checked' }}</x-ui.button>
             @elseif ($state === 'empty')
-                <x-ui.button variant="primary" icon="tabler-wand" wire:click="autoFill" busy="autoFill">Fill the week</x-ui.button>
+                <x-ui.button variant="primary" icon="tabler-wand" wire:click="openCheckIn" busy="openCheckIn">Fill the week</x-ui.button>
             @else
                 @if ($completable)
                     <x-ui.button icon="tabler-check" wire:click="markCompleted" busy="markCompleted"

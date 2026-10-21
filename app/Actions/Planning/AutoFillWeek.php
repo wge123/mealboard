@@ -56,7 +56,8 @@ class AutoFillWeek
 
     /**
      * Fill the plan's empty Mon–Fri breakfast/lunch/dinner slots with
-     * approved recipes and return the created planned meals.
+     * approved recipes, leaving the week check-in's skipped slots empty,
+     * and return the created planned meals.
      *
      * @return Collection<int, PlannedMeal>
      */
@@ -106,6 +107,9 @@ class AutoFillWeek
 
         $filled = $existing
             ->mapWithKeys(fn (PlannedMeal $meal) => [$meal->date->toDateString().'|'.$meal->slot->value => true]);
+
+        // A skipped slot (eating out, away) is never filled.
+        $filled = $filled->toBase()->merge($plan->skippedSlots()->flip());
 
         // Recipes already on the plan count toward the no-repeat rule.
         $useCounts = $existing->countBy('recipe_id')->all();

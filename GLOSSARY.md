@@ -78,6 +78,16 @@ _Avoid_: prep step, prep task, instruction
 One plain-text action once the heat is on. It names tools and ingredients in words only; the recipe declares its tools once, not per step.
 _Avoid_: instruction, method step
 
+## Planning
+
+**Week check-in**:
+The short set of questions the household answers about one week before Mealboard fills it, saved on that week for both of you. "Just fill it" skips the questions and fills without saving any answers. Only a draft week has one.
+_Avoid_: week survey, week setup, preferences (those are the household's standing rules)
+
+**Skipped slot**:
+A breakfast, lunch or dinner on one date that the household will not cook (eating out, away), marked on the week check-in. Auto-fill never fills it, the week shows it as "Out", and it adds nothing to the shopping list. Choosing a recipe there by hand ends the skip.
+_Avoid_: blocked slot, empty slot (an empty slot is just not filled yet), day off
+
 ## Shopping
 
 **Shopping list**:

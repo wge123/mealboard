@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class MealPlan extends Model
 {
@@ -88,6 +89,40 @@ class MealPlan extends Model
             ->where('status', MealPlanStatus::Locked)
             ->whereDate('week_start_date', '>', $this->week_start_date->toDateString())
             ->exists();
+    }
+
+    /**
+     * The week's skipped slots (GLOSSARY) as "YYYY-MM-DD|slot" keys, the same
+     * keys the week screen uses for a cell.
+     *
+     * @return Collection<int, string>
+     */
+    public function skippedSlots(): Collection
+    {
+        return collect($this->check_in['skipped'] ?? [])
+            ->map(fn (array $skip) => $skip['date'].'|'.$skip['slot'])
+            ->values();
+    }
+
+    /**
+     * Save the skipped slots (as "YYYY-MM-DD|slot" keys), keeping every other
+     * check-in answer as it was.
+     *
+     * @param  iterable<string>  $keys
+     */
+    public function saveSkippedSlots(iterable $keys): void
+    {
+        $skipped = collect($keys)
+            ->unique()
+            ->map(function (string $key) {
+                [$date, $slot] = explode('|', $key);
+
+                return ['date' => $date, 'slot' => $slot];
+            })
+            ->values()
+            ->all();
+
+        $this->update(['check_in' => [...($this->check_in ?? []), 'skipped' => $skipped]]);
     }
 
     public function plannedMeals(): HasMany

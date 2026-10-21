@@ -91,6 +91,43 @@
 
         @include('livewire.partials.week-notice')
 
+        {{-- The week check-in: what is different about this week, asked before Mealboard fills it. --}}
+        @if ($checkInOpen && $editable)
+            <div class="modal modal-open modal-bottom sm:modal-middle" role="dialog" aria-label="Week check-in"
+                 x-on:keydown.escape.window="$wire.closeCheckIn()">
+                <div class="modal-box [scrollbar-gutter:stable]">
+                    <div class="flex items-center gap-3">
+                        <h3 class="flex-1 text-lg font-semibold">Week check-in</h3>
+                        <x-ui.button square variant="ghost" icon="tabler-x" label="Close" wire:click="closeCheckIn" />
+                    </div>
+                    <p class="mt-1 text-sm text-base-content/70">Anything different about this week? Mealboard fills around your answers.</p>
+
+                    <h4 class="mt-4 text-sm font-medium">Which meals are we skipping?</h4>
+                    <p class="text-xs text-base-content/70">Eating out or away. Skipped meals stay empty and are not shopped for.</p>
+                    <div class="mt-2 flex flex-col gap-2">
+                        @foreach ($days as $day)
+                            <div class="flex flex-wrap items-center gap-2" wire:key="skip-{{ $day->toDateString() }}">
+                                <span class="w-20 shrink-0 text-sm font-medium">{{ $day->format('D j M') }}</span>
+                                @foreach ($slots as $slot)
+                                    <x-ui.button class="flex-1 capitalize" data-test="skip-{{ $day->toDateString() }}-{{ $slot->value }}"
+                                                 aria-pressed="{{ in_array($day->toDateString().'|'.$slot->value, $skips, true) ? 'true' : 'false' }}"
+                                                 wire:click="toggleSkip('{{ $day->toDateString() }}', '{{ $slot->value }}')">{{ $slot->value }}</x-ui.button>
+                                @endforeach
+                                <x-ui.button variant="ghost" data-test="skip-day-{{ $day->toDateString() }}"
+                                             wire:click="toggleSkipDay('{{ $day->toDateString() }}')">Whole day</x-ui.button>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="modal-action flex-wrap">
+                        <x-ui.button wire:click="justFill" busy="justFill">Just fill it</x-ui.button>
+                        <x-ui.button variant="primary" icon="tabler-wand" wire:click="submitCheckIn" busy="submitCheckIn">Fill</x-ui.button>
+                    </div>
+                </div>
+                <button type="button" class="modal-backdrop" wire:click="closeCheckIn" aria-label="Close check-in"></button>
+            </div>
+        @endif
+
         {{-- Desktop: the ledger, a row per day. --}}
         <x-ui.card flush class="hidden lg:block">
             <x-ui.table class="table-fixed" aria-label="Meals by day">
