@@ -307,7 +307,7 @@ it('badges a filled draft Suggested and tells what to do next', function () {
 
     planBuilder()
         ->assertSee('Suggested')
-        ->assertSee('Mealboard filled this week for you')
+        ->assertSee('Mise filled this week for you')
         ->assertSee('Lock week')
         ->assertSee('Fill the gaps')
         ->assertDontSee('Fill the week');
