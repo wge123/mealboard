@@ -82,7 +82,7 @@
                 </x-ui.card>
                 <x-ui.card>
                     <x-ui.empty-state title="No week planned" icon="tabler-calendar-week">
-                        Let Mealboard fill it from your approved recipes.
+                        Let Mise fill it from your approved recipes.
                         <x-slot:action><x-ui.button variant="primary" icon="tabler-wand">Fill the week</x-ui.button></x-slot:action>
                     </x-ui.empty-state>
                 </x-ui.card>

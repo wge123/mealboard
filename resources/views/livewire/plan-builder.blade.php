@@ -114,7 +114,7 @@
                         <h3 class="flex-1 text-lg font-semibold">Week check-in</h3>
                         <x-ui.button square variant="ghost" icon="tabler-x" label="Close" wire:click="closeCheckIn" />
                     </div>
-                    <p class="mt-1 text-sm text-base-content/70">Anything different about this week? Mealboard fills around your answers.</p>
+                    <p class="mt-1 text-sm text-base-content/70">Anything different about this week? Mise fills around your answers.</p>
 
                     <h4 class="mt-4 text-sm font-medium">Which meals are we skipping?</h4>
                     <p class="text-xs text-base-content/70">Eating out or away. Skipped meals stay empty and are not shopped for.</p>
@@ -144,7 +144,7 @@
                     </div>
 
                     <h4 class="mt-5 text-sm font-medium">Craving</h4>
-                    <p class="text-xs text-base-content/70">Pick a cuisine and Mealboard plans two dinners of it, on the nights you have time to cook.</p>
+                    <p class="text-xs text-base-content/70">Pick a cuisine and Mise plans two dinners of it, on the nights you have time to cook.</p>
                     <select class="select select-bordered mt-2 w-full" data-test="craving" aria-label="Craving" wire:model="craving">
                         <option value="">No craving</option>
                         @foreach ($cuisines as $cuisine)

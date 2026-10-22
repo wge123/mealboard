@@ -4,14 +4,14 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             @if ($state === 'suggested')
-                <p class="font-semibold">Mealboard filled this week for you</p>
+                <p class="font-semibold">Mise filled this week for you</p>
                 <p class="text-base-content/70">
                     Look it over and change anything you don't fancy, then lock it. Locking makes the shopping list.
                     @if ($gaps > 0) {{ $gaps }} {{ \Illuminate\Support\Str::plural('meal', $gaps) }} still empty. @endif
                 </p>
             @elseif ($state === 'empty')
                 <p class="font-semibold">Nothing planned for this week yet</p>
-                <p class="text-base-content/70">Let Mealboard fill it from your approved recipes, or pick meals one by one.</p>
+                <p class="text-base-content/70">Let Mise fill it from your approved recipes, or pick meals one by one.</p>
             @elseif ($completable)
                 <p class="font-semibold">This week is over</p>
                 <p class="text-base-content/70">Log anything you missed, then mark it done.</p>

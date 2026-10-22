@@ -1,6 +1,6 @@
 <div class="mx-auto w-full max-w-2xl">
     <x-ui.page-header title="Request a recipe"
-        subtitle="Ask for a specific dish and Mealboard searches YouTube for it. Requests ignore the weekday limits that shape the daily suggestions." />
+        subtitle="Ask for a specific dish and Mise searches YouTube for it. Requests ignore the weekday limits that shape the daily suggestions." />
 
     <x-ui.card class="mb-6">
         <form wire:submit="submit" class="flex flex-col gap-3">

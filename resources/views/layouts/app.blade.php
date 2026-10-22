@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? config('app.name', 'Mealboard') }}</title>
+    <title>{{ $title ?? config('app.name', 'Mise') }}</title>
     <script>
         // Apply persisted theme before first paint (system = no attribute).
         (() => {
@@ -45,7 +45,7 @@
     {{-- Desktop: a slim sticky top bar (lg+ only; phones get the bottom tabs and no top bar). --}}
     <header class="sticky top-0 z-30 hidden border-b border-base-300 bg-base-100 lg:block">
         <nav aria-label="Main" class="mx-auto flex h-14 w-full items-center gap-1 px-6 {{ $wide ? 'lg:px-8' : 'max-w-6xl' }}">
-            <a href="{{ url('/') }}" class="me-4 text-base font-semibold text-primary">Mealboard</a>
+            <a href="{{ url('/') }}" class="me-4 text-base font-semibold text-primary">Mise</a>
             @auth
                 <div class="flex items-center gap-1">
                     <a href="{{ route('plan.builder') }}" class="{{ $item }} {{ request()->routeIs('plan.builder') ? 'bg-base-200 text-primary' : 'text-base-content/70 hover:text-base-content' }}" @if (request()->routeIs('plan.builder')) aria-current="page" @endif>

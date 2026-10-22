@@ -1,10 +1,10 @@
 @extends('layouts.bare')
 
-@section('title', 'Log in — Mealboard')
+@section('title', 'Log in — Mise')
 
 @section('content')
     <div class="w-full max-w-sm">
-        <p class="mb-6 text-center font-display text-2xl font-semibold text-primary">Mealboard</p>
+        <p class="mb-6 text-center font-display text-2xl font-semibold text-primary">Mise</p>
 
         <x-ui.card title="Log in">
             <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-4">

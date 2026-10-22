@@ -1,4 +1,6 @@
-# Mealboard
+# Mise
+
+`mealboard` is the internal codename: it stays in the config (`config/mealboard.php`, `MEALBOARD_*` env vars), the daisyUI themes, the MCP server name, the repo, the database and the second-brain store area. Only what people see says Mise.
 
 Self-hosted Laravel household meal planner: recipe library with AI/YouTube discovery and approve/reject cards, Mon–Fri auto-filled meal plans weighted by a taste profile learned from eat/rating logs, weekly shopping lists, second-brain vault sync, and a three-tier Walmart pickup handoff.
 
@@ -78,7 +80,7 @@ Scheduled commands (`php artisan schedule:list`):
 
 ## MCP server
 
-Mealboard ships a local stdio MCP server (JSON-RPC 2.0 over STDIN/STDOUT, protocol `2024-11-05`, no SDK dependency) so Claude Code can drive the Walmart handoff directly.
+Mise ships a local stdio MCP server (JSON-RPC 2.0 over STDIN/STDOUT, protocol `2024-11-05`, no SDK dependency) so Claude Code can drive the Walmart handoff directly.
 
 A project-scoped [`.mcp.json`](.mcp.json) ships with the repo, so a Claude Code
 session started in this directory picks the server up automatically — approve it
