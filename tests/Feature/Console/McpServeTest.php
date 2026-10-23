@@ -490,7 +490,7 @@ it('refuses to propose a rejected item, a matched ingredient, an id-less url, or
 })->with([
     'rejected id' => [['ingredient' => 'chicken thighs', 'product_url' => 'https://www.walmart.com/ip/mp-thighs/14296616416'], 'was rejected'],
     'already matched' => [['ingredient' => 'yellow onion', 'product_url' => 'https://www.walmart.com/ip/onion/123'], 'already has a confirmed match'],
-    'no item id' => [['ingredient' => 'chicken thighs', 'product_url' => 'https://www.walmart.com/search?q=chicken'], 'No Walmart item id'],
+    'no item id' => [['ingredient' => 'chicken thighs', 'product_url' => 'https://www.walmart.com/search?q=chicken'], 'must be an https walmart.com/ip'],
     'bad confidence' => [['ingredient' => 'chicken thighs', 'product_url' => 'https://www.walmart.com/ip/t/51259017', 'confidence' => 'sure'], 'Confidence must be'],
 ]);
 
