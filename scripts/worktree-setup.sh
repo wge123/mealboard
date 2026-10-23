@@ -1,6 +1,7 @@
 #!/bin/sh
 # Make a fresh git worktree of this repo runnable: vendor, .env and the built
-# frontend come from the main checkout, and the repo's hooks get switched on.
+# frontend come from the main checkout, and the repo's pre-commit hook gets linked
+# into the shared .git/hooks (the global hooks chain to it).
 #
 # vendor is a real copy (APFS clone, so it is cheap), never a symlink: a
 # symlinked vendor resolves Composer's autoloader to the MAIN checkout's app/,
@@ -12,9 +13,10 @@ set -eu
 here="$(git rev-parse --show-toplevel)"
 main="$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")"
 
-git config core.hooksPath .githooks
+hook="$(git rev-parse --path-format=absolute --git-common-dir)/hooks/pre-commit"
+[ -e "$hook" ] || [ -L "$hook" ] || ln -s ../../scripts/githooks/pre-commit "$hook"
 
-[ "$here" = "$main" ] && { echo "worktree-setup: main checkout, hooks enabled, nothing to copy"; exit 0; }
+[ "$here" = "$main" ] && { echo "worktree-setup: main checkout, hooks linked, nothing to copy"; exit 0; }
 
 for p in vendor public/build; do
   if [ ! -e "$here/$p" ]; then

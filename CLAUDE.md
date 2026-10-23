@@ -14,4 +14,4 @@ Single-context: root `GLOSSARY.md` + `docs/adr/`, with `DECISIONS.md` as the pre
 
 ### Worktrees
 
-A fresh worktree runs `scripts/worktree-setup.sh` first: it copies vendor, the built frontend and .env from the main checkout and switches on the repo hooks.
+A fresh worktree runs `scripts/worktree-setup.sh` first: it copies vendor, the built frontend and .env from the main checkout and links the pre-commit hook (`scripts/githooks/pre-commit`) into the shared `.git/hooks`.
