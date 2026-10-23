@@ -399,3 +399,43 @@ it('re-matching a flagged row clears its badge', function () {
         ->assertDontSee('out of stock ·')
         ->assertDontSee('Replace the Walmart product for');
 });
+
+it('refuses a pasted url that is not an https walmart.com product page', function (string $url) {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    $plan = lockedPlanWith([[$onion, 2, 'count']]);
+
+    shoppingListPage($plan)
+        ->set('foundUrls.yellow onion', $url)
+        ->call('saveMatch', 'yellow onion')
+        ->assertHasErrors('foundUrls.yellow onion');
+
+    expect(WalmartMatch::count())->toBe(0);
+})->with([
+    'javascript://x/%0aalert(1)//123',
+    'https://evil.example/ip/x/999',
+]);
+
+it('refuses a pasted value that is not a string', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    $plan = lockedPlanWith([[$onion, 2, 'count']]);
+
+    shoppingListPage($plan)
+        ->set('foundUrls.yellow onion', ['https://www.walmart.com/ip/x/1'])
+        ->call('saveMatch', 'yellow onion')
+        ->assertHasErrors('foundUrls.yellow onion');
+
+    expect(WalmartMatch::count())->toBe(0);
+});
+
+it('refuses an oversized cart import paste', function () {
+    $onion = Ingredient::factory()->create(['name' => 'yellow onion', 'category' => IngredientCategory::Produce]);
+    WalmartMatch::factory()->create(['ingredient_id' => $onion->id]);
+    $plan = lockedPlanWith([[$onion, 2, 'count']]);
+
+    shoppingListPage($plan)
+        ->set('outOfStockPaste', str_repeat('a', 20001))
+        ->call('recordAvailability')
+        ->assertHasErrors('outOfStockPaste');
+
+    expect(WalmartMatch::sole()->availability)->toBeNull();
+});

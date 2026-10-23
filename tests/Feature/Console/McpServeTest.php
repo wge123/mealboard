@@ -503,3 +503,47 @@ it('reports an unknown ingredient on propose as not found', function () {
 
     expect($response['error']['code'])->toBe(-32002);
 });
+
+it('refuses non-walmart product urls on both match tools', function (string $tool, string $url) {
+    mcpSeededPlan();
+
+    [$response] = mcpSession([
+        ['jsonrpc' => '2.0', 'id' => 9, 'method' => 'tools/call', 'params' => [
+            'name' => $tool,
+            'arguments' => ['ingredient' => 'chicken thighs', 'product_url' => $url, 'product_name' => 'Thighs'],
+        ]],
+    ]);
+
+    expect($response['error']['code'])->toBe(-32602)
+        ->and(WalmartMatchProposal::count())->toBe(0)
+        ->and(Ingredient::query()->where('name', 'chicken thighs')->sole()->walmartMatch)->toBeNull();
+})->with([
+    'propose javascript' => ['propose_product_match', 'javascript://x/%0aalert(1)//123'],
+    'propose other host' => ['propose_product_match', 'https://evil.example/ip/x/999'],
+    'save javascript' => ['save_product_match', 'javascript://x/%0aalert(1)//123'],
+    'save other host' => ['save_product_match', 'https://evil.example/ip/x/999'],
+]);
+
+it('serves a pending proposed url on the buy list', function () {
+    mcpSeededPlan();
+    $chicken = Ingredient::query()->where('name', 'chicken thighs')->sole();
+    WalmartMatchProposal::factory()->create([
+        'ingredient_id' => $chicken->id,
+        'product_url' => 'https://www.walmart.com/ip/gv-chicken-thighs/51259017',
+    ]);
+    // The seeded week ticks the thighs off; untick so they are on the buy list.
+    MealPlan::query()->update(['checked_items' => []]);
+    WalmartRejectedItem::create(['ingredient_id' => $chicken->id, 'item_id' => '14296616416']);
+
+    [$response] = mcpSession([
+        ['jsonrpc' => '2.0', 'id' => 3, 'method' => 'tools/call', 'params' => [
+            'name' => 'get_current_shopping_list',
+            'arguments' => [],
+        ]],
+    ]);
+
+    $entry = collect(mcpToolData($response)['buy_list'])->firstWhere('name', 'chicken thighs');
+
+    expect($entry['proposed_url'])->toBe('https://www.walmart.com/ip/gv-chicken-thighs/51259017')
+        ->and($entry['rejected_item_ids'])->toBe(['14296616416']);
+});

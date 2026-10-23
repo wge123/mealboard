@@ -71,3 +71,12 @@ it('clears a pending proposal when a match is confirmed', function () {
     expect(WalmartMatchProposal::count())->toBe(0)
         ->and(WalmartMatch::count())->toBe(1);
 });
+
+it('refuses a url that is not an https walmart.com product page', function (string $url) {
+    $cilantro = Ingredient::factory()->create(['name' => 'cilantro']);
+
+    app(ProposeProductMatch::class)->handle($cilantro, $url, 'Cilantro');
+})->throws(DomainException::class, 'walmart.com/ip')->with([
+    'javascript://x/%0aalert(1)//123',
+    'https://evil.example/ip/x/999',
+]);

@@ -118,3 +118,46 @@ it('keeps proposals off the shopping list cart link and points at the review scr
         ->assertDontSee('to Walmart cart')
         ->assertDontSee('10403017');
 });
+
+it('refuses a pasted url that is not an https walmart.com product page', function (string $url) {
+    $paste = proposalFor('cabbage', 'https://www.walmart.com/ip/organic-cabbage/5430271509');
+
+    reviewPage()
+        ->set("foundUrls.{$paste->id}", $url)
+        ->call('submit')
+        ->assertHasErrors("foundUrls.{$paste->id}");
+
+    expect(WalmartMatch::count())->toBe(0)
+        ->and(WalmartMatchProposal::count())->toBe(1);
+})->with([
+    'javascript://x/%0aalert(1)//123',
+    'https://evil.example/ip/x/999',
+]);
+
+it('refuses a pasted value that is not a string', function () {
+    $paste = proposalFor('cabbage', 'https://www.walmart.com/ip/organic-cabbage/5430271509');
+
+    reviewPage()
+        ->set("foundUrls.{$paste->id}", ['x'])
+        ->call('submit')
+        ->assertHasErrors("foundUrls.{$paste->id}");
+
+    expect(WalmartMatch::count())->toBe(0);
+});
+
+it('settles only the proposals that were on screen and unchanged', function () {
+    proposalFor('flour', 'https://www.walmart.com/ip/gv-flour/10403017');
+    $changed = proposalFor('cabbage', 'https://www.walmart.com/ip/organic-cabbage/5430271509');
+
+    $page = reviewPage();
+
+    // After render: a brand-new guess arrives, and a shown one is swapped.
+    proposalFor('feta', 'https://www.walmart.com/ip/feta/10315355');
+    $this->travel(1)->minute();
+    $changed->update(['product_url' => 'https://www.walmart.com/ip/other-cabbage/777', 'product_name' => 'Other']);
+
+    $page->call('submit');
+
+    expect(WalmartMatch::with('ingredient')->get()->pluck('ingredient.name')->all())->toBe(['flour'])
+        ->and(WalmartMatchProposal::count())->toBe(2);
+});
