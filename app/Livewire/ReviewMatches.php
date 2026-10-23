@@ -124,7 +124,7 @@ class ReviewMatches extends Component
 
     private function stamp(WalmartMatchProposal $proposal): string
     {
-        return $proposal->updated_at->format('Y-m-d H:i:s.u');
+        return $proposal->updated_at->format('Y-m-d H:i:s.u').'|'.$proposal->product_url.'|'.$proposal->confidence;
     }
 
     public function render(): View

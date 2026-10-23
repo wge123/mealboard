@@ -49,7 +49,8 @@ class WalmartCartLink
      */
     public function isProductUrl(string $url): bool
     {
-        return preg_match('#^https://(?:www\.)?walmart\.com/ip/(?:[^/?\#\s]+/)?\d+/?(?:\?[^\s\#]*)?(?:\#\S*)?$#Di', $url) === 1
+        return strlen($url) <= 2048
+            && preg_match('#^https://(?:www\.)?walmart\.com/ip/(?:[^/?\#\s]+/)?\d{1,20}/?(?:\?[^\s\#]*)?(?:\#\S*)?$#Di', $url) === 1
             && preg_match('/^[\x21-\x7e]+$/D', $url) === 1;
     }
 
