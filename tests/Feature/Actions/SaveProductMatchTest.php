@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Planning\SaveProductMatch;
+use App\Enums\WalmartAvailability;
 use App\Models\Ingredient;
 use App\Models\WalmartMatch;
 use Illuminate\Support\Carbon;
@@ -59,4 +60,37 @@ it('keeps matches per ingredient independent', function () {
     expect(WalmartMatch::count())->toBe(2)
         ->and($onion->walmartMatch->product_url)->toBe('https://www.walmart.com/ip/onion/1')
         ->and($garlic->walmartMatch->product_url)->toBe('https://www.walmart.com/ip/garlic/2');
+});
+
+it('clears the availability flag when the product changes', function () {
+    $sprouts = Ingredient::factory()->create(['name' => 'bean sprouts']);
+
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $sprouts->id,
+        'product_url' => 'https://www.walmart.com/ip/old/1',
+        'availability' => WalmartAvailability::OutOfStock,
+        'availability_seen_at' => now(),
+    ]);
+
+    app(SaveProductMatch::class)->handle($sprouts, 'https://www.walmart.com/ip/new/2', 'New Sprouts');
+
+    $match = WalmartMatch::sole();
+
+    expect($match->availability)->toBeNull()
+        ->and($match->availability_seen_at)->toBeNull();
+});
+
+it('keeps the availability flag when the same product is re-confirmed', function () {
+    $sprouts = Ingredient::factory()->create(['name' => 'bean sprouts']);
+
+    WalmartMatch::factory()->create([
+        'ingredient_id' => $sprouts->id,
+        'product_url' => 'https://www.walmart.com/ip/same/1',
+        'availability' => WalmartAvailability::ShipOnly,
+        'availability_seen_at' => now(),
+    ]);
+
+    app(SaveProductMatch::class)->handle($sprouts, 'https://www.walmart.com/ip/same/1', 'Same Sprouts');
+
+    expect(WalmartMatch::sole()->availability)->toBe(WalmartAvailability::ShipOnly);
 });
