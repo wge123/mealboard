@@ -141,10 +141,10 @@
                 <summary class="flex min-h-11 cursor-pointer items-center text-base-content/70 sm:min-h-9">Paste what Walmart could not add to the pickup order</summary>
                 <div class="flex flex-col gap-3 pt-2">
                     <x-ui.field label="&quot;Unable to add to Cart&quot; list (out of stock)" name="outOfStockPaste">
-                        <textarea id="outOfStockPaste" rows="3" class="textarea w-full" wire:model="outOfStockPaste"></textarea>
+                        <textarea id="outOfStockPaste" rows="3" maxlength="20000" class="textarea w-full" wire:model="outOfStockPaste"></textarea>
                     </x-ui.field>
                     <x-ui.field label="Cart's shipping section (ship-only, not pickup)" name="shipOnlyPaste">
-                        <textarea id="shipOnlyPaste" rows="3" class="textarea w-full" wire:model="shipOnlyPaste"></textarea>
+                        <textarea id="shipOnlyPaste" rows="3" maxlength="20000" class="textarea w-full" wire:model="shipOnlyPaste"></textarea>
                     </x-ui.field>
                     @error('availability')
                         <p class="font-medium text-error">{{ $message }}</p>

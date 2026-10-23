@@ -22,11 +22,11 @@ class ProposeProductMatch
      */
     public function handle(Ingredient $ingredient, string $productUrl, string $productName, ?string $confidence = null): WalmartMatchProposal
     {
-        $itemId = $this->cartLink->itemId($productUrl);
-
-        if ($itemId === null) {
-            throw new DomainException("No Walmart item id in {$productUrl}: propose a walmart.com/ip/<slug>/<id> URL.");
+        if (! $this->cartLink->isProductUrl($productUrl)) {
+            throw new DomainException("No Walmart item id in {$productUrl}: propose an https walmart.com/ip/<slug>/<id> URL.");
         }
+
+        $itemId = $this->cartLink->itemId($productUrl);
 
         if ($confidence !== null && ! in_array($confidence, WalmartMatchProposal::CONFIDENCES, true)) {
             throw new DomainException('Confidence must be one of: '.implode(', ', WalmartMatchProposal::CONFIDENCES).'.');

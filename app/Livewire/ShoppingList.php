@@ -11,6 +11,7 @@ use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\WalmartMatch;
 use App\Models\WalmartMatchProposal;
+use App\Support\WalmartCartLink;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -79,10 +80,11 @@ class ShoppingList extends Component
      */
     public function saveMatch(string $name): void
     {
-        $url = trim($this->foundUrls[$name] ?? '');
+        $raw = $this->foundUrls[$name] ?? '';
+        $url = is_string($raw) ? trim($raw) : '';
 
-        if (! filter_var($url, FILTER_VALIDATE_URL)) {
-            $this->addError('foundUrls.'.$name, 'Paste a full product URL.');
+        if (! app(WalmartCartLink::class)->isProductUrl($url)) {
+            $this->addError('foundUrls.'.$name, 'Paste a walmart.com/ip/... product URL.');
 
             return;
         }
@@ -103,6 +105,11 @@ class ShoppingList extends Component
      */
     public function recordAvailability(): void
     {
+        $this->validate([
+            'outOfStockPaste' => 'string|max:20000',
+            'shipOnlyPaste' => 'string|max:20000',
+        ]);
+
         if (trim($this->outOfStockPaste) === '' && trim($this->shipOnlyPaste) === '') {
             $this->addError('availability', 'Paste the unavailable list or the shipping section first.');
 

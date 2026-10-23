@@ -9,6 +9,7 @@ use App\Enums\MealSlot;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
+use App\Support\WalmartCartLink;
 use DomainException;
 use Illuminate\Support\Arr;
 use Throwable;
@@ -38,6 +39,7 @@ class McpServer
         private BuildShoppingList $buildShoppingList,
         private SaveProductMatch $saveProductMatch,
         private ProposeProductMatch $proposeProductMatch,
+        private WalmartCartLink $cartLink,
     ) {}
 
     /**
@@ -223,8 +225,8 @@ class McpServer
         $productUrl = $this->stringArgument($arguments, 'product_url');
         $productName = $this->stringArgument($arguments, 'product_name');
 
-        if (! filter_var($productUrl, FILTER_VALIDATE_URL)) {
-            throw new McpError(self::INVALID_PARAMS, 'Invalid params: product_url must be a full URL.');
+        if (! $this->cartLink->isProductUrl($productUrl)) {
+            throw new McpError(self::INVALID_PARAMS, 'Invalid params: product_url must be an https walmart.com/ip/<slug>/<id> product URL.');
         }
 
         $ingredient = Ingredient::query()->where('name', $name)->first();
@@ -258,8 +260,8 @@ class McpServer
             throw new McpError(self::INVALID_PARAMS, 'Invalid params: confidence must be a string.');
         }
 
-        if (! filter_var($productUrl, FILTER_VALIDATE_URL)) {
-            throw new McpError(self::INVALID_PARAMS, 'Invalid params: product_url must be a full URL.');
+        if (! $this->cartLink->isProductUrl($productUrl)) {
+            throw new McpError(self::INVALID_PARAMS, 'Invalid params: product_url must be an https walmart.com/ip/<slug>/<id> product URL.');
         }
 
         $ingredient = Ingredient::query()->where('name', $name)->first();

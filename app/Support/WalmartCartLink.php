@@ -40,6 +40,19 @@ class WalmartCartLink
         return $ids === [] ? null : self::ADD_TO_CART.implode(',', $ids);
     }
 
+    /**
+     * Whether a string is a Walmart product page we will store, link to and
+     * cart: https, host walmart.com or www.walmart.com (no userinfo, no port),
+     * path `/ip/[<slug>/]<usItemId>`, printable ASCII only. One strict pattern
+     * over the whole string, so no parser disagreement can smuggle another
+     * scheme or host past it.
+     */
+    public function isProductUrl(string $url): bool
+    {
+        return preg_match('#^https://(?:www\.)?walmart\.com/ip/(?:[^/?\#\s]+/)?\d+/?(?:\?[^\s\#]*)?(?:\#\S*)?$#Di', $url) === 1
+            && preg_match('/^[\x21-\x7e]+$/D', $url) === 1;
+    }
+
     /** The usItemId of a canonical product URL, or null if it carries none. */
     public function itemId(string $url): ?string
     {
