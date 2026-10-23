@@ -161,3 +161,21 @@ it('settles only the proposals that were on screen and unchanged', function () {
     expect(WalmartMatch::with('ingredient')->get()->pluck('ingredient.name')->all())->toBe(['flour'])
         ->and(WalmartMatchProposal::count())->toBe(2);
 });
+
+it('does not settle a proposal whose url changed within the same second', function () {
+    $proposal = proposalFor('cabbage', 'https://www.walmart.com/ip/organic-cabbage/5430271509');
+
+    $page = reviewPage();
+
+    $stamp = $proposal->updated_at;
+    $proposal->product_url = 'https://www.walmart.com/ip/other-cabbage/777';
+    $proposal->updated_at = $stamp;
+    $proposal->saveQuietly();
+
+    expect($proposal->fresh()->updated_at->equalTo($stamp))->toBeTrue();
+
+    $page->call('submit');
+
+    expect(WalmartMatch::count())->toBe(0)
+        ->and(WalmartMatchProposal::count())->toBe(1);
+});

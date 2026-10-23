@@ -79,6 +79,9 @@ it('accepts only https walmart.com product urls', function (string $url, bool $o
     'newline' => ["https://www.walmart.com/ip/x/123\n", false],
     'embedded control char' => ["https://www.walmart.com/ip/x/12\n3", false],
     'space' => ['https://www.walmart.com/ip/x y/123', false],
+    'url over 2048 chars' => ['https://www.walmart.com/ip/'.str_repeat('a', 2048).'/123', false],
+    'item id of 21 digits' => ['https://www.walmart.com/ip/x/'.str_repeat('9', 21), false],
+    'item id of 20 digits' => ['https://www.walmart.com/ip/x/'.str_repeat('9', 20), true],
     'not a url' => ['not a url', false],
     'empty' => ['', false],
 ]);
