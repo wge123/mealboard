@@ -75,6 +75,9 @@
                             <x-ui.table.group :label="ucfirst($category)" :done="$aisleDone" :total="count($categoryLines)" :cols="4" />
                             @foreach ($categoryLines as $line)
                                 @php($matched = $line['product_url'] !== null)
+                                {{-- A flagged product needs a replacement, so it gets the paste flow too. --}}
+                                @php($flag = $flagged[$line['name']] ?? null)
+                                @php($canPaste = ! $matched || $flag !== null)
                                 <x-ui.table.row :group="ucfirst($category)" :class="$line['checked'] ? 'text-base-content/70' : ''">
                                     <td class="p-0!">
                                         <label class="flex min-h-11 cursor-pointer items-center gap-3 px-4 py-1.5">
@@ -95,17 +98,22 @@
                                             <a href="{{ $line['product_url'] ?? $line['search_url'] }}" target="_blank" rel="noopener"
                                                class="inline-flex min-h-11 items-center sm:min-h-9"
                                                aria-label="Walmart {{ $matched ? 'product' : 'search' }} for {{ $line['name'] }}">
-                                                <x-ui.badge :tone="$matched ? 'primary' : 'neutral'" :dot="true">{{ $matched ? 'Matched' : 'Search' }}</x-ui.badge>
+                                                @if ($flag)
+                                                    <x-ui.badge :tone="$flag->availability === \App\Enums\WalmartAvailability::OutOfStock ? 'warning' : 'error'" :dot="true"
+                                                                title="Seen at the {{ $flag->availability_seen_at->format('j M') }} cart import">{{ $flag->availability === \App\Enums\WalmartAvailability::OutOfStock ? 'out of stock' : 'ship-only' }} · {{ $flag->availability_seen_at->format('j M') }}</x-ui.badge>
+                                                @else
+                                                    <x-ui.badge :tone="$matched ? 'primary' : 'neutral'" :dot="true">{{ $matched ? 'Matched' : 'Search' }}</x-ui.badge>
+                                                @endif
                                             </a>
-                                            @unless ($matched)
+                                            @if ($canPaste)
                                                 <x-ui.button variant="ghost" square icon="tabler-plus"
-                                                             :label="'Save a Walmart product for '.$line['name']"
+                                                             :label="($matched ? 'Replace the Walmart product for ' : 'Save a Walmart product for ').$line['name']"
                                                              @click="paste[{{ Js::from($line['name']) }}] = ! paste[{{ Js::from($line['name']) }}]" />
-                                            @endunless
+                                            @endif
                                         </div>
                                     </td>
                                 </x-ui.table.row>
-                                @unless ($matched)
+                                @if ($canPaste)
                                     <tr x-show="open(@js(ucfirst($category))) && paste[@js($line['name'])]" x-cloak>
                                         <td colspan="4" class="px-4 pb-3">
                                             <div class="flex items-start gap-2">
@@ -117,7 +125,7 @@
                                             </div>
                                         </td>
                                     </tr>
-                                @endunless
+                                @endif
                             @endforeach
                         </tbody>
                     @endforeach
@@ -125,6 +133,40 @@
             @endif
         </div>
     </x-ui.card>
+
+    @if ($cartCount > 0)
+        {{-- After a cart import: paste what Walmart could not put in the pickup order. --}}
+        <x-ui.card title="Report cart import" class="mt-5">
+            <details @if ($errors->has('availability')) open @endif>
+                <summary class="flex min-h-11 cursor-pointer items-center text-base-content/70 sm:min-h-9">Paste what Walmart could not add to the pickup order</summary>
+                <div class="flex flex-col gap-3 pt-2">
+                    <x-ui.field label="&quot;Unable to add to Cart&quot; list (out of stock)" name="outOfStockPaste">
+                        <textarea id="outOfStockPaste" rows="3" class="textarea w-full" wire:model="outOfStockPaste"></textarea>
+                    </x-ui.field>
+                    <x-ui.field label="Cart's shipping section (ship-only, not pickup)" name="shipOnlyPaste">
+                        <textarea id="shipOnlyPaste" rows="3" class="textarea w-full" wire:model="shipOnlyPaste"></textarea>
+                    </x-ui.field>
+                    @error('availability')
+                        <p class="font-medium text-error">{{ $message }}</p>
+                    @enderror
+                    <div>
+                        <x-ui.button variant="primary" busy="recordAvailability" wire:click="recordAvailability">Record availability</x-ui.button>
+                    </div>
+                </div>
+            </details>
+        </x-ui.card>
+    @endif
+
+    @if ($availabilityReport !== null)
+        <x-ui.alert tone="info" class="mt-5">
+            Recorded: {{ count($availabilityReport['out-of-stock']) }} out of stock, {{ count($availabilityReport['ship-only']) }} ship-only, {{ $availabilityReport['ok'] }} ok.
+            @foreach (['out-of-stock' => 'Out of stock', 'ship-only' => 'Ship-only'] as $kind => $label)
+                @if ($availabilityReport[$kind] !== [])
+                    <span class="block text-base-content/70">{{ $label }}: {{ implode('; ', $availabilityReport[$kind]) }}</span>
+                @endif
+            @endforeach
+        </x-ui.alert>
+    @endif
 
     @if ($lines !== [])
         {{-- Phone bottom bar: floats above the tab bar. --}}

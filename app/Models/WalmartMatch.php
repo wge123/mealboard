@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\WalmartAvailability;
 use Database\Factories\WalmartMatchFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +18,8 @@ class WalmartMatch extends Model
         'product_url',
         'product_name',
         'last_confirmed_at',
+        'availability',
+        'availability_seen_at',
     ];
 
     /**
@@ -26,6 +29,8 @@ class WalmartMatch extends Model
     {
         return [
             'last_confirmed_at' => 'datetime',
+            'availability' => WalmartAvailability::class,
+            'availability_seen_at' => 'datetime',
         ];
     }
 

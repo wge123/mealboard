@@ -3,12 +3,16 @@
 namespace App\Livewire;
 
 use App\Actions\Planning\BuildShoppingList;
+use App\Actions\Planning\RecordCartAvailability;
 use App\Actions\Planning\SaveProductMatch;
 use App\Enums\MealPlanStatus;
+use App\Enums\WalmartAvailability;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
+use App\Models\WalmartMatch;
 use App\Models\WalmartMatchProposal;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -28,6 +32,19 @@ class ShoppingList extends Component
      * @var array<string, string>
      */
     public array $foundUrls = [];
+
+    /** Walmart's "Unable to add to Cart" list, pasted after a cart import. */
+    public string $outOfStockPaste = '';
+
+    /** The cart's shipping section, pasted after a cart import. */
+    public string $shipOnlyPaste = '';
+
+    /**
+     * What the last recordAvailability() call flagged, for the confirmation line.
+     *
+     * @var array{out-of-stock: list<string>, ship-only: list<string>, ok: int}|null
+     */
+    public ?array $availabilityReport = null;
 
     public function mount(MealPlan $mealPlan): void
     {
@@ -80,6 +97,51 @@ class ShoppingList extends Component
     }
 
     /**
+     * Record what the last cart import could not put in the pickup order. The
+     * matches the cart link covered (the buy list's matched products) are the
+     * ones judged: flagged when a pasted line names them, ok otherwise.
+     */
+    public function recordAvailability(): void
+    {
+        if (trim($this->outOfStockPaste) === '' && trim($this->shipOnlyPaste) === '') {
+            $this->addError('availability', 'Paste the unavailable list or the shipping section first.');
+
+            return;
+        }
+
+        $carted = collect($this->shoppingList['buy_list'])->whereNotNull('product_url')->pluck('name');
+
+        $this->availabilityReport = app(RecordCartAvailability::class)->handle(
+            WalmartMatch::query()->whereHas('ingredient', fn ($query) => $query->whereIn('name', $carted))->get(),
+            $this->outOfStockPaste,
+            $this->shipOnlyPaste,
+        );
+
+        $this->outOfStockPaste = '';
+        $this->shipOnlyPaste = '';
+    }
+
+    /**
+     * Flagged matches by ingredient name: the last cart import said they are
+     * not in the pickup order.
+     *
+     * @return Collection<string, WalmartMatch>
+     */
+    #[Computed]
+    public function flagged(): Collection
+    {
+        $names = collect($this->shoppingList['lines'])->collapse()->pluck('name');
+
+        return WalmartMatch::query()
+            ->whereHas('ingredient', fn ($query) => $query->whereIn('name', $names))
+            ->whereNotNull('availability')
+            ->where('availability', '!=', WalmartAvailability::Ok->value)
+            ->with('ingredient')
+            ->get()
+            ->keyBy(fn (WalmartMatch $match) => $match->ingredient->name);
+    }
+
+    /**
      * The week's shopping list, merged once per request and shared by the
      * render and both exports.
      *
@@ -128,6 +190,7 @@ class ShoppingList extends Component
         return view('livewire.shopping-list', [
             'lines' => $this->shoppingList['lines'],
             'cartUrl' => $this->shoppingList['cart_link'],
+            'flagged' => $this->flagged,
             'proposedCount' => WalmartMatchProposal::query()
                 ->whereHas('ingredient', fn ($query) => $query->whereIn('name', collect($this->shoppingList['lines'])->collapse()->pluck('name')))
                 ->count(),
