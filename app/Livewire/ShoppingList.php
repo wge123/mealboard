@@ -7,6 +7,7 @@ use App\Actions\Planning\SaveProductMatch;
 use App\Enums\MealPlanStatus;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
+use App\Models\WalmartMatchProposal;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -127,6 +128,9 @@ class ShoppingList extends Component
         return view('livewire.shopping-list', [
             'lines' => $this->shoppingList['lines'],
             'cartUrl' => $this->shoppingList['cart_link'],
+            'proposedCount' => WalmartMatchProposal::query()
+                ->whereHas('ingredient', fn ($query) => $query->whereIn('name', collect($this->shoppingList['lines'])->collapse()->pluck('name')))
+                ->count(),
             'markdown' => $this->markdownExport(),
             'plain' => $this->plainExport(),
         ]);

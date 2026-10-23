@@ -9,6 +9,7 @@ use App\Livewire\RecipeCreate;
 use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeLibrary;
 use App\Livewire\RecipeRequester;
+use App\Livewire\ReviewMatches;
 use App\Livewire\Settings;
 use App\Livewire\ShoppingList;
 use App\Models\MealPlan;
@@ -34,6 +35,7 @@ Route::middleware('auth')->group(function () {
             : view('shop-empty');
     })->name('shop');
     Route::get('/plan/{mealPlan}/shopping-list', ShoppingList::class)->name('plan.shopping-list');
+    Route::get('/walmart/review', ReviewMatches::class)->name('walmart.review');
     Route::get('/log', DailyCatchUp::class)->name('log.catch-up');
     Route::get('/recipes', RecipeLibrary::class)->name('recipes.index');
     // /recipes/create must be registered before /recipes/{recipe} so "create"

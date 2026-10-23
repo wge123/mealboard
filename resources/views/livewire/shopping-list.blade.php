@@ -34,6 +34,13 @@
         </x-ui.alert>
     @endif
 
+    @if ($proposedCount > 0)
+        {{-- Matcher guesses stay off the cart link until reviewed. --}}
+        <x-ui.alert tone="info" class="mb-5">
+            <a href="{{ route('walmart.review') }}" class="font-medium underline">{{ $proposedCount }} proposed Walmart {{ Str::plural('match', $proposedCount) }} waiting for review &rarr;</a>
+        </x-ui.alert>
+    @endif
+
     <x-ui.card flush title="Items" :count="$total">
         <x-slot:actions>
             <label class="flex min-h-11 cursor-pointer items-center gap-2 sm:min-h-9">

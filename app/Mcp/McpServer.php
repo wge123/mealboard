@@ -3,11 +3,13 @@
 namespace App\Mcp;
 
 use App\Actions\Planning\BuildShoppingList;
+use App\Actions\Planning\ProposeProductMatch;
 use App\Actions\Planning\SaveProductMatch;
 use App\Enums\MealSlot;
 use App\Models\Ingredient;
 use App\Models\MealPlan;
 use App\Models\PlannedMeal;
+use DomainException;
 use Illuminate\Support\Arr;
 use Throwable;
 
@@ -35,6 +37,7 @@ class McpServer
     public function __construct(
         private BuildShoppingList $buildShoppingList,
         private SaveProductMatch $saveProductMatch,
+        private ProposeProductMatch $proposeProductMatch,
     ) {}
 
     /**
@@ -139,6 +142,7 @@ class McpServer
         $data = match ($params['name'] ?? null) {
             'get_current_shopping_list' => $this->getCurrentShoppingList(),
             'save_product_match' => $this->saveProductMatchTool($arguments),
+            'propose_product_match' => $this->proposeProductMatchTool($arguments),
             'get_week_plan' => $this->getWeekPlan($arguments),
             'mark_list_purchased' => $this->markListPurchased($arguments),
             default => throw new McpError(
@@ -179,18 +183,33 @@ class McpServer
 
         $list = $this->buildShoppingList->handle($plan);
 
+        $names = collect($list['lines'])->collapse()->pluck('name');
+
+        $ingredients = Ingredient::query()
+            ->whereIn('name', $names)
+            ->with(['walmartMatchProposal', 'walmartRejectedItems'])
+            ->get()
+            ->keyBy('name');
+
+        // What a human has not yet confirmed or turned down, per ingredient.
+        $review = fn (array $row) => [
+            ...$row,
+            'proposed_url' => $ingredients[$row['name']]->walmartMatchProposal?->product_url,
+            'rejected_item_ids' => $ingredients[$row['name']]->walmartRejectedItems->pluck('item_id')->all(),
+        ];
+
         return [
             'week_start_date' => $plan->week_start_date->toDateString(),
             'weeks_stale' => $plan->weeksStale(),
             'purchased_at' => $plan->purchased_at?->toIso8601String(),
             'items' => array_map(
                 fn (array $lines) => array_map(
-                    fn (array $line) => Arr::only($line, ['name', 'qty', 'unit', 'notes', 'keywords', 'product_url', 'checked']),
+                    fn (array $line) => $review(Arr::only($line, ['name', 'qty', 'unit', 'notes', 'keywords', 'product_url', 'checked'])),
                     $lines,
                 ),
                 $list['lines'],
             ),
-            'buy_list' => $list['buy_list'],
+            'buy_list' => array_map($review, $list['buy_list']),
         ];
     }
 
@@ -221,6 +240,46 @@ class McpServer
             'product_url' => $match->product_url,
             'product_name' => $match->product_name,
             'last_confirmed_at' => $match->last_confirmed_at->toIso8601String(),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $arguments
+     * @return array<string, mixed>
+     */
+    private function proposeProductMatchTool(array $arguments): array
+    {
+        $name = mb_strtolower($this->stringArgument($arguments, 'ingredient'));
+        $productUrl = $this->stringArgument($arguments, 'product_url');
+        $productName = $this->stringArgument($arguments, 'product_name');
+        $confidence = $arguments['confidence'] ?? null;
+
+        if ($confidence !== null && ! is_string($confidence)) {
+            throw new McpError(self::INVALID_PARAMS, 'Invalid params: confidence must be a string.');
+        }
+
+        if (! filter_var($productUrl, FILTER_VALIDATE_URL)) {
+            throw new McpError(self::INVALID_PARAMS, 'Invalid params: product_url must be a full URL.');
+        }
+
+        $ingredient = Ingredient::query()->where('name', $name)->first();
+
+        if ($ingredient === null) {
+            throw new McpError(self::NOT_FOUND, "Ingredient not found: {$name}");
+        }
+
+        try {
+            $proposal = $this->proposeProductMatch->handle($ingredient, $productUrl, $productName, $confidence);
+        } catch (DomainException $e) {
+            throw new McpError(self::INVALID_PARAMS, 'Invalid params: '.$e->getMessage());
+        }
+
+        return [
+            'ingredient' => $ingredient->name,
+            'product_url' => $proposal->product_url,
+            'product_name' => $proposal->product_name,
+            'confidence' => $proposal->confidence,
+            'status' => 'proposed',
         ];
     }
 
@@ -324,7 +383,7 @@ class McpServer
         return [
             [
                 'name' => 'get_current_shopping_list',
-                'description' => "The latest locked week's shopping list. `buy_list` is what to shop: one entry per ingredient still to buy (pantry staples and fully checked ingredients left out), each with cleaned Walmart search keywords and the remembered product URL when one exists; add each entry once. `items` are the lines grouped by store category, with checked (handled, don't buy again) state. Read `weeks_stale` before shopping: 0 means this week, anything higher means the week you are about to shop is that many weeks old and is probably not the one intended.",
+                'description' => "The latest locked week's shopping list. `buy_list` is what to shop: one entry per ingredient still to buy (pantry staples and fully checked ingredients left out), each with cleaned Walmart search keywords the remembered product URL when one exists (`product_url`), a pending unreviewed guess (`proposed_url`) and the Walmart item ids a human rejected for that ingredient (`rejected_item_ids`, never propose these); add each entry once. `items` are the lines grouped by store category, with checked (handled, don't buy again) state. Read `weeks_stale` before shopping: 0 means this week, anything higher means the week you are about to shop is that many weeks old and is probably not the one intended.",
                 'inputSchema' => ['type' => 'object', 'properties' => (object) []],
             ],
             [
@@ -336,6 +395,20 @@ class McpServer
                         'ingredient' => ['type' => 'string', 'description' => 'Ingredient name as it appears on the shopping list.'],
                         'product_url' => ['type' => 'string', 'description' => 'Walmart product page URL.'],
                         'product_name' => ['type' => 'string', 'description' => 'Product title as listed on Walmart.'],
+                    ],
+                    'required' => ['ingredient', 'product_url', 'product_name'],
+                ],
+            ],
+            [
+                'name' => 'propose_product_match',
+                'description' => 'Propose a Walmart product for an unmatched ingredient. Use this, not save_product_match, for any guess a human has not confirmed (e.g. a web-search match): it lands as proposed, stays off the cart link, and waits for the human review screen. Refused when the ingredient already has a confirmed match, when the URL carries no item id, or when the item id is in the ingredient\'s rejected list.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'ingredient' => ['type' => 'string', 'description' => 'Ingredient name as it appears on the shopping list.'],
+                        'product_url' => ['type' => 'string', 'description' => 'Walmart product page URL, walmart.com/ip/<slug>/<usItemId>.'],
+                        'product_name' => ['type' => 'string', 'description' => 'Product title as listed on Walmart.'],
+                        'confidence' => ['type' => 'string', 'enum' => ['high', 'medium', 'low'], 'description' => 'How sure the match is; low rows are reviewed first.'],
                     ],
                     'required' => ['ingredient', 'product_url', 'product_name'],
                 ],
