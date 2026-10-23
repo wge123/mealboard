@@ -1,6 +1,7 @@
 #!/bin/sh
-# Pint on the staged PHP files. Enabled by scripts/worktree-setup.sh, which
-# sets core.hooksPath=.githooks for this clone (shared by every worktree).
+# Pint on the staged PHP files. Linked into .git/hooks/pre-commit (shared by every
+# worktree); the global hooks chain to it:
+#   ln -s ../../scripts/githooks/pre-commit .git/hooks/pre-commit
 #
 # Pint reads the working tree, not the index, so an unstaged fix can make a
 # commit pass. Good enough for a one-person repo; stage what you lint.
